@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기획 하네스 설계 — 브리프</title>
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --surface-2: #f4f2ee;
+    --text: #1f1d1a;
+    --text-dim: #5f5b54;
+    --text-faint: #8b857c;
+    --line: #e2ded6;
+    --line-strong: #cdc7bc;
+    --accent: #1f5fa8;
+    --accent-soft: #e8f0fa;
+    --safe: #17714f;
+    --safe-soft: #e4f2ec;
+    --warn: #8a5a08;
+    --warn-soft: #faf0dc;
+    --danger: #a32f28;
+    --danger-soft: #fbe9e7;
+    --radius: 10px;
+    --maxw: 860px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171614;
+      --surface: #201e1b;
+      --surface-2: #292723;
+      --text: #ece9e3;
+      --text-dim: #b3ada3;
+      --text-faint: #8a847a;
+      --line: #35322d;
+      --line-strong: #47433c;
+      --accent: #7fb0e8;
+      --accent-soft: #1c2938;
+      --safe: #6cc79b;
+      --safe-soft: #16281f;
+      --warn: #e0b163;
+      --warn-soft: #2c2416;
+      --danger: #e58a80;
+      --danger-soft: #2e1c1a;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 0 20px 96px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+                 "Segoe UI", "Noto Sans KR", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+
+  header.doc { padding: 44px 0 8px; border-bottom: 1px solid var(--line); }
+  header.doc h1 { font-size: 1.85rem; line-height: 1.35; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .meta { font-size: 0.82rem; color: var(--text-faint); display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 22px; }
+  .meta a { color: var(--text-faint); }
+
+  h2 { font-size: 1.22rem; line-height: 1.45; margin: 46px 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 1.02rem; margin: 28px 0 10px; }
+  p { margin: 0 0 14px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  strong { font-weight: 650; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.3em; }
+  li { margin-bottom: 6px; }
+  code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 0.87em; background: var(--surface-2);
+    padding: 0.12em 0.4em; border-radius: 4px;
+  }
+
+  .tldr {
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: var(--radius); padding: 22px 24px; margin: 26px 0 0;
+  }
+  .tldr .label {
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-faint); margin-bottom: 12px;
+  }
+  .tldr ol { margin: 0; padding-left: 1.2em; font-size: 1.04rem; }
+  .tldr ol li { margin-bottom: 9px; }
+  .tldr ol li:last-child { margin-bottom: 0; }
+
+  .decision {
+    border: 1px solid var(--accent); background: var(--accent-soft);
+    border-radius: var(--radius); padding: 18px 20px; margin: 18px 0;
+  }
+  .decision .label {
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); font-weight: 650; margin-bottom: 8px;
+  }
+  .decision .q { font-weight: 650; margin-bottom: 10px; }
+  .decision .rec { margin-bottom: 6px; }
+  .decision .cost { font-size: 0.92rem; color: var(--text-dim); margin: 0; }
+
+  figure.map { margin: 22px 0; }
+  figure.map .frame {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px; overflow-x: auto;
+  }
+  figure.map svg { display: block; min-width: 520px; max-width: 100%; height: auto; margin: 0 auto; }
+  figure.map figcaption { font-size: 0.85rem; color: var(--text-dim); margin-top: 10px; }
+  .n-box { fill: var(--surface-2); stroke: var(--line-strong); }
+  .n-box-hi { fill: var(--accent-soft); stroke: var(--accent); }
+  .n-text { fill: var(--text); font-size: 13px; font-weight: 600; }
+  .n-sub { fill: var(--text-faint); font-size: 11px; }
+  .n-edge { stroke: var(--line-strong); fill: none; stroke-width: 1.6; }
+  .n-edge-hi { stroke: var(--accent); fill: none; stroke-width: 1.8; }
+  .n-edge-label { fill: var(--text-dim); font-size: 11px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.78rem; font-weight: 600; padding: 2px 9px;
+    border-radius: 999px; border: 1px solid currentColor; white-space: nowrap;
+  }
+  .badge.safe   { color: var(--safe);   background: var(--safe-soft); }
+  .badge.warn   { color: var(--warn);   background: var(--warn-soft); }
+  .badge.danger { color: var(--danger); background: var(--danger-soft); }
+  .risk-row { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; }
+  .risk-row .badge { flex-shrink: 0; margin-top: 3px; }
+
+  .owner {
+    display: inline-block; font-size: 0.69rem; font-weight: 650;
+    padding: 1px 7px; border-radius: 4px; vertical-align: 0.14em;
+    margin-left: 6px; white-space: nowrap;
+  }
+  .owner.you   { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent); }
+  .owner.agent { color: var(--text-faint); background: var(--surface-2); border: 1px solid var(--line-strong); }
+
+  .gate {
+    border: 1px solid var(--danger); background: var(--danger-soft);
+    border-radius: var(--radius); padding: 16px 20px; margin: 18px 0;
+  }
+  .gate ul { margin: 12px 0 0; columns: 2; column-gap: 28px; font-size: 0.95rem; }
+  .gate li { break-inside: avoid; margin-bottom: 5px; }
+  @media (max-width: 560px) { .gate ul { columns: 1; } }
+
+  .table-scroll { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 0.94rem; }
+  th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.03em; color: var(--text-faint); font-weight: 650;
+       text-transform: uppercase; border-bottom: 1px solid var(--line-strong); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.term { font-weight: 600; white-space: nowrap; }
+  tr.tier td {
+    background: var(--surface-2); font-weight: 650; font-size: 0.8rem;
+    color: var(--text-dim); padding: 7px 13px; letter-spacing: 0.02em;
+  }
+
+  .misread {
+    border: 1px solid var(--warn); background: var(--warn-soft);
+    border-radius: var(--radius); padding: 16px 18px; margin: 18px 0;
+  }
+  .misread .label {
+    font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--warn); font-weight: 650; margin-bottom: 10px;
+  }
+  .misread dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 0.94rem; }
+  .misread dt { color: var(--text-faint); font-size: 0.82rem; padding-top: 2px; white-space: nowrap; }
+  .misread dd { margin: 0; }
+  .misread dd.actual { font-weight: 600; }
+
+  .difficulty {
+    border-left: 3px solid var(--line-strong); padding: 2px 0 2px 14px;
+    margin: 16px 0; color: var(--text-dim); font-size: 0.94rem;
+  }
+  .difficulty.hard { border-left-color: var(--warn); }
+  .difficulty .tag { font-weight: 650; color: var(--text); }
+
+  details.fold {
+    border: 1px solid var(--line); border-radius: var(--radius);
+    margin: 12px 0; background: var(--surface); overflow: hidden;
+  }
+  details.fold > summary {
+    cursor: pointer; padding: 13px 18px; font-weight: 600; list-style: none;
+    display: flex; align-items: center; gap: 9px; font-size: 0.97rem;
+  }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before {
+    content: "▸"; color: var(--text-faint); font-size: 0.85rem;
+    transition: transform 0.15s; flex-shrink: 0;
+  }
+  details.fold[open] > summary::before { transform: rotate(90deg); }
+  details.fold > summary .hint { font-weight: 400; color: var(--text-faint); font-size: 0.86rem; margin-left: auto; }
+  details.fold .body { padding: 2px 18px 16px; border-top: 1px solid var(--line); }
+  details.fold .body > :first-child { margin-top: 14px; }
+
+  .foldbar { display: flex; justify-content: space-between; align-items: center; margin: 26px 0 -4px; gap: 12px; }
+  .foldbar .cap { font-size: 0.86rem; color: var(--text-faint); }
+  .foldbar button {
+    font: inherit; font-size: 0.84rem; color: var(--text-dim); cursor: pointer;
+    background: none; border: 1px solid var(--line-strong); border-radius: 6px; padding: 4px 11px;
+    flex-shrink: 0;
+  }
+  .foldbar button:hover { color: var(--text); border-color: var(--text-faint); }
+
+  .omitted {
+    border: 1px dashed var(--line-strong); border-radius: var(--radius);
+    padding: 18px 20px; margin: 40px 0 0; background: none;
+  }
+  .omitted .label { font-size: 0.8rem; font-weight: 650; color: var(--text-dim); margin-bottom: 10px; }
+  .omitted ul { margin: 0; font-size: 0.92rem; color: var(--text-dim); }
+  .omitted .why { color: var(--text-faint); font-style: italic; }
+  .omitted .note { font-size: 0.86rem; color: var(--text-faint); margin: 12px 0 0; }
+
+  footer.doc { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line);
+               font-size: 0.84rem; color: var(--text-faint); }
+
+  @media (max-width: 560px) {
+    body { padding: 0 15px 64px; font-size: 15.5px; }
+    header.doc h1 { font-size: 1.5rem; }
+    .tldr, .decision, .misread, .omitted, .gate { padding: 16px 16px; }
+  }
+  @media print {
+    details.fold { break-inside: avoid; }
+    details.fold > summary::before { content: "▾"; }
+    .foldbar button { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <h1>기획 하네스는 문서 길이를 고르는 시스템이 아니라, 사실과 기록을 분리해 보존하는 시스템이다</h1>
+  <div class="meta">
+    <span>원문: <a href="../planning-harness-discussion.md">planning-harness-discussion.md</a></span>
+    <span>536줄</span>
+    <span>브리프 2026-08-13</span>
+  </div>
+</header>
+
+<section class="tldr">
+  <div class="label">한눈에 · 30초</div>
+  <ol>
+    <li>기획을 <strong>크기(S/M/L)로 나누지 않습니다.</strong> <strong>무엇을 기획하는가(7종)</strong> × <strong>얼마나 깊이(5축)</strong>로 분류하고, 점수를 합산하지 않습니다. 축마다 처방이 다르기 때문입니다.</li>
+    <li>여덟 가지 <strong>하드 게이트</strong> 중 하나라도 걸리면 분류·점수와 무관하게 기획 강도가 올라갑니다. 버튼 문구 한 줄이라도 결제 약관에 걸리면 해당합니다.</li>
+    <li>가장 중요한 것은 분류가 아니라 <strong>저장 구조</strong>입니다. "지금 사실"과 "변경 기록"을 분리하지 않으면 결정 이유가 사라집니다.</li>
+  </ol>
+</section>
+
+<div class="decision">
+  <div class="label">지금 결정할 것</div>
+  <div class="q">이 체계에서 무엇부터 도입할 것인가?</div>
+  <p class="rec"><strong>권고:</strong> 저장 영역 분리(<code>current/</code>와 <code>work/</code>)부터. 분류 규칙과 Manifest는 그다음.</p>
+  <p class="cost">근거: 원문이 이 구분을 "장기적으로 가장 중요한 구분"으로 직접 지목합니다(4절). · 대가: 기존 문서를 한 번 옮겨야 합니다. · 되돌림: 폴더 구조는 언제든 바꿀 수 있지만, <strong>문서 ID 체계는 한 번 쓰기 시작하면 바꾸기 비쌉니다.</strong></p>
+</div>
+
+<h2>먼저 볼 것 — 이 여덟 가지는 강도를 무조건 올립니다</h2>
+
+<div class="risk-row">
+  <span class="badge danger">되돌리기 어려움</span>
+  <div>아래 항목에 걸리는 기획은 <strong>분류가 무엇이든, 강도 점수가 얼마든</strong> 승인·감사·롤백 문서가 붙어야 합니다. 원문은 이것을 <strong>하드 게이트</strong>라고 부릅니다.</div>
+</div>
+
+<div class="gate">
+  <ul>
+    <li>결제 · 정산 · 가격</li>
+    <li>개인정보 · 보안 · 권한</li>
+    <li>법무 · 규제 · 약관</li>
+    <li>운영 데이터 삭제</li>
+    <li>데이터 마이그레이션</li>
+    <li>외부 공개 API</li>
+    <li>되돌리기 어려운 정책 변경</li>
+    <li>서비스 중단 가능성</li>
+  </ul>
+</div>
+
+<p><strong>버튼 문구 한 줄을 바꾸는 일이라도 결제 약관에 관련되면 여기 걸립니다.</strong> 반대로 코드를 전부 리팩터링해도 사용자 동작과 제품 정책이 그대로면 제품 PRD는 얇아도 됩니다. 이 때문에 <strong>제품 기획 강도와 기술 구현 강도는 반드시 따로 분류해야 합니다.</strong></p>
+
+<h2>기획은 크기가 아니라 두 층으로 분류합니다</h2>
+
+<p>이 표가 매번 참조할 판단 기준입니다. 1층에서 <em>무엇을 기획하는지</em>를 정하고, 2층에서 <em>얼마나 깊이 할지</em>를 정합니다.</p>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>구분</th><th>무엇을 보고 판단하는가</th><th>그러면 어떻게 되는가</th></tr>
+    </thead>
+    <tbody>
+      <tr class="tier"><td colspan="3">1층 · 무엇을 기획하는가 — 같은 "기능 요청"도 종류가 다릅니다</td></tr>
+      <tr><td class="term">Change</td><td>기존 동작의 국소적인 변경</td><td>Change Brief + 기술 스펙</td></tr>
+      <tr><td class="term">Feature</td><td>하나의 사용자 문제를 종단 간 해결</td><td>Feature PRD + 기술 스펙</td></tr>
+      <tr><td class="term">Discovery · Experiment</td><td>구현보다 <strong>학습과 의사결정</strong>이 목적</td><td>Experiment Brief + 측정 계획</td></tr>
+      <tr><td class="term">Initiative</td><td>여러 기능·정책·채널이 하나의 성과를 만듦</td><td>Charter + 하위 Feature PRD들</td></tr>
+      <tr><td class="term">Product · Strategy</td><td>제품·시장·고객에 대한 장기 방향 결정</td><td>Product Strategy + Research</td></tr>
+      <tr><td class="term">GTM · Operation</td><td>출시, 마케팅, 운영 절차, 정책 변경</td><td>GTM·Operations Plan</td></tr>
+      <tr><td class="term">Platform · Migration</td><td>사용자 기능보다 시스템·데이터 전환이 중심</td><td>얇은 Brief + Migration·Rollback</td></tr>
+
+      <tr class="tier"><td colspan="3">2층 · 얼마나 깊이 기획하는가 — 다섯 축을 <strong>합산하지 않습니다</strong></td></tr>
+      <tr><td class="term">Scope</td><td>몇 개의 사용자 여정·제품 영역·채널이 바뀌는가</td><td>넓으면 상위 문서와 하위 Feature 문서를 분리</td></tr>
+      <tr><td class="term">Uncertainty</td><td>문제·고객가치·시장·해결책 중 무엇이 불명확한가</td><td>높으면 PRD보다 <strong>Discovery를 먼저</strong></td></tr>
+      <tr><td class="term">Impact</td><td>성패가 사용자·매출·전략에 얼마나 영향을 주는가</td><td>목표·지표·가드레일·사후검증 강화</td></tr>
+      <tr><td class="term">Reversibility</td><td>쉽게 되돌릴 수 있는가. 법무·돈·데이터 문제가 있는가</td><td>승인·감사·롤백·마이그레이션 문서 추가</td></tr>
+      <tr><td class="term">Coordination</td><td>몇 개 팀·시스템·외부 업체가 관여하는가</td><td>이해관계자·의존성·마일스톤·출시조정 추가</td></tr>
+
+      <tr class="tier"><td colspan="3">보조값 · 판단의 근거와 한도</td></tr>
+      <tr><td class="term">evidence_confidence</td><td>지금 판단을 뒷받침하는 근거가 충분한가</td><td>낮으면 상세 PRD 대신 Discovery로 라우팅</td></tr>
+      <tr><td class="term">appetite</td><td>이 문제에 <strong>최대 얼마까지 투자할 의향</strong>이 있는가</td><td>해결책 범위를 먼저 제한. 공수 추정이 아님</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p><strong>"총점 12점이므로 Large PRD" 방식을 쓰지 않는 이유는 축마다 처방이 다르기 때문입니다.</strong> 불확실하면 Discovery를 먼저 하고, 범위가 넓으면 문서를 나누고, 영향이 크면 측정을 강화하고, 위험하면 승인·롤백을 강제하고, 조율이 복잡하면 의존성 문서를 추가합니다. 이것들은 서로 대체되지 않습니다.</p>
+
+<h2>저장 구조가 분류 체계보다 먼저입니다</h2>
+
+<p>원문은 분류 → 양식 → 레이어 → 저장 순서로 전개되지만, 실제로 먼저 정해야 하는 것은 저장입니다. 분류를 아무리 정교하게 만들어도 산출물이 한 폴더에 쌓이면 6개월 뒤에 "왜 이렇게 결정했는지"를 아무도 답할 수 없습니다.</p>
+
+<figure class="map">
+  <div class="frame">
+    <svg viewBox="0 0 620 280" role="img" aria-label="문서 저장 영역 다섯 곳과 그 사이의 이동 방향">
+      <rect class="n-box" x="245" y="14" width="130" height="48" rx="8"/>
+      <text class="n-text" x="310" y="36" text-anchor="middle">decisions/</text>
+      <text class="n-sub"  x="310" y="52" text-anchor="middle">덮어쓰지 않고 대체</text>
+
+      <rect class="n-box" x="15" y="112" width="120" height="58" rx="8"/>
+      <text class="n-text" x="75" y="137" text-anchor="middle">evidence/</text>
+      <text class="n-sub"  x="75" y="155" text-anchor="middle">인터뷰·데이터·실험</text>
+
+      <rect class="n-box-hi" x="245" y="112" width="130" height="58" rx="8"/>
+      <text class="n-text" x="310" y="137" text-anchor="middle">work/</text>
+      <text class="n-sub"  x="310" y="155" text-anchor="middle">지금 진행 중인 일</text>
+
+      <rect class="n-box" x="470" y="112" width="130" height="58" rx="8"/>
+      <text class="n-text" x="535" y="137" text-anchor="middle">current/</text>
+      <text class="n-sub"  x="535" y="155" text-anchor="middle">현재 유효한 것만</text>
+
+      <rect class="n-box" x="245" y="212" width="130" height="48" rx="8"/>
+      <text class="n-text" x="310" y="234" text-anchor="middle">releases/ · archive/</text>
+      <text class="n-sub"  x="310" y="250" text-anchor="middle">끝난 것</text>
+
+      <path class="n-edge" d="M135 141 H 238" marker-end="url(#ar)"/>
+      <text class="n-edge-label" x="186" y="133" text-anchor="middle">근거를 준다</text>
+
+      <path class="n-edge-hi" d="M375 141 H 463" marker-end="url(#arhi)"/>
+      <text class="n-edge-label" x="419" y="133" text-anchor="middle">공통 사실만 승격</text>
+
+      <path class="n-edge" d="M310 112 V 69" marker-end="url(#ar)"/>
+      <text class="n-edge-label" x="320" y="94">결정을 남긴다</text>
+
+      <path class="n-edge" d="M310 170 V 205" marker-end="url(#ar)"/>
+      <text class="n-edge-label" x="320" y="192">종료 후 동결</text>
+
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--line-strong)"/>
+        </marker>
+        <marker id="arhi" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+  <figcaption>화살표는 문서가 <em>이동</em>하는 것이 아니라 내용이 <em>복사·승격</em>되는 방향입니다. <code>work/</code>의 문서는 끝나도 그 자리에 남아 당시 의도를 증언합니다. 모든 출시 기능을 <code>current/</code>로 복제하지 않고, 다른 작업이 앞으로 다시 참조할 공통 사실만 올립니다.</figcaption>
+</figure>
+
+<p class="difficulty hard"><span class="tag">이 문서에서 제일 헷갈리는 곳입니다.</span> 폴더 이름은 비슷해 보이지만 <strong>시간적 성격이 다릅니다.</strong> <code>current/</code>는 계속 갱신되고, <code>work/</code>는 끝나면 동결되고, <code>decisions/</code>는 덮어쓰지 않고 새 결정으로 대체되고, <code>evidence/</code>는 원본을 보존한 채 해석만 버전 관리합니다. 이 구분을 건너뛰면 나머지 체계가 전부 무너집니다.</p>
+
+<p>무엇을 <code>current/</code>로 올릴지는 제품 판단입니다. 신규 가격 정책이나 여러 기능이 공유하는 인증 규칙은 올리고, 특정 캠페인 문구나 일회성 UI 배치 결정은 올리지 않습니다. 기준은 하나입니다 — <strong>다른 작업이 앞으로 다시 참조해야 하는가.</strong></p>
+
+<h2>이름이 익숙해서 오히려 잘못 읽히는 것들</h2>
+
+<div class="misread">
+  <div class="label">헷갈리기 쉬운 곳 1</div>
+  <dl>
+    <dt>이렇게 읽기 쉽다</dt><dd>PRD는 제품 설명서다. 제품이 바뀌면 최신 상태로 갱신한다.</dd>
+    <dt>실제로는</dt><dd class="actual">PRD는 <strong>그 시점의 변경 의도</strong>입니다. 덮어쓰면 왜 그렇게 결정했는지가 사라집니다.</dd>
+    <dt>언제 문제가 되나</dt><dd>6개월 뒤 같은 영역을 다시 손댈 때. 현재 동작은 알 수 있지만 제약이 왜 생겼는지 아무도 답하지 못합니다.</dd>
+  </dl>
+</div>
+
+<div class="misread">
+  <div class="label">헷갈리기 쉬운 곳 2</div>
+  <dl>
+    <dt>이렇게 읽기 쉽다</dt><dd>Released = 완료. 출시했으면 그 작업은 닫는다.</dd>
+    <dt>실제로는</dt><dd class="actual">Released는 <strong>완료가 아닙니다.</strong> 실제 동작 확인과 결과 측정, 또는 측정하지 못한 이유와 후속 결정까지 기록해야 닫힙니다.</dd>
+    <dt>언제 문제가 되나</dt><dd>다음 분기 성과 리뷰에서. 무엇을 냈는지는 목록이 있는데 그것이 효과가 있었는지에 대한 근거가 없습니다.</dd>
+  </dl>
+</div>
+
+<h2>문서 이름이 소유하는 것</h2>
+
+<p>같은 내용을 여러 문서에 복사하지 않으려면, 각 문서가 <strong>무엇을 소유하는지</strong>가 먼저 정해져야 합니다.</p>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>이름</th><th>이 체계에서 소유하는 것</th><th>오해하기 쉬운 점</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="term">Initiative Charter</td>
+        <td>왜 하는지, 어떤 성과를 원하는지, 무엇을 하지 않는지</td>
+        <td>"큰 PRD"가 아닙니다. 요구사항과 AC는 여기 없습니다</td>
+      </tr>
+      <tr>
+        <td class="term">Feature PRD</td>
+        <td>사용자 행동, 비즈니스 규칙, 예외 상태, Acceptance Criteria</td>
+        <td>Charter 내용을 다시 적으면 그 순간 중복이 생깁니다</td>
+      </tr>
+      <tr>
+        <td class="term">Milestone Plan</td>
+        <td>구현 순서, 의존성, 컷라인, 검증 시점</td>
+        <td>하위 PRD를 요약한 또 다른 PRD가 아닙니다</td>
+      </tr>
+      <tr>
+        <td class="term">Discovery Brief</td>
+        <td>무엇을 만들지가 아니라 <strong>진행할지 말지</strong>의 판단 근거</td>
+        <td>상세 PRD의 축소판이 아닙니다. 목적이 다릅니다</td>
+      </tr>
+      <tr>
+        <td class="term">Change Brief</td>
+        <td>국소 변경의 이유·범위·검증 방법</td>
+        <td>작다고 생략하면 안 됩니다. 하드 게이트에 걸리면 강도가 올라갑니다</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>원문은 <code>Project PRD</code>라는 이름을 피하라고 권합니다. 프로젝트가 제품 전체인지, 특정 Initiative인지, 실행 기간인지 사람마다 다르게 읽기 때문입니다.</p>
+
+<h3>문서를 하나로 합쳐도 되는 조건<span class="owner you">당신이 정할 것</span></h3>
+
+<p>다섯 가지를 모두 만족할 때만 합칩니다 — <strong>단일 사용자 문제 · 단일 오너 · 단일 출시 · 단일 성공지표 · 하나의 의사결정으로 종료.</strong></p>
+
+<p>반대로 아래 중 하나라도 나타나면 분리합니다. 독립적으로 배포할 수 있다 · 오너나 승인자가 다르다 · 대상 사용자나 성공지표가 다르다 · 여러 마일스톤에 걸친다 · 병렬로 개발된다 · 별도 법무·보안·운영 검토가 필요하다.</p>
+
+<div class="foldbar">
+  <span class="cap">아래는 실행 방식입니다. 결론은 각 제목에 담았습니다.</span>
+  <button type="button" id="toggleAll">전체 펼치기</button>
+</div>
+
+<details class="fold">
+  <summary>문서 양식은 템플릿을 늘리지 말고 코어 + 오버레이로 조립한다<span class="hint">원문 2절</span></summary>
+  <div class="body">
+    <p>모든 구현 기획의 공통 코어: 배경과 문제 · 대상 사용자와 사용 상황 · 기대하는 사용자·사업 결과 · 범위와 비범위 · Acceptance Criteria 또는 의사결정 기준 · 주요 가정과 열린 질문 · 문서 오너와 상태 · 상위 목표·근거·관련 문서 · 기술 스펙 링크.</p>
+    <p>그 위에 조건이 맞을 때만 모듈을 붙입니다. 문제·시장 불확실성이 높으면 Discovery/Research/Validation, 실험이 목적이면 Hypothesis/Experiment Design, 핵심 지표에 영향이 있으면 Measurement/Analytics, 여러 사용자 흐름이 바뀌면 Journey/Story Map, 결제·개인정보·법무면 Risk/Approval/Compliance, 기존 사용자·데이터 전환이면 Migration/Rollback, 여러 팀이 참여하면 Dependency/Stakeholder, 외부 출시면 GTM/Launch, 운영 절차가 바뀌면 Support/Operations, 장기 영향이 있는 결정이면 Product Decision Record 또는 ADR.</p>
+    <p>성숙한 기술 프로젝트도 모든 변경에 같은 절차를 적용하지 않습니다. Rust는 일반 변경, 주요 변경 제안, 더 무거운 RFC 절차를 구분합니다.</p>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>문서 체계는 폴더 트리 하나가 아니라 서로 독립인 세 축이다<span class="hint">원문 3절</span></summary>
+  <div class="body">
+    <p>세 축은 <strong>범위</strong>(Product → Initiative → Feature/Change → Task), <strong>성격</strong>(Strategy / Evidence / Product / Technical / GTM / Operations), <strong>생명주기</strong>(Discovery → Decision → Delivery → Launch → Outcome)입니다.</p>
+    <p>전략·리서치·마케팅·기술은 단순한 부모·자식 관계가 아닙니다. 하나의 사용자 인사이트가 여러 Initiative를 뒷받침할 수 있고, 하나의 ADR이 여러 Feature에 영향을 줍니다. GTM 계획은 Feature 아래가 아니라 Initiative나 Release와 <strong>병렬로</strong> 붙는 경우가 많습니다.</p>
+    <p>그래서 폴더는 사람이 찾기 쉬운 기본 경로만 제공하고, <strong>실제 관계는 문서 ID와 메타데이터, 링크가 담당해야 합니다.</strong></p>
+    <p>덧붙여 <code>Task</code>는 장기 기획 문서가 아닙니다. 실행이 끝났다고 모든 이슈를 지식 문서로 승격시키지 않습니다.</p>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>문서 상태와 작업 상태를 분리해야 셋 다 어긋난 상황을 표현할 수 있다<span class="hint">원문 5절</span></summary>
+  <div class="body">
+    <p>본문은 Markdown, 하네스가 읽을 정보는 YAML frontmatter로 관리합니다. <code>id</code>, <code>type</code>, <code>owner</code>, <code>parent</code>, <code>supports</code>, <code>informed_by</code>, <code>related_specs</code>, <code>target_release</code>, <code>last_reviewed</code>, <code>supersedes</code> 같은 항목입니다.</p>
+    <p><code>doc_status</code>와 <code>work_status</code>를 나누는 이유는 이런 상황이 실제로 생기기 때문입니다.</p>
+    <ul>
+      <li>PRD는 승인됐지만 개발은 시작되지 않을 수 있습니다</li>
+      <li>기능은 출시됐지만 성과 측정은 안 끝났을 수 있습니다</li>
+      <li>문서는 대체됐지만 실제 제품은 아직 이전 버전일 수 있습니다</li>
+    </ul>
+    <p>종결 상태도 구분합니다. <code>completed</code>(구현과 결과 확인 완료) · <code>superseded</code>(새 결정이 대체) · <code>abandoned</code>(전략·비용 문제로 중단) · <code>archived</code>(활성 관리 대상에서 제외).</p>
+    <p>중요한 결정은 과거 문서를 수정해 지우지 않고 <strong>새 결정으로 대체합니다.</strong> 이력과 대체 관계를 남기는 방식은 AWS의 ADR 지침과 같습니다.</p>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>SSOT는 "문서가 하나"가 아니라 "사실마다 기준 장소가 하나"라는 뜻이다<span class="hint">원문 6·7절</span></summary>
+  <div class="body">
+    <p>제품 방향과 정책은 Git 문서, 담당자·일정은 이슈 트래커, 실제 구현 상태는 코드와 PR, 실제 배포 상태는 배포 플랫폼, 지표 값은 분석 시스템에 있습니다. 같은 내용을 여러 PRD에 복사하지 말고 기준 문서에 링크합니다.</p>
+    <p>사용자 리서치 원본에는 개인정보가 들어갈 수 있으므로 Git에는 연구 ID, 목적, 요약 인사이트, 근거 수준, 수행 날짜, 원본 위치 링크, 접근 권한 책임자만 둡니다.</p>
+    <p><strong>하네스 저장소와 프로젝트 산출물도 분리합니다.</strong> 하네스에는 라우팅 규칙·스키마·템플릿·오버레이·검증기만 두고, 실제 기획 산출물은 각 프로젝트가 소유합니다. 그래야 하네스 버전을 바꾸거나 Claude와 Codex를 교체해도 프로젝트 지식이 종속되지 않습니다.</p>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>하네스의 첫 출력물은 PRD 본문이 아니라 무엇을 만들고 무엇을 뺐는지의 선언이다<span class="hint">원문 8절</span></summary>
+  <div class="body">
+    <p>하네스가 처음 내놓아야 하는 것은 <strong>Planning Package Manifest</strong>입니다. 무엇으로 분류했는지, 어떤 문서를 지금 만들고 무엇을 검증 후로 미루는지, 어떤 오버레이가 필요하고 무엇을 생략했는지, 상위 문서와 어떻게 연결되는지, 다음 단계로 넘어가는 조건이 무엇인지를 먼저 선언합니다.</p>
+    <p>그 뒤 순서는 이렇습니다. 기존 문서 카탈로그 확인 → 새 문서가 필요한지 기존 문서 수정인지 판단 → 필요한 문서만 생성 → 상하위 연결 → 기술 스펙·실행계획 연결 → 출시 후 결과 검증 → Current 갱신과 Archive.</p>
+    <p><strong>생략한 것을 명시적으로 기록하는 것</strong>이 핵심입니다. 무엇을 안 만들었는지가 기록되지 않으면, 나중에 그것이 빠뜨린 것인지 의도적으로 뺀 것인지 구분할 수 없습니다.</p>
+  </div>
+</details>
+
+<section class="omitted">
+  <div class="label">이 브리프에서 뺀 것 — 전부 실행 방식이라 결론만 위에 반영했습니다</div>
+  <ul>
+    <li>범위 계층별 추천 문서 이름 7단계 — <span class="why">명명 규칙</span> — 원문 3절</li>
+    <li>frontmatter 필드 전체와 YAML 예시 — <span class="why">데이터 구조. 도구가 정함</span> — 원문 5절</li>
+    <li>문서 상태·작업 상태의 전체 값 흐름 — <span class="why">상태 이름. 핵심인 "Released ≠ 완료"는 위에 있음</span> — 원문 5절</li>
+    <li>Planning Package Manifest의 YAML 전문 — <span class="why">출력 포맷</span> — 원문 8절</li>
+    <li>하네스 저장소와 프로젝트 저장소의 폴더 구조 예시 — <span class="why">디렉토리 배치</span> — 원문 7절</li>
+    <li>외부 사례 링크 5건 (Shape Up, GOV.UK, Rust, AWS ADR, GitLab) — <span class="why">근거 확인용. 원문에 링크가 있음</span></li>
+  </ul>
+  <p class="note">제품 판단에 필요한 것 — 분류 기준 2층, 하드 게이트 8종, 문서 합치기·나누기 조건, <code>current/</code> 승격 기준 — 은 전부 위에 있습니다. 실제로 폴더를 만들거나 템플릿을 작성하기 전에는 원문을 확인하십시오.</p>
+</section>
+
+<footer class="doc">
+  기획 하네스 설계 논의 · 원문 기준일 2026-08-12 · 이 브리프는 <code>/explain</code>이 생성했습니다.
+</footer>
+
+</div>
+<script>
+  (function () {
+    var btn = document.getElementById('toggleAll');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var folds = document.querySelectorAll('details.fold');
+      var opening = btn.textContent.indexOf('펼치기') !== -1;
+      folds.forEach(function (d) { d.open = opening; });
+      btn.textContent = opening ? '전체 접기' : '전체 펼치기';
+    });
+  })();
+</script>
+</body>
+</html>
