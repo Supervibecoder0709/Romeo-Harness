@@ -1,0 +1,7 @@
+interface:
+  display_name: "Repository Archive"
+  short_description: "GitHub 레포를 한국어 운영 문서로 아카이브"
+  default_prompt: "Use $repo-archive to analyze a GitHub repository and create a Korean archive."
+
+policy:
+  allow_implicit_invocation: true
