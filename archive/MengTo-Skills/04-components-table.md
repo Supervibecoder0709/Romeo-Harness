@@ -1,0 +1,16 @@
+# 구성요소 표
+
+| 구성요소 | 종류 | 역할 | 입력 | 출력/상태변화 | 권한·외부 경계 | 원문 위치 | 근거 상태 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| agent-skills/category/skill/SKILL.md | 콘텐츠 계약 | 에이전트가 읽고 따를 절차·trigger·기본값·함정·acceptance check | 사용자 작업 요청과 project context | skill별 산출물, 공통 runtime 상태 없음 | skill별 browser/API/local FS/외부 쓰기가 달라짐 | README.md 152-174 | 확인됨 [E03] |
+| 5개 컬렉션 | 분류 | codex, game-development, media, ui, web-design의 skill 묶음 | skill 경로 | 130개 skill 경로의 분류 | 없음 | Git tree API | 확인됨 [E17] |
+| agents/openai.yaml | UI metadata | 일부 skill의 display name, short description, default prompt | host/agent UI가 읽는 metadata로 추정 | UI 표시/기본 prompt 후보 | host의 자동 발견·실행은 미확인 | 대표 4개 agents/openai.yaml | 부분 확인: 63개 존재, 대표 4개 본문 확인 [E20] |
+| iterate-until-verified | Codex workflow skill | 원래 작업을 보존하면서 gate, 독립 판정, 증거 기반 반복 정의 | 원 작업, 품질 기준, 결과물, benchmark | pass/fail/blocked와 evidence | subagent/검증자를 쓸 수 있으나 권한 자동 확대 없음 | agent-skills/codex/iterate-until-verified/SKILL.md | 확인됨 [E08] |
+| publish-project-to-github | Codex workflow skill | local project의 repo/Pages 발행을 별도 gate로 다룸 | project, owner/repo, visibility, deployment 의도 | Git repo/push/Pages/read-back | GitHub repo 생성, visibility, push, Pages, public URL | agent-skills/codex/publish-project-to-github/SKILL.md | 확인됨 [E09] |
+| ship-web-games | game release skill | 검증한 commit만 배포하고 production을 별도 검증 | exact commit, tests/build, deployment target | deployed game와 rollback evidence | deployment, browser/production access | agent-skills/game-development/ship-web-games/SKILL.md | 확인됨 [E10] |
+| build-awwwards-quality-sites | web-design skill | 원본성·접근성·성능을 포함한 motion-led site 제작 절차 | reference, direction, media/provenance, site code | complete page와 validation 기록 | asset source, browser, 선택적 Three.js/GSAP | agent-skills/web-design/build-awwwards-quality-sites/SKILL.md | 확인됨 [E11] |
+| backfill-skill-demos.mjs | Node 유지보수 CLI | tracked skill의 누락 demo scaffold와 DEMOS.md 생성 | git tracked skill, filesystem, force option | demo files/DEMOS.md write | local filesystem write, source-derived demo 보존 | scripts/backfill-skill-demos.mjs | 확인됨 [E13] |
+| validate-skill-demos.mjs | Node validator | demo 파일, HTML, prompt, preview, provenance, indexes 검사 | git tracked skill, local files | failure list+exit 1 또는 통계+exit 0 | local read, git ls-files, inline JS parsing; browser render는 하지 않음 | scripts/validate-skill-demos.mjs | 확인됨 [E12] |
+| build-demo-screenshot-gallery.mjs | Node generator | preview를 모아 Markdown/HTML gallery 재생성 | tracked skills, previews, source manifest | SCREENSHOTS.md/HTML write | local filesystem write | scripts/build-demo-screenshot-gallery.mjs | 확인됨 [E14] |
+| sync-neuform-skill-demos.mjs + security test | source demo sync | Neuform public design에서 sandbox demo/provenance를 만들고 보안 규칙 시험 | env/.env, API URL/key, asset hosts, target skill | demo HTML/prompt/manifest write, test result | HTTPS network, API key, remote assets, local FS write, dry-run | top-level scripts | 코드 계약 확인, 실제 API 실행 미확인 [E15] [E16] |
+| stitch_full_page_capture.mjs | skill helper CLI | viewport screenshot을 이어 붙여 full-page/section image와 manifest 갱신 | manifest, page URL, Playwright, ffmpeg, sips | images와 manifest write, temp cleanup | browser network access, local FS write, ffmpeg/sips | stitched-full-page-capture helper | 코드 계약 확인, 실행 미확인 [E18] |

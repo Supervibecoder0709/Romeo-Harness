@@ -1,0 +1,14 @@
+# Codex CLI sidecar(선택 사항). 이 skill이
+# ~/.agents/skills/od-contribute/ 또는 .agents/skills/에서 Codex로 load될 때
+# 더 친숙한 picker 항목을 추가한다.
+# 필수는 아니다. Codex는 SKILL.md를 그대로 load한다.
+
+interface:
+  display_name: "OpenDesign — 기여"
+  short_description: "코드를 작성하지 않고 nexu-io/open-design에 Skill / Design System / 번역 / 오타 수정을 올립니다."
+  default_prompt: "OpenDesign에 기여하고 싶습니다."
+
+policy:
+  # 사용자가 명시적으로 `$od-contribute`를 호출하지 않아도 OD 기여를 언급하면
+  # Codex가 이 skill을 제안할 수 있게 한다. 이것이 이 skill의 목적이다.
+  allow_implicit_invocation: true
