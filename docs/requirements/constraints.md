@@ -1,0 +1,95 @@
+---
+id: constraints
+type: requirements
+status: draft
+updated: 2026-08-27
+authority: canonical
+---
+
+# 제약
+
+여기 있는 항목은 선호가 아니라 **위반하면 설계가 깨지는 조건**이다.
+"확인된 사실"은 원천 대화에서 공식 문서나 실물로 교차 확인된 것이고,
+그렇지 않은 것은 [열린 질문](../planning/open-questions.md)의 가정으로 옮겨 두었다.
+
+---
+
+## 1. 런타임 제약 (확인된 사실)
+
+| ID | 제약 | 근거 | 위반 시 |
+| --- | --- | --- | --- |
+| K-01 | 지원 런타임은 Claude Code CLI와 Codex CLI 둘뿐이다 | `README.md`, S01 | 범위 폭발 |
+| K-02 | Codex는 subagent와 `.codex/agents/*.toml`을 지원한다. 과거의 "Codex에는 서브에이전트가 없다"는 전제는 **사실 오류**다 | S03 리뷰 #1, S04 리뷰 #1 | 불필요한 폴백·릴레이 계층 |
+| K-03 | Codex 프로젝트 skill의 네이티브 위치는 `.agents/skills`다. `.codex/skills` 심링크는 불필요하다 | S04 리뷰 #2 | 스킬 발견 실패 |
+| K-04 | Codex custom prompts는 deprecated이며 사용자 홈 전용이다. 프로젝트 workflow는 skill로 배포한다 | S01 KEEL 리뷰, S04 리뷰 #2 | 프로젝트 공유 실패 |
+| K-05 | Codex `--json`은 최종 결과 하나가 아니라 NDJSON 이벤트 스트림이다 | S10 §5 | 결과 파싱 실패 |
+| K-06 | Claude의 agent hook은 실험적이다. **핵심 상태 전이를 hook에 의존하지 않는다** | S10 §9, COUNCIL "남은 이견 3" | 상태 유실 |
+| K-07 | Claude는 `CLAUDE.md`에서 `@AGENTS.md`를 import하는 방식이 심볼릭 링크보다 이식성이 좋다 | S01 KEEL 리뷰 | 새 worktree에서 깨짐 |
+| K-08 | 프로젝트 trust와 개별 command-hook hash 승인은 별개다 | S04 리뷰 #3 | 훅 미실행 |
+
+> K-02~K-05는 2026-08-05 기준 공식 문서로 확인된 내용이다. 두 CLI는 빠르게 바뀌므로
+> 어댑터를 구현할 때 `doctor` 단계에서 capability probe로 재확인한다. (S02 리뷰 2)
+
+---
+
+## 2. Orca 경계
+
+| ID | 제약 | 근거 |
+| --- | --- | --- |
+| K-10 | Orca가 Run·Task·Dispatch·worktree·메시지·DAG·결정 게이트·재시도를 소유한다. 하네스는 두 번째 스케줄러가 되지 않는다 | S01 plan, S04 리뷰 #5 |
+| K-11 | 독립 작업자 간 파일은 자동 공유되지 않는다. 단계형 실행은 같은 워크트리이거나 명시적 전달이 필요하다 | `skills/repo-archive/SKILL.md` |
+| K-12 | 검증되지 않은 provider model ID를 추정해 넣지 않는다. Orca는 사람이 읽는 별칭이 아니라 계정별 opaque ID를 요구한다 | `.claude/commands/repo.md` 7단계 |
+| K-13 | 공개 `orca-cli/orca` 저장소는 골격만 있고 실제 사용 중인 Orca 제품과 다르다. 이 저장소를 기반으로 삼지 않는다 | `archive/orca-cli-orca`, S13 |
+
+---
+
+## 3. 저장·데이터 제약
+
+| ID | 제약 | 근거 |
+| --- | --- | --- |
+| K-20 | v1 인프라 제로. catalog·SQLite·큐·Postgres·샤딩 없이 `rg` + 구조 검증 스크립트로 시작한다 | COUNCIL Consensus 7 |
+| K-21 | 도입 트리거를 미리 명명한다. 문서 약 100개 이상 또는 저장소 횡단 조회 반복 → 인덱스. 동시 요청자 2명 이상 → 큐·DB | COUNCIL "짓지 않는 것" |
+| K-22 | 순차 ID 금지. 병렬 worktree에서 충돌한다 | S01 KEEL 리뷰, COUNCIL Consensus 6 |
+| K-23 | PII·인터뷰 원본·계약서·크리덴셜은 Git에 두지 않는다. 접근통제된 위치 링크, 요약, 근거 수준, 연구 ID만 남긴다 | PHD §6, COUNCIL |
+| K-24 | 원시 대화·로그·임시 상태는 `.harness/runs/<run-id>/`에 두고 Git에서 제외한다 | S01 plan §4 |
+| K-25 | 생성된 `.claude/`·`.codex/` 파일은 커밋한다. 새 worktree와 새 clone이 별도 설치 없이 동작해야 한다. 로컬 trust와 credential만 제외한다 | S01 KEEL 리뷰 |
+
+---
+
+## 4. 비용·컨텍스트 제약
+
+| ID | 제약 | 근거 |
+| --- | --- | --- |
+| K-30 | 첫 병목은 처리량이 아니라 **운영자 주의력·문서 부패·컨텍스트 비용**이다 | COUNCIL "5.3 대비 달라진 것" |
+| K-31 | 상위 문서 전체가 아니라 관련 노드 1-hop만 로드한다. 기준 문서에 있는 내용은 복사하지 않고 링크한다 | S10 §7 |
+| K-32 | 저위험 작업은 classifier 1회 + writer 1회로 제한한다. 전문 reviewer는 hard gate나 overlay가 발동할 때만 추가한다 | S10 §7 |
+| K-33 | 미확인 내용은 장문의 추측 대신 `UNKNOWN` 또는 `NEEDS_VALIDATION`으로 남긴다 | S10 §7 |
+
+---
+
+## 5. 라이선스·출처 제약
+
+| ID | 제약 | 근거 |
+| --- | --- | --- |
+| K-40 | 참조 저장소를 통째로 포크하지 않는다. 버전 고정 + 선별 채택 | S01 plan, S13 최종 |
+| K-41 | 복사한 자산은 원 라이선스 고지와 `THIRD_PARTY_NOTICES.md`를 유지하고, 공식 프로젝트로 오인시키지 않는다 | S01 plan §4, S02 리뷰 1 |
+| K-42 | 라이선스 표기가 불명확한 저장소는 코드 포함을 보류한다 | S13 |
+| K-43 | 현재 저장소 라이선스는 **GPL-3.0**(`LICENSE` 실물)이다. 2026-08-05 권고는 Apache-2.0이었다 | `LICENSE`, S05 |
+
+> K-43은 미해결 충돌이다. [열린 질문 X-05](../planning/open-questions.md)와
+> [결정 D-41](../decisions/decision-register.md)을 참조한다.
+
+---
+
+## 6. 운영 안전 제약
+
+사용자의 상시 persona 지시문과 프로젝트 `CLAUDE.md`에서 온 것이며, 모든 워크플로우에 적용된다.
+
+| ID | 제약 | 근거 |
+| --- | --- | --- |
+| K-50 | 비용 결제·권한 확대·공개 전환·삭제·소유권 이전·운영 데이터 변경은 영향 범위와 복구 방법을 먼저 설명하고 명시적 승인을 받는다 | AGENTS-P |
+| K-51 | 실행 자체를 완료로 간주하지 않는다. 관찰 가능한 기준으로 검증하고 확인하지 못한 항목은 미검증으로 표기한다 | AGENTS-P, S07/S08 |
+| K-52 | 확인된 사실 / 현재 가정 / 추천을 구분한다 | AGENTS-P |
+| K-53 | 계획만 요청받았다면 파일을 수정하지 않는다 | `CLAUDE.md` |
+| K-54 | 존재하지 않는 기능이나 도구를 가정하지 않는다 | `CLAUDE.md` |
+| K-55 | 정보와 지시가 충돌하면 현재 사용자의 명시적 요청 → 승인된 현재 문서와 결정 → 프로젝트 인덱스 → 과거 대화·조사 자료 → 참고 저장소 → 일반 권고 순으로 따르고, 충돌을 임의 해석하지 않고 차이와 추천안을 알린다 | `CLAUDE.md` |
