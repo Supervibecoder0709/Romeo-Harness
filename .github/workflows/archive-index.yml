@@ -1,8 +1,8 @@
 name: archive index
 
-# archive/ 에 아카이브가 추가·수정되면 archive/README.md 인덱스를 최신으로 유지한다.
-#   - PR   : 인덱스가 오래됐으면 실패시켜 재생성을 요구한다 (포크 PR에도 안전).
-#   - main : 인덱스를 재생성하고 달라졌으면 자동 커밋한다 (누락 방지 안전망).
+# archive/ 가 바뀌면 archive/README.md 인덱스가 최신인지 검사한다.
+# 검사만 하고 커밋하지 않으므로 이 워크플로는 레포에 쓰기 권한이 필요 없다.
+# 인덱스를 갱신하려면 `python3 scripts/generate-archive-index.py` 를 돌려 결과를 커밋한다.
 on:
   push:
     branches: [main]
@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: archive-index-${{ github.ref }}
@@ -29,34 +29,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # main 자동 커밋 단계가 push 할 수 있도록 토큰을 남긴다.
-          persist-credentials: ${{ github.event_name == 'push' }}
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # PR: 인덱스가 최신인지 검사만 한다. 커밋하지 않으므로 포크 PR에서도 권한이 필요 없다.
       - name: 인덱스 최신 여부 검사
-        if: github.event_name == 'pull_request'
         run: python3 scripts/generate-archive-index.py --check
 
-      # main: 재생성해서 달라졌으면 커밋한다. 훅을 설치하지 않은 클론에서 들어와도 인덱스가 밀리지 않는다.
-      - name: 인덱스 재생성 및 커밋
-        if: github.event_name != 'pull_request'
+      # 실패했을 때 어디가 다른지 로그에 남겨 재생성 없이도 원인을 알 수 있게 한다.
+      - name: 실패 시 차이 출력
+        if: failure()
         run: |
           python3 scripts/generate-archive-index.py
-          # 인덱스가 아직 추적 전일 수 있으므로 stage 한 뒤 --cached 로 판정한다.
-          # `git diff` 만 쓰면 untracked 파일을 못 봐서 첫 실행이 조용히 넘어간다.
-          git add archive/README.md
-          if git diff --cached --quiet -- archive/README.md; then
-            echo "인덱스가 이미 최신입니다. 커밋할 것이 없습니다."
-            exit 0
-          fi
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit \
-            -m "chore: archive 인덱스 자동 갱신" \
-            -m "scripts/generate-archive-index.py 가 archive/ 변경을 반영해 생성했습니다."
-          git push
+          echo "::group::archive/README.md 예상 결과와의 차이"
+          git --no-pager diff -- archive/README.md
+          echo "::endgroup::"
+          echo "::error::인덱스가 오래되었습니다. 'python3 scripts/generate-archive-index.py' 실행 후 결과를 커밋하세요."

@@ -1,6 +1,7 @@
 <!-- 이 파일은 scripts/generate-archive-index.py 가 생성합니다. 직접 수정하지 마세요. -->
-<!-- archive/ 아래 항목을 추가·수정한 뒤 `python3 scripts/generate-archive-index.py` 를 실행하거나,
-     그대로 PR을 올리면 .github/workflows/archive-index.yml 이 검사·갱신합니다. -->
+<!-- archive/ 아래 항목을 추가·수정했다면 `python3 scripts/generate-archive-index.py` 를 실행해
+     이 파일을 다시 만들고 함께 커밋하세요. CI(.github/workflows/archive-index.yml)가 최신인지
+     검사하며, 오래되었으면 실패합니다. -->
 
 # 아카이브 인덱스
 
