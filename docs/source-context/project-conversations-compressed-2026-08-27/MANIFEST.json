@@ -1,0 +1,413 @@
+{
+  "project_id": "g-p-6a71afd45f388191a09744e1fda91709",
+  "exported_at_utc": "2026-08-26T22:08:11Z",
+  "transcript_scope": "user/assistant messages plus observable tool calls and tool results",
+  "excluded": [
+    "system instructions",
+    "developer instructions",
+    "private reasoning",
+    "internal event bookkeeping"
+  ],
+  "sessions": [
+    {
+      "position": 1,
+      "session_id": "019fcd2e-2e56-7d02-95de-017a3faedb9b",
+      "started_at_utc": "2026-08-04T14:29:43.638Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/04/rollout-2026-08-04T23-29-43-019fcd2e-2e56-7d02-95de-017a3faedb9b.jsonl",
+      "source_sha256": "2e1d33ae47b6548de206c27882c5190ace31f3c5f6a89bcc3e2fcb316d58f46f",
+      "transcript": "transcripts/01_2026-08-04_019fcd2e-2e56-7d02-95de-017a3faedb9b.md",
+      "transcript_sha256": "15a91b4a108270b1010e4393d99aceb210d61a43eb8b3293db1ec3daff2b5f48",
+      "counts": {
+        "user": 7,
+        "assistant": 13,
+        "tool_call": 56,
+        "tool_output": 56,
+        "sub_agent": 11
+      }
+    },
+    {
+      "position": 2,
+      "session_id": "019fcd2e-2e56-7d02-95de-017a3faedb9b",
+      "started_at_utc": "2026-08-04T14:35:34.977Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/04/rollout-2026-08-04T23-35-34-019fcd33-8ac1-7383-9e00-1ff821f143f8.jsonl",
+      "source_sha256": "7efd3a05315bd54f23918b0f90c410f1529755108e75dbce76db25c69f70d87b",
+      "transcript": "transcripts/02_2026-08-04_019fcd2e-2e56-7d02-95de-017a3faedb9b.md",
+      "transcript_sha256": "693fb2223e25bad443c20a54486df032087bd7f2c603724871616a72008bc867",
+      "counts": {
+        "user": 4,
+        "sub_agent": 2,
+        "assistant": 6,
+        "tool_call": 52,
+        "tool_output": 52
+      }
+    },
+    {
+      "position": 3,
+      "session_id": "019fcd2e-2e56-7d02-95de-017a3faedb9b",
+      "started_at_utc": "2026-08-04T14:35:38.535Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/04/rollout-2026-08-04T23-35-38-019fcd33-98a7-76e0-8369-64af94bcbbe2.jsonl",
+      "source_sha256": "ba574e459204b63b9a495d05d584e0cf4d9f04d787de44b293d2ee91f6994355",
+      "transcript": "transcripts/03_2026-08-04_019fcd2e-2e56-7d02-95de-017a3faedb9b.md",
+      "transcript_sha256": "461d0909f7dfe299e023d5c537af9667355f0e19afd473c8b08be436a89cb013",
+      "counts": {
+        "user": 4,
+        "sub_agent": 2,
+        "assistant": 6,
+        "tool_call": 52,
+        "tool_output": 52
+      }
+    },
+    {
+      "position": 4,
+      "session_id": "019fcd2e-2e56-7d02-95de-017a3faedb9b",
+      "started_at_utc": "2026-08-04T14:35:52.489Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/04/rollout-2026-08-04T23-35-52-019fcd33-cf29-75b2-b254-ae1c45d8c80c.jsonl",
+      "source_sha256": "067d59dbfd33808a2c6ecb67fb84021809a4f0cb50f481f8104a83502ad7445b",
+      "transcript": "transcripts/04_2026-08-04_019fcd2e-2e56-7d02-95de-017a3faedb9b.md",
+      "transcript_sha256": "6c10ef2cf8f9e398b28297c067b45a975114ceda3ff918ae91cde61aa11b6814",
+      "counts": {
+        "user": 4,
+        "sub_agent": 2,
+        "assistant": 6,
+        "tool_call": 49,
+        "tool_output": 49
+      }
+    },
+    {
+      "position": 5,
+      "session_id": "019fcf5c-bc0d-7f10-a7f3-8c1f34011aa4",
+      "started_at_utc": "2026-08-05T00:39:49.005Z",
+      "storage": "archived session",
+      "source_path": "/Users/julliettelee/.codex/archived_sessions/rollout-2026-08-05T09-39-49-019fcf5c-bc0d-7f10-a7f3-8c1f34011aa4.jsonl",
+      "source_sha256": "a62b49c973246950c36894f136ebe82971e00bc020b4ca1cc1899e0375ab56e0",
+      "transcript": "transcripts/05_2026-08-05_019fcf5c-bc0d-7f10-a7f3-8c1f34011aa4.md",
+      "transcript_sha256": "659efc37138cd2a480e39db1619e7c94d4bf69561b61e2b5beccda6969a649cf",
+      "counts": {
+        "user": 2,
+        "assistant": 2,
+        "tool_call": 2,
+        "tool_output": 2
+      }
+    },
+    {
+      "position": 6,
+      "session_id": "019fe775-3d42-7ef0-9b05-2b220129eff6",
+      "started_at_utc": "2026-08-09T16:57:28.219Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/10/rollout-2026-08-10T01-57-28-019fe775-3d42-7ef0-9b05-2b220129eff6.jsonl",
+      "source_sha256": "1b837d32e53933c0bf616200dab81c34e4539710b647256df061b714491e7469",
+      "transcript": "transcripts/06_2026-08-09_019fe775-3d42-7ef0-9b05-2b220129eff6.md",
+      "transcript_sha256": "972f8b4889732bbaa18a863309efaf8730c31fb53b8e5b823fb78a4520c01f91",
+      "counts": {
+        "user": 2,
+        "assistant": 3,
+        "tool_call": 10,
+        "tool_output": 10
+      }
+    },
+    {
+      "position": 7,
+      "session_id": "019fe7f7-d981-7cf0-8a25-27b8430a1831",
+      "started_at_utc": "2026-08-10T00:57:23.527Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/10/rollout-2026-08-10T09-57-23-019fe92c-9f15-7b41-a43e-f669e2ad1a97.jsonl",
+      "source_sha256": "219bbc75136d723f1935ce652dd169f589538abe39b0fc9331b2317edcdc0e09",
+      "transcript": "transcripts/07_2026-08-10_019fe7f7-d981-7cf0-8a25-27b8430a1831.md",
+      "transcript_sha256": "37c8513df33652e4d54193a50932d96ad7277446bad6f4cf407ad9ec4b637038",
+      "counts": {
+        "user": 1,
+        "sub_agent": 13,
+        "assistant": 23,
+        "tool_call": 259,
+        "tool_output": 259
+      }
+    },
+    {
+      "position": 8,
+      "session_id": "019fe7f7-d981-7cf0-8a25-27b8430a1831",
+      "started_at_utc": "2026-08-10T01:50:15.388Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/10/rollout-2026-08-10T10-50-15-019fe95d-0533-73e1-b69b-30736dce6066.jsonl",
+      "source_sha256": "ee3c652d8180940ef7173e9385c9c429d6079500a24faf34de7d437960f177c5",
+      "transcript": "transcripts/08_2026-08-10_019fe7f7-d981-7cf0-8a25-27b8430a1831.md",
+      "transcript_sha256": "42ef59b7a144e9d6302c9376bbf6391ff45a82ffb6a8d2c976292bc48da6991f",
+      "counts": {
+        "user": 1,
+        "sub_agent": 15,
+        "assistant": 11,
+        "tool_call": 293,
+        "tool_output": 293
+      }
+    },
+    {
+      "position": 9,
+      "session_id": "019ff1bf-bcf9-7501-bbed-e98c3e16e1fc",
+      "started_at_utc": "2026-08-11T16:55:02.689Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/12/rollout-2026-08-12T01-55-02-019ff1bf-bcf9-7501-bbed-e98c3e16e1fc.jsonl",
+      "source_sha256": "00e1734e8bdc665b6d2985fcff7b0cff2944a2c3ac90859bf2158986af39cbcb",
+      "transcript": "transcripts/09_2026-08-11_019ff1bf-bcf9-7501-bbed-e98c3e16e1fc.md",
+      "transcript_sha256": "04be8c8538d842e6a8e77df36b4b71fdeebb28c408f9a3120537aff70436dcb1",
+      "counts": {
+        "user": 2,
+        "assistant": 4,
+        "tool_call": 13,
+        "tool_output": 13
+      }
+    },
+    {
+      "position": 10,
+      "session_id": "019ff1c2-e5f1-7c91-ab50-26ff78dac972",
+      "started_at_utc": "2026-08-11T16:58:29.786Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/12/rollout-2026-08-12T01-58-29-019ff1c2-e5f1-7c91-ab50-26ff78dac972.jsonl",
+      "source_sha256": "5c2221040996d61cc45687d87183dcfaf799ac7b4c21a14d20c6e4698e7d3151",
+      "transcript": "transcripts/10_2026-08-11_019ff1c2-e5f1-7c91-ab50-26ff78dac972.md",
+      "transcript_sha256": "484c1f8c35dbef6bb2708f713b9fb525160377feb26c81990fa88037b24266ba",
+      "counts": {
+        "user": 2,
+        "assistant": 4,
+        "tool_call": 14,
+        "tool_output": 14
+      }
+    },
+    {
+      "position": 11,
+      "session_id": "01a02a5c-a944-7a22-9acb-22e2c6e46d11",
+      "started_at_utc": "2026-08-22T16:49:00.363Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/23/rollout-2026-08-23T01-49-00-01a02a5c-a944-7a22-9acb-22e2c6e46d11_01a02a60-29cb-7760-8828-50a8a93533fe.jsonl",
+      "source_sha256": "950ad8bed87c237376b6567d3d1e9a103c77fa174aa06ef236f8a6ed509d1eab",
+      "transcript": "transcripts/11_2026-08-22_01a02a5c-a944-7a22-9acb-22e2c6e46d11.md",
+      "transcript_sha256": "391700943d5ef0fccdda740455245135f2ef1d0580fc61d0d0a4116ce775a830",
+      "counts": {
+        "user": 5,
+        "assistant": 17,
+        "tool_call": 78,
+        "tool_output": 78
+      }
+    },
+    {
+      "position": 12,
+      "session_id": "01a02f20-c7df-7cc1-a670-a018bbebde43",
+      "started_at_utc": "2026-08-23T14:57:52.607Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/23/rollout-2026-08-23T23-57-52-01a02f20-c7df-7cc1-a670-a018bbebde43.jsonl",
+      "source_sha256": "5dc3ef7b6668b9694104635668650a8928e383728de647e9ca41ff0645155231",
+      "transcript": "transcripts/12_2026-08-23_01a02f20-c7df-7cc1-a670-a018bbebde43.md",
+      "transcript_sha256": "8824545bc3fde28f1b5a086bfe43df1a40657f8a531b92a98d8b90919cd3f9ae",
+      "counts": {
+        "user": 8,
+        "assistant": 15,
+        "tool_call": 46,
+        "tool_output": 46
+      }
+    },
+    {
+      "position": 13,
+      "session_id": "01a02fc8-41e5-7222-a4f8-7efae666ac9d",
+      "started_at_utc": "2026-08-23T18:00:48.357Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/24/rollout-2026-08-24T03-00-48-01a02fc8-41e5-7222-a4f8-7efae666ac9d.jsonl",
+      "source_sha256": "da2ee0efb4fb3582e3107df04afddcee680f10333a5fb28c87785bf37fdff64a",
+      "transcript": "transcripts/13_2026-08-23_01a02fc8-41e5-7222-a4f8-7efae666ac9d.md",
+      "transcript_sha256": "13618e2385e288e8952c388b22467281d8d14c1dc17570d5b1b35a668eca5358",
+      "counts": {
+        "user": 4,
+        "assistant": 9,
+        "tool_call": 19,
+        "tool_output": 19
+      }
+    },
+    {
+      "position": 14,
+      "session_id": "01a02fcd-e2e0-79f0-9487-e72a09f94efa",
+      "started_at_utc": "2026-08-23T18:07:56.127Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/24/rollout-2026-08-24T03-07-56-01a02fcd-e2e0-79f0-9487-e72a09f94efa_01a02fce-c8df-7f42-9494-505928be67b6.jsonl",
+      "source_sha256": "e812916f257d8db3674e2ec09c0c6c3f0f8b2a47c2fa364ae7aa90a6a91bd407",
+      "transcript": "transcripts/14_2026-08-23_01a02fcd-e2e0-79f0-9487-e72a09f94efa.md",
+      "transcript_sha256": "c5e2a4eb7238576376a7b3cf3cd4627615c2e67120ebc9658b7f49665e132cd2",
+      "counts": {
+        "user": 8,
+        "assistant": 24,
+        "tool_call": 203,
+        "tool_output": 203
+      }
+    },
+    {
+      "position": 15,
+      "session_id": "01a03cc1-5693-7290-bfea-d1e04c3557dd",
+      "started_at_utc": "2026-08-26T06:28:18.707Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-28-18-01a03cc1-5693-7290-bfea-d1e04c3557dd.jsonl",
+      "source_sha256": "31ab136b0a22ce92820394e6950acbffa98d49608dcb390a365d46b5597e55d6",
+      "transcript": "transcripts/15_2026-08-26_01a03cc1-5693-7290-bfea-d1e04c3557dd.md",
+      "transcript_sha256": "2d5d7e716be4d8bcd37408bfe42800ffbbed31e2f95697ccff569f22f0bb1427",
+      "counts": {
+        "user": 4,
+        "assistant": 11,
+        "tool_call": 34,
+        "tool_output": 34
+      }
+    },
+    {
+      "position": 16,
+      "session_id": "01a03cc5-1ad1-7d41-980e-a08590959177",
+      "started_at_utc": "2026-08-26T06:32:25.553Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-32-25-01a03cc5-1ad1-7d41-980e-a08590959177.jsonl",
+      "source_sha256": "d6df29924a4aaba93f86b8afe40d6a4f859ea440b0278a45c8773bc6ae6292d9",
+      "transcript": "transcripts/16_2026-08-26_01a03cc5-1ad1-7d41-980e-a08590959177.md",
+      "transcript_sha256": "104640586982ee199a4d649256c2d4d390c61a627edf93a8aeab7ac18045014d",
+      "counts": {
+        "user": 2
+      }
+    },
+    {
+      "position": 17,
+      "session_id": "01a03cc5-1ad1-7d41-980e-a08590959177",
+      "started_at_utc": "2026-08-26T06:34:14.247Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-34-14-01a03cc5-1ad1-7d41-980e-a08590959177_01a03cc6-c367-75b0-917a-264b797e0cb0.jsonl",
+      "source_sha256": "d4ba37317c0ba8f79797c8b77b27c440ece1867102cb558d4fa69dc545156b75",
+      "transcript": "transcripts/17_2026-08-26_01a03cc5-1ad1-7d41-980e-a08590959177.md",
+      "transcript_sha256": "0de0bc270ef127c0f8082f2b2b77a9b85bf2d9a70b938e045aa1de0a6a8620c0",
+      "counts": {
+        "user": 3,
+        "assistant": 6,
+        "tool_call": 30,
+        "tool_output": 30
+      }
+    },
+    {
+      "position": 18,
+      "session_id": "01a03cc7-4218-7722-86a4-3393680c12e6",
+      "started_at_utc": "2026-08-26T06:34:46.681Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-34-46-01a03cc7-4218-7722-86a4-3393680c12e6.jsonl",
+      "source_sha256": "c37768247e8687314e2b0bd60ddd1f7aa587e67851d645db54be9c36eca0e998",
+      "transcript": "transcripts/18_2026-08-26_01a03cc7-4218-7722-86a4-3393680c12e6.md",
+      "transcript_sha256": "44a429d9d7b58dd206d108e62fde41c90411bfb9facedb2c1119ecadb5cdcf7b",
+      "counts": {
+        "user": 2
+      }
+    },
+    {
+      "position": 19,
+      "session_id": "01a03cc7-4218-7722-86a4-3393680c12e6",
+      "started_at_utc": "2026-08-26T06:35:08.208Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-35-08-01a03cc7-4218-7722-86a4-3393680c12e6_01a03cc7-9630-7e11-9d56-fadf79a03e8d.jsonl",
+      "source_sha256": "0c2dbdded650490d0b1954bdebf20ceef013bedca25f5e5a5ff65a5e7937e65d",
+      "transcript": "transcripts/19_2026-08-26_01a03cc7-4218-7722-86a4-3393680c12e6.md",
+      "transcript_sha256": "388dd7784e588deaf6c9d87a0d68b44a9c67b8a721b9d2dc0bf7397dc66db63e",
+      "counts": {
+        "user": 2,
+        "assistant": 5,
+        "tool_call": 47,
+        "tool_output": 47
+      }
+    },
+    {
+      "position": 20,
+      "session_id": "01a03cd6-43cb-79d1-9a7d-b7a040c42cba",
+      "started_at_utc": "2026-08-26T06:51:10.155Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T15-51-10-01a03cd6-43cb-79d1-9a7d-b7a040c42cba.jsonl",
+      "source_sha256": "88bdee0e56ab5f03c33796d00020a65d7076d0337875d8c0fa65a536d93f9d2a",
+      "transcript": "transcripts/20_2026-08-26_01a03cd6-43cb-79d1-9a7d-b7a040c42cba.md",
+      "transcript_sha256": "72e3b7753df619d6b2833910411ab3690fa2b13fec45a63ff0d4cf449441027c",
+      "counts": {
+        "user": 5,
+        "assistant": 20,
+        "tool_call": 164,
+        "tool_output": 164
+      }
+    },
+    {
+      "position": 21,
+      "session_id": "01a03cf3-7a02-7be3-a961-ead8e7fcd539",
+      "started_at_utc": "2026-08-26T07:23:04.579Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T16-23-04-01a03cf3-7a02-7be3-a961-ead8e7fcd539.jsonl",
+      "source_sha256": "1a46acd659a5207205fbb1e82746a81cf17a076ff34fcd522403429c340d9b34",
+      "transcript": "transcripts/21_2026-08-26_01a03cf3-7a02-7be3-a961-ead8e7fcd539.md",
+      "transcript_sha256": "0d957b61c7c417eabb15f42f17254de1e316639d3ec67f87baf8151ad8e7294d",
+      "counts": {
+        "user": 3,
+        "assistant": 5,
+        "tool_call": 22,
+        "tool_output": 22
+      }
+    },
+    {
+      "position": 22,
+      "session_id": "01a03cf3-7a02-7be3-a961-ead8e7fcd539",
+      "started_at_utc": "2026-08-26T08:48:07.015Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T17-48-07-01a03cf3-7a02-7be3-a961-ead8e7fcd539_01a03d41-5567-7db2-9550-ed6b6880ceda.jsonl",
+      "source_sha256": "433bd633c89e5a41cd63209d4952b1a391376bef376efef146174267d3e2027f",
+      "transcript": "transcripts/22_2026-08-26_01a03cf3-7a02-7be3-a961-ead8e7fcd539.md",
+      "transcript_sha256": "d95a601e33156f0f8b907536cb9e862fff81641ecbbdf2bb7033b282f66e4d26",
+      "counts": {
+        "user": 2,
+        "assistant": 8,
+        "tool_call": 54,
+        "tool_output": 54
+      }
+    },
+    {
+      "position": 23,
+      "session_id": "01a03d92-e4b2-7a01-9b8a-3c3ec71350ed",
+      "started_at_utc": "2026-08-26T10:17:12.172Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T19-17-12-01a03d92-e4b2-7a01-9b8a-3c3ec71350ed.jsonl",
+      "source_sha256": "bcf2e3a606088390c6ed12aec6483ff05a8cb4e8f8051a86293e71049767e67c",
+      "transcript": "transcripts/23_2026-08-26_01a03d92-e4b2-7a01-9b8a-3c3ec71350ed.md",
+      "transcript_sha256": "e7f7a220d8f45b2df6424c1056afdf936d98dbe27e566b471d94521eefcb7007",
+      "counts": {
+        "user": 2,
+        "assistant": 3,
+        "tool_call": 8,
+        "tool_output": 8
+      }
+    },
+    {
+      "position": 24,
+      "session_id": "01a03da4-525a-7b13-8a98-9dcb00fcc86d",
+      "started_at_utc": "2026-08-26T10:36:14.298Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/26/rollout-2026-08-26T19-36-14-01a03da4-525a-7b13-8a98-9dcb00fcc86d.jsonl",
+      "source_sha256": "3b764b4fbbad7ed3656f594a4b8aa3e99180de5edfea29fd93f0499353e53488",
+      "transcript": "transcripts/24_2026-08-26_01a03da4-525a-7b13-8a98-9dcb00fcc86d.md",
+      "transcript_sha256": "91321c13eaea9739d646a4a6f8362fbb1ff47f36c2817dadeb007bc1d088127c",
+      "counts": {
+        "user": 2,
+        "assistant": 2,
+        "tool_call": 3,
+        "tool_output": 3
+      }
+    },
+    {
+      "position": 25,
+      "session_id": "01a0401a-9945-7462-a146-6612d24cd9fc",
+      "started_at_utc": "2026-08-26T22:04:40.134Z",
+      "storage": "active session",
+      "source_path": "/Users/julliettelee/.codex/sessions/2026/08/27/rollout-2026-08-27T07-04-40-01a0401a-9945-7462-a146-6612d24cd9fc.jsonl",
+      "source_sha256": "259fcf6caddbad90a8387521b6990b7db6e0f4b7ab0c0e3a883a74c611b17c9c",
+      "transcript": "transcripts/25_2026-08-26_01a0401a-9945-7462-a146-6612d24cd9fc.md",
+      "transcript_sha256": "8ea208c3b06798921228bd06dbbc536b1591408d430639b9a3775803d9e20a69",
+      "counts": {
+        "user": 2,
+        "assistant": 3,
+        "tool_call": 12,
+        "tool_output": 11
+      }
+    }
+  ]
+}
