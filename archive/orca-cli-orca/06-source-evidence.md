@@ -1,0 +1,27 @@
+# 소스 근거 목록
+
+모든 링크는 분석을 고정한 커밋 `5beeefcb57555962bb93facc54b5f82484731802`를 가리킨다. 분석 문서의 `[E##]` 표기는 아래 행을 뜻한다.
+
+| ID | 원문 URL | 파일·줄 범위 | 뒷받침하는 사실 |
+| --- | --- | --- | --- |
+| E01 | [repository metadata](https://api.github.com/repos/orca-cli/orca) | API response `default_branch` | 기본 branch가 `main`이고 public repository임을 확인했다. |
+| E02 | [fixed recursive tree](https://api.github.com/repos/orca-cli/orca/git/trees/5beeefcb57555962bb93facc54b5f82484731802?recursive=1) | tree blob 39개 | 분석 대상의 파일 목록, agent/skill definition path 부재, README가 가리킨 누락 경로를 판정했다. |
+| E03 | [README](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/README.md#L19-L351) | 19–351 | 제품 설명, 12개 명령/MCP/TUI/config 주장, agent 설정, 문서·asset 링크를 보여 준다. 이는 문서 주장이지 단독 실행 증거가 아니다. |
+| E04 | [cmd/orca/main.go](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/cmd/orca/main.go#L1-L8) | 1–8 | binary main이 `cli.Execute()`만 호출하는 실제 진입점이다. |
+| E05 | [cli root and version](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/cli/root.go#L9-L20) · [version command](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/cli/version.go#L9-L26) | root 9–20; version 9–26 | Cobra root, error exit 1, build fields와 `versionCmd` 등록을 증명한다. |
+| E06 | [go.mod](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/go.mod#L1-L26) | 1–26 | Go 1.25 및 UUID, Cobra, testify, pure-Go SQLite 직접 의존성을 증명한다. |
+| E07 | [adapter port](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/adapter/adapter.go#L5-L97) | 5–97 | agent launch request, handle, result, adapter interface의 입력 계약을 증명한다. |
+| E08 | [adapter registry](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/adapter/registry.go#L9-L69) | 9–69 | registry의 lock, 중복/미발견 오류, factory get/register를 증명한다. |
+| E09 | [state definitions](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/state/state.go#L3-L43) | 3–43 | lifecycle status와 event의 정의를 증명한다. |
+| E10 | [state transition](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/state/transition.go#L5-L55) | 5–55 | legal state transition 표와 순수 `Apply` 구현을 증명한다. |
+| E11 | [store open](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/store.go#L13-L65) · [migrate](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/migrate.go#L12-L64) · [runs](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/runs.go#L16-L166) | store 13–65; migrate 12–64; runs 16–166 | SQLite DSN/WAL/single writer/migration과 runs CRUD 일부를 증명한다. |
+| E12 | [initial schema](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/migrations/0001_init.sql#L13-L120) | 13–120 | pod/run/dependency/context/constraint/log/event, FTS와 trigger, indexes schema를 증명한다. |
+| E13 | [worktree manager](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/worktree/worktree.go#L19-L135) | 19–135 | root canonicalization, create branch/worktree, archive move, non-fatal prune을 증명한다. |
+| E14 | [adapter registry tests](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/adapter/registry_test.go#L14-L91) | 14–91 | round-trip, duplicate, unknown, factory error tests를 증명한다. |
+| E15 | [state tests](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/state/state_test.go#L13-L99) | 13–99 | legal/illegal/unknown transition test 범위를 증명한다. |
+| E16 | [store tests](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/store_test.go#L13-L107) · [runs tests](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/store/runs_test.go#L42-L196) · [worktree tests](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/internal/worktree/worktree_test.go#L17-L105) | 각 링크의 범위 | store reopen/FTS, run CRUD/concurrent status update, worktree create/archive test 범위를 증명한다. |
+| E17 | [GoReleaser config](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/.goreleaser.yaml#L1-L47) | 1–47 | `./cmd/orca` build target, CGO off, OS/arch, ldflags, checksum을 증명한다. |
+| E18 | [CI workflow](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/.github/workflows/ci.yml#L3-L56) | 3–56 | PR/main push의 vet/lint/race test/coverage artifact 설정을 증명한다. 실행 성공 자체는 증명하지 않는다. |
+| E19 | [release workflow](https://github.com/orca-cli/orca/blob/5beeefcb57555962bb93facc54b5f82484731802/.github/workflows/release.yml#L3-L35) | 3–35 | v tag trigger, `contents: write`, GoReleaser action과 `GITHUB_TOKEN` 사용 설정을 증명한다. |
+| E20 | [planned package docs](https://github.com/orca-cli/orca/tree/5beeefcb57555962bb93facc54b5f82484731802/internal) | `config/constraint/mcp/pod/runner/tui` 각 `doc.go` | 각 패키지에 역할 설명만 있고 fixed tree에는 그 package의 추가 `.go` 구현 파일이 없음을 tree와 대조했다. |
+| E21 | [fixed recursive tree](https://api.github.com/repos/orca-cli/orca/git/trees/5beeefcb57555962bb93facc54b5f82484731802?recursive=1) | path absence: `DOCS.md`, `CONTRIBUTING.md`, `assets/*` | README link/image 대상이 고정 tree에 없고 Contents API 조회도 실패했음을 기록한다. |
