@@ -27,7 +27,15 @@ expected:
   - UNIT_NONE_WITH_GATE
   guards: []
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-08-27'
+  reviewed_by: user
+  round: shadow-1
+  verdict: confirmed
+  changes: []
+  note: intent=read 이므로 payment 게이트(applies_to write/delete/deploy/mixed)는 발동하지 않고, privacy-security(applies_to any)만
+    발동하는 것이 정책표 설계 그대로다. unit=none + UNIT_NONE_WITH_GATE 경고 조합도 의도된 것
+  followup: payment 게이트를 실제로 발동시키는 fixture 가 아직 0건이다 — M3 종료 조건(게이트별 fixture ≥ 1)에서 별도로 채운다
 source:
   kind: session-log
   ref: claude:Documents-Claude-Projects------------:1265198f

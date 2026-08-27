@@ -24,7 +24,14 @@ expected:
   warnings:
   - DOCS_ONLY_CHANGE
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-08-27'
+  reviewed_by: user
+  round: shadow-1
+  verdict: confirmed
+  changes: []
+  note: archive 는 저장소 문서(docs facet)이지 운영 중인 시스템의 실제 데이터(ops-data)가 아니므로 ops-data-deletion hard gate 는
+    발동하지 않는다. 대신 실행 가드 deletion 이 승인을 요구하는 두 층위 구분이 의도된 설계다
 source:
   kind: repo
   ref: implementation-plan §4.1/§7

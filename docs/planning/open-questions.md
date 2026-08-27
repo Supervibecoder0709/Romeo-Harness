@@ -32,7 +32,7 @@ authority: canonical
 | A-10 | 하네스 부착이 코드 프로젝트가 아닌 프로젝트에도 같은 분류로 작동한다 | 면접 준비·커머스 운영 사례는 T0/T1/T2와 매핑되지 않는다 | **v1 에서는 검증하지 않는다(D-43)**. 비코드 fixture 2건(S15·S24)은 `OUT_OF_SCOPE_NON_CODE` 정직 보고가 기대값 | S15, S24 |
 | A-11 | 고정 SHA 원문(`verbatim`) 스킬이 어댑터 투영 후 Claude `.claude/skills`와 Codex `.agents/skills` **양쪽에서 실제로 discovery**된다 | 정적 분석뿐, 실행 미검증. 실패하면 해당 스킬은 `rewrite` 강등 | M2 doctor 프로브 + 충돌 fixture (K-68) | D-54, archive superpowers `05` |
 | A-12 | BMAD 설치기가 Codex 대상으로도 동작하거나, 동작하지 않아도 "Claude 전용 discovery 능력"으로 정직 표기하면 동등성 게이트에 영향이 없다 | 현재 설치는 `ides: [claude-code]`뿐 | G-M3에서 Codex 설치 시도 1회 + capabilities.yaml 표기 검토 | D-55, `~/bmad-ordi/_bmad/_config/manifest.yaml` |
-| A-13 | 정책표 fixture 일치율 100%(M0)가 실제 분류 정확도를 뜻한다 | 기대값을 정책표 저자가 썼으므로 자기 일관성 검사다. LLM 이 요청 원문에서 같은 분류를 제안하는지는 별개 | shadow mode 20건의 분류 수정률(human_correction) | M0 리포트 2026-08-27 |
+| A-13 | 정책표 fixture 일치율 100%(M0)가 실제 분류 정확도를 뜻한다 | **부분 반증(2026-08-27, shadow 1차 5건)**: 카드 수정률 2/5 = 40%. 단 수정된 것은 정책표 계산이 아니라 LLM 이 제안한 입력 분류값(mode 1·uncertainty 1)이고, unit·hard gate 는 5/5 정확했다. 일치율과 분류 정확도는 실제로 별개임이 확인됐다 | shadow mode 20건까지 15건 남음. 수정 유형(요청에 섞인 조사·판단 단계를 놓쳐 깊이를 낮게 잡음)이 반복되는지 관찰 | M0 리포트 2026-08-27, `fixtures/shadow/2026-08-27-cards.md` |
 
 ---
 

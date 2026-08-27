@@ -17,15 +17,30 @@ classification:
   - brand
   gates: []
   blast_radius: small
-  uncertainty: low
+  uncertainty: medium
 expected:
-  profile: quick
+  profile: standard
   package:
   - spec
   parts:
   - design-landing
+  - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-08-27'
+  reviewed_by: user
+  round: shadow-1
+  verdict: corrected
+  changes:
+  - field: classification.uncertainty
+    from: low
+    to: medium
+    reason: 카피를 바꾼다는 것은 알지만 어떤 카피로 바꿀지는 선행 조사(브레인스토밍·spec 확인, 타깃 유저 분석, 실패 사례 정리) 결과에 달렸다.
+      rubric 정의상 '무엇은 알지만 방법 일부가 미정'(medium)이다
+  downstream:
+  - profile quick → standard (profile:uncertainty.medium 발동)
+  - parts +superpowers (overlay:profile.standard-or-deeper 가 profile_min standard 에서 발동)
+  unit_confirmed: T0 — 산출물은 문서 1건의 카피 교체이고 새 사용자 흐름이 없다
 source:
   kind: session-log
   ref: claude:orca-workspaces-ordi-desktop-app-strategy-workflow:81527ff2

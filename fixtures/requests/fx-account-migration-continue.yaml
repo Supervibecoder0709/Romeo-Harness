@@ -46,7 +46,14 @@ expected:
   parts:
   - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-08-27'
+  reviewed_by: user
+  round: shadow-1
+  verdict: confirmed
+  changes: []
+  note: 파일럿 → 5개 배치 → final remainder → G5 라는 마일스톤 구조 때문에 T2 승격을 검토했으나, AUTOMATION-PLAN 이 이미 승인된 계약이라
+    Charter 를 새로 쓰지 않는다(D-25). 기존 문서는 inputs 로 링크하고 T1(Brief+Spec)을 유지한다
 source:
   kind: session-log
   ref: claude:orca-workspaces-coupang-automation-account-migration-claude-handoff:aea5900d

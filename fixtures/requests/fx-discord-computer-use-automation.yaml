@@ -10,7 +10,7 @@ context:
   notes: 가능 여부 자체가 미정 → 실험 + 능력 확인.
 classification:
   unit: T1
-  mode: experiment
+  mode: discovery
   intent: write
   facets:
   - browser-automation
@@ -25,14 +25,33 @@ expected:
   - brief
   - spec
   sections:
-  - experiment-design
+  - discovery-plan
   - capability-check
+  blocks:
+  - spec-ready
+  - discovery-result
   warnings:
   - CAPABILITY_CHECK_REQUIRED
   parts:
+  - bmad-cis
   - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-08-27'
+  reviewed_by: user
+  round: shadow-1
+  verdict: corrected
+  changes:
+  - field: classification.mode
+    from: experiment
+    to: discovery
+    reason: 요청 4개 항목 중 3개가 '가능한지 분석하고 제안하라 / 알려달라'다. 측정 가능한 실험(experiment)이 아니라 해법 자체가 미정인
+      조사(discovery)이며, 되는지 확인하기 전에 구현이 나가지 않도록 dispatch 를 차단해야 한다
+  downstream:
+  - sections experiment-design → discovery-plan (overlay:mode.discovery)
+  - blocks +discovery-result (구현 dispatch 차단)
+  - parts +bmad-cis (CIS 기획 구체화 — D-64 사용자 선호와 정합)
+  - profile deep 유지 (mode.discovery·uncertainty.high 둘 다 min deep)
 source:
   kind: session-log
   ref: claude:orca-workspaces-coupang-automation-discord-setup:e42f6ea4
