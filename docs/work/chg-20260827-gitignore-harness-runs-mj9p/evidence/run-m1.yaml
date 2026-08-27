@@ -1,0 +1,94 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run-m1
+task_id: null
+dispatch_id: null
+unit_id: chg-20260827-gitignore-harness-runs-mj9p
+spec_ref:
+  path: docs/work/chg-20260827-gitignore-harness-runs-mj9p/spec.md
+  sha256: 4aaa06f35bbef1ccb589a763f026c80a0ed6336b936f1b5e7bff5c5b32dc43ec
+base_sha: bac8cffe8f7e11e90a3c47ba9303f460888ae92c
+head_sha: c55ba9d4e63a88529758e9f8da1b13cc235803d6
+dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
+started_at: '2026-08-27T16:38:53+09:00'
+finished_at: '2026-08-27T16:38:56+09:00'
+commands:
+- id: check-1
+  command: git check-ignore -q .harness/runs/probe/x.log
+  exit_code: 0
+  started_at: '2026-08-27T16:38:53+09:00'
+  finished_at: '2026-08-27T16:38:53+09:00'
+  seconds: 0.018
+  log: .harness/runs/chg-20260827-gitignore-harness-runs-mj9p/run-m1/01-check-1.log
+  log_sha256: 4c0935f0a2d6d4343981d92344f4fd7543eb432a21fd323719bf46964e89f9d4
+  stdout_tail: ''
+- id: check-2
+  command: git check-ignore -q .harness/cache/probe
+  exit_code: 0
+  started_at: '2026-08-27T16:38:53+09:00'
+  finished_at: '2026-08-27T16:38:53+09:00'
+  seconds: 0.018
+  log: .harness/runs/chg-20260827-gitignore-harness-runs-mj9p/run-m1/02-check-2.log
+  log_sha256: 536dcd54c0eb6e102eab4e51332496d93b57c5dedd17dd3706c0b170ebaf98dd
+  stdout_tail: ''
+- id: check-3
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-27T16:38:53+09:00'
+  finished_at: '2026-08-27T16:38:56+09:00'
+  seconds: 3.553
+  log: .harness/runs/chg-20260827-gitignore-harness-runs-mj9p/run-m1/03-check-3.log
+  log_sha256: 13de0194f8850f24d2b2894d6fd9edb12049e3ac336ced7cb290f9034742ed83
+  stdout_tail: ''
+changed_files:
+- .gitignore
+- romeo/cli.py
+- romeo/evidence.py
+artifact_hash: 4376b058b77a59819da9d4082c1af9c013644fe2f7e94b777e406cefd0fb5414
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-27T16:39:22+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    detail: ''
+  - id: APPROVED
+    ok: true
+    detail: status=active approved_at=2026-08-27T16:38:12+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    detail: evidence/*.yaml 없음 — romeo evidence run 으로 만든다
+  - id: FRESH_HEAD
+    ok: true
+    detail: evidence c55ba9d4e63a vs 현재 c55ba9d4e63a
+  - id: FRESH_TREE
+    ok: true
+    detail: evidence 682e4deea426 vs 현재 682e4deea426 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-1: exit 0 — git check-ignore -q .harness/runs/probe/x.log'
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-2: exit 0 — git check-ignore -q .harness/cache/probe'
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-3: exit 0 — python3 -m unittest discover -s tests'
+  - id: AC_ALL_CHECKED
+    ok: true
+    detail: 미체크 0개
+  - id: NO_OPEN_LOOP
+    ok: true
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    detail: changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    detail: spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.

@@ -10,14 +10,14 @@ gates: []
 profile: quick
 blast_radius: small
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-08-27T16:38:12+09:00'
 approved_by: Supervibecoder0709
 base_sha: bac8cffe8f7e11e90a3c47ba9303f460888ae92c
-closed_at: null
+closed_at: '2026-08-27T16:39:22+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run-m1.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T0=quick']
@@ -38,9 +38,9 @@ updated: '2026-08-27'
 - **왜 지금:** M1 부터 `romeo evidence` 가 명령 로그를 `.harness/runs/` 에 쓴다. 제외 규칙이 없으면 로그가 커밋 후보로 잡히고, 작업 트리 신선도 계산도 흐려진다(K-24).
 - **기대 결과:** `git status` 에 `.harness/runs/`·`.harness/cache/` 아래 파일이 나타나지 않는다. evidence yaml 에는 로그 경로와 해시만 남는다.
 - **수용 기준:**
-  - [ ] AC-1 `.harness/runs/` 아래 임의 경로가 `git check-ignore` 에서 무시 대상으로 판정된다
-  - [ ] AC-2 `.harness/cache/` 아래 임의 경로가 `git check-ignore` 에서 무시 대상으로 판정된다
-  - [ ] AC-3 기존 테스트 23개가 그대로 통과한다
+  - [x] AC-1 `.harness/runs/` 아래 임의 경로가 `git check-ignore` 에서 무시 대상으로 판정된다
+  - [x] AC-2 `.harness/cache/` 아래 임의 경로가 `git check-ignore` 에서 무시 대상으로 판정된다
+  - [x] AC-3 기존 테스트 23개가 그대로 통과한다
 - **위험과 되돌리기:** 위험 거의 없음. 되돌리기는 `.gitignore` 삭제 또는 `git revert <커밋>`.
 - **결정 필요:** 없음
 
@@ -86,6 +86,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-27T16:39:22+09:00 · HEAD c55ba9d4e63a
 
-- (없음)
+- [evidence/run-m1.yaml](evidence/run-m1.yaml) — exit codes [0, 0, 0]
