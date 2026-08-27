@@ -1,0 +1,27 @@
+id: fx-query-draft-fix
+request_text: <url> 이 쿼리 draft 수정해줘. owner level 필터 걸어서 실제 유저들만 나오도록 해주고, 타임존은 유저 로컬 기준으로 추릴 수 있는지 확인해줘.
+context:
+  project: internal-saas-analytics
+  kind: code
+  notes: 집계 쿼리 수정. PII 컬럼 없음 → 게이트 없음(제안 단계 판단).
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - data
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  parts: []
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:Documents-Claude-Projects------------:f95922ee
+  date: '2026-07-07'

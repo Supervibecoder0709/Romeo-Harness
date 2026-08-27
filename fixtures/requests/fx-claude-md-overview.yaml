@@ -1,0 +1,32 @@
+id: fx-claude-md-overview
+request_text: '아래 내용 읽고, claude.md에 200줄 내외로 프로젝트 overview 와 함께 꼭 들어가야 할 내용만 추려서 작성해줘. 이 프로젝트는 사용자가 요청한 깃헙 링크를 분석해서
+  파일을 읽고, 핵심 구조와 read.me, 사용설명서, cluade.md, skill, agent.md 등 외국어로 되어 있는 것들을 원문 그대로 한국어로 번역해 아카이브하는 것이 목적이야. #사용
+  시나리오 1. 사용자가 깃헙 주소를 입력한다. 2. 해당 레포를 분석한다. 3. 핵심 구조를 추린다. 이때, 사용자가 궁금해하는 정보는 다음과 같다. -이repo의 사용 설명서 격의 문서 (readme,claude.md,agent.md
+  등) - 이 레포가 동작하는 워크플로우 요약 (어떤 원리로 어떻게 동작하는지 비개발자가 쉽게 이해할 수 있도록) - 핵심 구성 요소의 설명 문서 (클로드나 코덱스 에이전트,스킬 설명서들의 원문 그대로,혹은
+  기타 핵심적이라 생각하는 요소)) - 위 핵심 구성 요소들이 어떤 역할하는지 간략하게 요약한 표 4. 위 정보들을 레포별로 폴더링해 이 프로젝트에 아카이브한다.'
+context:
+  project: understand-every-repo-ko
+  kind: code
+  notes: null
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  warnings:
+  - DOCS_ONLY_CHANGE
+  parts: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-Understand-every-repo-ko:b3a060c1
+  date: '2026-08-10'

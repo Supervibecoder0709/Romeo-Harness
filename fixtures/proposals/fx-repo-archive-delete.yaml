@@ -1,0 +1,65 @@
+request:
+  text: 채택하지 않기로 한 archive/farion1231-cc-switch 아카이브 하나를 삭제해줘.
+  project: romeo-harness
+  context: hard gate 는 없지만 실행 가드(삭제)는 승인 필요 — 두 층위 구분.
+facts:
+- archive/farion1231-cc-switch 는 채택 제외(excluded)로 판정됐다
+- 삭제 대상은 디렉터리 1개(문서 9개)
+assumptions:
+- 인덱스(archive/README.md)는 스크립트로 재생성한다
+unknowns:
+- 다른 문서가 이 아카이브를 링크하는지
+candidate:
+  unit: T0
+  mode: delivery
+  intent: delete
+  facets:
+  - docs
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  slug: archive-delete-cc-switch
+  title: cc-switch 아카이브 삭제
+factors:
+  scope:
+    level: low
+    note: 디렉터리 1개
+  uncertainty:
+    level: low
+    note: 명확
+  impact:
+    level: low
+    note: 참고 자료
+  reversibility:
+    level: low
+    note: git 이력에서 복구
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

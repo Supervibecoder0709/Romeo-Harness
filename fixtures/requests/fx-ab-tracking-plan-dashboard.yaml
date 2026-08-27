@@ -1,0 +1,34 @@
+id: fx-ab-tracking-plan-dashboard
+request_text: a/b 테스트 까먹고 있어서 내 지표에 못 넣었어. 내가 원하는 지표들 각 섹션별로 a/b 추적은 어떻게 하면 좋을지 계획세우고 간단히 대시보드에 보여지도록 계획 수정해줘 1.
+  최종 cta 7번 섹션으로 추가해줘 2. 가장 먼저 받아보기는 버튼을 누른 순간 기준으로 해줘. 폼 작성 실패율은 별도로 기록해. 3. 아직 배포 전이야. 4. 아직 없는 것 같아.
+context:
+  project: ordi-desktop-app
+  kind: code
+  notes: 배포 전이라 운영 데이터 게이트 없음.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - analytics
+  - data
+  - ui
+  gates: []
+  blast_radius: medium
+  uncertainty: medium
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - ui-state-table
+  parts:
+  - design-ui
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-ordi-desktop-app-event-kpi-setup:20a7db24
+  date: '2026-08-10'

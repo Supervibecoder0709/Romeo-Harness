@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "romeo/frontmatter",
+  "title": "Romeo 작업 문서 frontmatter",
+  "description": "docs/work/<unit-id>/{spec,brief,charter}.md 의 frontmatter. 분류 기록 겸 재개 체크포인트(D-05, C-B4).",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "unit",
+    "mode",
+    "intent",
+    "facets",
+    "gates",
+    "profile",
+    "status",
+    "routing",
+    "created",
+    "updated"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(chg|feat|init)-[0-9]{8}-[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]{4}$"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "spec",
+        "brief",
+        "charter"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "T0",
+        "T1",
+        "T2"
+      ]
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "delivery",
+        "discovery",
+        "experiment"
+      ]
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "delete",
+        "deploy",
+        "mixed"
+      ]
+    },
+    "facets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "payment",
+          "privacy-security",
+          "legal",
+          "ops-data-deletion",
+          "migration",
+          "public-api",
+          "irreversible-policy",
+          "availability"
+        ]
+      }
+    },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "quick",
+        "standard",
+        "deep"
+      ]
+    },
+    "blast_radius": {
+      "type": "string",
+      "enum": [
+        "small",
+        "medium",
+        "large"
+      ]
+    },
+    "uncertainty": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "done",
+        "dropped",
+        "superseded"
+      ]
+    },
+    "approved_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "approved_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "closed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "parent": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "routing": {
+      "type": "object",
+      "required": [
+        "policy_version",
+        "fired_rules"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "policy_version": {
+          "type": "string"
+        },
+        "fired_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}"
+    },
+    "base_sha": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

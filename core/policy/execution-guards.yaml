@@ -1,0 +1,81 @@
+# Romeo 실행 가드 — "요청이 건드리는 영역"(hard gate)과 다른 층위인 "지금 하려는 행동"의 위험 목록.
+# 기획 시점에는 카드에 힌트로만 인쇄하고, 실행 시점에 승인·설명 항목을 강제한다.
+# 집행 수단: 역할 계약(M2) + Claude permission deny(M2) + Codex sandbox/approval(M2) + Orca gate-create(M3).
+# M0·M1에서는 데이터와 카드 표시만 한다. 승인은 대화 승인 기록(evidence.approvals)으로 남긴다.
+# 근거: 원 요청 "안전하게 실행하고 완료를 판정하는 능력", constraints K-50·K-66, 사용자 메모리(안전 브레이크 C).
+policy_version: "0.1.0"
+updated: "2026-08-27"
+
+required_explanation:
+  - 영향 범위 (무엇이 어디까지 바뀌는가)
+  - 사전 백업 (되돌릴 수 있는 스냅샷이 있는가)
+  - 복구 방법 (실패 시 정확한 명령·절차)
+  - 확인할 내용 (승인자가 보고 판단할 사실)
+
+approval:
+  mechanism:
+    M1: 대화에서 명시적 승인 → evidence.approvals[{guard, approved_at, approved_by, note}]
+    M3: orca orchestration gate-create --question ... → gate id·응답·시각을 evidence에 기록
+  rule: 승인 전 상태 변경 0건. 승인 없이 실행하면 BLOCKED_APPROVAL 로 종료하고 evidence를 무효로 본다.
+
+guards:
+  - id: payment-charge
+    name: 비용 결제
+    examples: [유료 API 대량 호출, 이미지 생성, 도메인·플랜 구매, 크레딧 사용]
+    triggers: {facets: [payment, ai-cost], intent: [write, deploy, mixed]}
+  - id: permission-escalation
+    name: 권한 확대
+    examples: [토큰 스코프 확대, IAM 정책 변경, sudo, 새 시크릿 발급]
+    triggers: {actions: [escalate, token-scope, iam]}
+  - id: public-exposure
+    name: 공개 전환
+    examples: [private → public 저장소, 공개 URL 배포, 문서 외부 공유]
+    triggers: {actions: [publish, share, expose]}
+  - id: production-deploy
+    name: 운영 배포
+    examples: [VPS 재배포, 프로덕션 빌드 반영, 서비스 재시작]
+    triggers: {intent: [deploy, mixed]}
+  - id: ops-data-change
+    name: 운영 데이터 변경
+    examples: [운영 DB 쓰기, 고객·주문·계정 데이터 수정, 대량 갱신]
+    triggers: {facets: [ops-data], intent: [write, delete, deploy, mixed]}
+  - id: db-migration
+    name: 데이터베이스 마이그레이션
+    examples: [스키마 변경 적용, 데이터 이전 실행]
+    triggers: {facets: [migration], intent: [write, deploy, mixed]}
+  - id: account-ownership
+    name: 계정·소유권 변경
+    examples: [소유자 이전, 계정 삭제·병합, 결제 수단 변경]
+    triggers: {actions: [transfer, ownership]}
+  - id: deletion
+    name: 삭제
+    examples: [파일·디렉터리 삭제, 아카이브 삭제, 리소스 파기]
+    triggers: {intent: [delete, mixed]}
+  - id: main-merge
+    name: main 병합
+    examples: [PR merge, 기본 브랜치 fast-forward]
+    triggers: {actions: [merge]}
+  - id: workspace-deletion
+    name: 다른 작업 공간 삭제
+    examples: [git worktree remove, 다른 세션의 worktree 정리]
+    triggers: {actions: [worktree-remove]}
+  - id: external-transfer
+    name: 외부 전송·게시
+    examples: [git push, PR 생성, 메시지 발송, 외부 API로 데이터 전송]
+    triggers: {actions: [push, pr, send, upload]}
+
+# trigger 의미: 적힌 키(intent / facets / actions)가 모두 맞아야 발동한다(AND). 없는 키는 조건 없음.
+
+# 집행 수단 초안 (M2에서 어댑터가 실제 설정으로 컴파일한다)
+enforcement:
+  claude:
+    permission_deny:
+      - "Bash(git push*)"
+      - "Bash(gh pr merge*)"
+      - "Bash(git worktree remove*)"
+      - "Bash(rm -rf /*)"
+  codex:
+    reviewer_sandbox: read-only
+    approval_policy: on-request
+  orca:
+    gate: "orca orchestration gate-create --question <설명> --options approve,reject"

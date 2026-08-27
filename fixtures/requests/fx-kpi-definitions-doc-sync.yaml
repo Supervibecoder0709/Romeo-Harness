@@ -1,0 +1,31 @@
+id: fx-kpi-definitions-doc-sync
+request_text: 동의 문안에 반영할 필요 없어. 마지막으로, 현재 대시보드에 반영되어 있는 kpi들의 정의서를 정리한 문서를 하나 만들고 대시보드와 동기화 시켜줘. 이 문서는 현재 kpi 대시보드에서
+  보여주는 지표들이 어떤 목적을 가지고 어떻게 구성이 되어 있는지 지표 정의 측면에서 설명하는 문서여야 하고, 앞으로 대시보드에 지표가 추가될 때 이 문서도 함께 업데이트 될 수 있도록 규칙 추가하고
+  싶어. 섹션별로 정의서를 정리하고 동기화 할 수 있게 만든 다음 보고해
+context:
+  project: ordi-desktop-app
+  kind: code
+  notes: 문서 + 동기화 규칙. 대시보드 변경 시 함께 갱신.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  - analytics
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-ordi-desktop-app-event-kpi-setup:20a7db24
+  date: '2026-08-10'

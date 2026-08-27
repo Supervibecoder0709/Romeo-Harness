@@ -1,0 +1,41 @@
+id: fx-artifact-attachment-commits
+request_text: 'ultracode 로 진행해줘. §6-F artifact 파일 첨부 게시의 **커밋 3·4·5** 를 순서대로 구현하는 작업이다. 정본 계획서는 `_bmad-output/implementation-artifacts/door-artifact-attachment-plan.md`
+  — §10 표가 커밋별 범위와 green 기준을, §2 가 불변식 INV-1~7 을, §4~§5 가 데이터 흐름과 모듈별 설계를, §6 이 실패 모드 판정표를, §7 이 확정 상수를, §9 가 테스트
+  계획을 정의한다. 왜 그렇게 설계했는지와 초판이 무엇을 틀렸는지는 착수 게이트 리포트 `_bmad-output/implementation-artifacts/plan-reviews/<masked-long-id>.md`
+  에 있으니 먼저 읽어라. 계약 정본은 `_bmad-output/planning-artifacts/specs/<masked-long-id>/` 이고 값·절차·판정이 어긋나면 SPEC 이 이긴다. 커밋
+  1(문서 정합화)·2(artifact 검증기 + 로그·감사 bounded guard)는 이 브랜치에 이미 있다 — HEAD 1117172, platform/door 테스트 330건 그린. 반드시 지킬
+  것: (1) 각 커밋마다 platform/door 에서 npm run typecheck · npm run lint · npx vitest run 전건 그린을 확인하고 레포 루트에서 bash scripts/scan-secrets.sh
+  통과까지 본 뒤에만 커밋한다. (2) INV-1 optional-only — 기존 330건은 무수정이 목표다. 반환 타입을 넓힐 때도 additive 로만 한다. (3) 커밋 4 는 §5.9 reports
+  webhook probe 게이트를 먼저 넣기 전에 게시를 켜지 마라 — lifecycle.ts:262 가 두 route 를 OR 로 보므로 죽은 reports webhook 의 첫 게시 실패가 전
+  피처 pre-ACK 거부로 번진다. (4) 테스트 픽스처에 base64 리터럴과 raw 제어문자를 쓰지 마라 — scan-secrets.sh 의 COUPANG_RE 가 따옴표로 감싼 40자+ 영숫자를
+  무조건 잡고, raw 제어문자는 소스에 들어가면 편집 도구가 깨진다. 런타임 생성(Buffer.alloc(n,0x41).toString) 과 유니코드 이스케이프를 써라. (5) 커밋 메시지는 한국어로
+  쓰고 끝에 Co-Authored-By: Claude Opus 5 (1M context) <<email>> 를 붙인다. (6) 프로젝트 규약은 CLAUDE.md 를 따른다. 커밋 6(배포 문서·§6-H
+  스모크·MemoryHigh unit)은 이 작업 범위 밖이니 손대지 마라. 진행 중 계획서와 코드가 어긋나면 계획서가 아니라 SPEC 과 코드 실측을 근거로 판단하고, 계획서를 고쳐야 한다면 그 근거를
+  커밋 메시지에 남겨라. 작업 상태가 바뀔 때마다 orca worktree set --worktree active --comment 로 진행 상황을 갱신해라.'
+context:
+  project: coupang-automation
+  kind: code
+  notes: 정본 계획서는 inputs 링크.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - integration
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  parts:
+  - superpowers
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-coupang-automation-door-artifact-impl:044c8cea
+  date: '2026-08-10'

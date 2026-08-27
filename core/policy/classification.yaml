@@ -1,0 +1,205 @@
+# Romeo 분류 정책표 — 라우터가 "요청이 무엇인가"를 기록하는 축과, 깊이(profile)를 계산하는 규칙.
+# 사람이 확정한 분류(unit·mode·intent·facets·gates·2질문)를 입력으로 받아 결정론적으로 평가한다.
+# LLM은 제안만 하고(D-06), 사람이 확정하고, 이 표가 강제한다. 합산 점수는 쓰지 않는다(D-07).
+# 근거: capability-map C-A1~A7, decision-register D-03·D-06·D-07·D-11, 사용자 결정 2026-08-27(profile 라벨 = 정책표 출력).
+policy_version: "0.1.0"
+updated: "2026-08-27"
+
+# ── 1. planning unit (승인 단위) ─────────────────────────────────────────────
+units:
+  none:
+    name: 기획 단위 없음
+    when: 저장소 산출물을 만들지 않는 요청. 질문·조사·설명·읽기 전용 확인. 답변 자체가 결과물이다.
+    documents: 0
+    note: 분류 카드만 기록하고 문서를 만들지 않는다. 게이트 영역을 읽기만 해도 카드에 주의를 인쇄한다.
+  T0:
+    name: Change
+    when: 목적이 하나인 작은 변경. 새 사용자 흐름이 없고 파일 몇 개, 되돌리기 쉬움. 문구·설정·스크립트 보강·문서 1건.
+    documents: 1
+    note: 기획 파일 0개. Tech Spec 안 Planning Capsule(≤ 20줄)로 끝낸다 (D-04).
+  T1:
+    name: Feature
+    when: 사용자에게 보이는 동작이 새로 생기거나 바뀌거나, 여러 모듈에 걸친 능력. 수용 기준(AC)이 필요하다.
+    documents: 2
+    note: Compact Brief + Tech Spec.
+  T2:
+    name: Initiative
+    when: 여러 기능을 포함하거나 새 프로젝트·전략 수준. 마일스톤·검증 계획·성공 지표가 필요하다.
+    documents: 3
+    note: Charter + (기능별) Brief + Spec.
+
+# ── 2. mode (탐색 축, unit과 독립) ────────────────────────────────────────────
+modes:
+  delivery: 무엇을 만들지 알고 있다. 계획 → 구현 → 검증.
+  discovery: 문제나 해법이 미정. 조사·가설 검증·프로토타입·spike가 먼저다. 구현 dispatch를 차단한다.
+  experiment: 측정 가능한 실험. 성공 기준·중단 조건·측정 방법을 먼저 정한다.
+
+# ── 3. intent (지금 하려는 행동의 종류) ──────────────────────────────────────
+intents:
+  read: 읽기·조회·분석·보고. 상태를 바꾸지 않는다.
+  write: 파일·코드·문서·설정을 만들거나 고친다.
+  delete: 파일·데이터·리소스·작업 공간을 지운다.
+  deploy: 운영 환경에 반영한다(배포·재배포·마이그레이션 실행).
+  mixed: 위 여러 가지가 섞여 있다. 가장 위험한 쪽으로 평가한다.
+
+# ── 4. facet (요청이 건드리는 영역, 복수) ───────────────────────────────────
+facets:
+  ui: 화면·컴포넌트·상태(빈·로딩·오류·권한 없음·성공)
+  brand: 랜딩·마케팅·브랜드 인상·창의 작업
+  copy: 문구·카피·번역
+  data: 데이터 조회·쿼리·스키마 확인·지표 정의
+  analytics: 이벤트·KPI·대시보드·추적
+  payment: 결제·정산·가격·과금 기록
+  privacy: 개인정보·사용자 식별 정보
+  security: 시크릿·취약점·권한 경계
+  auth: 계정·로그인·권한 부여
+  legal: 약관·규제·법무
+  ops-data: 운영 중인 시스템의 실제 데이터(DB·계정·주문·고객)
+  migration: 데이터·계정·스키마 이전
+  public-api: 외부에 공개되는 API·계약
+  policy: 제품·운영 정책의 규칙·기본값 변경(가격·보존·권한 정책처럼 되돌리기 어려운 것). 프로젝트 규칙 문서(CLAUDE.md 등)는 docs
+  availability: 서비스 중단·가용성에 영향
+  deploy: 배포·운영 환경·인프라 반영
+  infra: 호스트·네트워크·클라우드 설정
+  tooling: 개발 도구·CLI·스크립트·에이전트 설정
+  docs: 문서·정의서·규칙 문서
+  integration: 외부 서비스 연동(슬랙·디스코드·API)
+  browser-automation: 브라우저·데스크톱 자동화(computer use·Playwright)
+  ai-cost: 이미지 생성·대량 LLM 호출처럼 비용이 드는 실행
+  research: 시장·사용자 조사, 전략 문서(코드 없음)
+
+# ── 5. hard gate 8 (요청이 건드리는 영역이 위험 영역이면 강도가 올라간다) ─────
+# applies_to: 이 intent일 때 힌트가 발동한다. any = 읽기만 해도 발동. (키 이름 on 은 YAML 1.1에서 불리언으로 읽히므로 쓰지 않는다)
+# 사람이 체크리스트를 확정한다. 힌트가 켜졌는데 체크되지 않으면 route가 GATE_HINT_UNCHECKED 경고를 낸다.
+hard_gates:
+  - id: payment
+    name: 결제·정산·가격
+    hint_facets: [payment]
+    applies_to: [write, delete, deploy, mixed]
+  - id: privacy-security
+    name: 개인정보·보안·권한
+    hint_facets: [privacy, security, auth]
+    applies_to: [any]
+  - id: legal
+    name: 법무·규제·약관
+    hint_facets: [legal]
+    applies_to: [write, delete, deploy, mixed]
+  - id: ops-data-deletion
+    name: 운영 데이터 삭제
+    hint_facets: [ops-data]
+    applies_to: [delete, mixed]
+  - id: migration
+    name: 데이터 마이그레이션
+    hint_facets: [migration]
+    applies_to: [write, delete, deploy, mixed]
+  - id: public-api
+    name: 외부 공개 API
+    hint_facets: [public-api]
+    applies_to: [write, delete, deploy, mixed]
+  - id: irreversible-policy
+    name: 되돌리기 어려운 정책 변경
+    hint_facets: [policy]
+    applies_to: [write, delete, deploy, mixed]
+  - id: availability
+    name: 서비스 중단 가능성
+    hint_facets: [availability, deploy]
+    applies_to: [write, delete, deploy, mixed]
+
+# ── 6. 2질문 rubric (카드에 인쇄, 사람이 확정) ─────────────────────────────
+two_questions:
+  blast_radius:
+    question: 이 요청이 잘못되면 어디까지 영향이 가는가?
+    small: 파일 몇 개, 한 모듈, 현재 작업 공간
+    medium: 여러 모듈 또는 한 시스템, 다른 작업자
+    large: 여러 시스템, 운영 환경, 실제 사용자·데이터
+  uncertainty:
+    question: 무엇을 어떻게 만들지 얼마나 알고 있는가?
+    low: 무엇을 어떻게 만들지 안다
+    medium: 무엇은 알지만 방법 일부가 미정이다
+    high: 문제 정의나 해법 자체가 미정이다
+
+# ── 7. 5요인 (합산하지 않고 각각 한 줄로 설명) ────────────────────────────────
+five_factors:
+  scope: 범위 — 파일·모듈·시스템 중 어디까지 바뀌는가
+  uncertainty: 불확실성 — 문제·해법·방법 중 무엇이 미정인가
+  impact: 영향 — 사용자·사업·운영에 무엇이 달라지는가
+  reversibility: 되돌리기 — 실패 시 되돌리는 비용과 방법
+  coordination: 조율 — 다른 사람·시스템·작업 공간과 맞춰야 하는가
+
+# ── 8. profile (작업 깊이, 사람에게 보이는 라벨) ─────────────────────────────
+# unit이 기본값을 주고, 규칙은 깊이를 올리기만 한다(내리지 않는다). 발동한 규칙은 fired_rules에 남는다.
+profile:
+  levels: [quick, standard, deep]
+  labels:
+    quick: Quick
+    standard: Standard
+    deep: Deep
+  base_by_unit:
+    none: null
+    T0: quick
+    T1: standard
+    T2: deep
+  escalations:
+    - id: gate.any
+      when: {gates: any}
+      min: standard
+      reason: hard gate가 발동하면 문서에 위험·백업·복구 섹션이 필요하다
+    - id: gate.ops-boundary
+      when: {gates_any: [migration, ops-data-deletion, availability], blast_radius: [large]}
+      min: deep
+      reason: 운영 데이터·가용성에 영향이 크면 깊은 검증이 필요하다
+    - id: mode.discovery
+      when: {mode: [discovery]}
+      min: deep
+      reason: 문제·해법이 미정이면 조사·검증 계획이 먼저다
+    - id: mode.experiment
+      when: {mode: [experiment]}
+      min: standard
+      reason: 실험은 성공 기준·중단 조건이 필요하다
+    - id: blast.large
+      when: {blast_radius: [large], unit: [T1, T2]}
+      min: deep
+      reason: 영향 반경이 크면 검토자·격리가 필요하다
+    - id: blast.large.t0
+      when: {blast_radius: [large], unit: [T0]}
+      min: standard
+      reason: T0인데 영향 반경이 크다 — 단위 승격을 검토한다
+    - id: uncertainty.high
+      when: {uncertainty: [high], unit: [T1, T2], blast_radius: [medium, large]}
+      min: deep
+      reason: 불확실성이 높고 영향 반경도 작지 않으면 discovery 또는 spike를 먼저 둔다
+    - id: uncertainty.high.small
+      when: {uncertainty: [high], unit: [T1, T2], blast_radius: [small]}
+      min: standard
+      reason: 불확실성은 높지만 영향 반경이 작다 — 실험 설계·확인 기준으로 충분하다
+    - id: uncertainty.medium
+      when: {uncertainty: [medium], unit: [T0, T1, T2]}
+      min: standard
+      reason: 방법이 일부 미정이면 확인 기준을 문서로 남긴다
+    - id: uncertainty.high.t0
+      when: {uncertainty: [high], unit: [T0]}
+      min: standard
+      reason: T0인데 불확실성이 높다 — T1 승격 또는 discovery를 검토한다
+
+# ── 9. 일관성 경고 (차단하지 않고 카드에 인쇄) ──────────────────────────────
+consistency_warnings:
+  - id: UNIT_TOO_SMALL
+    when: {unit: [T0], any_of: {blast_radius: [large], uncertainty: [high]}}
+    message: T0로 보기엔 영향 반경이나 불확실성이 크다. T1 승격 또는 mode=discovery를 검토한다.
+  - id: UNIT_NONE_WITH_GATE
+    when: {unit: [none], gates: any}
+    message: 문서 없이 답하는 요청이지만 게이트 영역을 건드린다. 결과에 개인 식별 정보·크리덴셜을 남기지 않고(K-23) 변경은 하지 않는다.
+  - id: DISCOVERY_ON_T0
+    when: {unit: [T0], mode: [discovery]}
+    message: T0는 discovery와 어울리지 않는다. 질문이면 unit=none, 조사가 필요하면 T1 discovery.
+  - id: READ_ONLY_UNIT
+    when: {unit: [T0, T1, T2], intent: [read]}
+    message: 읽기 전용인데 기획 단위가 잡혔다. 산출물이 문서(보고서)라면 유지하고, 답변이면 unit=none.
+
+# ── 10. 충돌 우선순위 (평가 순서, C-A5) ──────────────────────────────────────
+conflict_priority: [hard_gate, execution_block, unit, required_overlay, optional_overlay, budget]
+
+# ── 11. 재분류 (C-A6·D-11) ───────────────────────────────────────────────────
+reclassification:
+  allowed: true
+  record: frontmatter.routing.history 에 {at, from, to, reason} 를 append 한다. 경로는 옮기지 않는다(D-09).

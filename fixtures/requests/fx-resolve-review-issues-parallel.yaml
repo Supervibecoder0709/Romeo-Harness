@@ -1,0 +1,39 @@
+id: fx-resolve-review-issues-parallel
+request_text: '@_bmad-output/implementation-artifacts/code-reviews/code-review-door-<masked-token>.md 이 문서 읽고 순서대로
+  모든 이슈 해결할때까지 작업을 멈추지마. 동시에 진행 가능한 독립적인 이슈들은 병렬 서브에이전트를 활용하고 메인 에이전트는 task를 분배하고 해당 문서의 이슈를 어떻게 해결할지 전략적으로 고민하는
+  역할을 해야해. 모든 이슈가 고쳐지면 해당 문서의 내용을 codex에게 별도 워크트리로 전달해서 수정한 내용과 원본 계획서를 함께 전달하고, 해당 수정 작업 내용을 리뷰 받도록해. codex에게서
+  리뷰가 도착하면 해당 내용을 검토한 뒤 수정할 부분을 채택해서 수정 반영까지 하고 나에게 보고해'
+context:
+  project: coupang-automation
+  kind: code
+  notes: 코드리뷰 문서는 inputs 링크로 흡수(K-62).
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - security
+  - integration
+  gates:
+  - privacy-security
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - risk-backup-recovery
+  blocks:
+  - spec-ready
+  - approval-gate
+  parts:
+  - superpowers
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-coupang-automation-discord-setup:18792020
+  date: '2026-08-09'

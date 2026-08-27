@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "romeo/proposal",
+  "title": "Romeo /plan 제안 카드 입력",
+  "description": "LLM이 요청을 읽고 만드는 제안. 사람이 candidate 를 확정하면 romeo route 의 입력이 된다(D-06 3분할의 첫 단계).",
+  "type": "object",
+  "required": [
+    "request",
+    "facts",
+    "assumptions",
+    "unknowns",
+    "candidate",
+    "factors",
+    "gate_checklist"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "request": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "context": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reuse_hits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "candidate": {
+      "$ref": "#/definitions/classification"
+    },
+    "factors": {
+      "type": "object",
+      "required": [
+        "scope",
+        "uncertainty",
+        "impact",
+        "reversibility",
+        "coordination"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "$ref": "#/definitions/factor"
+        },
+        "uncertainty": {
+          "$ref": "#/definitions/factor"
+        },
+        "impact": {
+          "$ref": "#/definitions/factor"
+        },
+        "reversibility": {
+          "$ref": "#/definitions/factor"
+        },
+        "coordination": {
+          "$ref": "#/definitions/factor"
+        }
+      }
+    },
+    "gate_checklist": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "gate",
+          "checked"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "gate": {
+            "type": "string"
+          },
+          "checked": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "needs_decision": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "definitions": {
+    "factor": {
+      "type": "object",
+      "required": [
+        "level",
+        "note"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "required": [
+        "unit",
+        "mode",
+        "intent",
+        "facets",
+        "gates",
+        "blast_radius",
+        "uncertainty"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "type": "string",
+          "enum": [
+            "none",
+            "T0",
+            "T1",
+            "T2"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "delivery",
+            "discovery",
+            "experiment"
+          ]
+        },
+        "intent": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "delete",
+            "deploy",
+            "mixed"
+          ]
+        },
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blast_radius": {
+          "type": "string",
+          "enum": [
+            "small",
+            "medium",
+            "large"
+          ]
+        },
+        "uncertainty": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "slug": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "project_kind": {
+          "type": "string",
+          "enum": [
+            "code",
+            "non-code",
+            "harness",
+            "home"
+          ]
+        }
+      }
+    }
+  }
+}

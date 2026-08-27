@@ -1,0 +1,29 @@
+id: fx-repo-rg-fallback
+request_text: scripts/validate-repo-archive.sh 가 rg 없이도 돌게 grep -E 폴백을 넣어줘. rg 가 정식 설치가 아니라 앱 번들 바이너리뿐이다.
+context:
+  project: romeo-harness
+  kind: harness
+  notes: M1 T0 (b).
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - tooling
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  reviewer: none
+  isolation: current
+  parts: []
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: repo
+  ref: implementation-plan §4.1/§7
+  date: '2026-08-27'

@@ -1,0 +1,26 @@
+id: fx-posthog-structure-report
+request_text: 이 프로젝트에서 개발자가 posthog로 프로덕션 이벤트 관리하고 있다고 했는데 관련한 코드나 문서 찾아보고 어떻게 되어 있는지 내가 이해할 수 있도록 구조 현황 파악해서 보고해줘
+context:
+  project: codex-session
+  kind: code
+  notes: null
+classification:
+  unit: none
+  mode: delivery
+  intent: read
+  facets:
+  - analytics
+  - data
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: null
+  package: []
+  warnings: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: codex:codex:019fa751
+  date: '2026-07-28'

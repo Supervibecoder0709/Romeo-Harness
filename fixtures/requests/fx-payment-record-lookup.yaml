@@ -1,0 +1,34 @@
+id: fx-payment-record-lookup
+request_text: 우리 슬랙봇으로 유저 로컬타임 (미국 시간) 기준으로 결제 일어난 건에 대해 알림을 받고 있는데, 이 결제건이 테스트결제 건인지, 유저 결제 건이라면 취소되진 않았는지 db 조회로
+  확인부탁해
+context:
+  project: internal-saas-analytics
+  kind: code
+  notes: 읽기 전용 조회. 결과에 개인 식별 정보를 남기지 않는다. 문서 없음.
+classification:
+  unit: none
+  mode: delivery
+  intent: read
+  facets:
+  - payment
+  - ops-data
+  - data
+  - privacy
+  gates:
+  - privacy-security
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: null
+  package: []
+  reviewer: none
+  isolation: none
+  warnings:
+  - UNIT_NONE_WITH_GATE
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:Documents-Claude-Projects------------:1265198f
+  date: '2026-07-07'

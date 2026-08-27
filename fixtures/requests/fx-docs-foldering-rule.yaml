@@ -1,0 +1,31 @@
+id: fx-docs-foldering-rule
+request_text: discord 인프라 관련한 작업 문서들을 한 곳에 모으고 기존 작업이나 내용을 참고할 수 있게 폴더링 하고 싶어. docs 폴더 아래에 discord-infra라는 하위 폴더를
+  만들고 현재 생성된 문서들 중 디스코드 인프라와 관련된 내용들을 해당 폴더 안으로 옮겨줘. 마찬가지로 앞으로 생성되는 문서들도 이 폴더에 적합하다고 판단되는 경우 해당 폴더 안에 자동으로 저장되도록
+  claude.md에 규칙 추가해줘
+context:
+  project: coupang-automation
+  kind: code
+  notes: 문서 이동 + 규칙 추가. 프로젝트 규칙 문서는 policy facet 이 아니다.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  - tooling
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  reviewer: none
+  isolation: current
+  parts: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-coupang-automation-lightsail-setup:9abdb129
+  date: '2026-08-03'

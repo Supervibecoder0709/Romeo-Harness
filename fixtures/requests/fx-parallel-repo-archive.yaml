@@ -1,0 +1,34 @@
+id: fx-parallel-repo-archive
+request_text: repo archive 스킬 사용해서 아래 레포별로 병렬 작업 수행해줘. 1. superpower - <url> 2. rulesync - <url> 3. cc-switch -
+  <url> 4. openwiki - <url> 5. bmad cis - <url> 6. oh-my-agent - <url> 7. orca-cli - <url> 8. ui-ux-pro-max-skill
+  - <url> 10.impeccable - <url> 11.taste skill - <url> 12.community group- <url> 13.open -design - <url> 14 MengTo-<url>
+  15. storybook - <url> 16. <url> <url> <url>
+context:
+  project: romeo-harness
+  kind: harness
+  notes: 기존 워크플로우(/repo)의 병렬 실행. 조율(10개 worktree)이 크다.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - tooling
+  - docs
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-Romeo-Harness-mvp-planning:c2dce902
+  date: '2026-08-23'

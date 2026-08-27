@@ -1,0 +1,38 @@
+id: fx-skill-select-implement-cross-review
+request_text: 모두 제안대로 작업해줘. 1. 작업 이전에, 이 레포지토리에서 디자인 또는 코드 작업에 활용할 수 있는 이번 작업에 적절한 스킬이나 에이전트가 있는지 판단하고 어떤 것을 쓸 예정인지
+  생각해. 2. 해당 스킬과 에이전트를 활용해서 구체적으로 어떻게 작업할 것인지 작업 계획서를 세우고 해당 계획서대로 구현한뒤, 별도 워크트리를 열어 코덱스에게 요구사항을 잘 충족했는지 실구현에 대한
+  검토 작업을 맡겨줘. 3. 코덱스의 검토 내용이 도착하면 해당 내용을 재검토 후 반영해서 최종 작업하고, 로컬 환경에서 작업된 모습을 최종 보고해줘.
+context:
+  project: ordi-desktop-app
+  kind: code
+  notes: 사용자가 교차 검토를 명시. 정책표 기본값과 일치.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - ui
+  - brand
+  - tooling
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - ui-state-table
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  parts:
+  - design-ui
+  - design-landing
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-ordi-desktop-app-design-working:0dfb0f7b
+  date: '2026-08-07'

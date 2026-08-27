@@ -1,0 +1,31 @@
+id: fx-s24-commerce-ops-agent-md
+request_text: 커머스 운영 자동화용 AGENT.md를 만든다. 확인된 컨텍스트만 사용하고, 승인이 필요한 위험 작업을 구분하고, 검증 기준을 적는다.
+context:
+  project: S24
+  kind: non-code
+  notes: S24. 범위 밖이지만 운영 데이터 가드는 정직하게 표시.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  - ops-data
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  project_kind: non-code
+expected:
+  profile: null
+  package: []
+  out_of_scope: true
+  warnings:
+  - OUT_OF_SCOPE_NON_CODE
+  guards:
+  - ops-data-change
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: transcript
+  ref: S24
+  date: null

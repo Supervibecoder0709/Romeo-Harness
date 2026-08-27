@@ -1,0 +1,70 @@
+request:
+  text: '@Strategy/specs/spec-ordi-pricing-ab/landing-copy.md 랜딩페이지 작업계획서 작성했는데, 카피를 수정하고 싶어. [문제점] 1. 한국어 기준으로
+    문장이 좀 어색한 것 같아. 2. 각 섹션의 메인 카피들이 센스가 좀 부족하고, 뭔가 뾰족하지 않은 것 같아. 3. 본문 자체도 조금 추상적이라 더 구체적인 사례를 짚어서 ''어떤 것을 해줄 수
+    있는 앱이다''라고 바로 상상할 수 있게 만들고 싶어. 4. 실제 유저 실패 사례 기반으로 페인 포인트를 꼬집고 싶어. 이 문서와 관련있는 브레인스토밍 자료와 spec 문서들 확인해서 더 정밀하게
+    타겟 유저를 분석하고, 제품이 현재 해줄 수 있는 것들을 유저가 실제로 겪었을법한 실패 사례들을 겨냥해서 구체적으로 정리한 다음 각 섹션에 더 어울리는 카피 라이팅으로 바꾸고 싶어. 위 작업 수행하고
+    계획서 업데이트 한 다음 말해줘.'
+  project: ordi-desktop-app
+  context: 카피 수정은 T0. 랜딩 부품은 게이트 대기.
+facts:
+- 랜딩페이지 작업계획서의 카피가 대상이다
+- '문제 3가지: 어색한 문장·뾰족하지 않은 메인 카피·추상적 본문'
+assumptions:
+- 카피만 바꾸고 섹션 구조·디자인은 유지한다
+unknowns:
+- 타깃 페르소나·핵심 사례가 문서에 정의돼 있는지
+candidate:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - copy
+  - brand
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  slug: landing-copy-revision
+  title: 랜딩 카피 구체화
+factors:
+  scope:
+    level: low
+    note: 문서 1개의 카피
+  uncertainty:
+    level: low
+    note: 문제가 명확
+  impact:
+    level: medium
+    note: 전환 메시지
+  reversibility:
+    level: low
+    note: 텍스트 되돌리기
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

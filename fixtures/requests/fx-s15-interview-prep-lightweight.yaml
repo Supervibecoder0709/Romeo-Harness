@@ -1,0 +1,30 @@
+id: fx-s15-interview-prep-lightweight
+request_text: 면접 준비 프로젝트에 AGENTS.md와 PROJECT_CONTEXT.md를 붙이고, 대화로 규칙을 추가하며, 원본 자료의 해시 무결성과 분석 기준일, 출처별 수치를 분리해 관리하고
+  싶다.
+context:
+  project: S15
+  kind: non-code
+  notes: S15. v1 코드 전용(D-43) → 경량 부착 안내만.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  project_kind: non-code
+expected:
+  profile: null
+  package: []
+  out_of_scope: true
+  warnings:
+  - OUT_OF_SCOPE_NON_CODE
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: transcript
+  ref: S15
+  date: null

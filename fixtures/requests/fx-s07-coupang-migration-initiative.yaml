@@ -1,0 +1,51 @@
+id: fx-s07-coupang-migration-initiative
+request_text: 쿠팡 계정 34개를 새 자동화 구조로 마이그레이션한다. 계정마다 GO/NO-GO 판정을 내리고, fail-closed 게이트를 두고, 게이트를 통과하면 재승인 없이 계속 진행하되
+  크리덴셜이 드러나지 않는 증거와 함께 보고한다. 반대 런타임이 read-only로 교차 검토하고, 34개 분모를 전수 종결한다.
+context:
+  project: S07
+  kind: code
+  notes: S07/S08. 이니셔티브 전체. 실행 단계는 fx-account-migration-continue.
+classification:
+  unit: T2
+  mode: delivery
+  intent: deploy
+  facets:
+  - ops-data
+  - migration
+  - auth
+  - browser-automation
+  gates:
+  - migration
+  - privacy-security
+  blast_radius: large
+  uncertainty: medium
+expected:
+  profile: deep
+  package:
+  - charter
+  - brief
+  - spec
+  sections:
+  - risk-backup-recovery
+  - environment-plan
+  - capability-check
+  blocks:
+  - spec-ready
+  - milestone-plan
+  - approval-gate
+  guards:
+  - production-deploy
+  - ops-data-change
+  - db-migration
+  warnings:
+  - WORKTREE_ISOLATES_CODE_ONLY
+  - CAPABILITY_CHECK_REQUIRED
+  parts:
+  - bmad-cis
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: transcript
+  ref: S07
+  date: null

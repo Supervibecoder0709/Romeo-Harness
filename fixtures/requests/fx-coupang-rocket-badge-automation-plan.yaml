@@ -1,0 +1,39 @@
+id: fx-coupang-rocket-badge-automation-plan
+request_text: computer use 사용해서 아래와 같은 작업 수행할 계획 세워줘. 1. <url> 시트에서 상품명+옵션 조합으로 쿠팡 상품 검색 2. 상품 검색 1페이지 안에서 로켓그로스,
+  로켓 와우, 로켓 배송 뱃지 보유한 상품 있는지 확인 3. 없으면 '쿠팡 로켓 여부' 컬럼에 False로 기재하고 하나라도 해당 뱃지 보유한 상품 있는 경우 로켓 종류 기재 4. 로켓 뱃지 보유한
+  상품인 경우, '링크'에 해당 상품 url 등록. 만약 1페이지 내 로켓 상품이 여러개인 경우 가장 앞에 있는 상품을 고를 것. 5. '링크'에 등록된 상품 url 기준으로 상세페이지 진입해 총 별점
+  개수 (구매후기 개수) 긁어서 '리뷰 개 수' 컬럼에 숫자로 기재.
+context:
+  project: coupang-automation
+  kind: code
+  notes: 브라우저 자동화 능력 프로브가 먼저다.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - browser-automation
+  - integration
+  - data
+  gates: []
+  blast_radius: small
+  uncertainty: medium
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - capability-check
+  warnings:
+  - CAPABILITY_CHECK_REQUIRED
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-coupang-automation-new-item-list-up:c2f3bd4b
+  date: '2026-07-27'

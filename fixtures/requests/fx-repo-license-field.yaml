@@ -1,0 +1,32 @@
+id: fx-repo-license-field
+request_text: 아카이브 스키마에 라이선스 필드를 추가해줘 — _source.md 에 License 줄, 검증 스크립트 검사, 인덱스 열, 기존 18개 backfill.
+context:
+  project: romeo-harness
+  kind: harness
+  notes: M2 T1 페이로드. hard gate 없음(의도적).
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  - tooling
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  parts:
+  - superpowers
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: repo
+  ref: implementation-plan §4.1/§7
+  date: '2026-08-27'

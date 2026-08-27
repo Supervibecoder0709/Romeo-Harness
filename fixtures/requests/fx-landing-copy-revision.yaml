@@ -1,0 +1,32 @@
+id: fx-landing-copy-revision
+request_text: '@Strategy/specs/spec-ordi-pricing-ab/landing-copy.md 랜딩페이지 작업계획서 작성했는데, 카피를 수정하고 싶어. [문제점] 1. 한국어
+  기준으로 문장이 좀 어색한 것 같아. 2. 각 섹션의 메인 카피들이 센스가 좀 부족하고, 뭔가 뾰족하지 않은 것 같아. 3. 본문 자체도 조금 추상적이라 더 구체적인 사례를 짚어서 ''어떤 것을 해줄
+  수 있는 앱이다''라고 바로 상상할 수 있게 만들고 싶어. 4. 실제 유저 실패 사례 기반으로 페인 포인트를 꼬집고 싶어. 이 문서와 관련있는 브레인스토밍 자료와 spec 문서들 확인해서 더 정밀하게
+  타겟 유저를 분석하고, 제품이 현재 해줄 수 있는 것들을 유저가 실제로 겪었을법한 실패 사례들을 겨냥해서 구체적으로 정리한 다음 각 섹션에 더 어울리는 카피 라이팅으로 바꾸고 싶어. 위 작업 수행하고
+  계획서 업데이트 한 다음 말해줘.'
+context:
+  project: ordi-desktop-app
+  kind: code
+  notes: 카피 수정은 T0. 랜딩 부품은 게이트 대기.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - copy
+  - brand
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  parts:
+  - design-landing
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-ordi-desktop-app-strategy-workflow:81527ff2
+  date: '2026-07-29'

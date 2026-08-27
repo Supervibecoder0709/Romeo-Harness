@@ -1,0 +1,27 @@
+id: fx-global-mcp-add
+request_text: 전역 mcp에 코덱스 mcp를 추가 하고 싶어. 모든 프로젝트에서 사용하고 싶어.
+context:
+  project: home
+  kind: home
+  notes: 홈 레벨 설정. 모든 프로젝트에 영향 → 영향 반경 medium.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - tooling
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  parts: []
+  guards: []
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:-claude:cc839c67
+  date: '2026-07-21'

@@ -1,0 +1,33 @@
+id: fx-spec-revision-blockers
+request_text: 'SPEC 재검증 2회차 BLOCKER 해소 개정 작업이다. 먼저 이 파일을 정독하라 — 작업에 필요한 내용이 전부 들어 있다: _bmad-output/planning-artifacts/specs/<masked-long-id>/.revision-brief-2026-07-29.md
+  핵심만 미리 알린다. 1) 이 SPEC 은 개정 3회 모두 한쪽만 고쳐서 새 모순을 만드는 실패를 반복했다. 2회차 BLOCKER 4건 중 3건이 직전 개정에서 새로 쓴 문장들끼리의 충돌이었다. 그래서
+  무엇을 고칠지보다 브리프 4절의 필수 절차가 더 중요하다 — grep 전수 훑기 / 전 CAP success 반증 / 새 문장 간 충돌 점검 / 반영분 개별 기재. 절차를 건너뛰면 이 작업은 4번째
+  실패가 된다. 2) door 구현 코드는 작성하지 않는다. 이번 작업은 문서 개정이다. 3) 산출물과 대화는 한국어. 기술 용어·식별자·경로·명령어는 원형을 유지한다. 4) 판단이 갈리는 지점에서는
+  가정하지 말고 멈춰서 물어라 (CLAUDE.md 1절). 특히 브리프 7절이 지목한 세 가지는 임의로 결정하지 말 것. 브리프 2절의 필독 파일부터 읽고 시작하라. 읽기 순서 권장: 종합 리포트 ->
+  렌즈2(내부 일관성, 재현 시나리오) -> 렌즈1(제안 문구) -> SPEC 6종.'
+context:
+  project: codex-session
+  kind: code
+  notes: 명세 개정. 개정 이력이 실패를 반복 → 검토자 필요.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  gates: []
+  blast_radius: medium
+  uncertainty: medium
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: codex:codex:019fab7c
+  date: '2026-07-29'

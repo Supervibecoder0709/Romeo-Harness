@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "romeo/fixture",
+  "title": "Romeo 요청 fixture",
+  "description": "실제 요청 1건 + 사람이 확정했다고 보는 분류(classification) + 정책표가 내야 할 출력(expected). V-0.",
+  "type": "object",
+  "required": [
+    "id",
+    "request_text",
+    "context",
+    "classification",
+    "expected",
+    "source"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^fx-[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "request_text": {
+      "type": "string",
+      "minLength": 10
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "project",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "code",
+            "non-code",
+            "harness",
+            "home"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "classification": {
+      "$ref": "#/definitions/classification"
+    },
+    "expected": {
+      "type": "object",
+      "required": [
+        "profile",
+        "package"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "profile": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "quick",
+            "standard",
+            "deep",
+            null
+          ]
+        },
+        "package": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "spec",
+              "brief",
+              "charter"
+            ]
+          }
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reviewer": {
+          "type": "string",
+          "enum": [
+            "none",
+            "opposite-runtime-readonly"
+          ]
+        },
+        "isolation": {
+          "type": "string",
+          "enum": [
+            "none",
+            "current",
+            "worktree"
+          ]
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "guards": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope": {
+          "type": "boolean"
+        }
+      }
+    },
+    "acceptable_alternatives": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "human_correction": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "kind",
+        "ref"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "session-log",
+            "transcript",
+            "repo",
+            "authored"
+          ]
+        },
+        "ref": {
+          "type": "string"
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "classification": {
+      "type": "object",
+      "required": [
+        "unit",
+        "mode",
+        "intent",
+        "facets",
+        "gates",
+        "blast_radius",
+        "uncertainty"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "type": "string",
+          "enum": [
+            "none",
+            "T0",
+            "T1",
+            "T2"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "delivery",
+            "discovery",
+            "experiment"
+          ]
+        },
+        "intent": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "delete",
+            "deploy",
+            "mixed"
+          ]
+        },
+        "facets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "blast_radius": {
+          "type": "string",
+          "enum": [
+            "small",
+            "medium",
+            "large"
+          ]
+        },
+        "uncertainty": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "slug": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "project_kind": {
+          "type": "string",
+          "enum": [
+            "code",
+            "non-code",
+            "harness",
+            "home"
+          ]
+        }
+      }
+    }
+  }
+}

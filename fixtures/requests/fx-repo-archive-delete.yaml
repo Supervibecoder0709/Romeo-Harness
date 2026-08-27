@@ -1,0 +1,31 @@
+id: fx-repo-archive-delete
+request_text: 채택하지 않기로 한 archive/farion1231-cc-switch 아카이브 하나를 삭제해줘.
+context:
+  project: romeo-harness
+  kind: harness
+  notes: hard gate 는 없지만 실행 가드(삭제)는 승인 필요 — 두 층위 구분.
+classification:
+  unit: T0
+  mode: delivery
+  intent: delete
+  facets:
+  - docs
+  gates: []
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: quick
+  package:
+  - spec
+  guards:
+  - deletion
+  blocks:
+  - spec-ready
+  warnings:
+  - DOCS_ONLY_CHANGE
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: repo
+  ref: implementation-plan §4.1/§7
+  date: '2026-08-27'

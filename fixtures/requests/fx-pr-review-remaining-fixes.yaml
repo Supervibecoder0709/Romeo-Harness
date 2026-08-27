@@ -1,0 +1,70 @@
+id: fx-pr-review-remaining-fixes
+request_text: '이 워크트리는 PR #62(door/worker Discord 인프라, main으로 첫 병합 예정)의 브랜치(Supervibecoder0709/discord-setup)에서
+  파생됐다. 이 PR을 6개 영역 병렬 리뷰 + 적대적 재검증으로 최종 통합 리뷰했고 16건이 확정됐다. 그중 4건(MemoryHigh/MemoryMax 역전, tmpfiles.conf 주석, probes.ts
+  시크릿 노출, kill-switch.ts fail-open)은 이미 discord-setup 브랜치에 커밋·푸시됐다 — 이 워크트리에는 그 수정이 이미 반영된 상태로 들어와 있다. 이 워크트리 루트에
+  두 파일을 넣어뒀다: - pr62_findings_full.txt — 확정된 16건 전체 원문(파일·라인·요약·실패 시나리오) - pr62_review_synthesis.md — 그걸 종합한 최종
+  리뷰(Overview/Findings/Test coverage/Security/Recommendation, 심각도별 정리 + 각 항목 fix direction 포함) 먼저 pr62_review_synthesis.md
+  를 읽고 시작해라. 거기 나온 4건(MemoryHigh 등)은 이미 고쳐져 있으니 건드릴 필요 없다 — 실제 코드를 먼저 확인해서 반영됐는지 검증만 하고 넘어가라. **남은 항목을 전부 고쳐라**:
+  1. [HIGH] platform/door/src/core/store/state-store.ts:376-400 — writeAtomic()이 ensureInitMarker()를 같은 try/catch
+  안에서 호출해서, state 쓰기는 durable하게 성공했는데 marker 쓰기만 실패하면 commit() 전체가 reject되고 this.cached가 갱신 안 된 채 stale로 남는다. fix
+  direction: marker 쓰기 실패로 state mutation 성공 자체를 무효화하지 않게 — this.cached = draft를 marker 시도 전에 먼저 반영하거나, marker 실패를
+  별도 경로로 분리해라. 단, marker의 원래 목적(C-5: state 파일 소실을 "첫 부팅"으로 오판해 durable record를 리셋하는 fail-open 방지)은 절대 깨지면 안 된다 —
+  이 불변식을 지키는 선에서 고쳐라. state-store.test.ts에 회귀 테스트 추가. 2. [HIGH] platform/door/src/adapters/local-ipc-v1/index.ts:138-155,
+  213-251, 570-574 — dispatch()가 실패하거나(admission 거부·kill-switch·route-block·ack_failed·declined 등) core가 reclaimInline으로
+  ownership을 직접 지우는 모든 경로에서 clearToken()이 호출되지 않아, 원문 HMAC 콜백 토큰이 48시간(tombstoneRetentionMs) 동안 adapter 메모리에 남는다.
+  fix direction: WorkerPort에 명시적 discard/abandon 메서드를 추가해서 dispatch()/cancel()을 거치지 않는 모든 거부 경로에서 core가 그 시점에 바로
+  토큰을 지우게 해라. declined dispatch·admission 거부 경로에 대한 테스트 추가. 3. [MEDIUM] platform/door/systemd/coupang-door.service:33-40
+  — 유일하게 인터넷에 노출되는 unit(Discord Gateway)인데 하위 worker unit들보다 하드닝이 약하다(ProtectHome=·RestrictAddressFamilies= 없음).
+  ProtectHome=yes 추가(door state는 /var/lib/coupang-door라 기능 영향 없음), RestrictAddressFamilies=에 필요한 것(AF_INET AF_INET6
+  AF_UNIX)만 허용하는 allowlist 추가. door-wiring.test.ts에 정적 단언 추가. 4. [MEDIUM] platform/door/src/core/outbox/operational-notify.ts:169-172,
+  209 — 문서화된 "격리 상태 24시간마다 재알림"이 실제로는 boot 시점에 딱 1회만 호출돼 죽어있다. fix direction: door.ts의 blobSweepTimer/gcTimer 패턴처럼
+  주기 타이머로 notifyQuarantine을 재호출하게 배선해라. 5. [MEDIUM] platform/door/src/cli/operator.ts:128-165 — force-release-ownership이
+  "운영자가 직접 확인하라"는 안내 문구만 찍고 실제로는 그 확인 여부와 무관하게 파괴적 삭제를 바로 실행한다. fix direction: 명시적 확인 게이트 추가(예: --confirmed-dead
+  같은 필수 플래그, 또는 대화형 확인). 6. [LOW] platform/door/src/core/lifecycle.ts:564-566, 643-644 vs 750, 856-859 — commitTerminal/commitReceivedRejected가
+  transition_denied 결과에서도 무조건 disarmWatchdog를 호출한다. 같은 파일의 race_denied 처리(750, 856-859)는 같은 이유로 watchdog를 안 내리는데
+  이거랑 불일치한다. transition_denied도 committed일 때만 disarm하도록 고쳐라(race_denied와 같은 패턴). 7~10. [테스트 커버리지 공백 4건, pr62_findings_full.txt의
+  #12~#16 참조] - platform/door/src/cli/validate-manifest.ts — 테스트 0건. door-wiring.test.ts가 다른 3개 CLI(door.ts/operator.ts/retry-check.ts)에
+  하는 것처럼 최소 정적 검증이라도 추가. - platform/door/src/cli/operator.ts의 retry-reclaim·force-release-ownership — 인라인 로직이라 테스트
+  불가능. 다른 operator 커맨드들처럼 core/ 함수로 추출하고 유닛테스트 추가. - platform/door/src/cli/retry-check.ts — 5단계 게이트(state-read 실패·boot
+  latch·validation intent·retryAfter 유무/타이밍·A5 canary) 전부 미검증. StateStore/runA5Check를 mock해서 각 게이트 분기 테스트 추가. -
+  platform/door/src/discord/gateway.ts:182-243 DiscordCommandRegistrar — 실제 Discord REST 구현체가 한 번도 직접 테스트 안 됨(전부
+  MockRegistrar만 씀). 최소한 status code 처리(200/201 rate-limit 계수 차이)와 응답 필드 매핑 로직을 실제 클래스로 테스트. 작업 방식: - 순서대로 하나씩 고치고,
+  고칠 때마다 npm run typecheck && npm test (platform/door 안에서)를 돌려서 그린 유지. - 기존 프로젝트 컨벤션(주석 스타일 — 왜 이렇게 했는지 근거를 남기는
+  것, 파일마다 이미 있는 패턴)을 따라라. 불필요한 리팩터링은 하지 마라 — 지적된 것만 고쳐라. - 각 항목 고칠 때 커밋 하나씩(한국어 커밋 메시지, 이 프로젝트 기존 커밋 스타일 참고 — git
+  log 보면 됨). - 전부 끝나면 이 워크트리에 남겨둔 pr62_findings_full.txt, pr62_review_synthesis.md 두 파일은 git에 안 들어가게(untracked 상태
+  그대로 두거나 삭제) 해라. - 전부 끝나고 로컬 테스트 전건 통과 확인되면, 이 브랜치(Supervibecoder0709/pr62-fix-remaining)를 origin에 push까지 해라(머지는
+  하지 마라 — 그건 내가 한다). - 다 끝나면 정확히 무엇을 어떻게 고쳤는지 요약을 마지막 메시지로 남겨라. 막히거나 판단이 필요한 게 있으면(예: 불변식이 애매하거나 테스트가 애초에 불가능한 구조라면)
+  진행을 멈추지 말고 최선의 판단으로 처리한 뒤 요약에 그 판단 근거를 적어라.'
+context:
+  project: coupang-automation
+  kind: code
+  notes: 시크릿 노출 수정 포함 → 개인정보·보안 게이트.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - security
+  - infra
+  gates:
+  - privacy-security
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - risk-backup-recovery
+  blocks:
+  - spec-ready
+  - approval-gate
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: claude:orca-workspaces-coupang-automation-pr62-fix-remaining:85bbcbd7
+  date: '2026-08-13'

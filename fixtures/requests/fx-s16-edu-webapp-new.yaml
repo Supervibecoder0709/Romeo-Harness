@@ -1,0 +1,36 @@
+id: fx-s16-edu-webapp-new
+request_text: 초보자 교육용 단일 HTML 실습 웹앱을 처음부터 만든다. 수업 흐름, 연습 문제, 채점, 진행 상태 저장이 필요하다.
+context:
+  project: S16
+  kind: code
+  notes: S16~S22. 새 프로젝트 → T2.
+classification:
+  unit: T2
+  mode: delivery
+  intent: write
+  facets:
+  - ui
+  gates: []
+  blast_radius: small
+  uncertainty: medium
+expected:
+  profile: deep
+  package:
+  - charter
+  - brief
+  - spec
+  sections:
+  - ui-state-table
+  blocks:
+  - spec-ready
+  - milestone-plan
+  parts:
+  - bmad-cis
+  - design-ui
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: transcript
+  ref: S16
+  date: null

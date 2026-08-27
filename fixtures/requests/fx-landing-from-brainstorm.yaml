@@ -1,0 +1,34 @@
+id: fx-landing-from-brainstorm
+request_text: Strategy/brainstorming/<masked-long-id>/brainstorm-intent.md , Strategy/specs/spec-ordi-pricing-ab
+  이 경로에서 파일 읽고 ui ux pro max 스킬 사용해서 랜딩페이지 제작해줘. 모르는 부분이 있거나 모호한 사실들은 작업 전에 나에게 의사결정을 요구하는 질문을 반드시 선행해야 해.
+context:
+  project: codex-session
+  kind: code
+  notes: 브레인스토밍 산출물(_bmad-output)은 inputs 링크(K-62).
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - ui
+  - brand
+  gates: []
+  blast_radius: medium
+  uncertainty: medium
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  sections:
+  - ui-state-table
+  parts:
+  - design-ui
+  - design-landing
+  - superpowers
+acceptable_alternatives: []
+human_correction: null
+source:
+  kind: session-log
+  ref: codex:codex:019fa7bb
+  date: '2026-07-29'
