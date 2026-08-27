@@ -3,7 +3,7 @@
 # 부품은 스스로 켜지지 않아야 한다. 진입점은 라우터 하나다.
 ---
 id: c2-no-auto-trigger
-title: 부품이 스스로 세션에 끼어들지 않는다
+title: 부품이 라우터를 대체하지 않는다
 constraints: [K-60, K-65]
 kind: no_auto_trigger
 forbidden_hook_files:
@@ -18,5 +18,6 @@ forbidden_phrases:
   - "before any response"
   - "1% chance"
 why: >-
-  세션 시작 주입이나 1% 규칙이 살아 있으면 라우터를 우회해 부품이 먼저 켜진다.
-  제외 확정한 using-superpowers 가 어떤 경로로든 다시 들어오는 것을 막는 검사이기도 하다.
+  D-72 로 재정의된 K-60 을 검사한다 — 개발 규율 부품이 구현 중 런타임에 선택되는 것은 허용한다.
+  막는 것은 부품이 **라우터를 대체**하는 경로다: 세션 시작 주입, "모든 대화에서 나를 먼저" 규칙,
+  hook 등록. 제외 확정한 using-superpowers 가 어떤 경로로든 다시 들어오는 것을 막는 검사이기도 하다.

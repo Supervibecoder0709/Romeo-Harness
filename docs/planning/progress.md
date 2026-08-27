@@ -40,7 +40,8 @@ authority: derived
 | 14 | `romeo doctor` 부착 검증 | 완료 | 런타임 프로브 5종(claude·codex·orca·gh·git 전부 ✓) · 스킬 파일 프로브(claude 9 · codex 10) · 부착 상태 3종 · 충돌 fixture. **런타임 로드는 PASS 로 세지 않고 `.harness/observations.yaml` 의 관찰만 인쇄한다** |
 | 15 | 충돌 fixture 3종 (K-68) | 완료 | `fixtures/conflicts/` — c1 외부 계획 경로·c2 자동 트리거·c3 이름/마커 충돌. **c1 이 게이트에서 놓친 실제 충돌 1건을 잡았다** (`requesting-code-review:60` → `docs/superpowers/plans/`). `overrides.output_paths` 로 흡수 후 충돌 0 |
 | 16 | Codex 독립 리뷰 반영 | 완료 | `docs/reviews/2026-08-28-codex-m2-review/` — gpt-5.6-sol(effort max)이 반례를 실행해 Important 9 · Minor 1 보고. 8건 수정(F-01·02·04·05·06·07·09·10), fixture c4 추가, 테스트 80→95. F-03·F-08·F-07 upstream 재조회는 미해결 |
-| 17~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
+| 17 | K-60 재정의(D-72) | 완료 | 리뷰 F-03 → 사용자 확정. 개발 규율 부품의 런타임 직접 노출을 허용하고, 금지 대상을 "라우터 대체 경로"로 좁혔다. K-64 는 논리 id(`sp-*`)와 런타임 이름(원문)을 분리 |
+| 18~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
 
 ## 세션 기록
 
@@ -59,4 +60,4 @@ authority: derived
 - `.agents/skills` 투영·Codex discovery(A-11)·Orca dispatch(A-06)는 M2 에서 실측한다.
 - **A-11 해소 — 두 런타임 모두 discovery 확인.** Claude 는 컴파일 직후 같은 세션에서 9개, Codex 는 별도 워크트리의 독립 세션에서 10개(+repo-archive)가 스킬 목록에 나타났고 `romeo doctor` 가 센 목록과 이름까지 일치한다. 보류·제외한 스킬은 어느 쪽에도 나타나지 않았다(K-68 ② 부분 증거). 증거는 `.harness/observations.yaml` 과 `docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md`. **남은 것은 "목록에 뜬다" 가 아니라 "규율이 실제로 지켜지는가" 다.**
 - override 는 **8건**이다(`output_paths` 는 fixture c1 이, `reviewer_workspace`·`external_writes`·`destructive_tdd` 는 Codex 리뷰가 찾아냈다). **원문의 지시와 override 가 충돌할 때 에이전트가 실제로 override 를 따르는지는 여전히 미검증**이다 — fixture 는 "override 가 존재하는가" 만 검사한다. 실제 T1 관통에서 관찰해야 한다.
-- **미해결 리뷰 지적 3건**: F-03(벤더 스킬을 `superpowers:*` 네임스페이스 없이 노출해 라우터를 거치지 않고 선택될 수 있음 — 설계 판단 필요), F-08(컴파일이 원자적이지 않아 중간 실패 시 두 런타임이 다른 세대를 읽을 수 있음), F-07 후반(upstream 고정 커밋 재조회는 여전히 사람이 수행).
+- **미해결 리뷰 지적 2건**(F-03 은 D-72 로 해소): **F-08** — 컴파일이 원자적이지 않다. 중간 실패(디스크·권한·깨진 소스) 시 두 런타임이 다른 세대의 규칙을 읽을 수 있고 state 가 없을 수 있다. staging 트리 + 파일 단위 atomic replace 가 필요하다. **F-07 후반** — `vendor check` 는 upstream 재조회가 아니라 **로컬 자기일관성** 검사다. vendor 파일과 manifest 해시를 같은 변경에서 함께 바꾸면 통과한다. 고정 커밋 대조는 채택 게이트·업데이트 때 사람이 수행한다(모듈 docstring 에 한계 명시).

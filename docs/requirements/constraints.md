@@ -105,11 +105,11 @@ authority: canonical
 
 | ID | 규약 | 위반 시 | 근거 |
 | --- | --- | --- | --- |
-| K-60 | **진입점 단일.** 사용자 요청은 `/plan`(라우터)로만 들어오고, 부품은 라우터 출력(unit·mode·facet·profile)이 켤 때만 활성화된다. 부품의 자체 bootstrap·세션 시작 주입·키워드 자동 활성화는 끈다 | 이중 기획, 주의력 소모(K-30) | superpowers `using-superpowers` "1% 규칙", BMAD 자동 인사, ui-ux-pro-max 키워드 활성화 |
+| K-60 | **기획 진입점 단일.** 새 요청의 *분류와 문서화*는 `/plan`(라우터)로만 들어온다. **개발 규율 부품**(TDD·디버깅·완료 검증·코드리뷰)은 구현 중 런타임이 스스로 골라 써도 된다 — 그것이 규율의 목적이다. 금지되는 것은 부품이 **라우터를 대체**하는 것이다: 자체 bootstrap, 세션 시작 주입, "모든 대화에서 나를 먼저 써라" 규칙, 기획 문서 생성, 승인 창구 이중화. (D-72 로 재정의 — 원래 문구는 부품 스킬이 런타임에 노출되는 것 자체를 금지하는 것처럼 읽혔다) | 이중 기획, 주의력 소모(K-30), 승인 우회 | superpowers `using-superpowers` "1% 규칙", `brainstorming`, BMAD 자동 인사, ui-ux-pro-max 키워드 활성화 |
 | K-61 | **기획 원본 단일.** 승인된 Brief/Spec이 유일한 제품 요구 원본이다. 부품은 기획을 재생성하지 않고 누락·모순 시에만 질문한다(D-25). BMAD 산출물은 입력 링크로, superpowers `brainstorming`은 제외 | 문서 두 벌, 최종본 모호 | S12 충돌 1, S03 |
 | K-62 | **산출물 흡수.** 부품 산출물은 `docs/work/<id>/`에 생성하거나 frontmatter `inputs:`/`evidence:` 링크로 등록되어야 `/plan-close`가 인정한다. 부품 기본 경로(`docs/superpowers/**`, `_bmad-output/**`, `.superpowers/**`)는 설정으로 override하거나 링크로만 참조한다 | 고아 산출물, 경로 불변(D-09) 위반 | superpowers "사용자 선호 우선", BMAD `output_folder` |
 | K-63 | **상태 소유권.** 문서 상태·승인은 Romeo, 실행 상태는 Orca, 기술 문서 신선도는 OpenWiki. 부품 내부 상태(BMAD `stepsCompleted`, SDD ledger)는 참고 정보이며 완료 판정에 쓰지 않는다 | 진실이 세 곳 | D-20, D-23, K-10 |
-| K-64 | **네임스페이스.** 부품 스킬은 원본 이름을 유지(`superpowers:*`, `bmad-*`)하고 Romeo 자체는 `romeo:*`를 쓴다. `AGENTS.md` managed block 마커에 소유자(`romeo:managed`, `openwiki:managed`)를 넣는다. 이름·마커 충돌은 `doctor`가 검출한다 | 스킬 오호출, 마커 덮어쓰기 | §6 충돌 5 |
+| K-64 | **네임스페이스.** 부품 스킬은 **원본 이름을 유지**한다 — 논리 id 는 `provenance/imports.yaml` 의 `sp-*` 이고, 런타임 이름은 원문 그대로다(`verbatim` 이라 frontmatter 를 고칠 수 없다). 이름 충돌은 `doctor` 의 충돌 fixture c3 가 검출한다. Romeo 자체는 `romeo:*`를 쓴다. `AGENTS.md` managed block 마커에 소유자(`romeo:managed`, `openwiki:managed`)를 넣는다. 이름·마커 충돌은 `doctor`가 검출한다 | 스킬 오호출, 마커 덮어쓰기 | §6 충돌 5 |
 | K-65 | **트리거 소유권.** 부품의 hook을 `.claude/settings.json`·`.codex/hooks.json`에 등록하지 않는다(K-06 확장). 호출 순서는 Romeo 워크플로우 본문이 정한다 | hook 의존, 상태 유실 | K-06, impeccable "hook exit 0은 증거 아님" |
 | K-66 | **권한 상한.** 부품은 Romeo 역할 계약(implementer write / reviewer read-only)의 권한을 넘지 못한다. 부품이 유도하는 외부 쓰기(publish·push·PR·deploy·이미지 생성 비용)는 execution guard 대상이다 | 승인 우회 | K-50, MengTo publish guard, taste 이미지 비용 |
 | K-67 | **버전 고정·출처.** 모든 부품은 SHA 또는 릴리스 태그로 고정하고 `provenance/imports.yaml`에 기록한다. 업데이트는 `/repo` 재아카이브 → diff 검토 → 채택 게이트 재통과 순이다 | 조용한 드리프트 | K-40~K-42, C-H4 |
