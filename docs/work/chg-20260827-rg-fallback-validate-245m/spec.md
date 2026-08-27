@@ -10,10 +10,10 @@ gates: []
 profile: quick
 blast_radius: small
 uncertainty: low
-status: draft
-approved_at: null
-approved_by: null
-base_sha: null
+status: active
+approved_at: '2026-08-27T16:39:22+09:00'
+approved_by: Supervibecoder0709
+base_sha: 89fb61a864d2ecb8355ca4f5942d574f091cd419
 closed_at: null
 parent: null
 inputs: []
