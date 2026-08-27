@@ -37,7 +37,9 @@ authority: derived
 | 11 | CI(python 3.11) 하네스 검사 | 완료 | `.github/workflows/harness.yml` 6단계(unittest·route·fixtures·validate·vendor·notices). GitHub Actions run `33095164296` **success 13s** — 39 tests OK, vendor PASS files=15, notices 일치 |
 | 12 | 어댑터 컴파일(`romeo compile`) | 완료 | `core/principles/AGENTS.core.md`·`.harness/bindings.yaml`·`adapters/{claude,codex}/` → 산출물 22개(`CLAUDE.md`·`AGENTS.md` managed block, 두 런타임 스킬 18개, `.claude/settings.json`). `compile --check` PASS. 테스트 24개(마커 밖 보존·idempotent·심링크 대체·투영본 해시·stale 4경우) |
 | 13 | 실행 가드 `.claude/settings.json` | 완료 | ask 8건(git push·PR·worktree 삭제·reset --hard) · deny 5건(rm -rf /·sudo rm·force push). K-66 은 "승인 없이 실행 금지"이므로 정당한 작업은 deny 가 아니라 ask 로 뒀다 |
-| 14~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
+| 14 | `romeo doctor` 부착 검증 | 완료 | 런타임 프로브 5종(claude·codex·orca·gh·git 전부 ✓) · 스킬 파일 프로브(claude 9 · codex 10) · 부착 상태 3종 · 충돌 fixture. **런타임 로드는 PASS 로 세지 않고 `.harness/observations.yaml` 의 관찰만 인쇄한다** |
+| 15 | 충돌 fixture 3종 (K-68) | 완료 | `fixtures/conflicts/` — c1 외부 계획 경로·c2 자동 트리거·c3 이름/마커 충돌. **c1 이 게이트에서 놓친 실제 충돌 1건을 잡았다** (`requesting-code-review:60` → `docs/superpowers/plans/`). `overrides.output_paths` 로 흡수 후 충돌 0 |
+| 16~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
 
 ## 세션 기록
 
@@ -53,5 +55,5 @@ authority: derived
 - hard gate 8 중 fixture 가 있는 게이트는 privacy-security·migration·availability 3종. 나머지 5종(payment·legal·ops-data-deletion·public-api·irreversible-policy)은 실제 요청이 없어 M3 조건("게이트별 fixture ≥ 1")이 아직 미충족.
 - ~~`romeo` 는 Python 3.9 로만 검증했다~~ → 해소. 로컬 Python 3.9 와 CI Python 3.11 양쪽에서 39 tests PASS(run `33095164296`).
 - `.agents/skills` 투영·Codex discovery(A-11)·Orca dispatch(A-06)는 M2 에서 실측한다.
-- **Claude discovery 확인, Codex 는 미확인(A-11).** 컴파일 직후 같은 세션에서 채택 7종이 **전부** 스킬 목록에 나타났다 — `test-driven-development`·`systematic-debugging`·`verification-before-completion`·`requesting-code-review`·`receiving-code-review`·`using-git-worktrees`·`finishing-a-development-branch` + Romeo 의 `plan`·`plan-close`. 보류·제외한 스킬(`brainstorming`·`subagent-driven-development` 등)은 목록에 **없다** — K-68 ②(자동 트리거 미발생)의 부분 증거다. **Codex 쪽 discovery 는 여전히 미확인**이고, 스킬이 목록에 뜨는 것과 규율이 실제로 지켜지는 것은 다르다 — 충돌 fixture 3종이 남았다.
-- override 3건은 이제 `.harness/bindings.yaml` 에 있고 컴파일이 `CLAUDE.md`·`AGENTS.md` managed block 에 인쇄한다 — verbatim 원문을 고치지 않고도 규칙이 읽히는 경로다. 다만 **원문의 지시와 override 가 충돌할 때 에이전트가 실제로 override 를 따르는지는 미검증**이다. 충돌 fixture 3종(K-68)으로 확인해야 한다.
+- **Claude discovery 확인(`.harness/observations.yaml` 에 기록), Codex 는 미확인(A-11).** 컴파일 직후 같은 세션에서 채택 7종이 **전부** 스킬 목록에 나타났다 — `test-driven-development`·`systematic-debugging`·`verification-before-completion`·`requesting-code-review`·`receiving-code-review`·`using-git-worktrees`·`finishing-a-development-branch` + Romeo 의 `plan`·`plan-close`. 보류·제외한 스킬(`brainstorming`·`subagent-driven-development` 등)은 목록에 **없다** — K-68 ②(자동 트리거 미발생)의 부분 증거다. **Codex 쪽 discovery 는 여전히 미확인**이고, 스킬이 목록에 뜨는 것과 규율이 실제로 지켜지는 것은 다르다 — 충돌 fixture 3종이 남았다.
+- override 는 **5건**으로 늘었다(`output_paths` 는 충돌 fixture c1 이 찾아냈다). 컴파일이 두 지침 파일에 인쇄한다. 다만 **원문의 지시와 override 가 충돌할 때 에이전트가 실제로 override 를 따르는지는 여전히 미검증**이다 — fixture 는 "override 가 존재하는가" 를 검사할 뿐 "에이전트가 그것을 따르는가" 는 증명하지 못한다. 실제 T1 관통에서 관찰해야 한다.
