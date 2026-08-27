@@ -63,7 +63,7 @@ authority: canonical
 | ID | 결정 | 상태 | 근거 |
 | --- | --- | --- | --- |
 | D-30 | 전체 포크 금지. 버전 고정 + 선별 채택 + 출처·라이선스 추적 | accepted | S01 plan, S13 |
-| D-31 | BMAD는 **기획 자산만** 선별 벤더링하고 안정판 `v6.10.0`에 고정한다. `main` 구조와 혼용 금지 | accepted | S02 분석 1 |
+| D-31 | BMAD는 **기획 자산만** 선별 벤더링하고 안정판 `v6.10.0`에 고정한다. `main` 구조와 혼용 금지 | superseded | S02 분석 1 — **D-55로 대체됨**(벤더링하지 않고 `install`+링크). 버전 고정·`main` 혼용 금지는 유지 |
 | D-32 | CIS는 계획 깊이가 아니라 **불확실성 축**이다 (`phase=anytime, required=false`) | accepted | S02 분석 3 |
 | D-33 | Superpowers는 승인 이후 개발 규율만 채택. `brainstorming` 강제와 자체 spec 경로 제외 | accepted | S03 |
 | D-34 | OMA는 런타임을 설치하지 않고 `.agents` SSOT + adapter compiler 패턴만 재구현 | accepted | S01 plan, S04 |
@@ -71,6 +71,25 @@ authority: canonical
 | D-36 | 참조 저장소는 `/repo`로 고정 SHA 한국어 아카이브를 만든 뒤 판정한다 | accepted (구현됨) | `archive/`, S23 |
 | D-37 | 디자인은 `DESIGN.md`를 계약으로, 생성 규칙 1개 + 감사 규칙 2개만 채택. taste-skill은 랜딩·브랜드 한정 | accepted (권고) | S13 최종 |
 | D-38 | 문서 본문은 한국어, 경로·ID·키·상태값은 영어 | accepted | S01 plan §2 |
+
+---
+
+## 부품 조립 (개정 3, 2026-08-27)
+
+사용자 재정의 "잘 썼던 하네스들을 조립해서 나만의 라우터 체계로"에서 나왔다.
+근거 기록: [개정 3 요약](../reviews/2026-08-27-assembly-redefinition/summary.md).
+
+| ID | 결정 | 상태 | 근거 | 대체 관계 |
+| --- | --- | --- | --- | --- |
+| D-50 | Romeo는 **라우터 + 접착(문서·상태·증거) + 양 런타임 동등성**을 만들고, 기획 facilitation·개발 규율·기술 문서 파생·디자인 규칙·실행은 사용자가 검증한 외부 부품을 **조립**한다. 부품의 자체 제작·원칙 재작성은 기본값이 아니라 강등 경로다 | accepted | S01 사용자 원문("딱 기획 범위까지만 카피"), S12("한 패키지 모듈"), 2026-08-27 사용자 재정의 | 정규화 원칙 2의 "능력 후보 강등"을 라우터·접착에만 한정 |
+| D-51 | 채택 방식은 5단계로 명시한다: `install`(설치·연결, 코드 미복사) / `verbatim`(고정 SHA 원문 복사, 수정 0) / `rewrite`(원칙 재작성) / `principle`(참고) / `excluded`. `provenance/imports.yaml`의 `adoption` 값이다 | accepted | 2026-08-27 분석 | 계획 §6의 "전체 도입/일부 재작성/원칙만 참고/제외"를 대체 |
+| D-52 | **채택 확정 게이트.** 계획 단계에서는 후보만 기록한다. 어느 파일을 어떻게 가져올지는 해당 마일스톤 진입 시(G-M2 Superpowers, G-M3 BMAD/CIS, G-M6 디자인, G-M7 OpenWiki) 후보표를 제시하고 사용자가 확정한다. 제품 결정(B)이므로 자율 진행하지 않는다 | accepted | 2026-08-27 사용자 요청("해당 구현 단계가 됐을 때 나한테 다시 물어서 구체화") | — |
+| D-53 | 부품 부착 완료 조건은 **통합 규약 K-60~K-69** 준수 + 충돌 fixture 3종 PASS + 양 런타임 discovery 프로브다. 규약을 어기는 부품은 `rewrite`로 강등하거나 제외한다 | accepted | 2026-08-27 사용자 요청("충돌하지 않고 하나의 시스템에 녹아드는 것이 가장 중요") | — |
+| D-54 | Superpowers는 개발 규율 스킬 세트를 `verbatim` 후보로 둔다. `brainstorming`·`using-superpowers`·bootstrap hook·visual companion 제외(D-33 유지). 본문에 도구명이 없음을 고정 SHA `b36e082` 원문으로 확인했으므로 C-C6 위반이 아니다 | accepted (후보 — 파일 확정은 G-M2) | 원문 확인, S03 "거의 그대로 재사용", MIT | D-33을 보완 |
+| D-55 | BMAD 본체·CIS는 벤더링하지 않고 **프로젝트별 `install` + `/plan` 링크**로 조립한다. discovery·T2 판정 시 라우터가 해당 BMAD 스킬을 추천하고 산출물을 입력 링크로 흡수한다. v6.10.0 / CIS v0.2.1 고정은 유지. 사람 대화형이라 parity 비대상이며 Codex 미지원 시 정직 표기 | accepted (후보 — G-M3) | S01 사용자 원문, `~/bmad-ordi`·`~/readly-sologis` 실사용, D-32 | D-31을 대체 |
+| D-56 | OpenWiki는 `install`이다(D-23 그대로). 계획 §6의 "원칙만 참고" 라벨은 오기 → "도구 설치·연결, 코드 미복사"로 정정 | accepted | S12 | D-23 표기 정정 |
+| D-57 | ui-ux-pro-max는 "제외(보류)"가 아니라 **라이선스 확인 트랙**이다. `cli/`를 제외한 skill/data를 루트 MIT 범위로 채택할 수 있는지 확인한 뒤 G-M6에서 판정한다 | accepted | `~/readly-sologis` 실사용(v2.2.3), K-42 | 계획 §6 "제외(보류)"를 대체 |
+| D-58 | `install`·`verbatim`은 코어를 바꾸지 않으므로 채택 게이트 통과를 조건으로 **v1 안에서 허용**한다. `rewrite`·자체 제작·벤더링만 "슬라이스 통과 후"에 둔다. 동등성 게이트는 **부품이 켜진 상태에서** 판정한다 | accepted | 2026-08-27 | v1-scope "이 경로가 통과하기 전에는 BMAD·CIS·디자인·OpenWiki를 시작하지 않는다"를 완화 |
 
 ---
 
@@ -108,3 +127,5 @@ authority: canonical
 | 물리적 archive 폴더 이동 | 링크가 깨지고 병렬 브랜치 충돌 증가 | COUNCIL |
 | 범용 outcome gate | 내부 리팩터링에서 인위적 지표를 만들게 됨 | COUNCIL |
 | `binds.code` 변경만으로 문서 자동 `drifted` 강등 | 경로 변경이 의미 변경을 뜻하지 않음. 경고까지만 | S01 KEEL 리뷰, S04 리뷰 #8 |
+| 참고 저장소를 "능력 후보"로만 취급하고 원칙 재작성을 기본값으로 삼기 | 실사용 검증된 흐름을 탈락시키고 사용자 요구("카피하고 싶다", "한 패키지")를 강등함. 재작성은 통합 규약을 못 지킬 때의 강등 경로로만 | 2026-08-27 사용자 재정의, D-50·D-51 |
+| 계획 단계에서 채택 파일 목록을 확정하기 | 제품 결정을 구현 세션이 즉흥 판단하게 됨. 마일스톤 진입 시 게이트에서 사용자가 확정 | D-52 |

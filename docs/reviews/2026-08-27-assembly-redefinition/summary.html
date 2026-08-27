@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Romeo 부품 조립 재정의</title>
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --surface-2: #f4f2ee;
+    --text: #1f1d1a;
+    --text-dim: #5f5b54;
+    --text-faint: #8b857c;
+    --line: #e2ded6;
+    --line-strong: #cdc7bc;
+    --accent: #1f5fa8;
+    --accent-soft: #e8f0fa;
+    --safe: #17714f;
+    --safe-soft: #e4f2ec;
+    --warn: #8a5a08;
+    --warn-soft: #faf0dc;
+    --danger: #a32f28;
+    --danger-soft: #fbe9e7;
+    --radius: 10px;
+    --maxw: 860px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171614; --surface: #201e1b; --surface-2: #292723;
+      --text: #ece9e3; --text-dim: #b3ada3; --text-faint: #8a847a;
+      --line: #35322d; --line-strong: #47433c;
+      --accent: #7fb0e8; --accent-soft: #1c2938;
+      --safe: #6cc79b; --safe-soft: #16281f;
+      --warn: #e0b163; --warn-soft: #2c2416;
+      --danger: #e58a80; --danger-soft: #2e1c1a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171614; --surface: #201e1b; --surface-2: #292723;
+    --text: #ece9e3; --text-dim: #b3ada3; --text-faint: #8a847a;
+    --line: #35322d; --line-strong: #47433c;
+    --accent: #7fb0e8; --accent-soft: #1c2938;
+    --safe: #6cc79b; --safe-soft: #16281f;
+    --warn: #e0b163; --warn-soft: #2c2416;
+    --danger: #e58a80; --danger-soft: #2e1c1a;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; padding: 0 20px 96px;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", "Noto Sans KR", Roboto, sans-serif;
+    font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+  header.doc { padding: 44px 0 8px; border-bottom: 1px solid var(--line); }
+  header.doc h1 { font-size: 1.85rem; line-height: 1.35; margin: 0 0 10px; letter-spacing: -0.01em; text-wrap: balance; }
+  .meta { font-size: 0.82rem; color: var(--text-faint); display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 22px; }
+  .meta a { color: var(--text-faint); }
+  h2 { font-size: 1.22rem; line-height: 1.45; margin: 46px 0 14px; letter-spacing: -0.01em; text-wrap: balance; }
+  h3 { font-size: 1.02rem; margin: 28px 0 10px; }
+  p { margin: 0 0 14px; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  strong { font-weight: 650; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.3em; }
+  li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; font-size: 0.87em; background: var(--surface-2); padding: 0.12em 0.4em; border-radius: 4px; }
+
+  .tldr { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 22px 24px; margin: 26px 0 0; }
+  .tldr .label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px; }
+  .tldr ol { margin: 0; padding-left: 1.2em; font-size: 1.04rem; }
+  .tldr ol li { margin-bottom: 9px; }
+  .tldr ol li:last-child { margin-bottom: 0; }
+
+  .decision { border: 1px solid var(--accent); background: var(--accent-soft); border-radius: var(--radius); padding: 18px 20px; margin: 18px 0; }
+  .decision .label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); font-weight: 650; margin-bottom: 8px; }
+  .decision .q { font-weight: 650; margin-bottom: 10px; }
+  .decision .rec { margin-bottom: 6px; }
+  .decision .cost { font-size: 0.92rem; color: var(--text-dim); margin: 0; }
+
+  figure.map { margin: 22px 0; }
+  figure.map .frame { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; overflow-x: auto; }
+  figure.map svg { display: block; min-width: 520px; max-width: 100%; height: auto; margin: 0 auto; }
+  figure.map figcaption { font-size: 0.85rem; color: var(--text-dim); margin-top: 10px; }
+  .n-box { fill: var(--surface-2); stroke: var(--line-strong); }
+  .n-box-hi { fill: var(--accent-soft); stroke: var(--accent); }
+  .n-text { fill: var(--text); font-size: 13px; font-weight: 600; }
+  .n-sub { fill: var(--text-faint); font-size: 11px; }
+  .n-edge { stroke: var(--line-strong); fill: none; stroke-width: 1.6; }
+  .n-edge-hi { stroke: var(--accent); fill: none; stroke-width: 1.8; }
+  .n-edge-label { fill: var(--text-dim); font-size: 11px; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .badge.safe { color: var(--safe); background: var(--safe-soft); }
+  .badge.warn { color: var(--warn); background: var(--warn-soft); }
+  .badge.danger { color: var(--danger); background: var(--danger-soft); }
+  .risk-row { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; }
+  .risk-row .badge { flex-shrink: 0; margin-top: 3px; }
+
+  .owner { display: inline-block; font-size: 0.69rem; font-weight: 650; padding: 1px 7px; border-radius: 4px; vertical-align: 0.14em; margin-left: 6px; white-space: nowrap; }
+  .owner.you { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent); }
+  .owner.agent { color: var(--text-faint); background: var(--surface-2); border: 1px solid var(--line-strong); }
+
+  .table-scroll { overflow-x: auto; margin: 16px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 0.94rem; }
+  th, td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.03em; color: var(--text-faint); font-weight: 650; text-transform: uppercase; border-bottom: 1px solid var(--line-strong); }
+  tbody tr:last-child td { border-bottom: none; }
+  td.term { font-weight: 600; white-space: nowrap; }
+  tr.tier td { background: var(--surface-2); font-weight: 650; font-size: 0.8rem; color: var(--text-dim); padding: 7px 13px; letter-spacing: 0.02em; }
+
+  .misread { border: 1px solid var(--warn); background: var(--warn-soft); border-radius: var(--radius); padding: 16px 18px; margin: 18px 0; }
+  .misread .label { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warn); font-weight: 650; margin-bottom: 10px; }
+  .misread dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 0.94rem; }
+  .misread dt { color: var(--text-faint); font-size: 0.82rem; padding-top: 2px; white-space: nowrap; }
+  .misread dd { margin: 0; }
+  .misread dd.actual { font-weight: 600; }
+
+  .difficulty { border-left: 3px solid var(--line-strong); padding: 2px 0 2px 14px; margin: 16px 0; color: var(--text-dim); font-size: 0.94rem; }
+  .difficulty.hard { border-left-color: var(--warn); }
+  .difficulty .tag { font-weight: 650; color: var(--text); }
+
+  ol.steps { list-style: none; padding: 0; margin: 18px 0; counter-reset: s; }
+  ol.steps > li { position: relative; padding: 0 0 18px 38px; margin: 0; border-left: 1px solid var(--line); counter-increment: s; }
+  ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  ol.steps > li::before { content: counter(s); position: absolute; left: -13px; top: 0; width: 25px; height: 25px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--text-dim); font-size: 0.76rem; font-weight: 650; display: flex; align-items: center; justify-content: center; }
+  ol.steps .what { font-weight: 600; margin-bottom: 5px; }
+  ol.steps .signal { font-size: 0.89rem; color: var(--text-dim); background: var(--surface-2); border-radius: 6px; padding: 7px 11px; margin: 6px 0 0; }
+  ol.steps .signal b { color: var(--text); font-weight: 650; }
+
+  details.fold { border: 1px solid var(--line); border-radius: var(--radius); margin: 12px 0; background: var(--surface); overflow: hidden; }
+  details.fold > summary { cursor: pointer; padding: 13px 18px; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 9px; font-size: 0.97rem; }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before { content: "▸"; color: var(--text-faint); font-size: 0.85rem; transition: transform 0.15s; flex-shrink: 0; }
+  details.fold[open] > summary::before { transform: rotate(90deg); }
+  details.fold > summary .hint { font-weight: 400; color: var(--text-faint); font-size: 0.86rem; margin-left: auto; }
+  details.fold .body { padding: 2px 18px 16px; border-top: 1px solid var(--line); }
+  details.fold .body > :first-child { margin-top: 14px; }
+  .foldbar { display: flex; justify-content: flex-end; margin: 22px 0 -4px; }
+  .foldbar button { font: inherit; font-size: 0.84rem; color: var(--text-dim); cursor: pointer; background: none; border: 1px solid var(--line-strong); border-radius: 6px; padding: 4px 11px; }
+  .foldbar button:hover, .foldbar button:focus-visible { color: var(--text); border-color: var(--text-faint); outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .omitted { border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 18px 20px; margin: 40px 0 0; background: none; }
+  .omitted .label { font-size: 0.8rem; font-weight: 650; color: var(--text-dim); margin-bottom: 10px; }
+  .omitted ul { margin: 0; font-size: 0.92rem; color: var(--text-dim); }
+  .omitted .why { color: var(--text-faint); font-style: italic; }
+  .omitted .note { font-size: 0.86rem; color: var(--text-faint); margin: 12px 0 0; }
+  footer.doc { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 0.84rem; color: var(--text-faint); }
+
+  @media (max-width: 560px) {
+    body { padding: 0 15px 64px; font-size: 15.5px; }
+    header.doc h1 { font-size: 1.5rem; }
+    .tldr, .decision, .misread, .omitted { padding: 16px 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { details.fold > summary::before { transition: none; } }
+  @media print { details.fold { break-inside: avoid; } details.fold > summary::before { content: "▾"; } .foldbar { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <h1>Romeo는 부품을 다시 만들지 않는다 — 검증된 하네스를 조립하는 라우터이고, 무엇을 가져올지는 단계마다 당신이 정한다</h1>
+  <div class="meta">
+    <span>원문: <a href="summary.md">summary.md</a> (개정 3 기록)</span>
+    <span>반영된 계획: <a href="../../planning/implementation-plan.md">implementation-plan.md</a> §6·§12</span>
+    <span>브리프 작성 2026-08-27</span>
+  </div>
+</header>
+
+<section class="tldr">
+  <div class="label">한눈에 · 30초</div>
+  <ol>
+    <li><strong>정의가 바뀌었다.</strong> Romeo는 BMAD/CIS·Superpowers·OpenWiki·디자인 스킬·Orca를 <strong>부품 그대로</strong> 두고, 앞단에서 "어떤 부품을 어떤 깊이로 켤지" 정하는 <strong>라우터 + 접착 + 동등성</strong>만 만든다. 이전 계획이 거의 전부 "원칙만 참고"로 두었던 것을 <code>install</code>·<code>verbatim</code>으로 되돌렸다.</li>
+    <li><strong>무엇을 가져올지는 지금 정하지 않는다.</strong> M2·M3·M6·M7에 들어가는 순간 <strong>채택 확정 게이트</strong>가 열려 후보표를 보여 주고, 당신이 고른 파일만 기록·복사된다. 구현 세션이 임의로 정하지 못한다.</li>
+    <li><strong>충돌 방지는 규약으로 보장한다.</strong> 부품이 무엇이든 <strong>통합 규약 10조(K-60~K-69)</strong>를 지켜야 붙일 수 있고, 붙었다는 선언은 두 런타임 discovery 확인 + 충돌 fixture 3종 통과로만 한다. 정본 문서 9개와 계획을 이 기준으로 고쳤다.</li>
+  </ol>
+</section>
+
+<div class="decision">
+  <div class="label">지금 결정할 것 (선택)</div>
+  <div class="q">"실제로 써보고 정말 좋았던" 워크플로우가 무엇인지 알려 주시겠습니까?</div>
+  <p class="rec"><strong>권고:</strong> 지금 답하지 않아도 진행됩니다. 다만 목록이 있으면 첫 게이트(G-M2 Superpowers, G-M3 BMAD/CIS) 후보표의 기본 선택값을 그 우선순위로 채워 1클릭 확정이 됩니다. 로컬에서 확인된 실사용 흔적은 BMAD(브레인스토밍·tech-spec)와 UI UX Pro Max뿐이고, Superpowers·OpenWiki는 조사 기록만 있습니다.</p>
+  <p class="cost">대가: 없음 · 되돌리려면 게이트에서 다시 고르면 됨 (열린 질문 Q-07)</p>
+</div>
+
+<div class="decision">
+  <div class="label">지금 결정할 것</div>
+  <div class="q">UI UX Pro Max의 라이선스 확인 액션을 진행할까요?</div>
+  <p class="rec"><strong>권고:</strong> 진행. 실제로 쓰신 도구인데 <code>cli/README.md</code>의 CC-BY-NC 표기 하나 때문에 "제외(보류)"였습니다. <code>cli/</code>를 뺀 skill/data가 루트 MIT 범위인지 maintainer 표기를 확인하면 G-M6에서 <code>verbatim</code> 후보로 올라갑니다.</p>
+  <p class="cost">대가: 확인 작업 1회 · 되돌리려면 G-M6에서 제외로 판정 (결정 D-57)</p>
+</div>
+
+<h2>세 가지는 되돌리기 어렵거나 외부로 나가므로, 게이트 없이 일어나지 않습니다</h2>
+
+<div class="risk-row">
+  <span class="badge danger">되돌릴 수 없음</span>
+  <div><strong>부품이 유도하는 외부 쓰기</strong> — Superpowers <code>finishing-a-development-branch</code>의 merge/push/PR, OpenWiki의 schedule/PR write 권한, 디자인 스킬의 publish·이미지 생성 비용. 실행 전 확인할 것: 대상 브랜치·원격·비용 상한. 부품이 시켜도 Romeo의 execution guard가 먼저 승인을 요구합니다 (K-66).</div>
+</div>
+<div class="risk-row">
+  <span class="badge warn">조건부</span>
+  <div><strong>부품 원문 복사(<code>verbatim</code>)와 설치(<code>install</code>)</strong> — 되돌릴 수 있지만 대가가 있습니다: 복사한 파일은 <code>provenance/imports.yaml</code>에 SHA·라이선스가 기록되고 <code>THIRD_PARTY_NOTICES.md</code>가 생깁니다. 채택 게이트를 거치지 않은 복사는 규약 위반(K-67)입니다.</div>
+</div>
+<div class="risk-row">
+  <span class="badge safe">되돌릴 수 있음</span>
+  <div>이번에 고친 정본 문서 10개 — 전부 텍스트이고 커밋 전입니다. <code>git checkout --</code>로 되돌립니다. 아직 아무 부품도 복사·설치되지 않았습니다.</div>
+</div>
+
+<h2>라우터가 부품을 켜고, 접착이 산출물을 받는다</h2>
+
+<figure class="map">
+  <div class="frame">
+    <svg viewBox="0 0 620 300" role="img" aria-label="/plan 라우터가 네 부품을 조건에 따라 켜고, Orca에 실행을 위임하며, 부품 산출물은 접착 계층으로 링크된다">
+      <rect class="n-box-hi" x="205" y="14" width="210" height="58" rx="8"/>
+      <text class="n-text" x="310" y="38" text-anchor="middle">/plan 라우터 (Romeo)</text>
+      <text class="n-sub"  x="310" y="56" text-anchor="middle">요청 이해 → unit·mode·facet·profile</text>
+
+      <rect class="n-box" x="470" y="14" width="140" height="58" rx="8"/>
+      <text class="n-text" x="540" y="38" text-anchor="middle">Orca</text>
+      <text class="n-sub"  x="540" y="56" text-anchor="middle">실행·worktree·gate</text>
+      <path class="n-edge" d="M415 43 H 470" marker-end="url(#ar)"/>
+      <text class="n-edge-label" x="442" y="36" text-anchor="middle">위임</text>
+
+      <path class="n-edge-hi" d="M260 72 L 75 130" marker-end="url(#arhi)"/>
+      <path class="n-edge-hi" d="M295 72 L 232 130" marker-end="url(#arhi)"/>
+      <path class="n-edge-hi" d="M325 72 L 388 130" marker-end="url(#arhi)"/>
+      <path class="n-edge-hi" d="M360 72 L 545 130" marker-end="url(#arhi)"/>
+      <text class="n-edge-label" x="150" y="108" text-anchor="middle">켠다 (조건이 맞을 때만)</text>
+
+      <rect class="n-box" x="10" y="130" width="130" height="58" rx="8"/>
+      <text class="n-text" x="75" y="152" text-anchor="middle">BMAD / CIS</text>
+      <text class="n-sub"  x="75" y="170" text-anchor="middle">discovery·T2 · install</text>
+
+      <rect class="n-box" x="167" y="130" width="130" height="58" rx="8"/>
+      <text class="n-text" x="232" y="152" text-anchor="middle">Superpowers</text>
+      <text class="n-sub"  x="232" y="170" text-anchor="middle">구현·리뷰 · verbatim</text>
+
+      <rect class="n-box" x="323" y="130" width="130" height="58" rx="8"/>
+      <text class="n-text" x="388" y="152" text-anchor="middle">디자인 스킬</text>
+      <text class="n-sub"  x="388" y="170" text-anchor="middle">facet=ui · verbatim</text>
+
+      <rect class="n-box" x="480" y="130" width="130" height="58" rx="8"/>
+      <text class="n-text" x="545" y="152" text-anchor="middle">OpenWiki</text>
+      <text class="n-sub"  x="545" y="170" text-anchor="middle">기준 브랜치 후 · install</text>
+
+      <path class="n-edge" d="M75 188 L 250 238" marker-end="url(#ar)"/>
+      <path class="n-edge" d="M232 188 L 290 238" marker-end="url(#ar)"/>
+      <path class="n-edge" d="M388 188 L 330 238" marker-end="url(#ar)"/>
+      <path class="n-edge" d="M545 188 L 370 238" marker-end="url(#ar)"/>
+      <text class="n-edge-label" x="470" y="224" text-anchor="middle">산출물을 링크한다</text>
+
+      <rect class="n-box-hi" x="185" y="238" width="250" height="52" rx="8"/>
+      <text class="n-text" x="310" y="260" text-anchor="middle">접착 (Romeo)</text>
+      <text class="n-sub"  x="310" y="277" text-anchor="middle">docs/work · 상태 · evidence · /plan-close</text>
+
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--line-strong)"/></marker>
+        <marker id="arhi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <figcaption>강조된 두 상자만 Romeo가 만듭니다. 네 부품은 라우터가 조건을 판정했을 때만 켜지고(스스로 뜨지 않음), 부품이 만든 문서는 접착 계층에 링크되어야 "끝났다"로 인정됩니다. 이 그림이 정본 문서에 없던 것입니다 — 이전에는 척추(라우터·접착)만 있고 무엇을 켜는지가 없었습니다.</figcaption>
+</figure>
+
+<div class="misread">
+  <div class="label">헷갈리기 쉬운 곳</div>
+  <dl>
+    <dt>이렇게 읽기 쉽다</dt><dd>"조립한다"니까 플러그인을 설치하면 그대로 동작하겠구나. Superpowers 플러그인 켜고 BMAD 설치하면 Romeo가 되는 것 아닌가.</dd>
+    <dt>실제로는</dt><dd class="actual">설치하면 부품들이 각자 먼저 뜹니다 — Superpowers는 모든 대화 시작에 "1%라도 관련 있으면 스킬 먼저", BMAD는 인사와 메뉴, UI UX Pro Max는 키워드 감지. 라우터가 없으면 기획이 두 벌 생기고 T0 요청에도 설계 승인이 뜹니다. Romeo가 하는 일은 이 자체 트리거를 끄고(K-60) 라우터가 켜는 것으로 바꾸는 것입니다.</dd>
+    <dt>언제 문제가 되나</dt><dd>M2에서 Superpowers를 붙인 첫 세션. 그래서 충돌 fixture 1번이 "T0 요청에 <code>/plan</code>만 뜨는가"입니다.</dd>
+  </dl>
+</div>
+
+<h2>부품마다 가져오는 방식이 다르고, 파일 단위 확정은 당신이 합니다</h2>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>구분</th><th>무엇을 보고 판단하는가</th><th>그러면 어떻게 되는가</th></tr>
+    </thead>
+    <tbody>
+      <tr class="tier"><td colspan="3">1층 — 채택 방식 (결정 D-51)</td></tr>
+      <tr><td class="term"><code>install</code></td><td>런타임·설치기가 있는 도구인가 (BMAD 설치기, OpenWiki CLI, Orca)</td><td>코드를 복사하지 않고 설치·연결. 라우터가 호출하고 산출물을 링크로 받음</td></tr>
+      <tr><td class="term"><code>verbatim</code></td><td>순수 Markdown 스킬이고, 본문에 도구명이 없으며, 라이선스가 MIT/Apache인가 (Superpowers 규율 세트, WIG, taste, impeccable 스킬)</td><td>고정 SHA 원문을 <code>vendor/</code>에 수정 0으로 복사. 어댑터가 Claude·Codex 양쪽에 투영</td></tr>
+      <tr><td class="term"><code>rewrite</code></td><td>통합 규약을 원문 그대로는 못 지키는가 (경로·상태·hook 종속)</td><td>원칙만 코어 형식으로 재작성 + 출처 주석. <strong>강등 경로이지 기본값이 아님</strong></td></tr>
+      <tr><td class="term"><code>principle</code> / <code>excluded</code></td><td>설계 근거로만 필요한가 / 범위 밖인가</td><td>참고 인용만 / 채택 안 함</td></tr>
+      <tr class="tier"><td colspan="3">2층 — 부품별 후보와 게이트 (결정 D-54~D-57)</td></tr>
+      <tr><td class="term">Superpowers</td><td>승인 이후 개발 규율(TDD·디버깅·검증·리뷰·worktree·통합). 원문 도구명 0건 확인됨</td><td><code>verbatim</code> 세트 11개 후보. <code>brainstorming</code>·<code>using-superpowers</code>·hook은 제외. <strong>G-M2에서 파일 확정</strong></td></tr>
+      <tr><td class="term">BMAD 본체 + CIS</td><td>불확실성이 높거나(discovery) 큰 요청(T2)인가. 사람과 대화하는 facilitation</td><td>프로젝트별 <code>install</code>(6.10.0 / CIS 0.2.1 고정) + 라우터가 스킬 추천 + 산출물 링크. 벤더링 없음. <strong>G-M3에서 추천 목록 확정</strong></td></tr>
+      <tr><td class="term">OpenWiki</td><td>코드가 기준 브랜치에 반영된 뒤 기술 문서를 파생할 때</td><td><code>install</code>(라벨 정정). 기획·상태는 소유하지 않음. <strong>G-M7 (v1 통과 후)</strong></td></tr>
+      <tr><td class="term">디자인 4종</td><td><code>facet=ui</code> 또는 <code>brand</code>가 켜졌는가</td><td>WIG·taste·impeccable 파일 <code>verbatim</code>, UI UX Pro Max는 라이선스 확인 후, <code>visual-qa</code>만 자체 제작. <strong>G-M6 (UI 프로젝트 발생 시)</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p class="difficulty hard"><span class="tag">여기가 제일 헷갈립니다.</span> "그대로 쓴다(<code>verbatim</code>)"와 "설치한다(<code>install</code>)"는 다릅니다. Superpowers는 파일을 저장소 안에 복사하므로 업데이트를 우리가 SHA로 통제하고, BMAD는 설치기가 프로젝트에 <code>_bmad/</code>를 만들므로 복사하지 않고 연결만 합니다. 둘을 섞어 BMAD 템플릿을 복사하면 세 번째 진실(3rd SSOT)이 생깁니다 — 이전 계획 D-31이 그 방향이었고 이번에 대체했습니다.</p>
+
+<h2>충돌하지 않고 하나가 되는 조건은 열 가지이고, 부품이 무엇이든 같습니다</h2>
+
+<p>이것이 이번 기획에서 가장 중요하다고 하신 부분입니다. 채택 방식이 아니라 <strong>규약</strong>이 보장합니다. 지킬 수 없는 부품은 <code>rewrite</code>로 강등하거나 제외합니다 (결정 D-53, 제약 K-60~K-69).</p>
+
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr><th>규약</th><th>무엇을 보고 위반이라 판단하는가</th><th>부품별 처리</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="term">K-60 진입점 단일</td><td>부품이 라우터 판정 없이 스스로 뜨는가</td><td>Superpowers <code>using-superpowers</code>·BMAD 자동 인사·UI UX Pro Max 키워드 활성화를 끄고, profile·mode·facet이 켬</td></tr>
+      <tr><td class="term">K-61 기획 원본 단일</td><td>승인된 Spec이 있는데 부품이 기획을 다시 만드는가</td><td>Superpowers <code>brainstorming</code> 제외. BMAD 산출물은 Brief의 입력 링크</td></tr>
+      <tr><td class="term">K-62 산출물 흡수</td><td>부품 산출물이 <code>docs/work/&lt;id&gt;/</code> 링크 없이 떠 있는가</td><td>Superpowers 출력 경로 override, <code>_bmad-output</code> 링크, OpenWiki는 <code>docs/work/**</code> 무시</td></tr>
+      <tr><td class="term">K-63 상태 소유권</td><td>부품 내부 상태로 "완료"를 판정하려 하는가</td><td>SDD ledger·BMAD <code>stepsCompleted</code>는 참고용. 완료는 Romeo evidence + <code>/plan-close</code></td></tr>
+      <tr><td class="term">K-64 네임스페이스</td><td>스킬 이름·managed 마커가 겹치는가</td><td><code>superpowers:*</code>·<code>bmad-*</code> 유지, Romeo는 <code>romeo:*</code>, 마커에 소유자 이름</td></tr>
+      <tr><td class="term">K-65 트리거 소유권</td><td>부품 hook이 설정 파일에 등록됐는가</td><td>등록 금지. 호출 순서는 Romeo 워크플로우 본문</td></tr>
+      <tr><td class="term">K-66 권한 상한</td><td>부품이 역할 계약(reviewer read-only 등)을 넘거나 외부 쓰기를 유도하는가</td><td>merge/push/PR/publish/이미지 비용은 execution guard</td></tr>
+      <tr><td class="term">K-67 버전 고정·출처</td><td>SHA·라이선스가 <code>provenance/imports.yaml</code>에 없는가</td><td>모든 부품 고정. 업데이트는 재아카이브 → diff → 게이트 재통과</td></tr>
+      <tr><td class="term">K-68 부착 검증</td><td>"설치됐다"만으로 완료라 했는가</td><td>두 런타임 discovery 프로브 + fixture 3종(이중 기획 0 · 자동 트리거 0 · 경로/마커 충돌 0)</td></tr>
+      <tr><td class="term">K-69 분리 가능</td><td>부품을 빼면 코어가 깨지는가</td><td>세트 단위 채택(Superpowers 상호참조), 빼도 <code>/plan</code>·close 동작</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h2>채택 확정 게이트는 이렇게 진행됩니다 — 당신이 고르기 전에는 아무것도 복사되지 않습니다</h2>
+
+<ol class="steps">
+  <li>
+    <div class="what">마일스톤 진입 시 후보표를 받습니다<span class="owner agent">맡겨도 됨</span></div>
+    <p class="signal"><b>됐는지 확인:</b> 아카이브(<code>archive/&lt;repo&gt;/</code>)에서 만든 파일 단위 표 — 채택 방식·켜는 조건·충돌 지점·라이선스가 행마다 있고, 30행 이하이며, 추천값이 기본 선택으로 채워져 있음 · <b>안 되면:</b> 행에 충돌 지점이 비어 있으면 표가 미완성입니다</p>
+  </li>
+  <li>
+    <div class="what">가져올 파일을 고릅니다<span class="owner you">당신이 정할 것</span></div>
+    <p class="signal"><b>됐는지 확인:</b> 고른 파일마다 <code>provenance/imports.yaml</code>에 <code>status: accepted</code>·<code>decided_at</code>·<code>source_sha</code>가 기록됨 · <b>안 되면:</b> 기록 없이 <code>vendor/</code>에 파일이 생겼다면 규약 위반(K-67)</p>
+  </li>
+  <li>
+    <div class="what">원문 복사 또는 설치 프로브 + 어댑터 투영<span class="owner agent">맡겨도 됨</span></div>
+    <p class="signal"><b>됐는지 확인:</b> <code>verbatim</code>은 <code>vendor/</code> 파일 해시가 원문과 같음(수정 0), <code>install</code>은 <code>doctor</code>가 존재·버전을 보고 · <b>안 되면:</b> 해시 불일치 = 누군가 원문을 고친 것 → 롤백</p>
+  </li>
+  <li>
+    <div class="what">부착 검증 — 두 런타임 discovery + 충돌 fixture 3종<span class="owner agent">맡겨도 됨</span></div>
+    <p class="signal"><b>됐는지 확인:</b> Claude·Codex 양쪽에서 스킬이 발견되고, T0 요청에 <code>/plan</code>만 뜨고, 자동 트리거 0, 경로·마커 충돌 0 · <b>안 되면:</b> 실패한 파일만 <code>rewrite</code> 강등 또는 <code>rejected</code>. 게이트는 닫히지 않음</p>
+  </li>
+  <li>
+    <div class="what">게이트 닫힘 — 이후 그 마일스톤의 부품 작업 시작</div>
+    <p class="signal"><b>됐는지 확인:</b> 계획 §10 체크리스트 8b(G-M2)·13b(G-M3) 행이 관찰 가능한 근거와 함께 채워짐</p>
+  </li>
+</ol>
+
+<p>게이트는 네 번입니다: <strong>G-M2</strong> Superpowers(M2 첫 작업) · <strong>G-M3</strong> BMAD/CIS(BMAD 본체 아카이브 선행) · <strong>G-M6</strong> 디자인 4종(UI 프로젝트가 생길 때) · <strong>G-M7</strong> OpenWiki(v1 통과 후). 동등성 게이트(역할 교체 재현)는 그대로 있되, <strong>부품이 켜진 상태에서</strong> 통과해야 합니다(D-58) — 부품 없이 증명하면 실제 사용 조건이 아니기 때문입니다.</p>
+
+<div class="foldbar"><button type="button" id="toggleAll">전체 펼치기</button></div>
+
+<details class="fold">
+  <summary>왜 정본이 "원칙만 참고"로 흘렀는지 — 원인 세 가지와 근거 7개 재평가<span class="hint">3분</span></summary>
+  <div class="body">
+    <p><strong>원인 1 — 부품이 "능력 후보"로 강등됐습니다.</strong> 대화 정규화 원칙 2("도구 이름을 요구로 해석하지 않았다")를 부품에까지 적용해, "bmad를 딱 기획 범위까지만 카피하고 싶어"(S01)와 "한 패키지로 묶어"(S12)가 능력 후보로 내려갔습니다. 정규화 원칙 4로 정정했습니다(라우터·접착에만 적용).</p>
+    <p><strong>원인 2 — 조건이 목적 자리에 앉았습니다.</strong> "역할 교체 재현이 유일한 합격 기준"은 8월 5일 Codex 리뷰의 v0.1 제안이고, 최초 요구의 1순위는 라우터("어떤 bmad 워크플로우가 필요한지 자동 추천")였습니다. 라우터 없는 동등성은 증명할 대상이 없습니다.</p>
+    <p><strong>원인 3 — 척추만 남고 부품이 빠졌습니다.</strong> 최종 아키텍처 council 문서에는 BMAD·Superpowers·OpenWiki가 한 번도 등장하지 않고, Codex 리뷰도 §6을 다루지 않았습니다. 부품 조립은 아무 리뷰어도 보지 않은 영역이었습니다.</p>
+    <p><strong>"원칙만" 근거 7개 재평가:</strong> ① 원 요청은 "스킬·에이전트 구조 부분 선택"과 "연결"도 허용 → 절반만 타당. ② D-30·D-33 등은 "포크 금지"이지 "원문 복사 금지"가 아님. ③ 벤더 중립 제약(C-C6)은 Superpowers 원문에 도구명이 없어 해당 없음 — 오히려 그 규칙의 출처가 Superpowers porting guide. ④ 정적 분석 한계는 재작성해도 동일. ⑤ 라이선스는 UI UX Pro Max만 확인 필요. ⑥ 주의력 병목은 특정 2~3개 파일의 문제. ⑦ 8월 4일 분석(S03)조차 "TDD·디버깅·검증·리뷰는 거의 그대로 재사용"이라 했는데 계획이 더 보수적으로 감.</p>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>부품별 충돌 지점 상세 — 무엇이 어디서 부딪히고 어떻게 처리하는가<span class="hint">3분</span></summary>
+  <div class="body">
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>부품</th><th>충돌 지점</th><th>처리 (규약)</th></tr></thead>
+        <tbody>
+          <tr><td class="term">Superpowers</td><td><code>brainstorming</code>이 모든 창작 작업 전 설계·승인 강제 + 자체 <code>docs/superpowers/specs/</code></td><td>제외. 기획은 <code>/plan</code> (K-61)</td></tr>
+          <tr><td class="term">Superpowers</td><td><code>using-superpowers</code> "1% 규칙" + session-start hook</td><td>제외. profile 라우팅이 대체 (K-60·K-65)</td></tr>
+          <tr><td class="term">Superpowers</td><td><code>docs/superpowers/plans/</code>, <code>.superpowers/sdd/</code> ledger(git-ignored)</td><td>출력 경로를 <code>docs/work/&lt;id&gt;/</code>로 override — 스킬이 "사용자 선호 우선"을 명시. ledger는 <code>.harness/runs/</code> (K-62·K-63)</td></tr>
+          <tr><td class="term">Superpowers</td><td>스킬 간 이름 호출(<code>superpowers:test-driven-development</code> 등)</td><td>세트 단위 채택, 네임스페이스 유지 (K-69)</td></tr>
+          <tr><td class="term">Superpowers</td><td>Codex marketplace 버전 지연(6.2 vs 5.1.3)</td><td>marketplace 대신 고정 SHA 복사 (K-67)</td></tr>
+          <tr><td class="term">BMAD/CIS</td><td>매 단계 <code>[a]/[c]/[p]/[y]</code> 대기, persona 인사</td><td>discovery/T2에서만 켬. 사람 대화형이라 Claude·Codex 동등성 비대상 (K-60)</td></tr>
+          <tr><td class="term">BMAD/CIS</td><td><code>_bmad/</code>·<code>customize.toml</code>·<code>uv run</code> 스크립트 = 세 번째 진실</td><td>코어에 복사하지 않음. 산출물만 링크 (K-63)</td></tr>
+          <tr><td class="term">BMAD/CIS</td><td>현재 설치가 Claude Code 대상뿐</td><td>Codex 설치 1회 시도, 미지원이면 "Claude 전용 능력"으로 정직 표기 (K-68, 가정 A-12)</td></tr>
+          <tr><td class="term">OpenWiki</td><td><code>AGENTS.md</code> managed block 이름 / 계획 문서를 현재 기능으로 오해</td><td>마커에 소유자 이름 (K-64) / <code>.openwikiignore</code>에 <code>docs/work/**</code> (K-62)</td></tr>
+          <tr><td class="term">WIG · impeccable · taste</td><td><code>install.sh</code> 전역 설치 / hook·CLI·서브에이전트 / 취향 강제·이미지 비용</td><td>파일만 복사 (K-67) / 스킬 본문·판정만 (K-65·K-66) / 랜딩 한정, 비용은 guard (D-37, K-66)</td></tr>
+          <tr><td class="term">UI UX Pro Max</td><td><code>cli/README.md</code> CC-BY-NC 표기, <code>--global</code>, <code>stack/</code> MCP <code>@latest</code></td><td>라이선스 확인 후 <code>cli/</code>·<code>stack/</code> 제외 (K-67·K-66)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</details>
+
+<details class="fold">
+  <summary>이번에 고친 파일 11개와 각 파일에서 바뀐 것<span class="hint">2분</span></summary>
+  <div class="body">
+    <ul>
+      <li><code>docs/product/harness-brief.md</code> — 한 문장 교체, "만드는 것/만들지 않는 것" 표, 사용자 맥락(운영 방식·실사용 흔적), 성공 정의에 "부품이 켜진 상태에서", 경계표 → 부품 조립표</li>
+      <li><code>docs/requirements/capability-map.md</code> — J. 부품 조립 절(C-J1~C-J6) + 부품 조립표, 5기준 #3 수정</li>
+      <li><code>docs/requirements/constraints.md</code> — 7절 부품 통합 규약 K-60~K-69</li>
+      <li><code>docs/requirements/v1-scope.md</code> — V-11, 최소 흐름 문단 완화(D-58), 채택 게이트 절, "짓지 않는 것" 3행 정정</li>
+      <li><code>docs/decisions/decision-register.md</code> — D-31 대체, 부품 조립 절 D-50~D-58, 폐기 아이디어 2행</li>
+      <li><code>docs/planning/open-questions.md</code> — 가정 A-11·A-12, X-03 결정, Q-03·Q-06 갱신, Q-07 신설, 승인 필요 #9·#10</li>
+      <li><code>docs/traceability/conversation-coverage.md</code> — 인용 키 <code>REDEF-0827</code>, 정규화 원칙 4(정정)</li>
+      <li><code>docs/planning/implementation-plan.md</code> — 개정 3: §0·§2·§3·§5·§6 전면·§7(M2·M3·M6·M7)·§9.2·§10·§12</li>
+      <li><code>docs/explained/implementation-plan.html</code> — "개정 3 반영 전" 안내 배너</li>
+      <li><code>README.md</code> — 한 문장, 문서 표, 개정 3 링크</li>
+      <li><code>docs/reviews/2026-08-27-assembly-redefinition/summary.md</code> + 이 브리프 — 신규</li>
+    </ul>
+    <p>바꾸지 않은 것: Thin Policy-Compiled Planning Spine, unit/mode/facet, LLM 제안·사람 확정·규칙 강제 3분할, 상태 계약, 동등성 게이트와 v1 릴리스 게이트의 존재, Codex 리뷰 반영 8건 전부.</p>
+  </div>
+</details>
+
+<section class="omitted">
+  <div class="label">이 브리프에서 뺀 것 — 전부 기술 실행 영역입니다</div>
+  <ul>
+    <li><code>provenance/imports.yaml</code>의 필드 목록과 <code>vendor/&lt;repo&gt;@&lt;sha&gt;/</code> 디렉터리 규칙 — <span class="why">기록 형식이며 무엇을 채택하는지는 바꾸지 않음</span> — 계획 §5.1·§6 끝</li>
+    <li>doctor 프로브와 충돌 fixture 3종의 구현 방법 — <span class="why">검증 도구의 내부. 통과 기준은 위 K-68에 그대로 있음</span> — 계획 M2 검증</li>
+    <li>Superpowers 원문에 도구명이 없음을 확인한 방법(고정 SHA 6개 파일 GitHub API 조회) — <span class="why">확인 결과만 중요. 재현 명령은 summary.md</span> — summary.md "사실"</li>
+    <li>어댑터가 <code>vendor/</code>를 <code>.claude/skills</code>·<code>.agents/skills</code>로 투영하는 방식 — <span class="why">양 런타임에서 발견되는지는 게이트 검증이 보증</span> — 계획 §3.3</li>
+    <li>원천 대화 25건 재독의 추출 방법과 세션별 인용 위치 — <span class="why">정의의 근거로 이미 요약돼 있고, 원문 대조는 summary.md 표에서 가능</span> — summary.md "재독 결과"</li>
+  </ul>
+  <p class="note">제품 판단에 필요한 내용은 전부 위에 있습니다. 여기 있는 것은 실행 방식이라 결론만 반영했습니다. 구현에 들어가기 전에는 원문(summary.md, implementation-plan.md §6·§12)을 확인하십시오.</p>
+</section>
+
+<footer class="doc">
+  부품 조립 재정의 — 개정 3 기록 · 2026-08-27 · 이 브리프는 <code>/explain</code> 규칙으로 생성했습니다.
+</footer>
+
+</div>
+<script>
+  (function () {
+    var btn = document.getElementById('toggleAll');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var folds = document.querySelectorAll('details.fold');
+      var opening = btn.textContent.indexOf('펼치기') !== -1;
+      folds.forEach(function (d) { d.open = opening; });
+      btn.textContent = opening ? '전체 접기' : '전체 펼치기';
+    });
+  })();
+</script>
+</body>
+</html>

@@ -93,3 +93,25 @@ authority: canonical
 | K-53 | 계획만 요청받았다면 파일을 수정하지 않는다 | `CLAUDE.md` |
 | K-54 | 존재하지 않는 기능이나 도구를 가정하지 않는다 | `CLAUDE.md` |
 | K-55 | 정보와 지시가 충돌하면 현재 사용자의 명시적 요청 → 승인된 현재 문서와 결정 → 프로젝트 인덱스 → 과거 대화·조사 자료 → 참고 저장소 → 일반 권고 순으로 따르고, 충돌을 임의 해석하지 않고 차이와 추천안을 알린다 | `CLAUDE.md` |
+
+---
+
+## 7. 부품 통합 규약 (Integration Contract)
+
+2026-08-27 사용자 요구 "각 레포 추출물들이 충돌하지 않고 하나의 시스템에 잘 녹아드는 것"이 이 기획의 최우선 조건이다.
+부품이 무엇이든(BMAD/CIS·Superpowers·OpenWiki·디자인 스킬·Orca) 부착 시 아래 열 가지를 지켜야 하며,
+지킬 수 없는 부품은 `rewrite`로 강등하거나 제외한다 ([결정 D-53](../decisions/decision-register.md)).
+근거는 [개정 3 기록](../reviews/2026-08-27-assembly-redefinition/summary.md)과 각 `archive/*/05-pm-harness-notes.md`다.
+
+| ID | 규약 | 위반 시 | 근거 |
+| --- | --- | --- | --- |
+| K-60 | **진입점 단일.** 사용자 요청은 `/plan`(라우터)로만 들어오고, 부품은 라우터 출력(unit·mode·facet·profile)이 켤 때만 활성화된다. 부품의 자체 bootstrap·세션 시작 주입·키워드 자동 활성화는 끈다 | 이중 기획, 주의력 소모(K-30) | superpowers `using-superpowers` "1% 규칙", BMAD 자동 인사, ui-ux-pro-max 키워드 활성화 |
+| K-61 | **기획 원본 단일.** 승인된 Brief/Spec이 유일한 제품 요구 원본이다. 부품은 기획을 재생성하지 않고 누락·모순 시에만 질문한다(D-25). BMAD 산출물은 입력 링크로, superpowers `brainstorming`은 제외 | 문서 두 벌, 최종본 모호 | S12 충돌 1, S03 |
+| K-62 | **산출물 흡수.** 부품 산출물은 `docs/work/<id>/`에 생성하거나 frontmatter `inputs:`/`evidence:` 링크로 등록되어야 `/plan-close`가 인정한다. 부품 기본 경로(`docs/superpowers/**`, `_bmad-output/**`, `.superpowers/**`)는 설정으로 override하거나 링크로만 참조한다 | 고아 산출물, 경로 불변(D-09) 위반 | superpowers "사용자 선호 우선", BMAD `output_folder` |
+| K-63 | **상태 소유권.** 문서 상태·승인은 Romeo, 실행 상태는 Orca, 기술 문서 신선도는 OpenWiki. 부품 내부 상태(BMAD `stepsCompleted`, SDD ledger)는 참고 정보이며 완료 판정에 쓰지 않는다 | 진실이 세 곳 | D-20, D-23, K-10 |
+| K-64 | **네임스페이스.** 부품 스킬은 원본 이름을 유지(`superpowers:*`, `bmad-*`)하고 Romeo 자체는 `romeo:*`를 쓴다. `AGENTS.md` managed block 마커에 소유자(`romeo:managed`, `openwiki:managed`)를 넣는다. 이름·마커 충돌은 `doctor`가 검출한다 | 스킬 오호출, 마커 덮어쓰기 | §6 충돌 5 |
+| K-65 | **트리거 소유권.** 부품의 hook을 `.claude/settings.json`·`.codex/hooks.json`에 등록하지 않는다(K-06 확장). 호출 순서는 Romeo 워크플로우 본문이 정한다 | hook 의존, 상태 유실 | K-06, impeccable "hook exit 0은 증거 아님" |
+| K-66 | **권한 상한.** 부품은 Romeo 역할 계약(implementer write / reviewer read-only)의 권한을 넘지 못한다. 부품이 유도하는 외부 쓰기(publish·push·PR·deploy·이미지 생성 비용)는 execution guard 대상이다 | 승인 우회 | K-50, MengTo publish guard, taste 이미지 비용 |
+| K-67 | **버전 고정·출처.** 모든 부품은 SHA 또는 릴리스 태그로 고정하고 `provenance/imports.yaml`에 기록한다. 업데이트는 `/repo` 재아카이브 → diff 검토 → 채택 게이트 재통과 순이다 | 조용한 드리프트 | K-40~K-42, C-H4 |
+| K-68 | **부착 검증.** 부착 완료 = `doctor` 프로브(존재·버전·양 런타임 discovery) + 충돌 fixture 3종 PASS — ① 이중 기획 미발생(T0 요청에 `/plan`만 뜸) ② 자동 트리거 미발생(부품 스킬은 라우터가 켤 때만) ③ 산출물 경로·마커 충돌 0. 파일·설정 존재만으로 완료라 하지 않는다 | "설치됐다 ≠ 동작한다" | K-51, archive `05` 노트 전부 |
+| K-69 | **분리 가능.** 부품을 제거해도 Romeo 코어·문서·evidence가 깨지지 않아야 한다. 부품 세트 내부 상호참조(`superpowers:*` 간 호출)는 세트 단위로 채택한다 | 부품 종속, dangling reference | superpowers 원문 상호참조 확인 |

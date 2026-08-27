@@ -30,6 +30,8 @@ authority: canonical
 | A-08 | 미래 소비자가 사람이 아니라 LLM 세션이다 | 사람 협업자가 생기면 무문서 T0와 대화 내 승인이 전부 재검토 대상이 된다 | 협업자 발생 시 재평가 | COUNCIL |
 | A-09 | 자기학습 승격 루프의 회귀평가가 실현 가능하다 | 양 런타임 전후 평가 비용이 미측정이다 | v3 이전 파일럿 | S01 plan §4 |
 | A-10 | 하네스 부착이 코드 프로젝트가 아닌 프로젝트에도 같은 분류로 작동한다 | 면접 준비·커머스 운영 사례는 T0/T1/T2와 매핑되지 않는다 | 비코드 프로젝트 fixture 3건 추가 | S15, S24 |
+| A-11 | 고정 SHA 원문(`verbatim`) 스킬이 어댑터 투영 후 Claude `.claude/skills`와 Codex `.agents/skills` **양쪽에서 실제로 discovery**된다 | 정적 분석뿐, 실행 미검증. 실패하면 해당 스킬은 `rewrite` 강등 | M2 doctor 프로브 + 충돌 fixture (K-68) | D-54, archive superpowers `05` |
+| A-12 | BMAD 설치기가 Codex 대상으로도 동작하거나, 동작하지 않아도 "Claude 전용 discovery 능력"으로 정직 표기하면 동등성 게이트에 영향이 없다 | 현재 설치는 `ides: [claude-code]`뿐 | G-M3에서 Codex 설치 시도 1회 + capabilities.yaml 표기 검토 | D-55, `~/bmad-ordi/_bmad/_config/manifest.yaml` |
 
 ---
 
@@ -39,7 +41,7 @@ authority: canonical
 | --- | --- | --- | --- | --- |
 | X-01 | 하네스의 성격 | 전문가 역할·스킬을 폭넓게 갖춘 카탈로그 (S01 사용자 원문의 13개 역할) | 얇은 척추 + 역할 2개로 시작 (COUNCIL) | **B**. A는 v2 이후 순차 추가. "필요할 때만 오케스트레이션"이 원 대화의 원칙이기도 하다 |
 | X-02 | 사용자 정체성 | "코드를 볼 줄 모르는 비개발자" (S12) | "개발 암묵지를 공유하는 1인 개발 PM" (S14) | **B가 사실**. S12의 표현은 "기술 문서를 직접 관리하고 싶지 않다"는 요구로 읽는다. 이 해석의 확인이 필요하다 |
-| X-03 | 기획 코어의 출처 | BMAD 기획 자산 선별 벤더링(S01) 또는 Spec Kit 기반(S12) | 자체 얇은 정책표 + 템플릿 3개 (COUNCIL) | **COUNCIL**. BMAD·Spec Kit은 v2에서 템플릿 소스로 재검토 |
+| X-03 | 기획 코어의 출처 | BMAD 기획 자산 선별 벤더링(S01) 또는 Spec Kit 기반(S12) | 자체 얇은 정책표 + 템플릿 3개 (COUNCIL) | **양립 — D-50·D-55로 결정(2026-08-27).** 라우터·정책표·템플릿 3개는 Romeo 자체, BMAD/CIS는 discovery·T2 부품으로 `install`+링크. 벤더링은 하지 않는다. Spec Kit은 Q-01 유지 |
 | X-04 | 문서 정리 방식 | "새로 생성되는 문서가 자동으로 유형별 폴더링" (S01) | 경로 불변, 폴더 이동 없음 (D-09) | **양립**. 생성 시점 폴더링은 유지하고 상태 변화에 따른 이동만 금지한다 |
 | X-05 | 라이선스 | Apache-2.0 (S05 권고) | GPL-3.0 (현재 `LICENSE`) | **사용자 확인 필요**. 자유로운 재사용을 원하면 Apache-2.0, 파생물 공개 강제를 원하면 현행 유지 |
 | X-06 | 모델 선택 | "역할 난이도에 따라 모델을 직접 선택하고 싶다" (S01) | "역할에 모델을 영구 고정하지 않는다" (S01 KEEL 리뷰 §7) | **양립**. 역할은 capability를 선언하고, 모델 바인딩은 첫 등록 시 승인 후 고정하며 task별 override를 허용한다 |
@@ -55,10 +57,11 @@ authority: canonical
 | --- | --- | --- |
 | Q-01 | GitHub Spec Kit을 도입할 것인가, `converge` 개념만 차용할 것인가 | S12 (1순위 추천) |
 | Q-02 | 하네스 자체 성공 지표 8종을 언제부터 계측하는가 | COUNCIL §3 |
-| Q-03 | 디자인 트랙 4스킬(`ux-architect`·`creative-director`·`design-system-keeper`·`visual-qa`)을 자체 제작할 것인가, 외부 스킬을 선별 채택할 것인가 | S13 |
+| Q-03 | 디자인 트랙 4스킬(`ux-architect`·`creative-director`·`design-system-keeper`·`visual-qa`)을 자체 제작할 것인가, 외부 스킬을 선별 채택할 것인가 — **개정 3 추천: `visual-qa`만 자체, 나머지 3역할은 WIG·taste·impeccable·ui-ux-pro-max `verbatim` 파일 조합. 파일 확정은 G-M6** | S13, D-57 |
 | Q-04 | MCP registry 공통 스키마(Claude JSON + Codex TOML 동시 생성)를 v2에 넣는가 | S01 plan §3 |
 | Q-05 | `rulesync`, `cc-switch` 같은 후발 조사 대상을 어댑터 구현에 반영하는가 | `archive/` (분석만 완료) |
-| Q-06 | BMAD 본체는 아직 아카이브되지 않았다(CIS만 있음). 기획 자산 판정을 위해 필요한가 | `archive/README.md` 목록 |
+| Q-06 | BMAD 본체는 아직 아카이브되지 않았다(CIS만 있음). 기획 자산 판정을 위해 필요한가 — **G-M3 선행 조건으로 승격** | `archive/README.md` 목록, D-55 |
+| Q-07 | 사용자가 "실제로 써보고 정말 좋았던" 워크플로우의 구체 목록. 로컬 흔적은 BMAD(브레인스토밍·tech-spec)와 UI UX Pro Max(디자인 시스템)뿐이고 Superpowers·OpenWiki는 조사만 확인됨 | 2026-08-27 세션 — G-M2/G-M3 후보표 작성 시 확인 |
 
 ---
 
@@ -73,4 +76,6 @@ authority: canonical
 | 5 | 경로 불변 원칙 채택 (D-09, A-04) | 5.6 단독 제안이며 반박 기회가 없었다고 council이 명시했다 | 채택하되 A-04를 열린 가정으로 유지 |
 | 6 | fixture 15~20건을 어디서 모으는가 (V-0) | 실제 요청 로그가 필요하고 이것이 v1의 첫 작업이다 | 지난 3개월 실제 요청에서 추출 + 앞으로의 요청을 shadow mode로 축적 |
 | 7 | BMAD 본체 아카이브 필요 여부 (Q-06) | D-31의 근거가 3주 이상 지났다 | 필요. 템플릿을 실제로 가져올 때 다시 대조해야 한다 |
-| 8 | 디자인 트랙: 자체 4스킬 제작 vs 외부 선별 채택 (Q-03) | v2 범위와 유지비가 크게 달라진다 | `DESIGN.md`를 계약으로, 생성 규칙 1개 + 감사 규칙 2개만. `visual-qa`만 자체 제작 |
+| 8 | 디자인 트랙: 자체 4스킬 제작 vs 외부 선별 채택 (Q-03) | v2 범위와 유지비가 크게 달라진다 | `DESIGN.md`를 계약으로, `visual-qa`만 자체 제작, 나머지는 `verbatim` 파일 조합. 파일 확정은 G-M6 |
+| 9 | **채택 매니페스트 확정 — 게이트마다** (D-52: G-M2 Superpowers, G-M3 BMAD/CIS, G-M6 디자인, G-M7 OpenWiki) | 어느 파일을 가져올지는 제품 결정이다. 계획 단계에서 정하지 않고 마일스톤 진입 시 후보표를 보고 정한다 | 후보표는 `archive/<repo>/03-components/`·`04-components-table.md`에서 생성. Q-07 명단을 먼저 받으면 우선순위에 반영 |
+| 10 | ui-ux-pro-max 라이선스 확인 액션 (D-57) | 실사용한 도구인데 `cli/README.md` CC-BY-NC 표기 때문에 보류돼 있었다 | `cli/` 제외 skill/data만 루트 MIT 범위로 채택 가능한지 maintainer 표기 확인. G-M6 전까지 |

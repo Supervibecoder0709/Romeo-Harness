@@ -2,9 +2,11 @@
 
 The harness "Romeo" for Julliette. Codex &amp; Claude Code only.
 
-Romeo는 PM의 자연어 요청을 위험도와 규모에 맞는 최소 기획 문서·실행 계약·검증 증거로 바꿔
-Claude Code와 Codex가 같은 의미로 수행하게 만드는 **요청 운영 체계**입니다.
-에이전트·스킬 카탈로그가 아닙니다.
+Romeo는 사용자가 직접 써보고 검증한 하네스들(BMAD/CIS·Superpowers·OpenWiki·디자인 스킬·Orca)을
+**부품으로 그대로 두고**, 그 앞에서 요청을 이해해 어떤 부품을 어떤 깊이로 쓸지 정하고, 부품 사이의
+산출물·상태·증거를 하나의 문서 체계로 이어 주며, Claude Code와 Codex 어느 쪽에서 실행해도 같은 판정이
+나오게 하는 **개인용 라우터(요청 운영 체계)**입니다. 에이전트·스킬 카탈로그가 아니고, 부품을 다시 만드는
+프로젝트도 아닙니다.
 
 ## 요구사항과 결정
 
@@ -12,17 +14,21 @@ Claude Code와 Codex가 같은 의미로 수행하게 만드는 **요청 운영 
 
 | 문서 | 내용 |
 | --- | --- |
-| [제품 브리프](docs/product/harness-brief.md) | 무엇을 왜 만드는가, 성공의 정의, 비목표, 진실 소유권 경계 |
-| [능력 지도](docs/requirements/capability-map.md) | 필요 능력 A~I. 도구 이름이 아니라 능력 기준 |
-| [제약](docs/requirements/constraints.md) | 위반하면 설계가 깨지는 조건 |
+| [제품 브리프](docs/product/harness-brief.md) | 무엇을 왜 만드는가, 만드는 것/만들지 않는 것, 성공의 정의, 부품 조립표 |
+| [능력 지도](docs/requirements/capability-map.md) | 필요 능력 A~J. A~I는 라우터·접착·동등성, J는 부품 조립 |
+| [제약](docs/requirements/constraints.md) | 위반하면 설계가 깨지는 조건. 7절 = 부품 통합 규약 K-60~K-69 |
 | [v1 범위](docs/requirements/v1-scope.md) | 구현됨 / v1 필수 / 짓지 않는 것과 도입 트리거 |
 | [결정 등록부](docs/decisions/decision-register.md) | 확정·대체·미확정 결정과 폐기된 아이디어 |
 | [열린 질문](docs/planning/open-questions.md) | 미검증 가정, 충돌, 승인이 필요한 결정 |
 | [대화 커버리지](docs/traceability/conversation-coverage.md) | 각 판단이 어느 대화에서 왔는가 |
 
-최종 권장 아키텍처는 **Thin Policy-Compiled Planning Spine** 입니다.
-도출 과정은 [`docs/council/`](docs/council/README.md), 원 논의는
+최종 권장 아키텍처는 **Thin Policy-Compiled Planning Spine** 입니다 — 이것이 라우터와 접착이고,
+그 척추가 켜고 끄는 대상이 부품입니다. 도출 과정은 [`docs/council/`](docs/council/README.md), 원 논의는
 [`docs/planning-harness-discussion.md`](docs/planning-harness-discussion.md) 에 있습니다.
+
+구현 계획은 [`docs/planning/implementation-plan.md`](docs/planning/implementation-plan.md)(개정 3)이고,
+부품을 어떻게 조립하는지·채택 확정 게이트·통합 규약의 근거는
+[`docs/reviews/2026-08-27-assembly-redefinition/`](docs/reviews/2026-08-27-assembly-redefinition/summary.md)에 있습니다.
 
 ## 현재 구현 상태
 

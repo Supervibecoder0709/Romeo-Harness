@@ -42,6 +42,7 @@ authority: canonical
 | V-8 | 프로젝트 부착 상태 파일 | 하네스 버전과 활성 기능만. 인증정보 없음 (S12) |
 | V-9 | **수직 슬라이스 1건 관통** | 아래 참조 |
 | V-10 | shadow mode 20건 운영 | 분류를 전수 사람 확인. 오분류는 fixture + rubric 예시로 축적 |
+| V-11 | **부품 연결 최소 1세트** (개정 3) | G-M2 채택 게이트 통과 → `provenance/imports.yaml`에 `accepted` 항목 + `vendor/` 원문 + 두 런타임 discovery 프로브 + 충돌 fixture 3종(K-68) PASS. M3에서 BMAD/CIS `install` 프로브 + `/plan` 링크 |
 
 ---
 
@@ -64,9 +65,31 @@ v1의 유일한 합격 기준이다.
 ```
 
 합격 조건은 **역할 교체 재현**이다. 이것이 안 되면 하네스가 존재할 이유가 없다.
-이 경로가 통과하기 전에는 BMAD·CIS·디자인·자기학습·OpenWiki·인덱스를 시작하지 않는다.
+이 경로가 통과하기 전에는 부품의 **벤더링·원칙 재작성·자체 제작**, 자기학습, 인덱스를 시작하지 않는다.
+`install`·`verbatim` 연결은 코어를 바꾸지 않으므로 채택 게이트를 거쳐 v1 안에서 허용하며,
+**동등성은 부품이 켜진 상태에서 증명한다** ([결정 D-58](../decisions/decision-register.md)).
 
-근거: S01 KEEL 리뷰 §1, S10 최종 결론, COUNCIL 구현 우선순위 5.
+근거: S01 KEEL 리뷰 §1, S10 최종 결론, COUNCIL 구현 우선순위 5. 개정 3: 2026-08-27 사용자 재정의.
+
+---
+
+## 부품 채택 확정 게이트 (개정 3)
+
+계획 단계에서는 후보만 기록한다. **어느 파일을 어떻게 가져올지는 해당 마일스톤 진입 시 사용자가 확정한다**
+([결정 D-52](../decisions/decision-register.md)). 게이트 절차는 다섯 단계다.
+
+1. 후보표 제시 — `archive/<repo>/03-components/`·`04-components-table.md`에서 파일 단위 후보 + 채택 방식 + 켜는 조건 + 충돌 지점
+2. 사용자 선택 — 제품 결정(B)이므로 자율 진행하지 않는다
+3. `provenance/imports.yaml`에 `status: accepted`, `decided_at`, `source_sha` 기록
+4. `vendor/` 복사(`verbatim`) 또는 설치 프로브(`install`) + 어댑터 투영
+5. 부착 검증(K-68) PASS → 게이트 닫힘. 실패한 파일은 `rewrite` 강등 또는 `rejected`
+
+| 게이트 | 시점 | 대상 부품 | 확정하는 것 |
+| --- | --- | --- | --- |
+| G-M2 | M2 진입 | Superpowers | `verbatim` 세트의 파일 목록, 출력 경로 override, 제외 목록 |
+| G-M3 | M3 진입 | BMAD 본체 + CIS | 라우터가 추천할 스킬 목록(discovery/T2별), 산출물 링크 규약, Codex 미지원 표기 |
+| G-M6 | UI 프로젝트 발생 | WIG · taste · impeccable · ui-ux-pro-max | `verbatim` 파일 목록, `DESIGN.md` 스키마, ui-ux-pro-max 라이선스 판정 |
+| G-M7 | v1 통과 후 | OpenWiki | 부착 대상 프로젝트, `.openwikiignore`, 갱신 시점 |
 
 ---
 
@@ -82,9 +105,9 @@ v1의 유일한 합격 기준이다.
 | 물리 archive 폴더 | (기각 — archive는 상태이지 폴더가 아니다) |
 | 범용 outcome gate | 측정 가능한 제품 가설이 실제로 등장할 때 |
 | 자동 모델 라우팅 | fixture 축적 + T0 저위험 한정 |
-| OpenWiki 연동 | v1 수직 슬라이스 통과 후 |
-| BMAD / CIS 기획 자산 통합 | v1 수직 슬라이스 통과 후 |
-| 디자인 트랙 4스킬 | UI 산출물이 실제로 필요한 프로젝트가 생길 때 |
+| OpenWiki `install` 실험(A-07) | v1 수직 슬라이스 통과 후 → G-M7 |
+| BMAD / CIS **벤더링·템플릿 재작성** | 하지 않는다 (D-55). `install` + `/plan` 링크는 v1 M3 → G-M3 |
+| 디자인 **자체 제작** 4스킬 | 하지 않는다 (Q-03 → `visual-qa`만 자체). `verbatim` 채택은 UI 프로젝트 발생 시 → G-M6 |
 | 자기학습 승격 루프 | 실패 fixture가 축적된 뒤 (가장 마지막) |
 
 ---
@@ -106,7 +129,7 @@ v1의 유일한 합격 기준이다.
 ## v2 이후 권장 순서
 
 1. Orca 개발 실행 루프 정교화 (Delivery Map / Executable Plan 분리)
-2. BMAD 기반 기획 라우터 (2축: 계획 깊이 × 탐색 오버레이)
+2. BMAD/CIS 산출물 흡수 고도화 (2축: 계획 깊이 × 탐색 오버레이 — 라우터는 Romeo, facilitation은 BMAD)
 3. 검증·drift·CI 강화, 하네스 지표 8종 계측
 4. 전문 역할 확장 — architect·debugger·QA → security·SRE → design 4종 → backend/frontend/DB → researcher·doc-auditor
 5. OpenWiki 파생 계층 + converge 검사

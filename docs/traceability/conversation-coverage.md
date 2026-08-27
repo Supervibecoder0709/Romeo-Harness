@@ -20,6 +20,7 @@ authority: derived
 | `COUNCIL` | [`docs/council/03-codex-gpt5.6-debate-and-final-synthesis.md`](../council/03-codex-gpt5.6-debate-and-final-synthesis.md) |
 | `PHD` | [`docs/planning-harness-discussion.md`](../planning-harness-discussion.md) |
 | `AGENTS-P` | 모든 transcript에 반복 포함된 사용자 상시 persona 지시문 |
+| `REDEF-0827` | 2026-08-27 사용자 재정의(번들 밖 세션) — [개정 3 기록](../reviews/2026-08-27-assembly-redefinition/summary.md) |
 
 `S01`·`S02`·`S03`·`S04`는 같은 세션(`019fcd2e`)의 메인/서브 분기다.
 
@@ -29,7 +30,7 @@ authority: derived
 
 | # | 날짜 | 무엇이 나왔나 | 반영 위치 | 현행성 |
 | --- | --- | --- | --- | --- |
-| S01 | 08-04 / 08-05 | 최초 요구 원문(기획·개발·디자인·룰·자기학습), `proposed_plan` 전문, KEEL 초안 리뷰, "처음부터 구축하는 순서", v0.1 완료 기준 | brief, capability-map 전 영역, D-20~D-38, v1-scope | **부분 유효**. 요구 원문은 유효, plan의 실행 구조 상당수는 COUNCIL이 대체 |
+| S01 | 08-04 / 08-05 | 최초 요구 원문(기획·개발·디자인·룰·자기학습), `proposed_plan` 전문, KEEL 초안 리뷰, "처음부터 구축하는 순서", v0.1 완료 기준 | brief, capability-map 전 영역, D-20~D-38, v1-scope, **D-50(개정 3)** | **부분 유효**. 요구 원문은 유효, plan의 실행 구조 상당수는 COUNCIL이 대체. **plan의 책임표("자체 하네스 = 라우팅·문서 상태·SSOT·모델 정책·도구 레지스트리·자기개선", 나머지는 부품)는 2026-08-27 사용자 재정의로 재확인됨** |
 | S02 | 08-04 / 08-05 | BMAD `v6.10.0` vs `main` 구조 차이, CIS는 anytime·optional, `module.yaml`·`module-help.csv`·`customize.toml`·memlog 패턴, lifecycle과 implementation_state 분리 | D-31, D-32, C-B3, C-B5 | 유효 |
 | S03 | 08-04 / 08-05 | Superpowers `v6.2.0` 실구조, Claude/Codex marketplace 버전 불일치(6.2 vs 5.1.3), 공통 skill + thin adapter 패턴, brainstorming 충돌, 10개 리뷰 | D-33, C-C6, C-E1~E3 | 유효 |
 | S04 | 08-04 / 08-05 | OMA vs OMC 식별, `.agents` 투영 표, Codex 사실 정정 4건, Orca 이중 오케스트레이터 경고 | K-02~K-05, D-20, D-34, D-35 | 유효 |
@@ -87,3 +88,11 @@ authority: derived
 2. **도구 이름을 요구로 해석하지 않았다.** BMAD·Superpowers·OpenWiki·Spec Kit은 모두
    능력의 후보로 강등하고, [능력 지도](../requirements/capability-map.md)를 능력 ID 기준으로 작성했다.
 3. **1차 근거만 요구로 승격**했다. 운영 사례는 증거로, 범위 밖 대화는 기록으로만 남겼다.
+4. **(2026-08-27 정정) 원칙 2는 라우터·접착·동등성(A~I)에만 적용한다.** 원칙 2를 부품에까지 적용한 결과,
+   S01 "bmad는 내가 써본 기획 하네스 중 가장 정교… 딱 기획의 범위까지만 카피하고 싶어"와
+   S12 "기획 워크플로우 + openwiki + superpower + 디자인 에셋을 한 패키지로 묶어" 같은 **조립 요구가
+   능력 후보로 강등**됐고, 계획 §6이 거의 전부를 "원칙만 참고"로 두게 됐다. 사용자 재정의
+   ("잘 썼던 하네스들을 조립해서 나만의 라우터 체계로")에 따라 부품 조립 요구를 1차 근거로 승격했다.
+   반영: [능력 지도 J절](../requirements/capability-map.md), [결정 D-50~D-58](../decisions/decision-register.md),
+   [통합 규약 K-60~K-69](../requirements/constraints.md), [개정 3 기록](../reviews/2026-08-27-assembly-redefinition/summary.md).
+   이 재정의는 25건 번들 밖(2026-08-27 Claude Code 세션)에서 나왔으므로 인용 키 `REDEF-0827`로 표기한다.

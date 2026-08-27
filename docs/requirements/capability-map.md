@@ -11,6 +11,11 @@ authority: canonical
 원천 대화에서 언급된 **도구 이름이 아니라 필요 능력**으로 정규화했다.
 "후보" 열은 요구가 아니라 참고 구현이다. 특정 저장소를 쓰라는 뜻이 아니다.
 
+> **개정 3 (2026-08-27):** 위 원칙은 A~I(라우터·접착·동등성)에만 적용된다. 사용자가 직접 써보고 지목한
+> 부품(BMAD/CIS·Superpowers·OpenWiki·디자인 스킬)은 "능력 후보"가 아니라 **조립 대상**이다.
+> 그 능력은 [J. 부품 조립](#j-부품-조립-assembly)에 있고, 무엇을 어떻게 가져올지는
+> [결정 D-50~D-58](../decisions/decision-register.md)과 [통합 규약 K-60~K-69](constraints.md)가 정한다.
+
 `v1` 열: ✅ v1 필수 · 부분 = v1에 축소 도입 · v2/v3 = 이후 · **구현됨** = 현재 저장소에서 동작 확인됨.
 
 인용 키는 [대화 커버리지](../traceability/conversation-coverage.md)를 따른다.
@@ -179,7 +184,7 @@ artifact_hash, reviewer, verdict
 
 1. **목적 적합성** — 기획 계약 / 실행 규율 / 벤더 중립 / 파생 지식 / 디자인 중 어느 빈칸을 채우는가.
 2. **경계 충돌** — Orca의 실행 권위, 하네스의 명세 권위와 겹치는가.
-3. **채택 단위** — 패턴·규칙·템플릿만인가, 런타임 설치가 필요한가. 런타임 설치는 원칙적으로 제외.
+3. **채택 단위** — 패턴·규칙·템플릿만인가, 런타임 설치가 필요한가. 런타임이 필요한 부품은 코어에 벤더링하지 않고 `install`로 연결한다(D-51·D-55). 채택 방식 5단계는 [J절](#j-부품-조립-assembly) 참조.
 4. **유지비** — upstream 변경 속도와 포크 필요 여부.
 5. **출처 추적 가능성** — 고정 SHA 아카이브가 가능한가, 라이선스가 명확한가.
 
@@ -201,3 +206,36 @@ artifact_hash, reviewer, verdict
 사람이 분류를 수정한 비율 / 누락된 hard gate 수 / T0 처리 시간 /
 생성 문서 중 실제로 다시 읽힌 비율 / 중복 문서 발생률 / stale·broken dependency 수 /
 요청당 모델 호출과 토큰 사용량 / 실행 중 재분류된 비율. (COUNCIL §3)
+
+---
+
+## J. 부품 조립 (Assembly)
+
+2026-08-27 사용자 재정의("잘 썼던 하네스들을 조립해서 나만의 라우터 체계로")에서 승격했다.
+A~I가 "라우터와 접착이 무엇을 할 수 있는가"라면, J는 "부품을 어떻게 붙이고 떼는가"다.
+근거 기록: [개정 3 요약](../reviews/2026-08-27-assembly-redefinition/summary.md).
+
+| ID | 능력 | 왜 필요한가 | 근거 | v1 |
+| --- | --- | --- | --- | --- |
+| C-J1 | 라우터가 unit·mode·facet·profile로 **어떤 부품을 켤지** 결정하고 근거를 분류 카드에 인쇄 | 사용자 최초 요구: "어떤 bmad 워크플로우가 필요한지 자동 추천" | S01 사용자 원문, D-50 | ✅ |
+| C-J2 | 채택 방식 5단계(`install`/`verbatim`/`rewrite`/`principle`/`excluded`)를 부품·**파일 단위**로 `provenance/imports.yaml`에 기록 | "원칙만 vs 원문" 이분법이 실사용 검증된 흐름을 탈락시켰다 | D-51 | ✅ |
+| C-J3 | **채택 확정 게이트**: 마일스톤 진입 시 후보표 제시 → 사용자 확정 → `status: accepted` | 무엇을 가져올지는 제품 결정이다. 구현 세션이 즉흥 판단하면 안 된다 | D-52, 2026-08-27 사용자 요청 | ✅ |
+| C-J4 | 부품 산출물을 접착 문서로 흡수 (frontmatter `inputs`/`evidence` 링크, `docs/work/<id>/`) | 부품 기본 경로가 제각각이라 링크 없이는 고아 문서가 된다 | K-62 | ✅ |
+| C-J5 | 부착 검증: `doctor` 프로브(존재·버전·양 런타임 discovery) + 충돌 fixture 3종 | "설치됐다"와 "동작한다"는 다른 주장이다 (archive `05` 노트 전부) | K-68, K-51 | ✅ |
+| C-J6 | 부품 업데이트 비교·선택 반영: `/repo` 재아카이브 → diff → 게이트 재통과 | 자동 추종은 조용한 드리프트를 만든다 | K-67, C-H4 | v2 |
+
+### 부품 조립표 (후보)
+
+파일 단위 확정은 게이트에서 한다. 이 표는 후보와 경계를 기록한다.
+
+| 부품 | 담당 | 채택 방식(후보) | 켜는 조건 | 제외·조정 | 게이트 |
+| --- | --- | --- | --- | --- | --- |
+| Orca | 실행·worktree·dispatch·gate | `install` (사용 중) | 위임이 필요한 T1+ | — | — |
+| Superpowers | 승인 이후 개발 규율 | `verbatim` 세트: `test-driven-development` · `systematic-debugging` · `verification-before-completion` · `requesting-code-review`(+`code-reviewer.md`) · `receiving-code-review` · `using-git-worktrees` · `finishing-a-development-branch` · `subagent-driven-development`(+프롬프트 템플릿) · `executing-plans` · `dispatching-parallel-agents` · `writing-plans`(출력 경로만 override) | `profile ≥ standard` 구현·리뷰 | `brainstorming`(→ `/plan`), `using-superpowers`(→ profile 라우팅), bootstrap hook, visual companion | G-M2 |
+| BMAD 본체 + CIS | 발산·문제 정의·전략·스토리·PRD facilitation | `install` 프로젝트별 + `/plan` 링크 (v6.10.0 / CIS v0.2.1 고정) | `mode=discovery`, T2 | 벤더링·템플릿 재작성 없음; 산출물은 입력 링크; 사람 대화형이라 parity 비대상(Claude 전용 능력으로 정직 표기) | G-M3 |
+| OpenWiki | 기술 문서 파생 | `install` | 기준 브랜치 반영 후 | 기획·상태 미소유(D-23); `docs/work/**`는 `.openwikiignore` | G-M7 |
+| WIG | UI 감사 체크리스트·`file:line` 출력 계약 | `verbatim` (`AGENTS.md`·`command.md`) | `facet=ui` 리뷰 | `install.sh` 제외 | G-M6 |
+| taste-skill | 랜딩·브랜드 생성 규칙 | `verbatim` (`design-taste-frontend` v2) | `facet=brand` 랜딩 | 제품 UI에는 적용 안 함 (D-37) | G-M6 |
+| impeccable | `DESIGN.md`/`PRODUCT.md` 계약, finish-reviewer 판정 | `verbatim` 스킬 본문·판정 규칙 + `rewrite` 계약 스키마 | `facet=ui` | CLI·hook·4 서브에이전트 제외 | G-M6 |
+| ui-ux-pro-max | 디자인 시스템 검색·`design-review` | 라이선스 확인 후 `verbatim`(`cli/` 제외) | `facet=ui` 신규 화면 | `--global`·`stack/` MCP `@latest` 제외 | G-M6 |
+| `visual-qa` | 스크린샷·반응형·접근성 evidence 계약 | **자체 제작** (유일) | `facet=ui` close 전 | — | M6 |
