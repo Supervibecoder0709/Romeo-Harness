@@ -35,10 +35,13 @@ authority: derived
 | 9 | LICENSE Apache-2.0 교체 + `THIRD_PARTY_NOTICES.md` | 완료 | `LICENSE` 202줄 Apache-2.0(Copyright 2026 Supervibecoder0709). `THIRD_PARTY_NOTICES.md` 는 `bin/romeo notices` 가 imports.yaml 에서 생성 · `--check` PASS |
 | 10 | `vendor/obra-superpowers@b36e082/` 원문 복사(수정 0) | 완료 | 15파일(스킬 14 + MIT 사본). `bin/romeo vendor check` → **PASS · files=15 blob SHA 일치**. 변조 검출 테스트 5경우(수정·삭제·추가·디렉터리 없음·미등록 id) |
 | 11 | CI(python 3.11) 하네스 검사 | 완료 | `.github/workflows/harness.yml` 6단계(unittest·route·fixtures·validate·vendor·notices). GitHub Actions run `33095164296` **success 13s** — 39 tests OK, vendor PASS files=15, notices 일치 |
-| 12~ | 어댑터·역할·envelope·parity | 미착수 | 계획 §7 M2 |
+| 12 | 어댑터 컴파일(`romeo compile`) | 완료 | `core/principles/AGENTS.core.md`·`.harness/bindings.yaml`·`adapters/{claude,codex}/` → 산출물 22개(`CLAUDE.md`·`AGENTS.md` managed block, 두 런타임 스킬 18개, `.claude/settings.json`). `compile --check` PASS. 테스트 24개(마커 밖 보존·idempotent·심링크 대체·투영본 해시·stale 4경우) |
+| 13 | 실행 가드 `.claude/settings.json` | 완료 | ask 8건(git push·PR·worktree 삭제·reset --hard) · deny 5건(rm -rf /·sudo rm·force push). K-66 은 "승인 없이 실행 금지"이므로 정당한 작업은 deny 가 아니라 ask 로 뒀다 |
+| 14~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
 
 ## 세션 기록
 
+- **2026-08-28 (어댑터 세션)** — `romeo compile` 을 만들어 코어 → 두 런타임 산출물 경로를 세웠다. TDD 로 계약을 먼저 고정했고, 그 과정에서 실제 버그 2건을 잡았다 — 디렉터리 심링크에 `rmtree` 가 실패하는 문제와, `--check` 가 디렉터리 심링크를 PASS 로 통과시키던 문제. 실행 가드는 계획의 deny 대신 **ask/deny 분리**로 넣었다(K-66 은 금지가 아니라 승인 요구다). 테스트 39 → 63.
 - **2026-08-28 (vendor 복사 세션)** — LICENSE 를 Apache-2.0 으로 교체하고 `vendor/obra-superpowers@b36e082/` 에 15파일을 원문 복사했다(blob SHA 15/15 일치). `romeo vendor`·`romeo notices` 를 추가해 수정 0 대조와 고지 생성을 자동화하고, CI 워크플로 `harness.yml` 로 강제했다. 검사기가 `core/workflows/plan/SKILL.md` 의 미등록 출처(anthropics/skills SKILL.md 형식)를 잡아내 `imports.yaml` 에 기록했다. 테스트 23 → 39. CI(python 3.11) 첫 실행 success(run `33095164296`).
 - **2026-08-27 (M2 진입 · G-M2 게이트 세션)** — 후보 14종의 상호 참조를 고정 SHA 원문에서 실측해, 채택 7종의 나가는 참조가 세트 안에서 전부 닫힘을 확인했다. 오케스트레이션 4종은 Romeo 라우터·Orca 와 같은 자리를 차지해 보류(D-67). 계획 §6 의 "본문 도구명 0건" 이 사실 오류임을 발견해 정정했다(D-71 — 6개 스킬에 도구명 존재). `writing-plans` 의 두 규율을 Tech Spec 템플릿에 흡수(D-69), OpenWiki 선행 조건 추가(D-70).
 - **2026-08-27 (shadow 1차 검토 세션)** — 카드 5건 사람 확정. `mode` 와 `uncertainty` 각 1건 수정 → fixture 5건에 `human_correction` 기록, 정책표 리포트 33/33 유지. M0 체크리스트 전항목 완료.
@@ -50,5 +53,5 @@ authority: derived
 - hard gate 8 중 fixture 가 있는 게이트는 privacy-security·migration·availability 3종. 나머지 5종(payment·legal·ops-data-deletion·public-api·irreversible-policy)은 실제 요청이 없어 M3 조건("게이트별 fixture ≥ 1")이 아직 미충족.
 - ~~`romeo` 는 Python 3.9 로만 검증했다~~ → 해소. 로컬 Python 3.9 와 CI Python 3.11 양쪽에서 39 tests PASS(run `33095164296`).
 - `.agents/skills` 투영·Codex discovery(A-11)·Orca dispatch(A-06)는 M2 에서 실측한다.
-- **`vendor/` 복사는 끝났고 어댑터 투영은 아직이다.** 채택 7종이 `.claude/skills/`·`.agents/skills/` 로 투영돼 두 런타임에서 실제로 discovery 되는지는 **미검증**이다(A-11·K-68). 실패한 스킬은 `rewrite` 로 강등한다(D-53).
-- override 3건(`orca worktree create` 치환 · deny 목록 · reviewer 바인딩 치환)은 `provenance/imports.yaml` 에 기록만 돼 있고 `.harness/bindings.yaml`·`.claude/settings.json` 이 아직 없다. verbatim 원문은 수정하지 않으므로, override 가 실제로 작동하는지는 충돌 fixture 로만 확인할 수 있다.
+- **투영은 끝났고 discovery 는 미검증이다.** 채택 7종이 `.claude/skills/`·`.agents/skills/` 에 원문 그대로 놓였고(투영본 28개 blob SHA 일치) `.agents/skills/repo-archive` 심링크도 실제 파일로 대체됐다. 하지만 **두 런타임이 이 스킬들을 실제로 discovery 하는지는 아직 관찰하지 못했다**(A-11). `romeo doctor` 프로브와 충돌 fixture 3종(K-68)이 다음 작업이다. 실패한 스킬은 `rewrite` 로 강등한다(D-53).
+- override 3건은 이제 `.harness/bindings.yaml` 에 있고 컴파일이 `CLAUDE.md`·`AGENTS.md` managed block 에 인쇄한다 — verbatim 원문을 고치지 않고도 규칙이 읽히는 경로다. 다만 **원문의 지시와 override 가 충돌할 때 에이전트가 실제로 override 를 따르는지는 미검증**이다. 충돌 fixture 3종(K-68)으로 확인해야 한다.

@@ -47,9 +47,15 @@ Romeo는 사용자가 직접 써보고 검증한 하네스들(BMAD/CIS·Superpow
 bin/romeo route --fixtures fixtures/requests --report   # 정책표 일치율
 python3 -m unittest discover -s tests                   # 회귀 테스트
 bin/romeo validate                                      # docs/work 문서 검증
+bin/romeo compile                                       # 코어 → 두 런타임 산출물 생성
+bin/romeo compile --check                               # 산출물이 코어와 일치하는지
 bin/romeo vendor check                                  # vendor/ 원문 대조(수정 0) + provenance id
 bin/romeo notices --check                               # THIRD_PARTY_NOTICES.md 신선도
 ```
+
+`CLAUDE.md`·`AGENTS.md`·`.claude/skills/**`·`.agents/skills/**`·`.claude/settings.json` 은 **`romeo compile` 산출물**입니다.
+고칠 곳은 `core/`(벤더 중립 원본)와 `adapters/`(런타임 매핑)이고, 지침 파일은 `romeo:managed` 마커 안쪽만 하네스가 소유합니다 —
+마커 밖에 쓴 내용은 재컴파일해도 보존됩니다.
 
 `vendor/` 아래 파일은 **손으로 고치지 않는다.** 필요한 변경은 어댑터의 override 로 처리하고,
 `romeo vendor check` 가 blob SHA 로 원문과 대조한다(네트워크 불필요). CI 가 매번 강제한다.

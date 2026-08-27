@@ -1,0 +1,28 @@
+# `romeo compile` 산출물 목록. 손으로 고치지 않는다.
+# 여기 있는 경로는 언제든 다시 생성되므로, 고칠 곳은 core/ 와 adapters/ 다.
+---
+schema_version: 1
+romeo_version: 0.1.0
+outputs:
+- .agents/skills/finishing-a-development-branch
+- .agents/skills/plan-close/SKILL.md
+- .agents/skills/plan/SKILL.md
+- .agents/skills/receiving-code-review
+- .agents/skills/repo-archive
+- .agents/skills/requesting-code-review
+- .agents/skills/systematic-debugging
+- .agents/skills/test-driven-development
+- .agents/skills/using-git-worktrees
+- .agents/skills/verification-before-completion
+- .claude/settings.json
+- .claude/skills/finishing-a-development-branch
+- .claude/skills/plan-close/SKILL.md
+- .claude/skills/plan/SKILL.md
+- .claude/skills/receiving-code-review
+- .claude/skills/requesting-code-review
+- .claude/skills/systematic-debugging
+- .claude/skills/test-driven-development
+- .claude/skills/using-git-worktrees
+- .claude/skills/verification-before-completion
+- AGENTS.md
+- CLAUDE.md

@@ -1,0 +1,21 @@
+# Codex 어댑터 정의. `romeo compile` 이 읽는다.
+---
+id: codex
+name: Codex CLI
+instructions_file: AGENTS.md
+skills_dir: .agents/skills
+settings_file: null
+
+workflows:
+  plan:
+    mapping: adapters/codex/workflows/plan.md
+  plan-close:
+    mapping: adapters/codex/workflows/plan-close.md
+
+project_vendor_skills: true
+
+# 기존 심링크(.agents/skills/repo-archive)를 실제 파일로 대체한다 —
+# Windows 에서 심링크가 깨지는 문제를 피한다(계획 §7 M2 검증 항목).
+local_skills:
+  - name: repo-archive
+    source: skills/repo-archive

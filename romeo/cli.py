@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id · vendor · notices."""
+"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id · compile · vendor · notices."""
 import argparse
 import json
 import sys
@@ -179,6 +179,25 @@ def cmd_id(args):
     return 0
 
 
+def cmd_compile(args):
+    from .compile import check_compiled, compile_all
+    root = _root(args)
+    if args.check:
+        findings = check_compiled(root)
+        for code, path, _, why in findings:
+            print(f"{code} {path} — {why}", file=sys.stderr)
+        print(f"compile 검사 {'PASS' if not findings else f'FAIL ({len(findings)}건)'}")
+        return 0 if not findings else 1
+    written = compile_all(root)
+    if args.json:
+        print(json.dumps({"outputs": written}, ensure_ascii=False, indent=1))
+    else:
+        for rel in written:
+            print(f"  {rel}")
+        print(f"compile 완료 · 산출물 {len(written)}개")
+    return 0
+
+
 def cmd_vendor(args):
     from .provenance import check_vendor, check_provenance_ids
     root = _root(args)
@@ -293,6 +312,12 @@ def build_parser():
     s.add_argument("--unit", required=True, choices=["T0", "T1", "T2"])
     s.add_argument("--slug", required=True)
     s.set_defaults(fn=cmd_id)
+
+    s = sub.add_parser("compile", help="코어 → 런타임 산출물 컴파일 (--check 로 대조)")
+    s.add_argument("--check", action="store_true", help="쓰지 않고 최신인지만 검사")
+    s.add_argument("--root")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_compile)
 
     s = sub.add_parser("vendor", help="vendor/ 원문 대조(수정 0) + provenance id 검사")
     s.add_argument("action", nargs="?", default="check", choices=["check"])
