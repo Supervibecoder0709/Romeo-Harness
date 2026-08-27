@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Romeo 하네스 구현 계획 리뷰</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface-2: #f0efeb;
+    --text: #1d1c19;
+    --muted: #67635c;
+    --faint: #8a857c;
+    --line: #ddd9d1;
+    --line-strong: #c5bfb4;
+    --accent: #1f5fa8;
+    --accent-soft: #e9f1fb;
+    --major: #9a4b06;
+    --major-soft: #fff0df;
+    --minor: #765c00;
+    --minor-soft: #f8f1c8;
+    --blocker: #a32634;
+    --blocker-soft: #fdebed;
+    --preference: #355f9f;
+    --preference-soft: #eaf0fa;
+    --hold: #615d57;
+    --hold-soft: #eeece8;
+    --safe: #176b49;
+    --safe-soft: #e4f3eb;
+    --radius: 12px;
+    --maxw: 1050px;
+    --shadow: 0 10px 30px rgba(45, 38, 28, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151513;
+      --surface: #1e1e1b;
+      --surface-2: #292824;
+      --text: #ece9e2;
+      --muted: #b5afa4;
+      --faint: #928b80;
+      --line: #38352f;
+      --line-strong: #4c4840;
+      --accent: #86b8f0;
+      --accent-soft: #1a2b3d;
+      --major: #f1a558;
+      --major-soft: #352515;
+      --minor: #e3c95f;
+      --minor-soft: #302b15;
+      --blocker: #f18e99;
+      --blocker-soft: #351d21;
+      --preference: #9ac2f2;
+      --preference-soft: #1c2938;
+      --hold: #c1bbb1;
+      --hold-soft: #2b2925;
+      --safe: #78d0a6;
+      --safe-soft: #173024;
+      --shadow: none;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    padding: 0 20px 88px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+  header { padding: 42px 0 24px; }
+  .eyebrow { color: var(--accent); font-size: .78rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 8px 0 10px; font-size: clamp(1.75rem, 4vw, 2.55rem); line-height: 1.28; letter-spacing: -.025em; text-wrap: balance; }
+  .meta { color: var(--faint); font-size: .84rem; }
+  h2 { margin: 52px 0 16px; font-size: 1.35rem; line-height: 1.35; letter-spacing: -.015em; }
+  h3 { margin: 30px 0 10px; font-size: 1.06rem; }
+  p { margin: 0 0 13px; }
+  ul, ol { margin: 0 0 14px; padding-left: 1.3em; }
+  li { margin-bottom: 7px; }
+  code {
+    padding: .1em .36em;
+    border-radius: 4px;
+    background: var(--surface-2);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .88em;
+  }
+  a { color: var(--accent); }
+  strong { font-weight: 720; }
+
+  .verdict {
+    padding: 25px;
+    border: 1px solid var(--major);
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--major-soft), var(--surface));
+    box-shadow: var(--shadow);
+  }
+  .verdict-top { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 14px; margin-bottom: 12px; }
+  .verdict h2 { margin: 0; font-size: 1.45rem; }
+  .verdict p:last-child { margin-bottom: 0; }
+  .counts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 17px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 2px 9px;
+    font-size: .75rem;
+    font-weight: 760;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+  .badge.blocker { color: var(--blocker); background: var(--blocker-soft); }
+  .badge.major { color: var(--major); background: var(--major-soft); }
+  .badge.minor { color: var(--minor); background: var(--minor-soft); }
+  .badge.preference { color: var(--preference); background: var(--preference-soft); }
+  .badge.hold { color: var(--hold); background: var(--hold-soft); }
+  .badge.safe { color: var(--safe); background: var(--safe-soft); }
+
+  .keep-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+  .keep {
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .keep:last-child { grid-column: 1 / -1; }
+  .keep h3 { margin: 0 0 8px; }
+  .keep dl { margin: 0; }
+  .keep dt { margin-top: 9px; color: var(--faint); font-size: .76rem; font-weight: 720; text-transform: uppercase; }
+  .keep dd { margin: 1px 0 0; font-size: .93rem; }
+
+  .finding {
+    margin: 13px 0;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--major);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .finding.minor { border-left-color: var(--minor); }
+  .finding summary {
+    cursor: pointer;
+    padding: 15px 17px;
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-weight: 690;
+  }
+  .finding summary::-webkit-details-marker { display: none; }
+  .finding summary::after { content: "＋"; margin-left: auto; color: var(--faint); }
+  .finding[open] summary::after { content: "−"; }
+  .finding .body { border-top: 1px solid var(--line); padding: 14px 18px 17px; }
+  .finding dl { display: grid; grid-template-columns: 92px 1fr; gap: 8px 13px; margin: 0; }
+  .finding dt { color: var(--faint); font-size: .78rem; font-weight: 720; text-transform: uppercase; }
+  .finding dd { margin: 0; }
+
+  .table-scroll { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 780px; font-size: .9rem; }
+  th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { background: var(--surface-2); color: var(--muted); font-size: .76rem; letter-spacing: .025em; text-transform: uppercase; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.status { white-space: nowrap; font-weight: 700; }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 22px;
+    margin: 22px 0 28px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .flow .node {
+    position: relative;
+    padding: 11px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--surface-2);
+    text-align: center;
+    font-size: .82rem;
+    font-weight: 700;
+  }
+  .flow .node:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -19px;
+    color: var(--accent);
+    font-size: 1.15rem;
+  }
+  .moves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+  .move { padding: 16px 17px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .move h3 { margin: 0 0 8px; color: var(--accent); }
+  .move ul { margin-bottom: 0; }
+
+  .final-grid { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 13px; }
+  .final-card { padding: 17px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .final-card.must { border-color: var(--major); background: var(--major-soft); }
+  .final-card h3 { margin: 0 0 9px; }
+  .final-card ol, .final-card ul { margin-bottom: 0; }
+  footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--faint); font-size: .82rem; }
+
+  @media (max-width: 820px) {
+    .keep-grid, .moves, .final-grid { grid-template-columns: 1fr; }
+    .keep:last-child { grid-column: auto; }
+    .flow { grid-template-columns: 1fr; gap: 18px; }
+    .flow .node:not(:last-child)::after { content: "↓"; right: 50%; top: calc(100% + 1px); transform: translateX(50%); }
+  }
+  @media (max-width: 560px) {
+    body { padding: 0 14px 60px; font-size: 15px; }
+    header { padding-top: 28px; }
+    .verdict { padding: 19px; }
+    .finding dl { grid-template-columns: 1fr; gap: 2px; }
+    .finding dd { margin-bottom: 8px; }
+  }
+  @media print {
+    body { background: white; color: black; padding: 0; }
+    .finding { break-inside: avoid; }
+    .finding:not([open]) .body { display: block; }
+    .finding summary::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Codex plan review · 2026-08-27</div>
+    <h1>Romeo 하네스 구현 계획 리뷰</h1>
+    <p class="meta">정본 요구사항 6종 · 구현 계획 원문 · PM 브리프 · 현재 저장소 구조와 CLI 상태를 대조</p>
+  </header>
+
+  <main>
+    <section class="verdict" aria-labelledby="verdict-title">
+      <div class="verdict-top">
+        <span class="badge major">1. 최종 판정</span>
+        <h2 id="verdict-title">주요 수정 후 구현 가능</h2>
+      </div>
+      <p>얇은 정책 척추, Orca와의 소유권 경계, 두 런타임의 공통 계약이라는 핵심 구조는 유지해야 한다. 다만 M2를 v1 합격선으로 부르면서 정본의 v1 필수인 Charter·부착 상태·shadow mode를 M3~M5에 둔 완료 기준 충돌이 있다.</p>
+      <p>같은 M2의 migration 성격 작업보다 승인 가드가 늦고, reviewer read-only와 작업 트리 변경 후 stale 판정도 아직 강제되지 않는다. 이 경계와 설치·업데이트 복구 계약을 먼저 고치면 전체 구조를 다시 설계할 필요는 없다.</p>
+      <div class="counts" aria-label="등급별 발견 사항 개수">
+        <span class="badge blocker">BLOCKER 0</span>
+        <span class="badge major">MAJOR 5</span>
+        <span class="badge minor">MINOR 3</span>
+        <span class="badge preference">PREFERENCE 0</span>
+        <span class="badge hold">HOLD 0</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="keep-title">
+      <h2 id="keep-title">2. 반드시 유지할 결정</h2>
+      <div class="keep-grid">
+        <article class="keep">
+          <h3>K-01 · 얇은 정책 척추</h3>
+          <dl>
+            <dt>결정</dt><dd>T0/T1/T2, mode, facet·hard gate를 독립 축으로 유지한다.</dd>
+            <dt>잘한 이유</dt><dd>한 점수로 위험을 숨기지 않고 <code>policy_version</code>·<code>fired_rules</code>로 라우팅을 재현한다.</dd>
+            <dt>관련 요구</dt><dd>C-A2~A7, D-02~D-07, K-20.</dd>
+            <dt>근거</dt><dd><code>capability-map.md:20-43</code>, <code>decision-register.md:23-36</code>, <code>PLAN:168-232</code>.</dd>
+          </dl>
+        </article>
+        <article class="keep">
+          <h3>K-02 · 제안 / 확정 / 강제의 3분할</h3>
+          <dl>
+            <dt>결정</dt><dd>LLM이 후보를 만들고, 사람이 의미를 확정하고, 정책표가 문서와 차단을 계산한다.</dd>
+            <dt>잘한 이유</dt><dd>의미 판단을 가짜 결정론으로 만들지 않으면서 규칙 집행은 테스트 가능하다.</dd>
+            <dt>관련 요구</dt><dd>C-A1, C-A7, D-06, V-0, V-10.</dd>
+            <dt>근거</dt><dd><code>v1-scope.md:34-44</code>, <code>PLAN:100-120,185-230</code>.</dd>
+          </dl>
+        </article>
+        <article class="keep">
+          <h3>K-03 · Romeo / Orca 소유권 경계</h3>
+          <dl>
+            <dt>결정</dt><dd>Romeo는 의도·정책·계약·evidence 형식, Orca는 Run·Task·Dispatch·worktree·재시도를 소유한다.</dd>
+            <dt>잘한 이유</dt><dd>두 번째 스케줄러와 이중 상태 머신을 막는다.</dd>
+            <dt>관련 요구</dt><dd>C-D1, K-10, D-20.</dd>
+            <dt>근거</dt><dd><code>harness-brief.md:52-63</code>, <code>constraints.md:35-42</code>, <code>PLAN:153-164</code>.</dd>
+          </dl>
+        </article>
+        <article class="keep">
+          <h3>K-04 · 계약 중심 runtime parity</h3>
+          <dl>
+            <dt>결정</dt><dd>같은 프롬프트가 아니라 같은 schema·AC·권한·gate·evidence로 동등성을 정의한다.</dd>
+            <dt>잘한 이유</dt><dd>Claude와 Codex의 형식 차이를 인정하면서 비교 가능한 합격 기준을 만든다.</dd>
+            <dt>관련 요구</dt><dd>C-C1~C6, D-12, V-5, V-9.</dd>
+            <dt>근거</dt><dd><code>capability-map.md:78-100</code>, <code>v1-scope.md:52-67</code>, <code>PLAN:234-270</code>.</dd>
+          </dl>
+        </article>
+        <article class="keep">
+          <h3>K-05 · 확장은 관찰된 트리거 뒤로</h3>
+          <dl>
+            <dt>결정</dt><dd>역할은 implementer/reviewer 둘로 시작하고 DB·큐·자동 모델 라우팅·OpenWiki·디자인·자기개선은 연기한다.</dd>
+            <dt>잘한 이유</dt><dd>에이전트와 폴더 수를 진척으로 착각하지 않고 1인 운영의 주의력과 유지비를 먼저 보호한다.</dd>
+            <dt>관련 요구</dt><dd>K-20~K-21, K-30~K-32, D-30~D-37.</dd>
+            <dt>근거</dt><dd><code>v1-scope.md:73-88</code>, <code>PLAN:272-288,356-391</code>.</dd>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="findings-title">
+      <h2 id="findings-title">3. 발견 사항</h2>
+
+      <details class="finding" open>
+        <summary><span class="badge major">MAJOR</span><span>F-01 · v1 합격선과 v1 필수 산출물의 시점이 모순된다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>정본 V-0~V-10에는 Charter, 부착 상태, shadow 20건이 포함된다(<code>v1-scope.md:30-45</code>). PLAN은 M2를 “v1 유일 합격 기준”으로 부르면서 이들을 M3~M5에 둔다(<code>PLAN:260-270,421-463</code>).</dd>
+          <dt>실제 영향</dt><dd>PM·구현자·리뷰어가 서로 다른 완료 정의를 쓰고 문서 승인과 구현 완료가 다시 섞인다.</dd>
+          <dt>최소 수정</dt><dd>M2를 <code>core parity gate</code>로 바꾸고, V-0~V-10 충족을 <code>v1 release gate</code> 한 곳에 둔다. M2를 v1로 삼으려면 정본 범위를 먼저 승인 변경한다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding" open>
+        <summary><span class="badge major">MAJOR</span><span>F-02 · migration payload보다 위험 승인 gate가 늦다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>M2가 18개 문서 backfill을 migration facet으로 분류하지만(<code>PLAN:260-269</code>), 실제 <code>gate-create</code> 집행은 M3다(<code>PLAN:432-441</code>). K-50은 실행 전 영향·복구·승인을 요구한다.</dd>
+          <dt>실제 영향</dt><dd>게이트 대상이라고 스스로 분류한 변경을 게이트가 없는 단계에서 실행한다.</dd>
+          <dt>최소 수정</dt><dd>최소 execution guard를 M2 앞으로 옮기거나 M2 payload를 hard gate 없는 T1로 바꾼다. 8종 전체 시나리오는 M3에 남긴다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding" open>
+        <summary><span class="badge major">MAJOR</span><span>F-03 · reviewer read-only가 사후 <code>git status</code> 비교에 의존한다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>C-D2는 read-only를 v1 필수로 둔다. PLAN은 Orca가 강제하지 못한다고 인정하고 전후 상태 비교로 완화한다(<code>PLAN:506-515</code>). 현재 CLI에는 Codex <code>-s read-only</code>와 Claude 도구 허용·거부 옵션이 존재한다.</dd>
+          <dt>실제 영향</dt><dd>ignored 파일·외부 서비스·브라우저 세션 변경은 git 상태가 같아도 놓칠 수 있다.</dd>
+          <dt>최소 수정</dt><dd>Codex reviewer는 read-only sandbox, Claude reviewer는 명시적 읽기 도구 목록으로 실행한다. 상태 비교는 보조 방어로만 둔다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding" open>
+        <summary><span class="badge major">MAJOR</span><span>F-04 · evidence stale 판정이 작업 트리 변화를 완전히 묶지 못한다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>C-E2는 HEAD 또는 작업 트리 변경을 stale로 요구한다. PLAN 다이어그램에는 dirty hash가 있지만 M1 합격 테스트는 HEAD를 한 커밋 움직이는 경우가 중심이다(<code>PLAN:410-419</code>).</dd>
+          <dt>실제 영향</dt><dd>같은 HEAD에서 tracked·staged·untracked 변경이 생겨도 검증한 바이트를 재현하지 못할 수 있다.</dd>
+          <dt>최소 수정</dt><dd><code>base_sha</code>, <code>head_sha</code>, <code>dirty_tree_hash</code>, 포함·제외 경로와 정규화 규칙을 필수화하고 세 종류 작업 트리 변화 테스트를 넣는다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding" open>
+        <summary><span class="badge major">MAJOR</span><span>F-05 · attach/update 복구가 clean·tracked Git 상태를 과도하게 가정한다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>PLAN은 3-way hash와 dry-run을 제안하지만 실패 복구는 “git 추적 → git checkout” 중심이다(<code>PLAN:454-463</code>). 새 untracked 파일, dirty 대상, 중간 실패 원자성은 정의되지 않았다.</dd>
+          <dt>실제 영향</dt><dd>부분 설치와 사용자 설정 손실이 남을 수 있고 <code>git checkout</code>만으로 새 파일을 복구하지 못한다.</dd>
+          <dt>최소 수정</dt><dd>대상·branch·dirty·hash preflight, 파일별 승인, 임시 staging 후 원자 교체, 성공 뒤 상태 갱신, 생성 파일까지 포함한 백업 복원을 명세한다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding minor">
+        <summary><span class="badge minor">MINOR</span><span>F-06 · M0 수평 산출물이 첫 종단 흐름보다 크다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>M0는 정책표·스키마·템플릿·CLI·tests·provenance·NOTICE를 한 번에 만든다(<code>PLAN:399-408</code>). 유일한 합격 기준은 실제 관통 흐름이다.</dd>
+          <dt>실제 영향</dt><dd>파일과 단위 테스트가 늘어도 <code>/plan → 실행 → evidence → close</code>의 연결 실패가 늦게 드러난다.</dd>
+          <dt>최소 수정</dt><dd>M0의 최소 정책·Tech Spec·dry-run 결과를 즉시 M1 입력으로 연결하고, 소비자가 없는 provenance·범용 명령은 늦춘다.</dd>
+          <dt>확신도</dt><dd>중간</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding minor">
+        <summary><span class="badge minor">MINOR</span><span>F-07 · M0를 막는 결정의 설명이 문서 안에서 다르다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>M0 본문은 profile·상태 모델만 필요하고 라이선스는 막지 않는다고 하나(<code>PLAN:403-405</code>), 마지막 프롬프트는 라이선스·profile·상태·적용 범위를 모두 확정값으로 요구한다(<code>PLAN:568-577</code>).</dd>
+          <dt>실제 영향</dt><dd>가역적인 M0까지 불필요하게 중단될 수 있다.</dd>
+          <dt>최소 수정</dt><dd>frontmatter schema와 profile 표현만 blocking으로 두고 나머지는 <code>UNKNOWN/NEEDS_DECISION</code>으로 기록한다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+
+      <details class="finding minor">
+        <summary><span class="badge minor">MINOR</span><span>F-08 · 첫 T0 payload의 <code>rg</code> 환경 근거가 이미 바뀌었다</span></summary>
+        <div class="body"><dl>
+          <dt>근거</dt><dd>PLAN은 ChatGPT 앱 내부 경로를 기록했지만 현재 probe는 Codex standalone 0.147.0 경로의 ripgrep 15.2.0을 반환했다. 스크립트가 <code>rg</code>에 의존하는 사실은 유지된다.</dd>
+          <dt>실제 영향</dt><dd>첫 실제 작업이 낡은 환경 관찰을 고치는 일로 고정된다.</dd>
+          <dt>최소 수정</dt><dd>M1에서 경로와 CI를 다시 probe하고 실제 실패가 없으면 일반 T0 후보로만 둔다.</dd>
+          <dt>확신도</dt><dd>높음</dd>
+        </dl></div>
+      </details>
+    </section>
+
+    <section aria-labelledby="coverage-title">
+      <h2 id="coverage-title">4. 요구사항 누락 검사</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>요구사항</th><th>계획 대응</th><th>상태</th><th>검증 방법</th></tr></thead>
+          <tbody>
+            <tr><td>사실·가정·미확인과 분류 후보(C-A1)</td><td>공통 흐름, M0</td><td class="status">충분히 반영</td><td>dry-run 카드에서 네 구획과 근거 검사</td></tr>
+            <tr><td>unit + mode + facet, hard gate, 합산 점수 금지</td><td>정책표 3종</td><td class="status">충분히 반영</td><td>15~20 fixture의 기대값·<code>fired_rules</code> 대조</td></tr>
+            <tr><td>사람 확정과 shadow 20건(V-10)</td><td>M0 5건, M4 20건</td><td class="status">일부 반영</td><td>20건 승인·수정 기록과 수정률이 v1 gate 전 존재</td></tr>
+            <tr><td>템플릿 3개(V-2)</td><td>Spec·Brief M0, Charter M3</td><td class="status">일부 반영</td><td>T0/T1/T2 생성물과 schema·cap 검사</td></tr>
+            <tr><td><code>/plan</code> 재사용→제안→확정→문서(V-3)</td><td>M0, 재사용은 M4</td><td class="status">일부 반영</td><td>재실행 시 중복 방지와 재분류 history 검사</td></tr>
+            <tr><td><code>/plan-close</code> 구조·링크·open-loop 검사(V-4)</td><td>M1, M4 보강</td><td class="status">일부 반영</td><td>실패 fixture별 명시 거부 사유 확인</td></tr>
+            <tr><td>Claude/Codex 어댑터와 managed marker(V-5)</td><td>M2</td><td class="status">충분히 반영</td><td>fresh project discovery, 사용자 블록 보존, hash mismatch 감지</td></tr>
+            <tr><td>implementer 1 + reviewer read-only(V-6)</td><td>M2</td><td class="status">일부 반영</td><td>프로세스 권한에서 write 거부 + 전후 상태 보조 검사</td></tr>
+            <tr><td>HEAD·작업 트리 evidence와 stale(V-7)</td><td>M1/M2</td><td class="status">일부 반영</td><td>commit·tracked·staged·untracked 변경 각각 close FAIL</td></tr>
+            <tr><td>위험 행동의 승인·복구(K-50)</td><td>guard M0, gate M3</td><td class="status">일부 반영</td><td>대상·영향·백업·복구 없이는 승인 요청 생성 실패</td></tr>
+            <tr><td>Orca가 실행 상태의 유일한 권위자</td><td>구조 §3, RUNBOOK M2</td><td class="status">충분히 반영</td><td>Romeo에 Run/Dispatch 재시도 상태 중복 없음</td></tr>
+            <tr><td>부착 상태·설정 보존·업데이트·롤백</td><td>M5</td><td class="status">일부 반영</td><td>dirty/untracked/부분 실패 sandbox fixture</td></tr>
+            <tr><td>기획·디자인·개발 독립 호출</td><td>조건부 모듈, M6</td><td class="status">충분히 반영</td><td>비-UI 작업에 디자인 산출물 0, 승인 없는 구현 거부</td></tr>
+            <tr><td>DB·큐·자동 라우팅·OpenWiki·디자인 확대</td><td>명시적 제외, M6/M7</td><td class="status">V1 이후로 합리적으로 연기</td><td>v1 트리·로그에 해당 런타임과 저장소가 없는지 검사</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="order-title">
+      <h2 id="order-title">5. 구현 순서 검사</h2>
+      <p><strong>판단:</strong> M1에서 최소 흐름을 처음 완성하는 방향은 맞지만, M0의 수평 산출물이 크고 M2의 완료 명칭이 정본·안전 gate와 맞지 않는다. 전면 재작성 없이 아래 단계 이동만 필요하다.</p>
+      <div class="flow" aria-label="최소 수직 흐름">
+        <div class="node">요청 입력</div>
+        <div class="node">작업 깊이 판단</div>
+        <div class="node">워크플로우 선택</div>
+        <div class="node">계획·실행 결정</div>
+        <div class="node">결과 검증</div>
+        <div class="node">상태·증거 기록</div>
+      </div>
+      <div class="moves">
+        <article class="move">
+          <h3>앞당겨야 할 단계</h3>
+          <ul>
+            <li>최소 execution guard와 승인 evidence를 M2 전으로.</li>
+            <li>reviewer read-only 강제와 dirty-tree stale를 M2 선행 합격 조건으로.</li>
+            <li>정본 v1 유지 시 Charter·최소 부착 상태·shadow 20건을 v1 선언 전으로.</li>
+          </ul>
+        </article>
+        <article class="move">
+          <h3>늦춰야 할 단계</h3>
+          <ul>
+            <li>소비자가 없는 provenance·NOTICE 골격은 첫 외부 자산 채택 시점으로.</li>
+            <li>범용 doctor·metrics·디자인·OpenWiki는 관찰 트리거 뒤에 유지.</li>
+          </ul>
+        </article>
+        <article class="move">
+          <h3>합쳐야 할 단계</h3>
+          <ul>
+            <li>M0의 최소 정책·Spec·dry-run을 같은 fixture의 M1 종단 흐름으로 즉시 연결.</li>
+            <li><code>status</code>·<code>approved_at</code>·Orca 실행 상태·계산된 stale의 소유권을 하나의 계약 절로.</li>
+          </ul>
+        </article>
+        <article class="move">
+          <h3>제거·V1 이후</h3>
+          <ul>
+            <li>낡은 관찰에 고정된 <code>rg</code> payload는 probe 기반 후보로.</li>
+            <li>full updater·metrics·디자인·파생 지식은 트리거 뒤로. V-8 최소 상태 파일만 v1에 유지.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="final-title">
+      <h2 id="final-title">6. 최종 수정 목록</h2>
+      <div class="final-grid">
+        <article class="final-card must">
+          <h3>구현 전에 반드시 수정</h3>
+          <ol>
+            <li>M2 parity gate와 V-0~V-10 v1 release gate를 분리한다.</li>
+            <li>M2 payload를 바꾸거나 최소 승인 가드를 앞당긴다.</li>
+            <li>reviewer read-only를 런타임 권한으로 강제한다.</li>
+            <li>dirty-tree 정규화와 stale 테스트를 확정한다.</li>
+            <li>attach/update에 preflight·파일별 승인·원자 적용·완전 복구를 넣는다.</li>
+          </ol>
+        </article>
+        <article class="final-card">
+          <h3>구현하면서 검증 가능</h3>
+          <ul>
+            <li>profile 임계·표시명, 3-tier 충분성, 템플릿 cap.</li>
+            <li>정책 정확도, 경로 불변 탐색성, <code>rg</code> portability.</li>
+            <li>Orca 안정성, native projection, 모델·effort 바인딩.</li>
+            <li>OpenWiki·디자인·MCP·자동 라우팅은 트리거 뒤 실험.</li>
+          </ul>
+        </article>
+        <article class="final-card">
+          <h3>변경하지 않아도 됨</h3>
+          <ul>
+            <li>얇은 정책 척추와 세 축 분리.</li>
+            <li>LLM 제안 / 사람 확정 / 정책 강제.</li>
+            <li>Romeo 계약 / Orca 실행 상태 경계.</li>
+            <li>계약 중심 runtime parity.</li>
+            <li>역할 둘로 시작하고 확장을 늦추는 결정.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Romeo Harness · Codex implementation plan review · 외부 리소스 없이 단일 파일로 작성
+  </footer>
+</div>
+</body>
+</html>
