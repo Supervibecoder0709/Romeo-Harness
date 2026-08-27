@@ -51,7 +51,8 @@ OpenWiki = 기술 문서 파생, 디자인 스킬 세트 = UI·랜딩, Orca = �
   "개발자와 같은 암묵지"와 모순되지 않는다 — X-02는 설명 톤의 문제이지 설계 요구가 아니다.
 - 부품 실사용 흔적(2026-08-27 로컬 확인): BMAD v6.0.4(`~/readly-sologis`, 2026-03) ·
   v6.10.0 + CIS v0.2.1(`~/bmad-ordi`, 2026-07) · UI UX Pro Max v2.2.3(`~/readly-sologis`).
-  Superpowers·OpenWiki는 조사 흔적만 있다.
+  Superpowers·OpenWiki·impeccable·taste 는 로컬 흔적은 없지만 사용자가 다른 환경에서 실사용했고 좋았다고 확인했다(2026-08-27, D-64).
+  BMAD 기획 흐름의 PRD 양식은 "고정돼 있어 다양한 상황에 부적합", CIS 가 기획 구체화에 가장 유용했다.
 
 ## 성공의 정의 (v1)
 

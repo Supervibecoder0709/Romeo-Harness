@@ -99,12 +99,31 @@ authority: canonical
 
 | ID | 항목 | 상태 | 비고 |
 | --- | --- | --- | --- |
-| D-40 | GitHub Spec Kit 채택 여부 | open | S12에서 "기획 하네스에 가장 가까운 1순위"로 추천됐으나 이후 council·저장소에 반영 없음. `archive/`에도 없음 |
-| D-41 | 저장소 라이선스 | conflict | S05 권고 Apache-2.0 vs 실물 GPL-3.0 |
+| D-40 | GitHub Spec Kit 채택 여부 | **accepted → 비채택, `converge` 개념만 v2 재검토** (2026-08-27 확인) | S12 추천 vs 정본 추천 — 자체 정책표가 이미 더 구체적 |
+| D-41 | 저장소 라이선스 | **accepted → Apache-2.0** (2026-08-27) | 아래 "구현 착수 결정" D-41 참조. 파일 교체는 M2 첫 외부 자산 복사 시 |
 | D-42 | 하네스 명칭 | open | KEEL(2026-08-04 초안) vs Romeo(현재 저장소) |
-| D-43 | 하네스 적용 대상이 코드 프로젝트 전용인지 | open | S15(면접 준비)·S24(커머스 운영)에서 경량 적용 사례 존재 |
+| D-43 | 하네스 적용 대상이 코드 프로젝트 전용인지 | **accepted → v1 코드 전용** (2026-08-27) | 비코드 요청은 라우터가 `OUT_OF_SCOPE_NON_CODE` 로 정직 보고. 경량 부착은 v1.1 이후 |
 | D-44 | 모델 라우팅 정책 | open | S01은 "역할별 첫 등록 시 승인 후 고정", COUNCIL은 미다룸 |
 | D-45 | ECC / claude-multi-agent-architecture 채택 여부 | open | 비교 조사만 되고 채택 결정 미기록 (S13) |
+
+---
+
+## 구현 착수 결정 (2026-08-27, M0 진입 — 계획 §9.2 항목 1~8의 답)
+
+사용자에게 물은 것(제품·안전 결정)과 자율로 정한 것(기술 결정)을 구분해 적는다. 근거 세션: 2026-08-27 M0 착수 대화.
+
+| ID | 결정 | 상태 | 누가 | 근거·비고 |
+| --- | --- | --- | --- | --- |
+| D-41 | 저장소 라이선스를 **Apache-2.0** 으로 전환한다. 현재 GPL-3.0 은 2026-08-05 초기 커밋에 템플릿으로 들어온 것. `LICENSE` 교체와 `THIRD_PARTY_NOTICES.md` 는 M2 의 첫 외부 자산 복사 직전에 함께 처리한다 | accepted | 사용자 | 계획 §9.2 #1, X-05 |
+| D-43 | v1 은 **코드 프로젝트 전용**. 비코드 프로젝트 요청은 `project_kind: non-code` 로 받아 `OUT_OF_SCOPE_NON_CODE` 경고 + 문서 0개로 정직하게 보고한다. 비코드 fixture 2건(S15·S24)은 이 판정이 기대값 | accepted | 사용자 | 계획 §9.2 #5, A-10 |
+| D-59 | **깊이 라벨** `profile: quick / standard / deep` 은 정책표의 **출력**이고 unit(T0/T1/T2)은 승인 단위로 유지한다. 카드는 깊이와 그 이유를 먼저, 단위·모드·영역은 한 줄로 보여준다. 규칙은 unit 기본값에서 올리기만 한다 | accepted | 자율(기술) | 계획 §2.4 B1, `core/policy/classification.yaml` profile 절 |
+| D-60 | **승인 방식**: 사용자는 Tech Spec 의 `## 확인란`(무엇을·왜·기대 결과·수용 기준·위험과 되돌리기)만 읽고 승인한다. 기술 절은 검토자 런타임과 evidence 가 책임진다. `romeo approve` 는 확인란에 `NEEDS_INPUT` 이 남아 있으면 거부한다. persona(비개발자 PM)를 확정하고 X-02 를 해소한다 | accepted | 사용자 | 계획 §9.2 #2, `~/.codex/AGENTS.md`, 메모리 decision-authority-split |
+| D-61 | **상태 계약 구현**: `status` 5값 + `approved_at`·`approved_by`·`base_sha` 사실 필드 + 검증 상태는 저장하지 않고 `romeo close` 가 HEAD SHA·`dirty_tree_hash` 로 계산(D-15 보완). 신선도 계산에서 `.harness/` 와 `docs/work/<unit>/` 는 제외한다 — 기록 행위 자체가 트리를 바꾸기 때문. 대신 evidence 가 spec 해시를 기록해 이후 변경을 경고한다 | accepted | 자율(기술) | 계획 §3.5, F-04, `romeo/evidence.py`·`close.py`, 테스트 4경우 |
+| D-62 | **`unit: none`**: 저장소 산출물을 만들지 않는 질문·조사·설명은 기획 단위가 없다 — 문서 0, 카드만 기록. T0/T1/T2 3-tier 는 유지하고 none 은 "단위 없음" 판정이다. 게이트 영역을 읽기만 해도 카드에 주의를 인쇄한다(`UNIT_NONE_WITH_GATE`) | accepted | 자율(기술) | fixture 3건(결제 조회·posthog 보고·설문 답변)이 근거. C-B1 템플릿 폭발 금지 |
+| D-63 | **fixture 원천**: 로컬 세션 로그(`~/.claude/projects`, `~/.codex/history.jsonl`, 최근 90일)를 읽기 전용으로 스캔해 사용자가 보낸 메시지 문장만 추출하고 시크릿·URL·이메일·전화번호를 마스킹한 뒤 사용자가 후보를 확정한다(24건 채택). 원본 로그는 수정하지 않는다. 커밋 전 사용자 검토 | accepted | 사용자 | 계획 §9.2 #6, V-0, K-23 |
+| D-64 | **부품 선호(Q-07 답)**: CIS 4종이 기획 구체화에 가장 유용 → G-M3 후보표 최우선. BMAD 기획 흐름(PRD 양식)은 "양식이 고정돼 다양한 상황에 부적합" → 후순위. Superpowers·OpenWiki·impeccable·taste·ui-ux-pro-max 는 다른 환경에서 실사용했고 좋았음(메모리의 "사용 흔적 없음" 정정). 사용자가 상상하는 흐름: **CIS(구체화) → Romeo 문서(작업 status 에 따라 자동 갱신) → Superpowers(개발) → OpenWiki(ADR·제품 문서 자동 관리)**; 디자인은 **구현 문서 기반 디자인 시스템 문서 자동 갱신 + 랜딩 같은 창의 작업 시 별도 스킬 로드** | accepted | 사용자 | 2026-08-27 자유 답변. G-M2·G-M3·G-M6·G-M7 후보표 우선순위에 반영 |
+| D-65 | **첫 부품**: Superpowers 를 계획대로 G-M2 에서 시험 도입한다(세트 단위라 제거 쉬움, K-69) | accepted | 사용자 | 계획 §7 M2 |
+| D-66 | **이번 세션 정지선**: M0+M1 까지. M2 는 G-M2 채택 게이트·라이선스 파일 교체·역할 바인딩 승인이 필요해 사용자가 있는 세션에서 시작한다 | accepted | 사용자 | 계획 §7 |
 
 ---
 
