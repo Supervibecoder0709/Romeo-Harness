@@ -3,8 +3,8 @@ name: harness
 # Romeo 하네스 자체 검사. 네트워크 없이 도는 것만 넣는다 —
 # vendor/ 대조는 blob SHA 를 imports.yaml 에 기록해 두었으므로 upstream 을 다시 받지 않는다(계획 §6.2).
 on:
+  # 작업 브랜치에서도 돈다 — main 에 합치기 전에 회귀를 잡는 것이 이 검사의 목적이다.
   push:
-    branches: [main]
     paths:
       - 'romeo/**'
       - 'bin/romeo'
