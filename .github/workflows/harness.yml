@@ -14,6 +14,7 @@ on:
       - 'vendor/**'
       - 'provenance/**'
       - 'adapters/**'
+      - 'fixtures/conflicts/**'
       - '.harness/bindings.yaml'
       - '.claude/skills/**'
       - '.agents/skills/**'
@@ -31,6 +32,7 @@ on:
       - 'vendor/**'
       - 'provenance/**'
       - 'adapters/**'
+      - 'fixtures/conflicts/**'
       - '.harness/bindings.yaml'
       - '.claude/skills/**'
       - '.agents/skills/**'
@@ -82,6 +84,20 @@ jobs:
 
       - name: THIRD_PARTY_NOTICES 신선도
         run: bin/romeo notices --check
+
+      # 부착 검증(K-68) — 충돌 fixture 3종. 런타임 프로브는 CI 에 claude/codex/orca 가 없어
+      # 실패하므로 --strict 를 쓰지 않고, 충돌만 별도로 강제한다.
+      - name: 충돌 fixture (K-68)
+        run: |
+          python3 - <<'PY'
+          import sys
+          from romeo.doctor import check_conflicts
+          findings, ran = check_conflicts()
+          for f in findings:
+              print(f"CONFLICT [{f[0]}] {f[1]} — {f[2]}", file=sys.stderr)
+          print(f"충돌 fixture {ran}종 실행 · 충돌 {len(findings)}건")
+          sys.exit(1 if findings or ran < 3 else 0)
+          PY
 
       - name: 실패 시 안내
         if: failure()

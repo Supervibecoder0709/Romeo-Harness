@@ -148,6 +148,11 @@ imports:
         original: "Dispatch a `general-purpose` subagent"
         override: ".harness/bindings.yaml 의 roles.reviewer (M2 = codex, -s read-only)"
         applied_by: adapters/claude, adapters/codex
+      # 충돌 fixture c1 이 잡아낸 것 — 게이트 심사에서는 놓쳤다.
+      - target: "SKILL.md:60 의 산출물 경로 예시"
+        original: "PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md"
+        override: ".harness/bindings.yaml 의 overrides.output_paths → docs/work/<id>/"
+        applied_by: fixtures/conflicts/c1-external-plan-path.yaml
     reason: M2 reviewer 역할 계약의 본문. base/head SHA + 제한 컨텍스트 규약
     archive_ref: archive/obra-superpowers/03-components/skills.ko.md
 

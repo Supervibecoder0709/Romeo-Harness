@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id · compile · vendor · notices."""
+"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -198,6 +198,15 @@ def cmd_compile(args):
     return 0
 
 
+def cmd_doctor(args):
+    from .doctor import doctor, doctor_problem_count, format_report
+    rep = doctor(_root(args))
+    print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_report(rep))
+    if args.strict:
+        return 0 if doctor_problem_count(rep) == 0 else 1
+    return 0
+
+
 def cmd_vendor(args):
     from .provenance import check_vendor, check_provenance_ids
     root = _root(args)
@@ -318,6 +327,12 @@ def build_parser():
     s.add_argument("--root")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_compile)
+
+    s = sub.add_parser("doctor", help="부착 검증 — 런타임 프로브 + 충돌 fixture (K-68)")
+    s.add_argument("--strict", action="store_true", help="문제가 있으면 exit 1")
+    s.add_argument("--root")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_doctor)
 
     s = sub.add_parser("vendor", help="vendor/ 원문 대조(수정 0) + provenance id 검사")
     s.add_argument("action", nargs="?", default="check", choices=["check"])

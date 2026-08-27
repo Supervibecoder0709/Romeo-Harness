@@ -20,7 +20,7 @@
 | --- | --- | --- |
 | `sp-finishing-a-development-branch` | `skills/finishing-a-development-branch/SKILL.md` | Step 5·6 integration commands |
 | `sp-receiving-code-review` | `skills/receiving-code-review/SKILL.md` | 없음 |
-| `sp-requesting-code-review` | `skills/requesting-code-review/SKILL.md`<br>`skills/requesting-code-review/code-reviewer.md` | reviewer dispatch |
+| `sp-requesting-code-review` | `skills/requesting-code-review/SKILL.md`<br>`skills/requesting-code-review/code-reviewer.md` | reviewer dispatch; SKILL.md:60 의 산출물 경로 예시 |
 | `sp-systematic-debugging` | `skills/systematic-debugging/SKILL.md`<br>`skills/systematic-debugging/condition-based-waiting.md`<br>`skills/systematic-debugging/condition-based-waiting-example.ts`<br>`skills/systematic-debugging/defense-in-depth.md`<br>`skills/systematic-debugging/find-polluter.sh`<br>`skills/systematic-debugging/root-cause-tracing.md` | 없음 |
 | `sp-test-driven-development` | `skills/test-driven-development/SKILL.md`<br>`skills/test-driven-development/writing-good-tests.md` | 없음 |
 | `sp-using-git-worktrees` | `skills/using-git-worktrees/SKILL.md` | Step 1a native worktree tool; Step 1b git fallback |

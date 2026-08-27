@@ -46,6 +46,17 @@ overrides:
     denied_without_approval: ["git push", "gh pr merge", "git worktree remove", "git branch -D"]
     reason: "K-66 권한 상한"
     applies_to: [sp-finishing-a-development-branch]
+  output_paths:
+    # superpowers 본문이 예시로 docs/superpowers/plans/... 를 가리킨다
+    # (requesting-code-review SKILL.md:60). 원문을 고칠 수 없으므로 여기서 흡수한다.
+    target: "docs/work/<id>/ — 라우터가 만든 작업 단위 폴더"
+    external_paths_absorbed:
+      - "docs/superpowers/plans"
+      - "docs/superpowers/specs"
+      - ".superpowers/"
+    reason: "K-62 산출물 흡수 — 작업 단위 밖 산출물은 종료 검사가 인정하지 않는다"
+    applies_to: [sp-requesting-code-review]
+
   orchestration:
     # 다중 에이전트 조정은 Orca 가 소유한다(전역 규칙). 보류된 부품이 되살아나도 이 규칙이 우선한다.
     dispatch_tool: "orca orchestration"

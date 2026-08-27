@@ -18,7 +18,7 @@
 
 작업 결과는 완료한 내용, 변경된 항목, 검증 방법과 결과, 미검증 사항과 남은 위험, 다음 우선 작업을 중심으로 보고한다. 변동하는 요구사항, 구현 계획과 진행 상태는 프로젝트 인덱스와 개별 문서에서 관리한다.
 
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=b62b3132 -->
+<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=40c64dfe -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
@@ -100,6 +100,8 @@
 - **integration_commands** → 메뉴 제시까지만. 실행은 사람의 승인 뒤에
   - 승인 없이 실행하지 않는다: `git push`, `gh pr merge`, `git worktree remove`, `git branch -D`
   - 대상: `sp-finishing-a-development-branch` · 이유: K-66 권한 상한
+- **output_paths** → docs/work/<id>/ — 라우터가 만든 작업 단위 폴더
+  - 대상: `sp-requesting-code-review` · 이유: K-62 산출물 흡수 — 작업 단위 밖 산출물은 종료 검사가 인정하지 않는다
 - **orchestration** → orca orchestration
   - 병렬 비교는 `race` 를 쓴다.
   - 대상: `sp-subagent-driven-development`, `sp-dispatching-parallel-agents` · 이유: task/dispatch provenance·lifecycle 이 Orca 에만 생긴다
