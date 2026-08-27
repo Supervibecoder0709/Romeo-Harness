@@ -12,3 +12,10 @@ runtime_load:
     requesting-code-review · receiving-code-review · using-git-worktrees ·
     finishing-a-development-branch) + plan · plan-close 가 모두 나타났다.
     보류·제외한 스킬(brainstorming · subagent-driven-development 등)은 나타나지 않았다.
+  codex: >-
+    2026-08-28 · 별도 워크트리(codex-m2-review)의 독립 Codex 세션(gpt-5.6-sol, effort max)에게
+    "런타임이 실제로 제공한 스킬 목록" 을 물어 받은 답. .agents/skills/ 의 10개가 전부 나타났다 —
+    finishing-a-development-branch · plan · plan-close · receiving-code-review · repo-archive ·
+    requesting-code-review · systematic-debugging · test-driven-development · using-git-worktrees ·
+    verification-before-completion. romeo doctor 가 센 목록과 이름까지 일치한다.
+    증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md
