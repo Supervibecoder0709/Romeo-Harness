@@ -1,0 +1,95 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run-m1
+task_id: null
+dispatch_id: null
+unit_id: chg-20260827-rg-fallback-validate-245m
+spec_ref:
+  path: docs/work/chg-20260827-rg-fallback-validate-245m/spec.md
+  sha256: e5571a6213a8afa06c5ae27008ef563f0a177c744ff9b9da8ed1266b5b4fe828
+base_sha: 89fb61a864d2ecb8355ca4f5942d574f091cd419
+head_sha: 9c7c85bfa74013d2e145b8a7028cc50e6bbb5bf7
+dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
+started_at: '2026-08-27T16:39:22+09:00'
+finished_at: '2026-08-27T16:39:22+09:00'
+commands:
+- id: check-1
+  command: bash scripts/validate-repo-archive.sh archive/obra-superpowers
+  exit_code: 0
+  started_at: '2026-08-27T16:39:22+09:00'
+  finished_at: '2026-08-27T16:39:22+09:00'
+  seconds: 0.039
+  log: .harness/runs/chg-20260827-rg-fallback-validate-245m/run-m1/01-check-1.log
+  log_sha256: 5f656fcf8fdbfbce5cd91a1f55e54740711d53a0e7a109b885d9d57ea2e139a7
+  stdout_tail: 'PASS: archive/obra-superpowers'
+- id: check-2
+  command: env PATH=/usr/bin:/bin bash scripts/validate-repo-archive.sh archive/obra-superpowers
+  exit_code: 0
+  started_at: '2026-08-27T16:39:22+09:00'
+  finished_at: '2026-08-27T16:39:22+09:00'
+  seconds: 0.024
+  log: .harness/runs/chg-20260827-rg-fallback-validate-245m/run-m1/02-check-2.log
+  log_sha256: 5411352fd8533e22902c06afcd1092af1dce4f3ac67c372f37bbd731392ca544
+  stdout_tail: 'PASS: archive/obra-superpowers'
+- id: check-3
+  command: t=$(mktemp -d) && cp -R archive/obra-superpowers/. "$t" && sed -i '' 's/^- Commit SHA:/- Commit
+    XXX:/' "$t/_source.md" && ! env PATH=/usr/bin:/bin bash scripts/validate-repo-archive.sh "$t"
+  exit_code: 0
+  started_at: '2026-08-27T16:39:22+09:00'
+  finished_at: '2026-08-27T16:39:22+09:00'
+  seconds: 0.045
+  log: .harness/runs/chg-20260827-rg-fallback-validate-245m/run-m1/03-check-3.log
+  log_sha256: 353f84fc86371219b02ca5e8f4d15409c647c9d6dc50caa5f2c8d2b0118325dd
+  stdout_tail: ''
+changed_files:
+- scripts/validate-repo-archive.sh
+artifact_hash: 3b99d57e5ad5fdf6567af0fba80f43ddd0867e618a4b39aadf2b8fd39f5e4894
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-27T16:39:23+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    detail: ''
+  - id: APPROVED
+    ok: true
+    detail: status=active approved_at=2026-08-27T16:39:22+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    detail: evidence/*.yaml 없음 — romeo evidence run 으로 만든다
+  - id: FRESH_HEAD
+    ok: true
+    detail: evidence 9c7c85bfa740 vs 현재 9c7c85bfa740
+  - id: FRESH_TREE
+    ok: true
+    detail: evidence 682e4deea426 vs 현재 682e4deea426 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-1: exit 0 — bash scripts/validate-repo-archive.sh archive/obra-superpowers'
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-2: exit 0 — env PATH=/usr/bin:/bin bash scripts/validate-repo-archive.sh archive/obra-superpowers'
+  - id: REQUIRED_CHECK
+    ok: true
+    detail: 'check-3: exit 0 — t=$(mktemp -d) && cp -R archive/obra-superpowers/. "$t" && sed -i ''''
+      ''s/^- Commit SHA:/- Commit XXX:/'' "$t/_source.md" && ! env PATH=/usr/bin:/bin bash scripts/validate-repo-archive.sh
+      "$t"'
+  - id: AC_ALL_CHECKED
+    ok: true
+    detail: 미체크 0개
+  - id: NO_OPEN_LOOP
+    ok: true
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    detail: changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: false
+    detail: spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.

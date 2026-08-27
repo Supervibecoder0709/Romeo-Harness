@@ -10,14 +10,14 @@ gates: []
 profile: quick
 blast_radius: small
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-08-27T16:39:22+09:00'
 approved_by: Supervibecoder0709
 base_sha: 89fb61a864d2ecb8355ca4f5942d574f091cd419
-closed_at: null
+closed_at: '2026-08-27T16:39:23+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run-m1.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T0=quick']
@@ -38,9 +38,9 @@ updated: '2026-08-27'
 - **왜 지금:** 이 머신의 `rg` 는 정식 설치가 아니라 ChatGPT 앱 번들 바이너리뿐이고, Orca 워커 셸에서는 `command not found` 로 검증이 깨진 적이 있다(메모리 기록). M2 에서 Codex·Orca 워커가 이 스크립트를 실행해야 한다.
 - **기대 결과:** `rg` 가 없는 PATH 에서도 `bash scripts/validate-repo-archive.sh archive/obra-superpowers` 가 PASS 하고, 깨진 아카이브(SHA 줄 훼손)는 여전히 FAIL 한다.
 - **수용 기준:**
-  - [ ] AC-1 `rg` 가 있는 기본 PATH 에서 obra-superpowers 아카이브 검증이 PASS
-  - [ ] AC-2 `rg` 가 없는 PATH(`/usr/bin:/bin`)에서 같은 검증이 PASS
-  - [ ] AC-3 `rg` 가 없는 PATH 에서 SHA 줄을 훼손한 사본은 FAIL (폴백이 실제로 검사한다)
+  - [x] AC-1 `rg` 가 있는 기본 PATH 에서 obra-superpowers 아카이브 검증이 PASS
+  - [x] AC-2 `rg` 가 없는 PATH(`/usr/bin:/bin`)에서 같은 검증이 PASS
+  - [x] AC-3 `rg` 가 없는 PATH 에서 SHA 줄을 훼손한 사본은 FAIL (폴백이 실제로 검사한다)
 - **위험과 되돌리기:** 검증 스크립트만 바뀌므로 아카이브·CI 에 영향 없음. 되돌리기는 `git revert <커밋>`.
 - **결정 필요:** 없음
 
@@ -86,6 +86,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-27T16:39:23+09:00 · HEAD 9c7c85bfa740
 
-- (없음)
+- [evidence/run-m1.yaml](evidence/run-m1.yaml) — exit codes [0, 0, 0]
