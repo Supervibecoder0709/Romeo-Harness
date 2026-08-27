@@ -33,9 +33,18 @@ def codes(findings):
 
 
 class TestRepoItself(unittest.TestCase):
-    def test_doctor_passes_on_this_repo(self):
+    def test_repository_scope_passes_on_this_repo(self):
+        # 저장소 내용 문제만 본다. 런타임 설치 여부는 머신마다 다르므로 여기 섞으면 CI 에서 무조건 깨진다.
         rep = doctor(REPO)
-        self.assertEqual(doctor_problem_count(rep), 0, format_report(rep))
+        self.assertEqual(doctor_problem_count(rep, scope="repository"), 0, format_report(rep))
+
+    def test_missing_runtime_is_environment_not_repository(self):
+        rep = doctor(REPO)
+        rep["runtimes"] = [{"name": "codex", "ok": False, "detail": "PATH 에 없다", "why": "x"}]
+        self.assertEqual(doctor_problem_count(rep, scope="repository"), 0,
+                         "런타임 부재가 저장소 문제로 세어지면 CI 가 항상 실패한다")
+        self.assertEqual(doctor_problem_count(rep, scope="environment"), 1)
+        self.assertEqual(doctor_problem_count(rep), 1, "기본 scope 는 둘을 합친다")
 
     def test_three_conflict_fixtures_run(self):
         _findings, ran = check_conflicts(REPO)

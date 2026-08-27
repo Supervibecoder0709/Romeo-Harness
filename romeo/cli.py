@@ -203,7 +203,7 @@ def cmd_doctor(args):
     rep = doctor(_root(args))
     print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_report(rep))
     if args.strict:
-        return 0 if doctor_problem_count(rep) == 0 else 1
+        return 0 if doctor_problem_count(rep, args.scope) == 0 else 1
     return 0
 
 
@@ -330,6 +330,8 @@ def build_parser():
 
     s = sub.add_parser("doctor", help="부착 검증 — 런타임 프로브 + 충돌 fixture (K-68)")
     s.add_argument("--strict", action="store_true", help="문제가 있으면 exit 1")
+    s.add_argument("--scope", choices=["all", "repository", "environment"], default="all",
+                   help="--strict 가 무엇을 문제로 셀지. CI 는 repository (런타임 부재는 머신 문제다)")
     s.add_argument("--root")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_doctor)

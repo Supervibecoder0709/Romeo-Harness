@@ -242,19 +242,27 @@ def format_report(rep):
     for fid, where, why in [tuple(x) for x in c["findings"]]:
         out.append(f"  ✗ [{fid}] {where} — {why}")
 
-    problems = (sum(1 for r in rep["runtimes"] if not r["ok"])
-                + sum(len(s["problems"]) for s in rep["skills"])
-                + sum(len(a[k]) for k in ("compile", "vendor", "notices"))
-                + len(c["findings"]))
-    out += ["", f"결과: {'PASS' if problems == 0 else f'{problems}건 확인 필요'}"]
+    env = doctor_problem_count(rep, "environment")
+    repo = doctor_problem_count(rep, "repository")
+    out += ["",
+            f"결과 · 저장소: {'PASS' if repo == 0 else f'{repo}건'}"
+            f" · 이 머신의 런타임: {'PASS' if env == 0 else f'{env}건 없음'}"]
+    if env and not repo:
+        out.append("저장소는 정상이다. 런타임 부재는 이 머신의 문제이지 저장소의 문제가 아니다(CI 러너에는 없는 것이 정상).")
     if not observed:
         out.append("주의: 런타임이 스킬을 실제로 로드하는지는 아직 관찰되지 않았다(A-11).")
     return "\n".join(out)
 
 
-def doctor_problem_count(rep):
+def doctor_problem_count(rep, scope="all"):
+    """문제 수. 두 부류는 성격이 다르므로 합칠지 나눌지 부르는 쪽이 정한다.
+
+    - environment: 이 머신에 런타임이 있는가. CI 러너에는 없는 것이 정상이다.
+    - repository: 저장소 내용이 맞는가. 어느 머신에서든 같아야 한다.
+    """
     a = rep["attach"]
-    return (sum(1 for r in rep["runtimes"] if not r["ok"])
-            + sum(len(s["problems"]) for s in rep["skills"])
+    env = sum(1 for r in rep["runtimes"] if not r["ok"])
+    repo = (sum(len(s["problems"]) for s in rep["skills"])
             + sum(len(a[k]) for k in ("compile", "vendor", "notices"))
             + len(rep["conflicts"]["findings"]))
+    return {"environment": env, "repository": repo, "all": env + repo}[scope]
