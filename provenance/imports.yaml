@@ -1,0 +1,322 @@
+# 외부 자산 채택 기록 (계획 §6.2 · D-52 채택 확정 게이트)
+#
+# 이 파일이 THIRD_PARTY_NOTICES.md 의 생성 원본이다.
+# 코어 파일 frontmatter 의 `provenance: [id]` 는 여기 있는 id 만 가리킬 수 있다.
+# adoption: install | verbatim | rewrite | principle | excluded
+# status:   proposed | accepted | rejected | deferred
+---
+schema_version: 1
+updated: 2026-08-27
+
+imports:
+  # ── G-M2 (2026-08-27 닫힘) ─────────────────────────────────────────────
+  # 규율 코어 7종. 상호 참조가 세트 안에서 닫혀 깨진 링크 0 (실측: docs/reviews 참조).
+  - id: sp-test-driven-development
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/test-driven-development/SKILL.md
+      - skills/test-driven-development/writing-good-tests.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/test-driven-development/
+    modifications: none
+    local_overrides: []
+    reason: RED→GREEN→REFACTOR. Romeo·Orca 와 충돌 0, 나가는 참조 0
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-systematic-debugging
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/systematic-debugging/SKILL.md
+      - skills/systematic-debugging/condition-based-waiting.md
+      - skills/systematic-debugging/condition-based-waiting-example.ts
+      - skills/systematic-debugging/defense-in-depth.md
+      - skills/systematic-debugging/find-polluter.sh
+      - skills/systematic-debugging/root-cause-tracing.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/systematic-debugging/
+    modifications: none
+    local_overrides: []
+    reason: 근본 원인 → 가설 → 최소 시험. 세트 안의 TDD·verification 만 참조
+    excluded_files:
+      - skills/systematic-debugging/CREATION-LOG.md          # 스킬 제작 기록, 실행 계약 아님
+      - skills/systematic-debugging/test-academic.md          # 스킬 평가 자료
+      - skills/systematic-debugging/test-pressure-1.md
+      - skills/systematic-debugging/test-pressure-2.md
+      - skills/systematic-debugging/test-pressure-3.md
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-verification-before-completion
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/verification-before-completion/SKILL.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/verification-before-completion/
+    modifications: none
+    local_overrides: []
+    reason: K-51(실행은 완료가 아니다)의 실행 형태. evidence 계약과 같은 방향
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-requesting-code-review
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/requesting-code-review/SKILL.md
+      - skills/requesting-code-review/code-reviewer.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/requesting-code-review/
+    modifications: none
+    local_overrides:
+      # 원문 SKILL.md:34 이 `general-purpose` 서브에이전트를 지목한다.
+      # 코어를 벤더 중립으로 유지하기 위해(C-C6) 어댑터가 역할 바인딩으로 치환한다.
+      - target: "reviewer dispatch"
+        original: "Dispatch a `general-purpose` subagent"
+        override: ".harness/bindings.yaml 의 roles.reviewer (M2 = codex, -s read-only)"
+        applied_by: adapters/claude, adapters/codex
+    reason: M2 reviewer 역할 계약의 본문. base/head SHA + 제한 컨텍스트 규약
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-receiving-code-review
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/receiving-code-review/SKILL.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/receiving-code-review/
+    modifications: none
+    local_overrides: []
+    reason: 리뷰 지적을 맹목 수용도 형식적 동의도 하지 않는 규율. 역할 교체 parity 의 전제
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-using-git-worktrees
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/using-git-worktrees/SKILL.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/using-git-worktrees/
+    modifications: none
+    local_overrides:
+      # 원문 Step 1a 가 네이티브 도구를 이름으로 지목(EnterWorktree·WorktreeCreate·/worktree),
+      # Step 1b 폴백이 `git worktree add` 를 직접 실행한다. 전역 Orca 우선 규칙이 둘 다 금지한다.
+      - target: "Step 1a native worktree tool"
+        original: "a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command"
+        override: ".harness/bindings.yaml 의 worktree.native_tool = `orca worktree create`"
+        applied_by: adapters/orca/RUNBOOK.md
+      - target: "Step 1b git fallback"
+        original: "git worktree add \"$path\" -b \"$BRANCH_NAME\""
+        override: "Orca 런타임이 살아 있으면 폴백 금지 (orca status --json 로 판정)"
+        applied_by: adapters/orca/RUNBOOK.md
+    reason: 원문 원칙("Never fight the harness")이 Orca 우선 규칙과 같은 방향. 도구 지목만 override
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-finishing-a-development-branch
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path:
+      - skills/finishing-a-development-branch/SKILL.md
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: vendor/obra-superpowers@b36e082/skills/finishing-a-development-branch/
+    modifications: none
+    local_overrides:
+      # Step 5 의 merge/push/PR·Step 6 의 worktree 삭제는 K-66 권한 상한 대상.
+      - target: "Step 5·6 integration commands"
+        original: "git merge / git push -u origin / git branch -d / git worktree remove"
+        override: ".claude/settings.json deny 목록이 차단. 메뉴 제시까지만 하고 실행은 사람"
+        applied_by: .claude/settings.json, K-66
+    reason: 원문도 "integration is your human partner's decision" 이라 방향 일치. host 소유 워크스페이스는 원문이 스스로 보존
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  # ── G-M2 보류 (rejected 아님. M3 재검토) ────────────────────────────────
+  - id: sp-writing-plans
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/writing-plans/SKILL.md, skills/writing-plans/plan-document-reviewer-prompt.md]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: deferred
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    modifications: none
+    reason: >-
+      K-61 이중 기획이 문구가 아니라 산출물 수준에서 발생한다 — 원문이 "Every plan MUST start with
+      this header"(Goal·Architecture·Tech Stack·Spec·Global Constraints)를 요구해 Romeo Tech Spec 과
+      계획 원본이 2개가 된다. Scope Check 가 제외 확정된 brainstorming 을 전제하고(깨진 링크),
+      Execution Handoff 가 사용자에게 별도 3지선다를 물어 승인 창구가 이중화된다(K-60).
+      쓸모 있는 두 규율은 대신 흡수했다 → sp-writing-plans-absorbed
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-writing-plans-absorbed
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/writing-plans/SKILL.md]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: principle
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: core/templates/tech-spec.md
+    modifications: >-
+      원문의 Task Structure 중 두 요소만 Romeo `## 구현 단위` 표에 흡수했다 —
+      (1) Interfaces 블록(소비·생산 시그니처 계약) → "인터페이스" 열,
+      (2) No Placeholders 규칙 → 표 위 빈칸 금지 문단. 문장은 재작성이고 원문 복사가 아니다.
+    reason: 스킬 전체를 들이면 계획 원본이 2개가 되지만, 이 두 규율 자체는 Romeo 템플릿에 없던 빈칸이었다
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-executing-plans
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/executing-plans/SKILL.md]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: deferred
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    modifications: none
+    reason: >-
+      본문 14행이 제외 확정된 `../using-superpowers/references/`(런타임별 도구명 목록)를 읽으라고 지시한다 —
+      벤더 중립을 위해 제외한 것을 되불러온다. Step 1 이 using-git-worktrees, Step 3 이
+      finishing-a-development-branch 를 REQUIRED SUB-SKILL 로 요구해 단독 채택이 불가능하고,
+      역할이 Romeo `/plan` → 구현 흐름과 같은 자리를 차지한다
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-subagent-driven-development
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/subagent-driven-development/]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: deferred
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    modifications: none
+    reason: >-
+      승인 모델이 정반대다 — 원문이 "Do not pause to check in with your human partner between tasks",
+      "Rulings, not stalls. A running plan does not wait on a human" 을 지시하는데 D-60 은 사용자가
+      Tech Spec 확인란을 읽고 승인하도록 정한다. 경로 override 로 덮을 수 없다. 자체 상태를 소유하고
+      (scripts/sdd-workspace·task-brief·review-package + plan-scoped ledger) K-63 을 침범하며,
+      내장 subagent dispatch 전제라 전역 Orca 우선 규칙(orchestration)과 충돌한다.
+      병렬 실행 능력은 런타임과 orca orchestration·race 가 이미 제공하므로 잃는 능력이 없다
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  - id: sp-dispatching-parallel-agents
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/dispatching-parallel-agents/SKILL.md]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: verbatim
+    status: deferred
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    modifications: none
+    reason: >-
+      본문 71~73 행이 `Subagent (general-purpose)` 를 리터럴로 지시한다. 전역 Orca 우선 규칙은
+      다중 에이전트 조정을 `orca orchestration` 으로, 병렬 비교를 `race` 스킬로 이미 정해 두었다.
+      켜도 규칙상 실행할 수 없는 스킬이 된다
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  # ── G-M2 제외 확정 (D-54) ──────────────────────────────────────────────
+  - id: sp-brainstorming
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/brainstorming/]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    reason: K-61 기획 원본 단일. 기획 구체화는 CIS(G-M3) + Romeo 가 소유한다. visual companion 서버도 함께 제외
+    archive_ref: archive/obra-superpowers/03-components/visual-companion.ko.md
+
+  - id: sp-using-superpowers
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/using-superpowers/]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    reason: >-
+      K-60 진입점 단일 + K-65 트리거 소유권. "1% 규칙"(모든 대화 시작에서 스킬 먼저 로드)과
+      session-start hook 이 Romeo `/plan` 라우터를 대체하려 든다. references/ 하위는 런타임 도구명 목록
+    archive_ref: archive/obra-superpowers/03-components/runtime-adapters.ko.md
+
+  - id: sp-writing-skills
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_path: [skills/writing-skills/]
+    license: MIT
+    license_verified_at: 2026-08-27
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-27
+    decided_by: user
+    gate: G-M2
+    local_path: null
+    reason: 스킬 제작용. Romeo 의 대상은 작업이지 스킬이 아니다. 제외 확정된 using-superpowers 를 참조하기도 한다
+    archive_ref: archive/obra-superpowers/03-components/skills.ko.md
