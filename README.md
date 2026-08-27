@@ -51,7 +51,13 @@ bin/romeo compile                                       # 코어 → 두 런타�
 bin/romeo compile --check                               # 산출물이 코어와 일치하는지
 bin/romeo vendor check                                  # vendor/ 원문 대조(수정 0) + provenance id
 bin/romeo notices --check                               # THIRD_PARTY_NOTICES.md 신선도
+bin/romeo doctor                                        # 부착 검증 — 프로브 + 충돌 fixture (K-68)
 ```
+
+`doctor` 는 확인할 수 있는 것만 PASS 로 셉니다. 런타임이 스킬을 **실제로 로드하는지**는 파일 검사로
+증명되지 않으므로 `.harness/observations.yaml` 에 사람이 관찰한 것만 기록하고, 그 외에는 "미관찰" 로 인쇄합니다.
+문제는 두 부류로 나뉩니다 — `--scope repository`(저장소 내용, 어느 머신에서든 같아야 함)와
+`--scope environment`(이 머신에 런타임이 있는가). CI 는 앞의 것만 강제합니다.
 
 `CLAUDE.md`·`AGENTS.md`·`.claude/skills/**`·`.agents/skills/**`·`.claude/settings.json` 은 **`romeo compile` 산출물**입니다.
 고칠 곳은 `core/`(벤더 중립 원본)와 `adapters/`(런타임 매핑)이고, 지침 파일은 `romeo:managed` 마커 안쪽만 하네스가 소유합니다 —
