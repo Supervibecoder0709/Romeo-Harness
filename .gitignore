@@ -1,0 +1,10 @@
+# Romeo 하네스 — 원시 로그·캐시는 git 에 두지 않는다 (K-24). evidence 에는 경로와 해시만 남는다.
+.harness/runs/
+.harness/cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
