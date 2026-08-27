@@ -10,7 +10,7 @@ authority: derived
 >
 > **개정 2 (2026-08-27):** Codex(`gpt-5.6-sol`, fast) 리뷰 8건을 검증해 채택 6·부분 채택 2를 반영했다. 바뀐 곳은 §11에 정리했고 판정 근거는 [decisions.md](../reviews/2026-08-27-codex-plan-review/decisions.md)에 있다.
 >
-> **개정 4 (2026-08-27, M0 착수):** §9.2 의 사용자 결정 1~8 이 확정됐다(D-41·D-43·D-59~D-66, [decision-register](../decisions/decision-register.md) "구현 착수 결정"). 이번 세션 정지선은 M0+M1. M0 산출물은 `core/`·`romeo/`·`fixtures/`·`tests/`, 실행 기록은 `docs/work/` 와 `fixtures/shadow/`.
+> **개정 4 (2026-08-27, M0 착수):** §9.2 의 사용자 결정 1~8 이 확정됐다(D-41·D-43·D-59~D-66, [decision-register](../decisions/decision-register.md) "구현 착수 결정"). 이번 세션 정지선은 M0+M1. M0 산출물은 `core/`·`romeo/`·`fixtures/`·`tests/`, 실행 기록은 `docs/work/` 와 `fixtures/shadow/`, 진행 상태는 [progress.md](progress.md).
 >
 > **개정 3 (2026-08-27):** 사용자 재정의("잘 썼던 하네스들을 조립해서 나만의 라우터 체계로")를 반영했다. 참고 저장소를 "원칙만 참고"하던 §6을 **채택 방식 5단계·채택 확정 게이트·통합 규약**으로 다시 썼고, 부품 연결을 M2·M3 안으로 당겼다. 바뀐 곳은 §12, 근거는 [assembly-redefinition/summary.md](../reviews/2026-08-27-assembly-redefinition/summary.md)에 있다.
 

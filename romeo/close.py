@@ -44,7 +44,7 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False):
         check("NOT_ALREADY_DONE", False, f"이미 done ({fm.get('closed_at')})")
     check("APPROVED", fm.get("status") == "active" and fm.get("approved_at"), f"status={fm.get('status')} approved_at={fm.get('approved_at')}")
     runs = list_runs(project_root, unit_id)
-    if not check("HAS_EVIDENCE", bool(runs), "evidence/*.yaml 없음 — romeo evidence run 으로 만든다"):
+    if not check("HAS_EVIDENCE", bool(runs), "" if runs else "evidence/*.yaml 없음 — romeo evidence run 으로 만든다"):
         return _finish(checks, fm, body, spec, runs, dry_run, project_root)
     ev = runs[-1]
     cur_head = head_sha(project_root)
@@ -61,9 +61,10 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False):
             check("REQUIRED_CHECK", rec["exit_code"] == 0, f"{rc.get('id')}: exit {rec['exit_code']} — {cmd}")
     check("AC_ALL_CHECKED", not UNCHECKED_RE.search(body), f"미체크 {len(UNCHECKED_RE.findall(body))}개")
     check("NO_OPEN_LOOP", "NEEDS_INPUT" not in body, f"NEEDS_INPUT {body.count('NEEDS_INPUT')}곳")
-    check("HAS_CHANGE", bool(ev.get("changed_files")), "changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다")
+    check("HAS_CHANGE", bool(ev.get("changed_files")), f"changed_files {ev.get('changed_files')}" if ev.get("changed_files") else "changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다")
     spec_sha = sha256_file(spec)
-    check("SPEC_UNCHANGED_SINCE_EVIDENCE", (ev.get("spec_ref") or {}).get("sha256") == spec_sha, "spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.", level="warning")
+    spec_same = (ev.get("spec_ref") or {}).get("sha256") == spec_sha
+    check("SPEC_UNCHANGED_SINCE_EVIDENCE", spec_same, "" if spec_same else "spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.", level="warning")
     out = route(classification_from_frontmatter(fm), pol)
     if out["reviewer"] != "none":
         review_dir = udir / "review"

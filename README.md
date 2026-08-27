@@ -26,15 +26,24 @@ Romeo는 사용자가 직접 써보고 검증한 하네스들(BMAD/CIS·Superpow
 그 척추가 켜고 끄는 대상이 부품입니다. 도출 과정은 [`docs/council/`](docs/council/README.md), 원 논의는
 [`docs/planning-harness-discussion.md`](docs/planning-harness-discussion.md) 에 있습니다.
 
-구현 계획은 [`docs/planning/implementation-plan.md`](docs/planning/implementation-plan.md)(개정 3)이고,
+구현 계획은 [`docs/planning/implementation-plan.md`](docs/planning/implementation-plan.md)(개정 4)이고, 진행 상태는 [`docs/planning/progress.md`](docs/planning/progress.md)이며,
 부품을 어떻게 조립하는지·채택 확정 게이트·통합 규약의 근거는
 [`docs/reviews/2026-08-27-assembly-redefinition/`](docs/reviews/2026-08-27-assembly-redefinition/summary.md)에 있습니다.
 
 ## 현재 구현 상태
 
-동작하는 것은 참조 저장소 아카이브 파이프라인(`/repo`)뿐입니다.
-기획 하네스(`/plan`, `/plan-close`)는 아직 구현되지 않았습니다. 자세한 구분은
-[v1 범위](docs/requirements/v1-scope.md) 를 보세요.
+- 참조 저장소 아카이브 파이프라인(`/repo`) — 동작.
+- **M0 완료** (2026-08-27): 정책표 `core/policy/`, 스키마 `core/schemas/`, Tech Spec 템플릿, `/plan`·`/plan-close` 워크플로우 본문,
+  `bin/romeo` CLI(route·card·new·validate·approve·evidence·close), fixture 33건(`fixtures/requests/`), 테스트 23개.
+- **M1 완료** (2026-08-27): T0 2건이 `분류 → Tech Spec → 승인 → 구현 → evidence(HEAD SHA) → close PASS` 를 관통했다 (`docs/work/`).
+- 미착수: M2(어댑터·역할·Orca 위임·Codex 교차 리뷰) 이후. 진행 상태는 [progress.md](docs/planning/progress.md), 자세한 구분은
+  [v1 범위](docs/requirements/v1-scope.md).
+
+```bash
+bin/romeo route --fixtures fixtures/requests --report   # 정책표 일치율
+python3 -m unittest discover -s tests                   # 회귀 테스트
+bin/romeo validate                                      # docs/work 문서 검증
+```
 
 ## 아카이브
 
