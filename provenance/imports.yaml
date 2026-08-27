@@ -8,7 +8,56 @@
 schema_version: 1
 updated: 2026-08-27
 
+vendors:
+  # local_root 아래 파일은 원문 그대로다(수정 0). `romeo vendor check` 가 blob SHA 로 대조한다.
+  # blob SHA = git 오브젝트 해시(sha1 of "blob <len>\0<content>") — upstream tree API 값과 같다.
+  - id: obra-superpowers
+    source_repo: obra/superpowers
+    source_sha: b36e0829c6d0140e93cfef2ca599b1b07d4a7797
+    source_ref: main
+    local_root: vendor/obra-superpowers@b36e082
+    license: MIT
+    license_file: LICENSE
+    license_verified_at: 2026-08-27
+    copied_at: 2026-08-28
+    gate: G-M2
+    files:
+      LICENSE: abf0390320aa14406af7a520b9b0739fdda9bf08
+      skills/finishing-a-development-branch/SKILL.md: fa8aecaf8813f1b19d19996f7957d1b0121f2d9c
+      skills/receiving-code-review/SKILL.md: 950da7b74bf6dbed6b8726d12ddadd65a9f5fda7
+      skills/requesting-code-review/SKILL.md: fa4f2f9965591d6d8a7ef4ad47e6ba4d5ac344d0
+      skills/requesting-code-review/code-reviewer.md: b898cb982e8a368e847d31136ac106001173b1d5
+      skills/systematic-debugging/SKILL.md: 095d194ac041502905f15b01d22d294fb94db8b2
+      skills/systematic-debugging/condition-based-waiting-example.ts: 703a06b653160d060bbf46ab5c6e0cd7446bd592
+      skills/systematic-debugging/condition-based-waiting.md: 70994f777c586f7d4c43033aac34c7cf0da6688b
+      skills/systematic-debugging/defense-in-depth.md: e2483354dc2b62478a2624e34ca18bc0efe887b2
+      skills/systematic-debugging/find-polluter.sh: 985f5d08ccf8a3f2d40739cfcaf4413bb24bf1cb
+      skills/systematic-debugging/root-cause-tracing.md: 12ef5222e24e19ab92172b82b69ef1b0c30d9bfa
+      skills/test-driven-development/SKILL.md: 4320d8879a639d0536c2239bb80c9d7257ad8947
+      skills/test-driven-development/writing-good-tests.md: d3c4482fd30b4f9084bb61545fe73939a7502c28
+      skills/using-git-worktrees/SKILL.md: 1381dacb3516b94382dd6ec736ede21ee8ede2b3
+      skills/verification-before-completion/SKILL.md: 7d45333cc4a49c57a80df6c1fe2fa777a207afbc
+
 imports:
+  # ── M0 (게이트 이전 · 텍스트 복사 0) ───────────────────────────────────
+  - id: anthropics-skills-skill-format
+    source_repo: anthropics/skills
+    source_sha: 3b3fad96af16a10759d930941b4520ba0c40edae
+    source_path: [skills/*/SKILL.md]
+    license: "루트 LICENSE 없음 — 스킬별 LICENSE.txt"
+    license_verified_at: 2026-08-24
+    adoption: principle
+    status: accepted
+    decided_at: 2026-08-27
+    decided_by: 자율(기술)
+    gate: "없음 (M0, principle 은 게이트 대상이 아님)"
+    local_path: core/workflows/plan/SKILL.md
+    modifications: >-
+      SKILL.md frontmatter 의 name·description 규약만 따랐다. 원문 텍스트는 복사하지 않았다 —
+      루트 라이선스가 없어 텍스트 복사가 금지된다(K-42)
+    reason: 두 런타임이 스킬을 discovery 하는 사실상의 표준 형식
+    archive_ref: archive/anthropics-skills/04-components-table.md
+
   # ── G-M2 (2026-08-27 닫힘) ─────────────────────────────────────────────
   # 규율 코어 7종. 상호 참조가 세트 안에서 닫혀 깨진 링크 0 (실측: docs/reviews 참조).
   - id: sp-test-driven-development

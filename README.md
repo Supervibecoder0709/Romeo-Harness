@@ -36,14 +36,23 @@ Romeo는 사용자가 직접 써보고 검증한 하네스들(BMAD/CIS·Superpow
 - **M0 완료** (2026-08-27): 정책표 `core/policy/`, 스키마 `core/schemas/`, Tech Spec 템플릿, `/plan`·`/plan-close` 워크플로우 본문,
   `bin/romeo` CLI(route·card·new·validate·approve·evidence·close), fixture 33건(`fixtures/requests/`), 테스트 23개.
 - **M1 완료** (2026-08-27): T0 2건이 `분류 → Tech Spec → 승인 → 구현 → evidence(HEAD SHA) → close PASS` 를 관통했다 (`docs/work/`).
-- 미착수: M2(어댑터·역할·Orca 위임·Codex 교차 리뷰) 이후. 진행 상태는 [progress.md](docs/planning/progress.md), 자세한 구분은
-  [v1 범위](docs/requirements/v1-scope.md).
+- **M2 진행 중** (2026-08-28): G-M2 채택 게이트가 닫혔다 — obra/superpowers `b36e082` 의 개발 규율 7종 14파일을
+  `vendor/obra-superpowers@b36e082/` 에 원문 그대로(수정 0) 담았고, 오케스트레이션 4종은 Romeo 라우터·Orca 와
+  자리가 겹쳐 보류했다. 결정은 [`provenance/imports.yaml`](provenance/imports.yaml), 고지는
+  [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). 저장소 라이선스는 Apache-2.0 으로 바꿨다(D-41).
+  남은 M2 작업: 어댑터 투영·역할 바인딩·Orca 위임·T1 교차 관통. 진행 상태는 [progress.md](docs/planning/progress.md),
+  자세한 구분은 [v1 범위](docs/requirements/v1-scope.md).
 
 ```bash
 bin/romeo route --fixtures fixtures/requests --report   # 정책표 일치율
 python3 -m unittest discover -s tests                   # 회귀 테스트
 bin/romeo validate                                      # docs/work 문서 검증
+bin/romeo vendor check                                  # vendor/ 원문 대조(수정 0) + provenance id
+bin/romeo notices --check                               # THIRD_PARTY_NOTICES.md 신선도
 ```
+
+`vendor/` 아래 파일은 **손으로 고치지 않는다.** 필요한 변경은 어댑터의 override 로 처리하고,
+`romeo vendor check` 가 blob SHA 로 원문과 대조한다(네트워크 불필요). CI 가 매번 강제한다.
 
 ## 아카이브
 

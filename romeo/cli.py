@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id."""
+"""romeo CLI — route · card · new · validate · fixtures · approve · evidence · close · id · vendor · notices."""
 import argparse
 import json
 import sys
@@ -179,6 +179,39 @@ def cmd_id(args):
     return 0
 
 
+def cmd_vendor(args):
+    from .provenance import check_vendor, check_provenance_ids
+    root = _root(args)
+    findings, counts = check_vendor(root)
+    id_findings, id_counts = check_provenance_ids(root)
+    findings = findings + id_findings
+    if args.json:
+        print(json.dumps({"findings": [list(f) for f in findings],
+                          "counts": {**counts, **id_counts}}, ensure_ascii=False, indent=1))
+    else:
+        for code, who, what, why in findings:
+            print(f"{code} {who} :: {what} — {why}", file=sys.stderr)
+        status = "PASS" if not findings else f"FAIL ({len(findings)}건)"
+        print(f"vendor 검증 {status} · vendors={counts['vendors']} files={counts['files']} "
+              f"(수정 0 대조) · provenance id 를 쓴 코어 파일 {id_counts['files_with_provenance']}개")
+    return 0 if not findings else 1
+
+
+def cmd_notices(args):
+    from .provenance import check_notices, write_notices, NOTICES_PATH
+    root = _root(args)
+    if args.check:
+        findings = check_notices(root)
+        for code, path, _, why in findings:
+            print(f"{code} {path} — {why}", file=sys.stderr)
+        if not findings:
+            print(f"{NOTICES_PATH} 는 imports.yaml 과 일치한다")
+        return 0 if not findings else 1
+    write_notices(root)
+    print(f"{NOTICES_PATH} 생성")
+    return 0
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="romeo", description="Romeo 하네스 CLI (라우터·문서·증거·종료)")
     p.add_argument("--version", action="version", version=f"romeo {__version__} @ {HARNESS_ROOT}")
@@ -260,6 +293,17 @@ def build_parser():
     s.add_argument("--unit", required=True, choices=["T0", "T1", "T2"])
     s.add_argument("--slug", required=True)
     s.set_defaults(fn=cmd_id)
+
+    s = sub.add_parser("vendor", help="vendor/ 원문 대조(수정 0) + provenance id 검사")
+    s.add_argument("action", nargs="?", default="check", choices=["check"])
+    s.add_argument("--root")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_vendor)
+
+    s = sub.add_parser("notices", help="THIRD_PARTY_NOTICES.md 생성 (--check 로 대조)")
+    s.add_argument("--check", action="store_true", help="생성하지 않고 최신인지만 검사")
+    s.add_argument("--root")
+    s.set_defaults(fn=cmd_notices)
     return p
 
 

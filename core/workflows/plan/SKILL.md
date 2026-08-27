@@ -1,7 +1,7 @@
 ---
 name: plan
 description: 요청을 이해해 사실·가정·미확인·분류 후보를 제안 카드로 정리하고, 사람이 확정하면 정책표로 문서 패키지를 계산해 필요한 문서만 생성한다. 사용자가 새 요청을 가져오거나 "/plan", "이거 어떻게 진행할지 분류해줘", "계획 잡아줘"라고 할 때 사용한다. 구현은 하지 않는다.
-provenance: [anthropics-skills:skill-format(principle)]
+provenance: [anthropics-skills-skill-format]
 ---
 
 # romeo:plan — 요청 이해 → 제안 카드 → 사람 확정 → 정책 계산 → 문서 생성
