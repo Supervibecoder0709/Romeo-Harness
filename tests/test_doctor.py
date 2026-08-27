@@ -46,9 +46,10 @@ class TestRepoItself(unittest.TestCase):
         self.assertEqual(doctor_problem_count(rep, scope="environment"), 1)
         self.assertEqual(doctor_problem_count(rep), 1, "기본 scope 는 둘을 합친다")
 
-    def test_three_conflict_fixtures_run(self):
+    def test_conflict_fixtures_run(self):
         _findings, ran = check_conflicts(REPO)
-        self.assertEqual(ran, 3, "K-68 은 충돌 fixture 3종을 요구한다")
+        # K-68 이 요구하는 3종이 최소치다. 리뷰가 찾아낸 종류를 추가하면 늘어난다.
+        self.assertGreaterEqual(ran, 3, "K-68 은 충돌 fixture 3종 이상을 요구한다")
 
     def test_report_says_runtime_load_is_unproven(self):
         # 파일이 있다는 것과 런타임이 로드한다는 것은 다르다. 보고서가 그걸 숨기면 안 된다.
@@ -83,7 +84,7 @@ class TestConflictFixtures(unittest.TestCase):
     def test_clean_tree_has_no_conflicts(self):
         findings, ran = check_conflicts(self.root)
         self.assertEqual(findings, [], f"깨끗한 트리인데 충돌: {findings}")
-        self.assertEqual(ran, 3)
+        self.assertGreaterEqual(ran, 3)
 
     # ── c1: 외부 계획 경로 ─────────────────────────────────────────────
     def test_c1_flags_external_path_without_override(self):
@@ -158,6 +159,32 @@ class TestConflictFixtures(unittest.TestCase):
                        "<!-- romeo:managed end -->\n", encoding="utf-8")
         findings, _ = check_conflicts(self.root)
         self.assertTrue(any("둘 이상" in f[2] for f in findings))
+
+    # ── c4: 위험 명령 지시 ─────────────────────────────────────────────
+    def test_c4_flags_dangerous_instruction_without_override(self):
+        # Codex 독립 리뷰가 c1 을 통과한 충돌 3건을 찾아냈다. 그 종류를 자동으로 잡는지 본다.
+        import yaml
+        b = self.root / ".harness/bindings.yaml"
+        data = yaml.safe_load(b.read_text(encoding="utf-8"))
+        del data["overrides"]["external_writes"]
+        b.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        findings, _ = check_conflicts(self.root)
+        c4 = [f for f in findings if f[0] == "c4-dangerous-instruction"]
+        self.assertTrue(c4, "gh api 지시에 대응 override 가 없는데 통과했다")
+        self.assertTrue(all("external_writes" in f[2] for f in c4),
+                        "패턴마다 맞는 override 를 요구해야 한다 — 아무거나 하나면 통과시키면 안 된다")
+
+    def test_c4_other_overrides_do_not_cover_each_other(self):
+        import yaml
+        b = self.root / ".harness/bindings.yaml"
+        data = yaml.safe_load(b.read_text(encoding="utf-8"))
+        del data["overrides"]["destructive_tdd"]
+        b.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        findings, _ = check_conflicts(self.root)
+        c4 = [f for f in findings if f[0] == "c4-dangerous-instruction"]
+        self.assertTrue(any("destructive_tdd" in f[2] for f in c4))
+        self.assertFalse(any("external_writes" in f[2] for f in c4),
+                         "남아 있는 override 까지 없다고 보고했다")
 
     # ── 프로브 ────────────────────────────────────────────────────────
     def test_skill_without_description_is_flagged(self):

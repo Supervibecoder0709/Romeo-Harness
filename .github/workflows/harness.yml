@@ -20,6 +20,11 @@ on:
       - '.agents/skills/**'
       - 'CLAUDE.md'
       - 'AGENTS.md'
+      - '.claude/settings.json'
+      - '.harness/compiled.yaml'
+      - '.harness/bindings.yaml'
+      - 'LICENSE'
+      - 'THIRD_PARTY_NOTICES.md'
       - 'THIRD_PARTY_NOTICES.md'
       - '.github/workflows/harness.yml'
   pull_request:
@@ -38,6 +43,11 @@ on:
       - '.agents/skills/**'
       - 'CLAUDE.md'
       - 'AGENTS.md'
+      - '.claude/settings.json'
+      - '.harness/compiled.yaml'
+      - '.harness/bindings.yaml'
+      - 'LICENSE'
+      - 'THIRD_PARTY_NOTICES.md'
       - 'THIRD_PARTY_NOTICES.md'
       - '.github/workflows/harness.yml'
   workflow_dispatch:

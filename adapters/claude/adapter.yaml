@@ -46,6 +46,10 @@ settings_ask:
   - "Bash(git branch -D:*)"
   - "Bash(git reset --hard:*)"
   - "Bash(git stash:*)"
+  - "Bash(gh api:*)"
+  - "Bash(gh pr comment:*)"
+  - "Bash(gh pr review:*)"
+  - "Bash(git worktree add:*)"
 
 settings_deny:
   - "Bash(rm -rf /*)"

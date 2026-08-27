@@ -1,7 +1,10 @@
 """외부 자산 출처 검증 — provenance/imports.yaml 이 원본이다.
 
 두 가지를 검사한다(계획 §6.2).
-1. `vendor/` 파일이 `source_sha` 원문과 같은가 (수정 0). blob SHA 로 대조하므로 네트워크가 필요 없다.
+1. `vendor/` 파일이 **채택 시점에 기록한 blob SHA** 와 같은가 (수정 0). 네트워크가 필요 없다.
+   한계: 이것은 upstream 재조회가 아니라 **로컬 자기일관성 검사**다 — vendor 파일과 manifest 해시를
+   같은 변경에서 함께 바꾸면 통과한다(Codex 리뷰 F-07). upstream 고정 커밋과의 대조는 채택 게이트와
+   업데이트 시점에 사람이 수행하고 그 증거를 남긴다.
 2. 코어 파일 frontmatter 의 `provenance: [id]` 가 imports.yaml 에 있는가.
 
 `THIRD_PARTY_NOTICES.md` 도 이 파일에서 생성한다. 손으로 고치지 않는다.
@@ -46,15 +49,26 @@ def check_vendor(root=None):
         if not local_root.exists():
             findings.append(("VENDOR_MISSING", vid, vendor["local_root"], "디렉터리가 없다"))
             continue
+        modes = vendor.get("modes") or {}
         for rel, expected in sorted(recorded.items()):
             f = local_root / rel
             checked += 1
+            if f.is_symlink():
+                # 링크가 가리키는 내용이 맞아도 통과시키지 않는다 — 외부 파일 의존이자 Windows 이식성 문제다.
+                findings.append(("FILE_SYMLINK", vid, rel, "심링크다 — vendor 는 실제 파일이어야 한다"))
+                continue
             if not f.is_file():
                 findings.append(("FILE_MISSING", vid, rel, "기록된 파일이 없다"))
                 continue
             actual = blob_sha(f.read_bytes())
             if actual != expected:
                 findings.append(("FILE_MODIFIED", vid, rel, f"expected={expected} actual={actual}"))
+            # YAML 은 100755 를 정수로 읽는다. 문자열로 맞춰 비교한다.
+            want_exec = str(modes.get(rel, "100644")) == "100755"
+            is_exec = bool(f.stat().st_mode & 0o111)
+            if want_exec != is_exec:
+                findings.append(("FILE_MODE", vid, rel,
+                                 f"실행 비트가 원문과 다르다 (기록={modes.get(rel, '100644')}, 실제={'실행가능' if is_exec else '일반'})"))
         on_disk = {str(f.relative_to(local_root)) for f in local_root.rglob("*") if f.is_file()}
         for extra in sorted(on_disk - set(recorded)):
             findings.append(("FILE_UNTRACKED", vid, extra, "imports.yaml 에 없는 파일이다"))

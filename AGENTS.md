@@ -1,4 +1,4 @@
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=252b6470 -->
+<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=250a43e1 -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
@@ -82,6 +82,13 @@
   - 대상: `sp-finishing-a-development-branch` · 이유: K-66 권한 상한
 - **output_paths** → docs/work/<id>/ — 라우터가 만든 작업 단위 폴더
   - 대상: `sp-requesting-code-review` · 이유: K-62 산출물 흡수 — 작업 단위 밖 산출물은 종료 검사가 인정하지 않는다
+- **reviewer_workspace** → 다른 리비전이 필요하면 `orca worktree create` 를 쓴다. raw git worktree add 금지
+  - 대상: `sp-requesting-code-review` · 이유: 전역 Orca 우선 규칙 + reviewer 는 이 체크아웃을 바꾸지 않는다
+- **external_writes** → 
+  - 승인 없이 실행하지 않는다: `gh api`, `gh pr comment`, `gh pr review`
+  - 대상: `sp-receiving-code-review` · 이유: K-66 — 저장소 밖 상태를 바꾸는 것은 승인 대상이다
+- **destructive_tdd** → 테스트보다 먼저 쓴 코드를 발견해도 **지우지 않는다**. 무엇을 왜 지워야 하는지 보여주고 사용자의 승인을 받은 뒤에만 지운다. 미커밋 코드는 복구할 수 없다.
+  - 대상: `sp-test-driven-development` · 이유: K-66 + 되돌릴 수 없는 작업은 승인 뒤에
 - **orchestration** → orca orchestration
   - 병렬 비교는 `race` 를 쓴다.
   - 대상: `sp-subagent-driven-development`, `sp-dispatching-parallel-agents` · 이유: task/dispatch provenance·lifecycle 이 Orca 에만 생긴다

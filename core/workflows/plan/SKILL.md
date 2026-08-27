@@ -37,7 +37,7 @@ provenance: [anthropics-skills-skill-format]
    기록한다(shadow mode 20건 동안은 T0도 전부 확인받는다, V-10).
 5. **정책 계산.** 확정된 분류로 `romeo route --classification <파일>` 를 실행한다. 출력의 `policy_version`·`fired_rules`
    는 문서 frontmatter 에 그대로 기록된다.
-6. **문서 생성.** `romeo new --from <route 출력>` 이 `docs/work/<unit-id>/` 에 패키지 문서를 만든다.
+6. **문서 생성.** `romeo new --proposal <제안파일>` (또는 `--classification <분류파일>`) 이 `docs/work/<unit-id>/` 에 패키지 문서를 만든다.
    - `unit: none` 이면 문서를 만들지 않고 답변으로 종료한다. 카드는 `.harness/runs/` 에 남긴다.
    - T0 는 Tech Spec 1개(Planning Capsule 포함). T1 은 Compact Brief + Tech Spec. T2 는 Charter 부터.
    - 아직 템플릿이 없는 문서(brief 는 M2, charter 는 M3)는 `NOT_AVAILABLE_YET` 으로 정직하게 보고한다.

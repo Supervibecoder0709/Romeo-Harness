@@ -80,6 +80,23 @@ class TestTamperDetection(unittest.TestCase):
         findings, _ = check_vendor(self.root)
         self.assertIn("FILE_UNTRACKED", codes(findings))
 
+    def test_symlinked_vendor_file_is_rejected(self):
+        # 링크가 가리키는 내용이 맞아도 통과시키면 안 된다 (Codex 리뷰 F-07)
+        target = self.root / self.vendor_root / "skills/test-driven-development/SKILL.md"
+        content = target.read_bytes()
+        outside = self.root / "elsewhere.md"
+        outside.write_bytes(content)
+        target.unlink()
+        target.symlink_to(outside)
+        findings, _ = check_vendor(self.root)
+        self.assertIn("FILE_SYMLINK", codes(findings))
+
+    def test_exec_bit_change_is_rejected(self):
+        target = self.root / self.vendor_root / "skills/systematic-debugging/find-polluter.sh"
+        target.chmod(target.stat().st_mode & ~0o111)
+        findings, _ = check_vendor(self.root)
+        self.assertIn("FILE_MODE", codes(findings))
+
     def test_missing_vendor_dir_is_rejected(self):
         shutil.rmtree(self.root / self.vendor_root)
         findings, _ = check_vendor(self.root)

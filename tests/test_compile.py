@@ -176,6 +176,76 @@ class TestCompile(unittest.TestCase):
         codes = sorted(f[0] for f in check_compiled(self.root))
         self.assertIn("COMPILE_STALE", codes)
 
+    def test_deferred_skill_is_removed_on_recompile(self):
+        # 채택을 취소하면 산출물이 남아 있으면 안 된다 — 남으면 라우터 게이트 없이 discovery 된다.
+        import yaml
+        compile_all(self.root)
+        self.assertTrue((self.root / ".claude/skills/test-driven-development").exists())
+        imports = self.root / "provenance/imports.yaml"
+        data = yaml.safe_load(imports.read_text(encoding="utf-8"))
+        for item in data["imports"]:
+            if item["id"] == "sp-test-driven-development":
+                item["status"] = "deferred"
+        imports.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        compile_all(self.root)
+        self.assertFalse((self.root / ".claude/skills/test-driven-development").exists(),
+                         "채택 취소한 스킬이 남아 있다")
+        self.assertFalse((self.root / ".agents/skills/test-driven-development").exists())
+        self.assertEqual(check_compiled(self.root), [])
+
+    def test_check_fails_without_state(self):
+        compile_all(self.root)
+        (self.root / ".harness/compiled.yaml").unlink()
+        codes = sorted(f[0] for f in check_compiled(self.root))
+        self.assertIn("COMPILE_NO_STATE", codes)
+
+    def test_output_path_outside_repo_is_refused_before_writing(self):
+        import yaml
+        from romeo.compile import CompileError
+        a = self.root / "adapters/claude/adapter.yaml"
+        data = yaml.safe_load(a.read_text(encoding="utf-8"))
+        data["settings_file"] = "../outside.json"
+        a.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        outside = self.root.parent / "outside.json"
+        before = outside.exists()
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+        self.assertEqual(outside.exists(), before, "저장소 밖 파일을 건드렸다")
+
+    def test_managed_marker_inside_code_fence_is_not_touched(self):
+        p = self.root / "CLAUDE.md"
+        doc = ("# 문서\n\n마커 쓰는 법 설명:\n\n```markdown\n"
+               f"{MANAGED_START} v0 source=x sha=1 -->\n사용자 예시\n{MANAGED_END}\n```\n")
+        p.write_text(doc, encoding="utf-8")
+        compile_all(self.root)
+        text = p.read_text(encoding="utf-8")
+        self.assertIn("사용자 예시", text, "코드펜스 안의 사용자 예시를 덮어썼다")
+
+    def test_duplicate_romeo_block_is_refused(self):
+        from romeo.compile import CompileError
+        compile_all(self.root)
+        p = self.root / "CLAUDE.md"
+        p.write_text(p.read_text(encoding="utf-8")
+                     + f"\n{MANAGED_START} v0 source=x sha=1 -->\n둘째\n{MANAGED_END}\n",
+                     encoding="utf-8")
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+
+    def test_crlf_file_keeps_single_block(self):
+        p = self.root / "CLAUDE.md"
+        compile_all(self.root)
+        p.write_text(p.read_text(encoding="utf-8").replace("\n", "\r\n"), encoding="utf-8")
+        compile_all(self.root)
+        text = p.read_text(encoding="utf-8")
+        self.assertEqual(text.count(MANAGED_START), 1, "CRLF 파일에 블록이 중복 생성됐다")
+
+    def test_unclosed_marker_is_refused(self):
+        from romeo.compile import CompileError
+        p = self.root / "CLAUDE.md"
+        p.write_text(f"# 문서\n\n{MANAGED_START} v0 source=x sha=1 -->\n닫히지 않음\n", encoding="utf-8")
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+
     def test_check_passes_right_after_compile(self):
         compile_all(self.root)
         self.assertEqual(check_compiled(self.root), [])

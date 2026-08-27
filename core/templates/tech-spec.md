@@ -28,7 +28,7 @@ updated: "{{today}}"
 # {{title}}
 
 > 깊이 **{{profile_label}}** · 단위 {{unit}} · 모드 {{mode}} · 의도 {{intent}} · 영역 {{facets_text}} · 게이트 {{gates_text}}
-> 승인 전에는 구현을 시작하지 않는다(D-27). 승인은 `romeo approve {{id}}` 로 기록한다.
+> 승인 전에는 구현을 시작하지 않는다(D-27). 승인은 `romeo approve {{id}} --by <승인자>` 로 기록한다.
 
 ## 확인란
 

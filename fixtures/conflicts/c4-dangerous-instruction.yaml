@@ -1,0 +1,22 @@
+# K-68 충돌 fixture ④ — 위험 명령 지시 (K-66)
+#
+# c1 은 산출물 "경로" 만 본다. 부품 본문이 지시하는 **위험한 명령**은 그걸로 안 잡힌다.
+# Codex 독립 리뷰(2026-08-28)가 c1 을 통과한 충돌 3건을 찾아냈다 — 이 fixture 는 그 종류를 자동화한다.
+---
+id: c4-dangerous-instruction
+title: 부품이 지시하는 위험 명령에는 대응 override 가 있어야 한다
+constraints: [K-66]
+kind: pattern_requires_override
+scope: projected_skills
+# 패턴마다 어떤 override 가 그것을 덮는지 명시한다.
+# "아무 override 나 하나 있으면 통과" 로 두면 검사가 무의미해진다.
+patterns:
+  "git worktree add": reviewer_workspace     # raw worktree 조작 (전역 Orca 규칙)
+  "gh api": external_writes                  # 저장소 밖 상태 쓰기
+  "gh pr comment": external_writes
+  "git push": integration_commands
+  "Delete it. Start over": destructive_tdd   # 미커밋 사용자 코드 삭제 강제
+  "rm -rf": integration_commands
+why: >-
+  원문을 고칠 수 없으므로 지시 자체는 남는다. 그 지시를 덮는 규칙이 지침 파일에 인쇄되어야
+  에이전트가 무엇을 따라야 할지 알 수 있다. 새 부품을 채택할 때 이 검사가 먼저 걸린다.

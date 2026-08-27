@@ -40,7 +40,8 @@ Romeo는 사용자가 직접 써보고 검증한 하네스들(BMAD/CIS·Superpow
   `vendor/obra-superpowers@b36e082/` 에 원문 그대로(수정 0) 담았고, 오케스트레이션 4종은 Romeo 라우터·Orca 와
   자리가 겹쳐 보류했다. 결정은 [`provenance/imports.yaml`](provenance/imports.yaml), 고지는
   [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). 저장소 라이선스는 Apache-2.0 으로 바꿨다(D-41).
-  남은 M2 작업: 어댑터 투영·역할 바인딩·Orca 위임·T1 교차 관통. 진행 상태는 [progress.md](docs/planning/progress.md),
+  어댑터 투영·역할 바인딩·부착 검증(doctor·충돌 fixture)까지 끝났고, **남은 M2 작업은 실행 검증**이다 —
+  역할 실행(reviewer read-only)·envelope·Orca 위임·T1 교차 관통. 진행 상태는 [progress.md](docs/planning/progress.md),
   자세한 구분은 [v1 범위](docs/requirements/v1-scope.md).
 
 ```bash

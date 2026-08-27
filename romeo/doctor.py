@@ -96,15 +96,21 @@ def _override_keys(root):
 
 
 def _check_c1(root, fx):
+    """패턴이 있으면 대응 override 가 있어야 한다. 원문을 고칠 수 없으므로 금지가 아니라 흡수로 검사한다."""
     findings = []
-    needed = fx.get("requires_override_key")
-    have = needed in _override_keys(root)
+    keys = _override_keys(root)
+    pats = fx["patterns"]
+    # 리스트면 fixture 하나가 단일 override 를 요구하고, 매핑이면 패턴마다 다른 override 를 요구한다.
+    if isinstance(pats, dict):
+        needed_for = dict(pats)
+    else:
+        needed_for = {p: fx.get("requires_override_key") for p in pats}
     for f in _projected_skill_files(root):
         text = f.read_text(encoding="utf-8", errors="replace")
-        for pat in fx["patterns"]:
-            if pat in text and not have:
+        for pat, needed in needed_for.items():
+            if pat in text and needed not in keys:
                 findings.append((fx["id"], str(f.relative_to(root)),
-                                 f"'{pat}' 를 가리키는데 bindings.yaml 에 overrides.{needed} 가 없다"))
+                                 f"'{pat}' 를 지시하는데 bindings.yaml 에 overrides.{needed} 가 없다"))
     return findings
 
 

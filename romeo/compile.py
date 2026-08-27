@@ -19,10 +19,14 @@ from .util import load_any, dump_yaml, project_root as _project_root
 
 MANAGED_START = "<!-- romeo:managed start"
 MANAGED_END = "<!-- romeo:managed end -->"
-MANAGED_RE = re.compile(
-    re.escape(MANAGED_START) + r".*?-->\n(?P<body>.*?)\n?" + re.escape(MANAGED_END),
-    re.DOTALL,
-)
+# 줄 전체에 고정한다. 문서 중간이나 코드펜스 안의 마커 모양 텍스트를 소유 블록으로 오인하지 않는다.
+START_LINE_RE = re.compile(r"^<!--\s*([a-z0-9_-]+):managed\s+start\b.*-->$", re.I)
+END_LINE_RE = re.compile(r"^<!--\s*([a-z0-9_-]+):managed\s+end\s*-->$", re.I)
+FENCE_RE = re.compile(r"^\s*(```|~~~)")
+
+
+class CompileError(RuntimeError):
+    """산출물을 쓰기 전에 멈춘다. 반쯤 쓴 상태를 만들지 않는다."""
 STATE_PATH = ".harness/compiled.yaml"
 ADAPTERS_DIR = "adapters"
 GENERATED_NOTE = "<!-- 이 파일은 `romeo compile` 산출물이다. 직접 고치지 않는다 — 고칠 곳은 core/ 와 adapters/ 다. -->"
@@ -32,15 +36,56 @@ def _sha8(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:8]
 
 
-def replace_managed_block(text, content, source, version=None):
+def scan_managed_blocks(text, owner="romeo"):
+    """코드펜스 밖의 managed 블록을 줄 번호로 열거한다. 구조가 깨졌으면 예외를 던진다."""
+    lines = text.split("\n")
+    in_fence = False
+    opened = None
+    blocks = []
+    for i, raw in enumerate(lines):
+        line = raw.strip()
+        if FENCE_RE.match(raw):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        m = START_LINE_RE.match(line)
+        if m:
+            if opened is not None:
+                raise CompileError(f"managed 마커가 중첩됐다 (줄 {opened[1] + 1}, {i + 1})")
+            opened = (m.group(1).lower(), i)
+            continue
+        m = END_LINE_RE.match(line)
+        if m:
+            if opened is None:
+                raise CompileError(f"짝 없는 managed end 마커 (줄 {i + 1})")
+            blocks.append((opened[0], opened[1], i))
+            opened = None
+    if opened is not None:
+        raise CompileError(f"닫히지 않은 managed 마커 (줄 {opened[1] + 1})")
+    mine = [b for b in blocks if b[0] == owner.lower()]
+    if len(mine) > 1:
+        raise CompileError(f"{owner}:managed 블록이 {len(mine)}개다 — 하나만 있어야 한다")
+    return blocks, (mine[0] if mine else None)
+
+
+def replace_managed_block(text, content, source, version=None, owner="romeo"):
     """managed 블록만 교체한다. 마커 밖은 그대로 둔다. 블록이 없으면 끝에 붙인다."""
     version = version or __version__
     marker = f"{MANAGED_START} v{version} source={source} sha={_sha8(content)} -->"
     block = f"{marker}\n{content}\n{MANAGED_END}"
-    if MANAGED_RE.search(text):
-        return MANAGED_RE.sub(lambda _: block, text, count=1)
-    sep = "" if text.endswith("\n\n") or not text else ("\n" if text.endswith("\n") else "\n\n")
-    return f"{text}{sep}{block}\n"
+
+    crlf = "\r\n" in text                       # 원래 개행 스타일을 보존한다
+    work = text.replace("\r\n", "\n") if crlf else text
+
+    _all, mine = scan_managed_blocks(work, owner)
+    if mine:
+        lines = work.split("\n")
+        out = "\n".join(lines[:mine[1]] + block.split("\n") + lines[mine[2] + 1:])
+    else:
+        sep = "" if work.endswith("\n\n") or not work else ("\n" if work.endswith("\n") else "\n\n")
+        out = f"{work}{sep}{block}\n"
+    return out.replace("\n", "\r\n") if crlf else out
 
 
 def _strip_frontmatter(text):
@@ -180,12 +225,31 @@ def _copy_tree_as_files(src: Path, dst: Path):
             target.chmod(target.stat().st_mode | 0o111)
 
 
+def _inside(root: Path, target: Path, what: str) -> Path:
+    """저장소 밖으로 나가는 경로를 쓰기 전에 거부한다(K-66 — implementer 의 쓰기 범위는 작업 공간이다)."""
+    joined = Path(target) if Path(target).is_absolute() else root / target
+    # 검증만 resolve 로 한다. 반환은 원래 형태여야 호출부의 relative_to(root) 가 맞는다
+    # (macOS 의 /var → /private/var 처럼 root 자체가 심링크일 수 있다).
+    root_r, t_r = root.resolve(), joined.resolve()
+    try:
+        rel = t_r.relative_to(root_r)
+    except ValueError:
+        raise CompileError(f"{what}: '{target}' 이 저장소 밖을 가리킨다 ({t_r})")
+    if not str(rel) or str(rel) == ".":
+        raise CompileError(f"{what}: '{target}' 이 저장소 루트 자체다")
+    return joined
+
+
 def plan_outputs(root):
     """(파일 산출물 dict{path: text}, 트리 산출물 list[(src, dst)]) 를 계산한다. 쓰지는 않는다."""
     root = Path(root)
     bindings = load_any(root / ".harness/bindings.yaml") if (root / ".harness/bindings.yaml").exists() else {}
     files, trees = {}, []
     for adapter in load_adapters(root):
+        _inside(root, adapter["instructions_file"], f"{adapter['id']}.instructions_file")
+        _inside(root, adapter["skills_dir"], f"{adapter['id']}.skills_dir")
+        if adapter.get("settings_file"):
+            _inside(root, adapter["settings_file"], f"{adapter['id']}.settings_file")
         files[adapter["instructions_file"]] = ("managed", _render_instructions(root, adapter, bindings),
                                                "core/principles/AGENTS.core.md")
         if adapter.get("settings_file") and (adapter.get("settings_deny") or adapter.get("settings_ask")):
@@ -197,13 +261,33 @@ def plan_outputs(root):
             for sname, src in accepted_vendor_skills(root):
                 trees.append((src, root / skills_dir / sname))
         for local in (adapter.get("local_skills") or []):
-            trees.append((root / local["source"], root / skills_dir / local["name"]))
+            src = _inside(root, local["source"], f"{adapter['id']}.local_skills.source")
+            dst = _inside(root, f"{skills_dir}/{local['name']}", f"{adapter['id']}.local_skills.name")
+            trees.append((src, dst))
     return files, trees
 
 
-def compile_all(root=None):
+def _previous_outputs(root):
+    p = root / STATE_PATH
+    if not p.exists():
+        return None
+    return set((load_any(p) or {}).get("outputs") or [])
+
+
+def compile_all(root=None, prune=True):
+    """산출물을 만든다. 더 이상 대상이 아닌 이전 산출물은 지운다(채택 취소 시 잔존 방지)."""
     root = Path(root) if root else _project_root()
-    files, trees = plan_outputs(root)
+    files, trees = plan_outputs(root)          # 경로 검증이 여기서 끝난다 — 실패하면 아무것도 안 쓴다
+    planned = set(files) | {str(dst.relative_to(root)) for _s, dst in trees}
+    previous = _previous_outputs(root)
+    if prune and previous:
+        for rel in sorted(previous - planned):
+            _inside(root, rel, "prune")        # 이전 state 가 오염됐어도 저장소 밖은 지우지 않는다
+            target = root / rel
+            if target.is_symlink() or target.is_file():
+                target.unlink()
+            elif target.is_dir():
+                shutil.rmtree(target)
     written = []
     for rel, (mode, content, source) in sorted(files.items()):
         path = root / rel
@@ -270,9 +354,11 @@ def check_compiled(root=None):
             elif have[name].read_bytes() != want[name]:
                 findings.append(("COMPILE_STALE", f"{rel}/{name}", "", "원본과 다르다"))
 
-    state_path = root / STATE_PATH
-    if state_path.exists():
-        recorded = set((load_any(state_path) or {}).get("outputs") or [])
+    recorded = _previous_outputs(root)
+    if recorded is None:
+        findings.append(("COMPILE_NO_STATE", STATE_PATH, "",
+                         "산출물 목록이 없다 — 무엇이 하네스 소유인지 알 수 없다. `romeo compile` 로 재생성"))
+    else:
         current = set(files) | {str(dst.relative_to(root)) for _s, dst in trees}
         for rel in sorted(recorded - current):
             if (root / rel).exists():

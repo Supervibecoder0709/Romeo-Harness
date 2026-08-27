@@ -57,6 +57,29 @@ overrides:
     reason: "K-62 산출물 흡수 — 작업 단위 밖 산출물은 종료 검사가 인정하지 않는다"
     applies_to: [sp-requesting-code-review]
 
+  reviewer_workspace:
+    # code-reviewer.md:35 가 "git worktree add /tmp/review-<SHA>" 를 지시한다.
+    policy: "다른 리비전이 필요하면 `orca worktree create` 를 쓴다. raw git worktree add 금지"
+    original_instruction: "requesting-code-review/code-reviewer.md:35"
+    reason: "전역 Orca 우선 규칙 + reviewer 는 이 체크아웃을 바꾸지 않는다"
+    applies_to: [sp-requesting-code-review]
+
+  external_writes:
+    # receiving-code-review SKILL.md:205 가 gh api 로 PR 댓글을 쓰라고 한다.
+    denied_without_approval: ["gh api", "gh pr comment", "gh pr review"]
+    original_instruction: "receiving-code-review/SKILL.md:205"
+    reason: "K-66 — 저장소 밖 상태를 바꾸는 것은 승인 대상이다"
+    applies_to: [sp-receiving-code-review]
+
+  destructive_tdd:
+    # test-driven-development SKILL.md:37 이 "Write code before the test? Delete it." 를 강제한다.
+    policy: >-
+      테스트보다 먼저 쓴 코드를 발견해도 **지우지 않는다**. 무엇을 왜 지워야 하는지 보여주고
+      사용자의 승인을 받은 뒤에만 지운다. 미커밋 코드는 복구할 수 없다.
+    original_instruction: "test-driven-development/SKILL.md:37-44"
+    reason: "K-66 + 되돌릴 수 없는 작업은 승인 뒤에"
+    applies_to: [sp-test-driven-development]
+
   orchestration:
     # 다중 에이전트 조정은 Orca 가 소유한다(전역 규칙). 보류된 부품이 되살아나도 이 규칙이 우선한다.
     dispatch_tool: "orca orchestration"

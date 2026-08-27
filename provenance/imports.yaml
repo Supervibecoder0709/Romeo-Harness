@@ -21,6 +21,22 @@ vendors:
     license_verified_at: 2026-08-27
     copied_at: 2026-08-28
     gate: G-M2
+    modes:
+      LICENSE: 100644
+      skills/finishing-a-development-branch/SKILL.md: 100644
+      skills/receiving-code-review/SKILL.md: 100644
+      skills/requesting-code-review/SKILL.md: 100644
+      skills/requesting-code-review/code-reviewer.md: 100644
+      skills/systematic-debugging/SKILL.md: 100644
+      skills/systematic-debugging/condition-based-waiting-example.ts: 100644
+      skills/systematic-debugging/condition-based-waiting.md: 100644
+      skills/systematic-debugging/defense-in-depth.md: 100644
+      skills/systematic-debugging/find-polluter.sh: 100755
+      skills/systematic-debugging/root-cause-tracing.md: 100644
+      skills/test-driven-development/SKILL.md: 100644
+      skills/test-driven-development/writing-good-tests.md: 100644
+      skills/using-git-worktrees/SKILL.md: 100644
+      skills/verification-before-completion/SKILL.md: 100644
     files:
       LICENSE: abf0390320aa14406af7a520b9b0739fdda9bf08
       skills/finishing-a-development-branch/SKILL.md: fa8aecaf8813f1b19d19996f7957d1b0121f2d9c
@@ -147,7 +163,9 @@ imports:
       - target: "reviewer dispatch"
         original: "Dispatch a `general-purpose` subagent"
         override: ".harness/bindings.yaml 의 roles.reviewer (M2 = codex, -s read-only)"
-        applied_by: adapters/claude, adapters/codex
+        # 원문은 verbatim 이라 literal 이 그대로 남는다. override 는 지침 파일 managed block 으로만
+        # 전달되며, 실행 강제(launcher)는 아직 없다 — 역할 실행 단계에서 붙인다.
+        applied_by: "CLAUDE.md·AGENTS.md managed block (인쇄). 실행 강제 미구현"
       # 충돌 fixture c1 이 잡아낸 것 — 게이트 심사에서는 놓쳤다.
       - target: "SKILL.md:60 의 산출물 경로 예시"
         original: "PLAN_OR_REQUIREMENTS: Task 2 from docs/superpowers/plans/deployment-plan.md"
@@ -194,11 +212,11 @@ imports:
       - target: "Step 1a native worktree tool"
         original: "a tool with a name like `EnterWorktree`, `WorktreeCreate`, a `/worktree` command"
         override: ".harness/bindings.yaml 의 worktree.native_tool = `orca worktree create`"
-        applied_by: adapters/orca/RUNBOOK.md
+        applied_by: "CLAUDE.md·AGENTS.md managed block (인쇄). adapters/orca/RUNBOOK.md 는 아직 없다"
       - target: "Step 1b git fallback"
         original: "git worktree add \"$path\" -b \"$BRANCH_NAME\""
         override: "Orca 런타임이 살아 있으면 폴백 금지 (orca status --json 로 판정)"
-        applied_by: adapters/orca/RUNBOOK.md
+        applied_by: "CLAUDE.md·AGENTS.md managed block (인쇄). adapters/orca/RUNBOOK.md 는 아직 없다"
     reason: 원문 원칙("Never fight the harness")이 Orca 우선 규칙과 같은 방향. 도구 지목만 override
     archive_ref: archive/obra-superpowers/03-components/skills.ko.md
 
@@ -220,8 +238,8 @@ imports:
       # Step 5 의 merge/push/PR·Step 6 의 worktree 삭제는 K-66 권한 상한 대상.
       - target: "Step 5·6 integration commands"
         original: "git merge / git push -u origin / git branch -d / git worktree remove"
-        override: ".claude/settings.json deny 목록이 차단. 메뉴 제시까지만 하고 실행은 사람"
-        applied_by: .claude/settings.json, K-66
+        override: ".claude/settings.json 의 permissions.ask 가 매번 확인. deny 는 force push 등만"
+        applied_by: ".claude/settings.json (ask 8건 · deny 5건), K-66"
     reason: 원문도 "integration is your human partner's decision" 이라 방향 일치. host 소유 워크스페이스는 원문이 스스로 보존
     archive_ref: archive/obra-superpowers/03-components/skills.ko.md
 
