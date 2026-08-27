@@ -150,6 +150,15 @@ def cmd_evidence(args):
         print(f"[{'ok' if c['exit_code']==0 else 'exit '+str(c['exit_code'])}] {c['id']}: {c['command']} ({c['seconds']}s) → {res['evidence']}")
         print(f"  head {res['state']['head_sha'][:12]} tree {res['state']['dirty_tree_hash'][:12]} changed {res['state']['changed_files']}")
         return 0 if c["exit_code"] == 0 else 1
+    if args.action == "checks":
+        from .evidence import run_required_checks
+        rc = 0
+        for res in run_required_checks(args.unit, run_name=args.run, project_root=_root(args)):
+            c = res["command"]
+            print(f"[{'ok' if c['exit_code']==0 else 'exit '+str(c['exit_code'])}] {c['id']}: {c['command']} ({c['seconds']}s)")
+            rc = rc or (0 if c["exit_code"] == 0 else 1)
+        print(f"  → {res['evidence']}  head {res['state']['head_sha'][:12]} changed {res['state']['changed_files']}")
+        return rc
     if args.action == "approve":
         path = add_approval(args.unit, args.guard, args.by, note=args.note, run_name=args.run, project_root=_root(args))
         print(f"approval recorded → {path}")
@@ -219,16 +228,27 @@ def build_parser():
     s.set_defaults(fn=cmd_approve)
 
     s = sub.add_parser("evidence", help="증거 기록")
-    s.add_argument("action", choices=["run", "approve"])
-    s.add_argument("--unit", required=True)
-    s.add_argument("--run")
-    s.add_argument("--label")
-    s.add_argument("--guard")
-    s.add_argument("--by")
-    s.add_argument("--note")
-    s.add_argument("--root")
-    s.add_argument("command", nargs=argparse.REMAINDER)
-    s.set_defaults(fn=cmd_evidence)
+    es = s.add_subparsers(dest="action", required=True)
+    e_run = es.add_parser("run", help="명령 1개 실행·기록: romeo evidence run --unit ID [--run R] [--label L] -- <명령>")
+    e_run.add_argument("--unit", required=True)
+    e_run.add_argument("--run")
+    e_run.add_argument("--label")
+    e_run.add_argument("--root")
+    e_run.add_argument("command", nargs=argparse.REMAINDER)
+    e_run.set_defaults(fn=cmd_evidence)
+    e_chk = es.add_parser("checks", help="spec 의 required_checks 를 문자열 그대로 전부 실행·기록")
+    e_chk.add_argument("--unit", required=True)
+    e_chk.add_argument("--run")
+    e_chk.add_argument("--root")
+    e_chk.set_defaults(fn=cmd_evidence)
+    e_ap = es.add_parser("approve", help="실행 가드 승인 사건 기록")
+    e_ap.add_argument("--unit", required=True)
+    e_ap.add_argument("--guard", required=True)
+    e_ap.add_argument("--by", required=True)
+    e_ap.add_argument("--note")
+    e_ap.add_argument("--run")
+    e_ap.add_argument("--root")
+    e_ap.set_defaults(fn=cmd_evidence)
 
     s = sub.add_parser("close", help="/plan-close 검사 → status done")
     s.add_argument("--unit", required=True)

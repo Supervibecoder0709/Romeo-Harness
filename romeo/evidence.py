@@ -131,3 +131,14 @@ def add_approval(unit_id, guard, by, note=None, run_name=None, project_root=".")
     rec.setdefault("approvals", []).append({"guard": guard, "approved_at": now_iso(), "approved_by": by, "note": note})
     Path(path).write_text(dump_yaml(rec), encoding="utf-8")
     return path
+
+
+def run_required_checks(unit_id, run_name=None, project_root="."):
+    """spec.md 의 required_checks 를 문자열 그대로 순서대로 실행한다 — close 가 대조하는 명령과 정확히 일치시키기 위해."""
+    from .close import required_checks
+    udir = find_unit_dir(project_root, unit_id)
+    _, body = frontmatter.read(udir / "spec.md")
+    results = []
+    for rc in required_checks(body):
+        results.append(run_command(unit_id, rc["command"], run_name=run_name, label=rc.get("id"), project_root=project_root))
+    return results
