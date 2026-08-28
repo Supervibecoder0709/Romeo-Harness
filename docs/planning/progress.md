@@ -17,6 +17,25 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
+## 지금 상태 (기준 `47ce128` · 2026-08-29)
+
+> 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
+> `git log --oneline 47ce128..HEAD` 가 비어 있지 않으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> 바꿨다면 블록을 믿지 말고 `gh run list --limit 1` 과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
+
+- **마일스톤:** M2 진행 중 — 교차 관통 완료, 동등성 게이트가 **판정 FAIL**. M3~M7 미착수.
+- **CI:** ❌ 3연속 실패 (run `33200370506`). 원인은 아래 1번이다. 게이트 스텝에서 멈춰
+  뒤 5스텝(작업 문서·컴파일 대조·vendor·NOTICES·부착 검증)이 **미실행**이다.
+- **로컬 검사 (2026-08-29):** unittest 315 OK · `compile --check`·`notices --check`·`doctor` 전부 EXIT=0.
+- **다음 작업 3건** (§10 체크리스트 30·31·32):
+  1. **동등성 게이트 정의 보완 — 사용자 결정 대기.** 게이트가 "산출물이 달라서 판정이 갈린 것" 과
+     "런타임이 동등하지 않은 것" 을 구분하지 못한다. 지금 CI 빨간불의 유일한 원인.
+  2. **작업 단위 `feat-20260829-license-field-46an` 완료** — spec 의 AC-1 은 값 대조를 요구하는데
+     `check-2` 는 개수만 센다. 검증 계획 변경은 재승인 대상(D-27) → 재승인 후 재관통.
+  3. **`AGENTS.md` 서문 비대칭 해소** — 문서 인덱스·충돌 해소 순서를 Claude 쪽만 본다. 1번 뒤에 처리한다.
+- **문서 지연:** 아래 「세션 기록」과 「미검증·남은 위험」은 2026-08-28 기준이다.
+  8/29 관통 이후 사실이 아닌 항목이 있다(예: "게이트는 미판정", "CI 새 스텝은 한 번도 돌지 않았다").
+
 ## 마일스톤
 
 | 마일스톤 | 상태 | 관찰 가능한 결과 | 커밋 |
@@ -61,6 +80,7 @@ authority: derived
 | 29 | — | 관통이 찾은 결함 반영 (RUNBOOK 3건 + 코어 모순 1건) | 완료 | **① `--output-schema` 매핑이 실행 불가** — `core/schemas/result-envelope.json` 의 `anyOf` 가 `"schema": {}` 같은 빈 하위 스키마를 써서 codex 가 HTTP 400 으로 거부한다(`schema must have a 'type' key`). JSON Schema 로는 유효해 **검사기로는 잡히지 않고 그 CLI 를 호출해야만** 드러난다. §2 표를 "넘기지 않는다"로 고치고 형식 검증을 `envelope check` 로 일원화했다. **② §3.7 의 2단계 경로가 비대화형 실행에는 성립하지 않는다** — `codex exec` 는 `state: failed · stage: dispatch_input · last_failure: agent_prompt_stalled`, TUI(`codex -s read-only`)는 `state: ready · stage: input_accepted`. 원인은 `worker-start --terminal` 이 주입하는 task spec 을 비대화형 실행이 받을 자리가 없다는 것이고, 실제로 주입된 텍스트가 셸에 들어가 `zsh: parse error` 를 냈다. **③ §3.4 의 `--spec` 이 비대화형 검토자에게 도달하지 않는다** — DB 에만 남고 프롬프트로 가지 않아 절차 문서 지시가 워커에 닿지 않았다. **④ 코어 설계 모순** — 결과 계약 스키마는 검토자에게 `task_envelope_ref.sha256` 을 요구하는데 `core/roles/reviewer.yaml` 의 능력(`read`·`search`)에는 해시 계산 수단이 없다. 계약을 지킨 claude 검토자는 `BLOCKED_CAPABILITY` 를 냈고 그 봉투는 `TASK_ANCHORED` 에서 거부됐다. **위임한 쪽이 해시를 계산해 프롬프트에 제공**하는 방식으로 해결했다(사용자 확정) — 역할 계약도 앵커 검사도 약화되지 않는다. 네 건 모두 `adapters/orca/RUNBOOK.md` §2·§3.7·§3.8·§4·§11 에 반영했다 |
 | 30 | #11 | 동등성 게이트 정의 보완 | **미착수** | 게이트는 `expect: same` 으로 "두 실행의 판정이 같은가" 만 본다. 그런데 **역할 교체 실행에서 구현 산출물이 달라지면 검토 판정도 달라지는 것이 정상**이다 — 이번 관통이 그 경우였다(codex 구현자가 `archive/README.md` 표 구분선을 5셀로 만들었고 claude 검토자가 잡았다; baseline 산출물에는 그 버그가 없어 codex 검토자의 `PASS` 도 옳다). 지금 정의로는 "런타임이 동등하지 않다" 와 "산출물이 달라서 판정이 갈렸다" 를 구분하지 못한다. **`expect` 를 관측에 맞춰 고치는 것은 하지 않는다**(D-b) — 정의를 고칠지, 비교 대상을 구현자 면으로 좁힐지, 산출물 동일성을 전제로 넣을지는 사용자 결정이다 |
 | 31 | — | 작업 단위 `feat-20260829-license-field-46an` 완료 | **미착수** | 두 실행 모두 close 가 **정확히 하나의 실재하는 이유로** FAIL 한다 — baseline 은 `AC_ALL_CHECKED`(claude 구현자가 체크박스 미기입), swapped 는 `REVIEW_VERDICT`(claude 검토자가 잡은 README 표 버그 + `spec_ref.sha256` 불일치). 그리고 검토자가 baseline 1차에서 잡은 **spec 자체의 결함**이 남아 있다: AC-1 은 "18개 값이 계획 §1.3 표와 일치" 를 요구하는데 `check-2` 는 **개수만** 센다 — 어떤 required_check 도 값을 대조하지 않는다. 검증 계획 변경은 승인 대상이므로(D-27) 재승인 뒤 다시 관통해야 한다 |
+| 32 | — | `AGENTS.md` 서문 비대칭 해소 | **미착수** | `CLAUDE.md` 는 마커 밖에 프로젝트 정체성·충돌 해소 순서·문서 인덱스를 두는데 `AGENTS.md` 는 managed block 으로 바로 시작한다 — **같은 안내를 Codex 세션은 보지 못한다.** 코어 규칙("공통 규칙을 특정 실행기에 종속시키지 않는다")과 어긋나고 동등성의 전제도 약해진다. 지금 고치지 않는 이유는 순서다 — Codex 런타임의 지침이 바뀌면 그 조건 위에서 관측한 `fixtures/parity/pr-license-field-t1-observed.yaml` 의 의미가 흐려진다. 체크리스트 30 을 정리한 뒤 같이 처리한다. 후보 방식 2가지: (a) 두 파일의 마커 밖에 같은 서문을 손으로 유지 — 어긋나도 검사하는 게이트가 없다, (b) 인덱스를 `core/` 아래 한 파일에 두고 compile 이 두 지침 파일에 함께 투영 — 원본이 하나가 되지만 컴파일 대상이 는다 |
 
 ## 세션 기록
 
