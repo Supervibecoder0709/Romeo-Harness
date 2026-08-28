@@ -1,0 +1,82 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_5fc794f15236
+task_id: task_4c65f8e08cf9
+dispatch_id: null
+unit_id: feat-20260829-license-field-46an
+spec_ref:
+  path: docs/work/feat-20260829-license-field-46an/spec.md
+  sha256: 67d6b7de91247873d1e59de299f6118ec7fb67ece8a10b320688abee2a474b0e
+base_sha: 9d181a55095e3db36ad4aab5884bf91369d0bed1
+head_sha: 6e5290012dd8f088d3ede4b78f4c9e7c31877609
+dirty_tree_hash: 7b035490df840dce0acb7b070ecae1a61b7566e65d8e93f31843e84dc4744d21
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260829-license-field-46an
+started_at: '2026-08-29T05:14:18+09:00'
+finished_at: '2026-08-29T05:20:59+09:00'
+commands:
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T05:14:18+09:00'
+  finished_at: '2026-08-29T05:14:18+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260829-license-field-46an/run_5fc794f15236/01-review-tree-before.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T05:20:59+09:00'
+  finished_at: '2026-08-29T05:20:59+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260829-license-field-46an/run_5fc794f15236/02-review-tree-after.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+changed_files:
+- 00-exploration.md
+- 01-docs/AGENTS.ko.md
+- 01-docs/README.ko.md
+- 01-docs/testing.ko.md
+- 02-workflow-summary.md
+- 03-components/runtime-adapters.ko.md
+- 03-components/skills.ko.md
+- 03-components/visual-companion.ko.md
+- 04-components-table.md
+- 05-pm-harness-notes.md
+- 06-source-evidence.md
+- _source.md
+- archive/Leonxlnx-taste-skill/_source.md
+- archive/MengTo-Skills/_source.md
+- archive/README.md
+- archive/anthropics-skills/_source.md
+- archive/bmad-code-org-bmad-module-creative-intelligence-suite/_source.md
+- archive/design-tokens-community-group/_source.md
+- archive/dyoshikawa-rulesync/_source.md
+- archive/farion1231-cc-switch/_source.md
+- archive/first-fluke-oh-my-agent/_source.md
+- archive/langchain-ai-openwiki/_source.md
+- archive/nextlevelbuilder-ui-ux-pro-max-skill/_source.md
+- archive/nexu-io-open-design/_source.md
+- archive/obra-superpowers/_source.md
+- archive/orca-cli-orca/_source.md
+- archive/pbakaus-impeccable/_source.md
+- archive/sindresorhus-slugify/_source.md
+- archive/storybookjs-storybook/_source.md
+- archive/vercel-labs-web-interface-guidelines/_source.md
+- archive/w3c-aria-practices/_source.md
+- scripts/generate-archive-index.py
+- scripts/validate-repo-archive.sh
+artifact_hash: cf6540080690fb6fb8f66fe72bf0ce6de245633d117236399003374c6983c6ab
+reviewer: null
+verdict: null
+approvals: []

@@ -633,7 +633,7 @@ orca orchestration worker-release --dispatch <dispatch-id> --json
 | 실행 | 역할 | 정본 키 | 강제 수단 | 단독 프로브 | §3 기동 경로 |
 | --- | --- | --- | --- | --- | --- |
 | 기본 | 검토자 | `roles.reviewer.enforcement` | `-s read-only` | 예 | **예 — 2026-08-29 관통** (§4 방어 검사가 `유효`) |
-| 교체 | 검토자 | `parity_swap.reviewer.enforcement` | `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config` | 예 | 같은 관통의 교체 실행에서 방어 검사로 판정 |
+| 교체 | 검토자 | `parity_swap.reviewer.enforcement` | `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config` | 예 | **예 — 2026-08-29 §6.6 재실행**(방어 검사 `유효` · 세션 init 의 도구 목록 `Glob`·`Grep`·`Read` 3개 · tool_use 31건 전부 그 셋 · `permission_denials` 0) |
 | 기본 | 구현자 | `roles.implementer.enforcement` | `.claude/settings.json` 의 `permissions.ask`·`deny` | **아니오** | **아니오** |
 | 교체 | 구현자 | `parity_swap.implementer.enforcement` | `-s workspace-write` | **부분** — 아래 | **부분** — 아래 |
 
@@ -906,7 +906,24 @@ source:
 산출물이 다른 두 관통으로는 검토자 면이 영원히 비교 불가다. 검토자 동등성의 관측은 **산출물을 고정**해야 나온다:
 기준 실행의 구현자 워크트리(`$W1`)를 그대로 두고, 그 위에서 **검토자만** 교체 바인딩으로 한 번 더 띄운다(§3.7 의 절차 · 새 Run id ·
 같은 `<base-sha>`). 그 검토자의 봉투가 지목할 증거는 `$W1` 의 evidence 라야 하고(그래야 `head_sha`·`dirty_tree_hash` 가 같다),
-§4 의 `review-tree-before`/`after` 로 검토 중 트리가 바뀌지 않았음을 같은 evidence 에 남긴다. 이 절차는 **아직 실행한 적이 없다**(§11.2).
+§4 의 `review-tree-before`/`after` 로 검토 중 트리가 바뀌지 않았음을 같은 evidence 에 남긴다.
+
+**2026-08-29 에 한 번 실행했다**(§11.1 · Run `run_5fc794f15236`). 실제로 밟은 형태는 다음이고, 결과의 소유자는 `fixtures/parity/` 와 `docs/planning/progress.md` 다.
+
+1. `run-create` → 새 Run. `task-create` 는 검토자 1건만(`--deps` 없음).
+2. `"$W1/bin/romeo" envelope build --role reviewer --base-sha <같은 base-sha> --run <새 run> --root "$W1"` — 계약 sha256 이 기준 실행의 검토자 계약과
+   **바이트까지 같아야** 한다(`cmp`). 다르면 산출물 고정의 전제가 아니라 하네스 리비전이 어긋난 것이다.
+3. `bin/romeo evidence run --unit <id> --run <새 run> --root "$W1" --task-id <검토자 task> --label review-tree-before -- git status …` —
+   **새 run 의 evidence** 에 기록한다. 기준 실행의 evidence 에 덧붙이지 않는다(그 파일의 `task_id`·`dispatch_id` 는 구현자의 것이라
+   다른 값을 거부하고, 덧붙이면 모아 둔 사본과 갈린다). `dispatch_id` 는 없다 — 비대화형 경로는 워커를 채택하지 않는다.
+4. 검토자 프롬프트는 §3.7 과 같되 세 줄이 다르다 — "검토자만 다시 띄운 것", 읽을 증거·구현자 결과 계약은 **기준 실행의 것**
+   (`evidence/<기준 run>.yaml` · `result/<기준 run>-implementer.json`), `task_envelope_ref.path` 는 **새 run** 의 계약. `evidence_ref` 도 기준 실행의
+   evidence 를 지목한다 — 검토자가 읽은 증거가 그것이고, 산출물 식별(`head_sha`·`dirty_tree_hash`)은 거기서 읽힌다(D-73).
+5. `orca terminal create --worktree "path:$W1" --command "claude -p <3플래그> --verbose --output-format json \"\$(cat '<프롬프트>'; cat '<계약>')\" > <워크트리 밖 파일>"`.
+   워커로 채택하지 않았으므로 완료는 출력 파일의 표식으로 기다리고, Task 는 `task-update --status completed --result <json>` 으로 사람이 정리한다.
+6. 종료 직후 `review-tree-after` → `유효` 판정 → 출력의 마지막 `result` 를 봉투로 꺼내 `$W1/docs/work/<id>/review/<새 run>-reviewer.json` 에 쓴다 →
+   `"$W1/bin/romeo" envelope check` 5개 PASS → §6.3 모으기(봉투·evidence 복사, 계약은 재생성) → 검토자 면만 있는 관측 케이스 등록 → §6.5.
+   관측 케이스의 두 면은 `results.reviewer` 만 갖는다(구현은 한 번뿐이었다). 두 봉투가 같은 evidence 를 지목하므로 산출물 식별은 같고, 검토자 면이 **비교된다**.
 
 `--root` 는 스키마와 앵커를 찾는 루트이고, 케이스 목록은 호출된 `bin/romeo` 의 저장소에서 읽는다 —
 그래서 위 명령은 `$P/bin/romeo` 로 부른다. 두 값이 갈리면 "케이스는 여기 있는데 관측물은 저기 있다" 가 된다.
@@ -1028,6 +1045,8 @@ orca orchestration gate-list --json
 | **§3.1 의 (a)·(b) 가 실제 위임 실행에서 걸리는가** | **걸린다.** 두 체크아웃이 갈라진 상태에서 `REVIEW_TASK_ANCHORED`·`REVIEW_BASE_SHA`·`REVIEW_EVIDENCE_ANCHORED`·`REVIEW_ROLE_CONTRACT` 가 전부 PASS 로 인쇄됐다 — 실물 검토자 봉투로 이 앵커들이 작동한 첫 관측이다 |
 | **`--output-schema` 로 이 저장소의 스키마를 넘길 수 있는가** | **없다.** HTTP 400 — `anyOf` 의 빈 하위 스키마 때문이다. §2 의 경고 문단 참조 |
 | **`-o` 가 read-only 아래에서 파일을 쓰는가** | **쓴다.** 검토 대상 워크트리 **밖** 경로(`/private/tmp/...`)에 855바이트를 썼다. 샌드박스는 모델이 만든 셸 명령에만 걸리고 CLI 자신의 출력 파일에는 걸리지 않는다 |
+| **§6.6 검토자-only 재실행이 성립하는가** (2026-08-29 · Run `run_5fc794f15236` · Task `task_4c65f8e08cf9`) | **성립한다.** 기준 실행의 구현자 워크트리(트리 `7b035490df84…`, 기준 evidence 와 같은 값)에서 검토자 계약을 다시 만들어 `cmp` identical, `review-tree-before/after` 의 `log_sha256` 이 **기준 실행의 값과 같은** `2bc7dad48f31…`(트리가 그때와 지금 사이에 한 번도 바뀌지 않았다), 새 봉투는 두 체크아웃의 `envelope check` 5개 전부 PASS. 교체 검토자(claude 3플래그)는 32턴 · 6분 20초 · tool_use `Read` 24·`Glob` 4·`Grep` 3 · `permission_denials` 0 · 모델 `claude-fable-5`. **판정: `FAIL`(findings 6)** — 같은 산출물에 기준 검토자(codex)는 `PASS`(findings 0)였다. 두 봉투를 검토자 면만 있는 관측 케이스로 등록하자 게이트가 `VERDICT_DIFFERS reviewer PASS≠FAIL` 로 **FAIL** 을 냈다. claude 가 잡은 것은 기준 검토자의 자기 스냅샷(`13-review-tree-before.log`)에도 보이던 **작업 루트의 미추적 파일 11개**(`archive/obra-superpowers/` 사본 — `check-3` 의 첫 실행이 `bash -c` 인용 오류로 `$t` 가 비어 루트에 복사한 것)다 |
+| **비대화형 검토자의 Task 정리** | `task-update --id <task> --run <run> --status completed --result <json>` 이 `.ok == true` · `status: completed` 를 돌려준다. 워커를 채택하지 않았으므로 `worker_done` 은 없고 이 명령이 유일한 정리 경로다 |
 | **`worker-start --terminal` 이 비대화형 실행을 워커로 채택하는가** | **못 한다.** `codex exec` → `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled`. TUI(`codex -s read-only`) → `state: ready` · `stage: input_accepted`. §3.7 의 표 참조 |
 | **§3.7 로 기동한 검토자에 read-only 강제가 걸리는가** | **걸린다.** §4 의 방어 검사가 `유효` 를 냈다 — `review-tree-before` 와 `review-tree-after` 의 `log_sha256` 이 같은 값이었다. 검토자가 실행되는 동안 작업 트리가 바뀌지 않았다 |
 | 자식 워크트리에서 close 를 돌릴 수 있는가 | **있다.** `--root "$W"` 로 돌렸고 신선도·재실행·로그 대조가 모두 그 체크아웃 기준으로 성립했다 |
@@ -1045,8 +1064,9 @@ orca orchestration gate-list --json
   단독 프로브는 관측했다(§4). 이번 관통에서의 관측 여부는 §4 표가 소유한다.
 - **동등성 게이트가 이 관통으로 열리는지.** 관측 케이스 등록(§6.4)과 판정(§6.5)의 결과는 `fixtures/parity/` 와
   `docs/planning/progress.md` 가 소유한다 — 이 문서가 아니다.
-- **§6.6 의 검토자-전용 재실행(같은 산출물을 두 검토자에게)은 한 번도 실행하지 않았다.** 2026-08-29 관통은 산출물이 달라
-  검토자 면이 비교 불가였고(D-73), 검토자 동등성은 그 절차로만 관측할 수 있다. §6.6 은 §3.7·§4 의 명령형을 조합해 적은 것이지
-  실행 신호를 관찰한 것이 아니다.
+- **§6.6 을 TUI + `worker-start --terminal` 채택 경로로는 돌리지 않았다.** 2026-08-29 의 재실행은 비대화형(`claude -p`) + 출력 파일 +
+  `task-update` 정리 경로였다(§11.1). lifecycle(`worker_done`·heartbeat)이 있는 형태로 같은 결과가 나오는지는 미관측이다.
+- **기준 검토자(codex)의 `PASS` 가 우연인지 체계적인지 — 표본이 각 1건이다.** 같은 산출물에 codex 를 한 번 더 띄우거나 claude 를 한 번 더 띄운 적이 없다.
+  게이트 FAIL 은 관측 2건으로 선 판정이지 재현성의 증거는 아니다.
 - 이 문서가 지시하는 실패·복구 경로(§7) 중 실제로 밟은 것은 `worker-start` 실패 1건(`agent_prompt_stalled`)뿐이다.
   `residualResources` 가 비어 있지 않은 경우, `worker-stop`·`worker-abandon` 은 밟지 않았다.

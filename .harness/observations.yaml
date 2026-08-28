@@ -10,7 +10,7 @@
 # 기록을 지우지 않고 이어 붙인다. 관찰 시점의 개수가 지금 개수와 다르면 그 사실을 note 에 적는다.
 ---
 schema_version: 1
-updated: 2026-08-28
+updated: 2026-08-29
 
 runtime_load:
   claude:
@@ -134,3 +134,28 @@ reviewer_write_refusal:
     - 저장소 밖 절대경로로의 쓰기 시도(codex)
     - 외부 연결 도구를 통한 우회
     - roles.implementer 의 승인 프롬프트가 실제로 뜨는지
+
+# 교체 검토자(claude, 3플래그)를 §3 기동 경로(orca terminal create --command)로 띄웠을 때 강제가 걸리는가 — 2026-08-29 §6.6 재실행.
+# doctor 는 이 블록을 읽지 않는다(runtime_load 만 읽는다). 사람이 읽는 기록이고, 값은 출력 파일(claude -p --output-format json --verbose)에서 계산했다.
+swapped_reviewer_launch_path:
+  observed_at: 2026-08-29
+  evidence: docs/work/feat-20260829-license-field-46an/evidence/run_5fc794f15236.yaml
+  run_id: run_5fc794f15236
+  task_id: task_4c65f8e08cf9
+  dispatch_id: null            # 비대화형 경로 — 워커를 채택하지 않았다. Task 는 task-update 로 정리했다
+  launch: orca terminal create --worktree path:<기준 구현자 워크트리> --command "claude -p <3플래그> --verbose --output-format json \"$(cat <프롬프트>; cat <계약>)\" > <워크트리 밖 파일>"
+  enforcement: 'claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config'
+  model: claude-fable-5
+  turns: 32
+  duration_ms: 379777
+  tools_in_session_init: [Glob, Grep, Read]
+  tool_use_counts: {Read: 24, Glob: 4, Grep: 3}
+  permission_denials: 0
+  defensive_check: >-
+    유효 — review-tree-before/after 의 log_sha256 이 같고(2bc7dad48f31…), 그 값은 기준 실행(run_31e175742892)의
+    네 스냅샷과도 같다. 검토자가 도는 동안 작업 트리는 바뀌지 않았다.
+  verdict: FAIL (findings 6) — 같은 산출물의 기준 검토자(codex, run_31e175742892) 는 PASS (findings 0)
+  conclusion: >-
+    §4 표의 교체 검토자 행은 이제 '§3 기동 경로' 칸도 관측이다 — 도구 목록이 셋뿐이었고 그 밖의 도구 호출·거부가 0건이다.
+    강제가 작동했다는 사후 확인이지 쓰기 시도가 막힌 것을 본 것은 아니다(단독 프로브 쪽이 그것을 봤다).
+

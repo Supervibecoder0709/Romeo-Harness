@@ -1,0 +1,30 @@
+# 검토자-only 재실행의 관측 케이스 — 2026-08-29 에 adapters/orca/RUNBOOK.md §6.6 을 처음 실행해 얻었다(D-73 이후).
+#
+# 2026-08-29 의 교차 관통(pr-license-field-t1-observed)은 두 구현자가 다른 산출물을 만들어 검토자 면이 비교 불가였다.
+# 검토자 동등성을 판정하려면 **같은 산출물**을 두 검토자에게 보여야 하므로, 기준 실행(run_31e175742892 · 구현자 claude ·
+# 검토자 codex)의 구현자 워크트리를 그대로 두고(트리 7b035490df84…) 그 위에서 검토자만 교체 바인딩(claude · 3플래그)으로
+# 새 Run(run_5fc794f15236)에 띄웠다. 구현자 면은 이 케이스에 없다 — 구현은 한 번뿐이었다.
+#
+# 두 검토자 봉투는 같은 증거(run_31e175742892.yaml)를 지목한다 — 검토한 산출물이 같다는 것은 그 증거의 head_sha·dirty_tree_hash 가
+# 말하고, 새 검토가 도는 동안 트리가 그대로였다는 것은 run_5fc794f15236.yaml 의 review-tree-before/after 가 말한다(source.ref).
+# 봉투를 인라인으로 적지 않는다(D-b). expect 는 관측 결과에 맞춰 고치지 않는다(D-b).
+---
+id: pr-license-field-t1-reviewer-observed
+title: 아카이브 라이선스 필드 T1 — 같은 산출물을 본 두 검토자 (검토자-only 재실행 관측)
+unit_id: feat-20260829-license-field-46an
+status: executed
+expect: same
+
+baseline:
+  runtimes: {reviewer: codex}
+  results:
+    reviewer: {file: docs/work/feat-20260829-license-field-46an/review/run_31e175742892-reviewer.json}
+swapped:
+  runtimes: {reviewer: claude}
+  results:
+    reviewer: {file: docs/work/feat-20260829-license-field-46an/review/run_5fc794f15236-reviewer.json}
+
+source:
+  kind: observed
+  ref: docs/work/feat-20260829-license-field-46an/evidence/run_5fc794f15236.yaml
+  date: '2026-08-29'

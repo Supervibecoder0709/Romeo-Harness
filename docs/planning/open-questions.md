@@ -63,6 +63,7 @@ authority: canonical
 | Q-05 | `rulesync`, `cc-switch` 같은 후발 조사 대상을 어댑터 구현에 반영하는가 | `archive/` (분석만 완료) |
 | Q-06 | BMAD 본체는 아직 아카이브되지 않았다(CIS만 있음). 기획 자산 판정을 위해 필요한가 — **G-M3 선행 조건으로 승격** | `archive/README.md` 목록, D-55 |
 | Q-07 | 사용자가 "실제로 써보고 정말 좋았던" 워크플로우의 구체 목록 | **답변됨(2026-08-27, D-64)**: CIS 4종 최우선, BMAD PRD 흐름 후순위, Superpowers 개발 체계·OpenWiki 자동 문서 관리·impeccable/taste anti-slop·UI UX Pro Max 실사용. 상상 흐름 CIS → Romeo 문서 → Superpowers → OpenWiki |
+| Q-08 | **같은 산출물에서 두 검토자의 판정이 갈렸다(2026-08-29 §6.6 관측, 게이트 FAIL) — codex 검토자의 `PASS` 는 우연인가 체계적인가.** codex 는 자기 스냅샷에 보이던 루트 미추적 파일 11개를 지적하지 않고 PASS, claude 는 그것을 FAIL 사유로 잡았다. 표본이 각 1건이라 재현성을 모른다. 선택지: (a) 같은 산출물에 codex 검토자를 1~2회 더 띄워 재현성 측정 (b) 검토 절차 문서에 '작업 트리 스냅샷의 미추적 파일을 반드시 대조' 를 명시하고 두 런타임 재실행 (c) 이 관측을 근거로 기본 바인딩(reviewer=codex)을 재검토. 어느 쪽이든 게이트 FAIL 은 관측이지 검사기 버그가 아니므로 `expect` 를 고치지 않는다(D-b) | `fixtures/parity/pr-license-field-t1-reviewer-observed.yaml`, `docs/work/feat-20260829-license-field-46an/review/run_5fc794f15236-reviewer.json`, RUNBOOK §11.1 |
 
 ---
 
