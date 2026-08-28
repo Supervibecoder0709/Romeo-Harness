@@ -1,0 +1,17 @@
+## 현재 사용 가능한 도구
+
+1. Agent
+2. Bash
+3. Edit
+4. Glob
+5. Grep
+6. ListAgents
+7. Read
+8. ReportFindings
+9. ScheduleWakeup
+10. Skill
+11. ToolSearch
+12. Workflow
+13. Write
+
+**쓰기 계열 도구:** Write, Edit, Bash 모두 있습니다. ✅

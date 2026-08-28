@@ -1,9 +1,16 @@
 import copy
+import io
+import json
+import os
+import tempfile
 import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
 
 from romeo import HARNESS_ROOT
+from romeo.cli import main
 from romeo.fixtures import check_fixtures, load_fixtures, run_report
-from romeo.policy import RouteError, route
+from romeo.policy import RouteError, load_project_state, route
 
 
 def cls(**kw):
@@ -97,6 +104,114 @@ class TestRoute(unittest.TestCase):
     def test_deterministic(self):
         a = cls(unit="T1", intent="deploy", facets=["ops-data", "migration"], gates=["migration"], blast_radius="large")
         self.assertEqual(route(copy.deepcopy(a)), route(copy.deepcopy(a)))
+
+
+CLASSIFICATION_T1 = """unit: T1
+mode: delivery
+intent: write
+facets: [tooling]
+gates: []
+blast_radius: small
+uncertainty: low
+"""
+
+
+class TestProjectState(unittest.TestCase):
+    """부착 상태(.harness/romeo.project.yaml)가 부품 레지스트리의 기본 status 를 덮는다.
+    파일이 없으면 덮지 않는다 — 부착을 관찰하지 못한 것을 부착으로 세지 않는다(K-51)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        (self.root / ".harness").mkdir()
+        self.path = self.root / ".harness" / "romeo.project.yaml"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _write(self, text):
+        self.path.write_text(text, encoding="utf-8")
+
+    def test_attached_module_is_active_and_clears_warning(self):
+        self._write("schema_version: 1\nmodules:\n  superpowers: active\n")
+        state = load_project_state(self.root)
+        self.assertEqual(state["modules"]["superpowers"], "active")
+        out = route(cls(unit="T1"), project_state=state)
+        self.assertEqual(out["parts"][0]["id"], "superpowers")
+        self.assertEqual(out["parts"][0]["status"], "active")
+        self.assertNotIn("PART_PENDING_GATE", [w["id"] for w in out["warnings"]])
+
+    def test_missing_file_keeps_pending_gate(self):
+        self.assertIsNone(load_project_state(self.root))
+        out = route(cls(unit="T1"), project_state=load_project_state(self.root))
+        self.assertEqual(out["parts"][0]["status"], "pending_gate")
+        self.assertIn("PART_PENDING_GATE", [w["id"] for w in out["warnings"]])
+
+    def test_pending_gate_value_does_not_activate(self):
+        self._write("schema_version: 1\nmodules:\n  superpowers: pending_gate\n")
+        out = route(cls(unit="T1"), project_state=load_project_state(self.root))
+        self.assertEqual(out["parts"][0]["status"], "pending_gate")
+
+    def test_unknown_status_value_is_rejected(self):
+        self._write("schema_version: 1\nmodules:\n  superpowers: activ\n")
+        with self.assertRaises(ValueError):
+            load_project_state(self.root)
+
+    def test_broken_yaml_is_rejected(self):
+        self._write("modules: [\n")
+        with self.assertRaises(ValueError):
+            load_project_state(self.root)
+
+    def test_this_repository_declares_superpowers_active(self):
+        state = load_project_state(HARNESS_ROOT)
+        self.assertIsNotNone(state)
+        self.assertEqual(state["modules"]["superpowers"], "active")
+
+
+class TestRouterWiring(unittest.TestCase):
+    """CLI 가 부착 상태를 라우터까지 실제로 배선하는가(F01·F07: 호출자 0건이었다)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        self.cls_path = self.root / "cls.yaml"
+        self.cls_path.write_text(CLASSIFICATION_T1, encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _attach(self):
+        (self.root / ".harness").mkdir(exist_ok=True)
+        (self.root / ".harness" / "romeo.project.yaml").write_text(
+            "schema_version: 1\nmodules:\n  superpowers: active\n", encoding="utf-8")
+
+    def _route_json(self):
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = main(["route", "--classification", str(self.cls_path), "--json", "--root", str(self.root)])
+        self.assertEqual(rc, 0)
+        return json.loads(buf.getvalue())
+
+    def test_route_command_reads_attachment(self):
+        out = self._route_json()
+        self.assertEqual(out["parts"][0]["status"], "pending_gate")
+        self._attach()
+        out = self._route_json()
+        self.assertEqual(out["parts"][0]["status"], "active")
+        self.assertEqual([w["id"] for w in out["warnings"]], [])
+
+    def test_new_command_records_attached_routing(self):
+        self._attach()
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            rc = main(["new", "--classification", str(self.cls_path), "--title", "부착 배선",
+                       "--slug", "wiring", "--root", str(self.root), "--json"])
+        self.assertEqual(rc, 0)
+        res = json.loads(buf.getvalue())
+        spec = Path([f for f in res["files"] if f.endswith("spec.md")][0])
+        from romeo import frontmatter
+        fm, _ = frontmatter.read(spec)
+        self.assertNotIn("warn:PART_PENDING_GATE", fm["routing"]["fired_rules"])
 
 
 class TestFixtures(unittest.TestCase):

@@ -1,0 +1,26 @@
+# 프로젝트 부착 상태 — 이 저장소에 하네스가 어떤 판으로, 어떤 기능을 켜고 붙어 있는가.
+#
+# V-8 이 요구하는 것만 담는다: 하네스 버전과 활성 기능. 인증정보·토큰을 담지 않는다(S12).
+# 코어 규칙을 복제하지 않는다 — 복제하면 드리프트다(계획 §3.1).
+# 전체 스키마(runtimes·overrides·managed_files)는 M5 다. 여기는 최소판이다(계획 §7 M2).
+---
+schema_version: 1
+harness_version: "0.1.0"
+policy_version: "0.1.0"
+updated: 2026-08-28
+
+# 이 저장소가 하네스의 첫 부착 대상이다 — 하네스를 만드는 저장소가 스스로에게 먼저 붙는다.
+# 부착 명령(`romeo attach`)은 M5 이므로, 이 파일은 손으로 만든 첫 부착 기록이다.
+attachment:
+  self: true
+  since: 2026-08-28
+  note: 부착 대상이 이 저장소 하나뿐이므로 대상 식별자·경로를 적지 않는다. 계정·토큰도 적지 않는다(S12).
+
+# 라우터가 켜려는 부품의 실제 부착 상태. 여기 없는 id 는 부품 레지스트리의 기본값을 쓴다.
+# 값이 부품 레지스트리(core/policy/packages.yaml)의 status 를 덮는다 — 게이트가 닫힌 것만 active 다.
+modules:
+  superpowers: active        # G-M2 통과 (D-67, 2026-08-27). 원문 7종 14파일 복사 완료
+  bmad-cis: pending_gate     # G-M3
+  design-ui: pending_gate    # G-M6
+  design-landing: pending_gate  # G-M6
+  openwiki: pending_gate     # G-M7

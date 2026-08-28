@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "romeo/task-envelope",
+  "title": "Romeo 작업 계약(TaskEnvelope)",
+  "description": "승인된 Tech Spec 에서 계산해 실행 런타임에 넘기는 실행 계약. 두 런타임이 같은 것을 받는다(C-C3·C-C6).",
+  "type": "object",
+  "required": [
+    "schema",
+    "unit_id",
+    "role",
+    "spec_ref",
+    "base_sha",
+    "allowed_paths",
+    "guards",
+    "required_checks",
+    "output_schema",
+    "workspace"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "romeo/task-envelope@0.1.0"
+    },
+    "unit_id": {
+      "type": "string",
+      "pattern": "^(chg|feat|init)-[0-9]{8}-[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]{4}$"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "implementer",
+        "reviewer"
+      ]
+    },
+    "spec_ref": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "base_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$"
+    },
+    "allowed_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "guards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "required_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expect": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace": {
+      "type": "string",
+      "enum": [
+        "current",
+        "worktree"
+      ]
+    }
+  }
+}

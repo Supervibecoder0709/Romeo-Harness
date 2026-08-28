@@ -81,6 +81,56 @@ jobs:
       - name: fixture 스키마 검사
         run: bin/romeo fixtures check
 
+      # 동등성 판정은 두 층이다(D-b). 여기서 강제하는 것은 **검사기 자기 검증** 뿐이다 —
+      # 합성 케이스(source.kind: authored)가 선언한 대로 판정되는가, 케이스 파일이 구조적으로 유효한가.
+      # 게이트 판정 자체는 실제 교차 실행 관측이 있어야 성립하므로 아래 스텝에서 인쇄만 한다.
+      - name: 동등성 검사기 자기 검증 (강제)
+        run: python3 -m unittest tests.test_parity -v
+
+      # 판정은 **종료 코드가 아니라 기계 판독 출력**으로 읽는다.
+      # `bin/romeo fixtures parity` 는 게이트 FAIL 과 미판정(관측 0건)을 똑같이 종료 코드 1 로 내므로
+      # 종료 코드만으로는 둘을 구분할 수 없다 — 그래서 `|| echo` 로 넘기면 '미판정을 넘긴다' 는
+      # 의도와 함께 관측이 생긴 뒤의 **게이트 FAIL 까지** 삼킨다.
+      #
+      # 대응: 게이트 FAIL · 구조 오류(PARITY_INVALID) · 검사기 FAIL · 합성 0건 → CI 실패.
+      #       미판정(관측 0건)만 경고로 넘긴다.
+      # 관측이 생기면 사람이 이 줄을 지우지 않아도 그때부터 저절로 강제된다.
+      - name: 동등성 게이트 판정 (FAIL 이면 CI 실패 · 관측 0건이면 미판정)
+        run: |
+          # 산출물은 작업 트리 밖에 둔다 — 뒤따르는 검사가 보는 트리를 더럽히지 않는다.
+          REP="${RUNNER_TEMP:-/tmp}/parity-report.json"
+          ERR="${RUNNER_TEMP:-/tmp}/parity-invalid.txt"
+          bin/romeo fixtures parity --report || true
+          bin/romeo fixtures parity --json > "$REP" 2> "$ERR" || true
+          if [ ! -s "$REP" ]; then
+            cat "$ERR"
+            echo "::error::parity 케이스가 구조적으로 유효하지 않다(PARITY_INVALID). 관측이라고 선언한 케이스는 source.ref·unit_id·evidence_ref 가 저장소에 실재해야 한다."
+            exit 1
+          fi
+          read_field() { python3 -c "import json,sys;print(json.load(open(sys.argv[1]))[sys.argv[2]])" "$REP" "$1"; }
+          gate=$(read_field gate_verdict)
+          checker=$(read_field checker_verdict)
+          synthetic=$(read_field synthetic)
+          observed=$(read_field observed)
+          echo "gate_verdict=$gate · checker_verdict=$checker · 관측 ${observed}건 · 합성 ${synthetic}건"
+          rc=0
+          if [ "$gate" = "FAIL" ]; then
+            echo "::error::핵심 동등성 게이트 FAIL — 관측된 역할 교체 실행에서 판정이 갈렸다. 리포트의 불일치 행을 본다."
+            rc=1
+          fi
+          if [ "$checker" = "FAIL" ]; then
+            echo "::error::검사기 자기 검증 FAIL — 합성 케이스가 선언한 대로 판정되지 않는다."
+            rc=1
+          fi
+          if [ "$synthetic" = "0" ]; then
+            echo "::error::합성 케이스가 0건이다 — 검사기를 검증할 것이 없다. fixtures/parity 를 확인한다."
+            rc=1
+          fi
+          if [ "$gate" = "UNDETERMINED" ]; then
+            echo "::warning::핵심 동등성 게이트 미판정 — 관측 케이스 0건이다(합성은 검사기 검증용). 실제 교차 실행 관측이 1건 생기면 이 스텝이 그때부터 판정한다."
+          fi
+          exit $rc
+
       - name: 작업 문서 검증
         run: bin/romeo validate
 

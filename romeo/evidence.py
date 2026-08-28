@@ -68,30 +68,55 @@ def _spec_ref(project_root, unit_id):
     return {"path": rel(spec, project_root), "sha256": sha256_file(spec)}
 
 
-def run_command(unit_id, command, run_name=None, label=None, project_root="."):
-    project_root = Path(project_root).resolve()
-    if not is_repo(project_root):
-        raise RuntimeError("git 저장소가 아니다 — evidence 는 HEAD SHA 에 묶여야 한다")
+def default_run_name():
+    return time.strftime("run-%Y%m%d")
+
+
+def _open_record(project_root, unit_id, run_name):
+    """run 레코드를 열거나(없으면) 만든다. 명령 실행과 승인 기록이 같은 레코드 구조를 쓴다 —
+    승인이 먼저 와도(절차 순서: 승인 → 실행) 기록할 곳이 있어야 한다."""
     udir = find_unit_dir(project_root, unit_id)
-    fm, _ = frontmatter.read(udir / "spec.md")
-    base_sha = fm.get("base_sha") or head_sha(project_root)
-    run_name = run_name or time.strftime("run-%Y%m%d")
     edir = udir / "evidence"
     edir.mkdir(exist_ok=True)
     epath = edir / f"{run_name}.yaml"
     if epath.exists():
-        rec = load_yaml(epath)
-    else:
-        rec = {
-            "schema": EVIDENCE_SCHEMA, "romeo_version": __version__,
-            "repo_id": repo_id(project_root), "run_id": run_name, "task_id": None, "dispatch_id": None,
-            "unit_id": unit_id, "spec_ref": _spec_ref(project_root, unit_id),
-            "base_sha": base_sha, "head_sha": None, "dirty_tree_hash": None,
-            "environment": {"os": platform.platform(), "python": sys.version.split()[0], "cwd": str(project_root)},
-            "started_at": now_iso(), "finished_at": None,
-            "commands": [], "changed_files": [], "artifact_hash": None,
-            "reviewer": None, "verdict": None, "approvals": [],
-        }
+        return epath, load_yaml(epath)
+    fm, _ = frontmatter.read(udir / "spec.md")
+    base_sha = fm.get("base_sha") or (head_sha(project_root) if is_repo(project_root) else None)
+    rec = {
+        "schema": EVIDENCE_SCHEMA, "romeo_version": __version__,
+        "repo_id": repo_id(project_root), "run_id": run_name, "task_id": None, "dispatch_id": None,
+        "unit_id": unit_id, "spec_ref": _spec_ref(project_root, unit_id),
+        "base_sha": base_sha, "head_sha": None, "dirty_tree_hash": None,
+        "environment": {"os": platform.platform(), "python": sys.version.split()[0], "cwd": str(project_root)},
+        "started_at": now_iso(), "finished_at": None,
+        "commands": [], "changed_files": [], "artifact_hash": None,
+        "reviewer": None, "verdict": None, "approvals": [],
+    }
+    return epath, rec
+
+
+def _stamp_ids(rec, **ids):
+    """위임 식별자를 run 당 한 번만 기록한다(계획 §3.5). 이미 다른 값이 있으면 덮어쓰지 않고 거부한다 —
+    한 run 이 두 위임에 속한 것처럼 보이면 증거의 출처를 알 수 없다."""
+    for key, val in ids.items():
+        if val is None:
+            continue
+        cur = rec.get(key)
+        if cur is not None and cur != val:
+            raise ValueError(f"{key} 가 이미 {cur!r} 로 기록돼 있다 (요청값 {val!r}) — "
+                             f"한 run 은 한 위임에 속한다. 다른 위임이면 --run 으로 새 run 을 만든다")
+        rec[key] = val
+
+
+def run_command(unit_id, command, run_name=None, label=None, project_root=".", task_id=None, dispatch_id=None):
+    project_root = Path(project_root).resolve()
+    if not is_repo(project_root):
+        raise RuntimeError("git 저장소가 아니다 — evidence 는 HEAD SHA 에 묶여야 한다")
+    run_name = run_name or default_run_name()
+    epath, rec = _open_record(project_root, unit_id, run_name)
+    _stamp_ids(rec, task_id=task_id, dispatch_id=dispatch_id)
+    base_sha = rec.get("base_sha") or head_sha(project_root)
     n = len(rec["commands"]) + 1
     label = label or f"cmd-{n}"
     log_dir = project_root / ".harness" / "runs" / unit_id / run_name
@@ -118,27 +143,35 @@ def run_command(unit_id, command, run_name=None, label=None, project_root="."):
     return {"evidence": str(epath), "command": cmd_rec, "state": state}
 
 
-def add_approval(unit_id, guard, by, note=None, run_name=None, project_root="."):
-    """실행 가드 승인 사건을 evidence 에 기록한다(M1: 대화 승인)."""
+def add_approval(unit_id, guard, by, note=None, run_name=None, project_root=".", task_id=None, dispatch_id=None):
+    """실행 가드 승인 사건을 evidence 에 기록한다(M1: 대화 승인).
+
+    승인은 실행보다 **먼저** 온다 — 가드가 붙은 작업은 승인 전에 상태를 바꾸지 않기 때문이다.
+    그래서 선행 run 이 없으면 승인 전용 레코드(`commands: []`)를 새로 만든다:
+    승인 시점에 실행한 명령이 0건이라는 사실 자체가 '승인 전 상태 변경 0건' 의 증거다.
+    선행 run 이 있으면 지금까지처럼 거기에 붙인다."""
     project_root = Path(project_root).resolve()
     runs = list_runs(project_root, unit_id)
     if run_name:
         runs = [r for r in runs if r["run_id"] == run_name]
-    if not runs:
-        raise FileNotFoundError("승인을 기록할 evidence run 이 없다 — 먼저 romeo evidence run 을 실행한다")
-    rec = runs[-1]
-    path = rec.pop("_path")
+    if runs:
+        rec = runs[-1]
+        path = Path(rec.pop("_path"))
+    else:
+        path, rec = _open_record(project_root, unit_id, run_name or default_run_name())
+    _stamp_ids(rec, task_id=task_id, dispatch_id=dispatch_id)
     rec.setdefault("approvals", []).append({"guard": guard, "approved_at": now_iso(), "approved_by": by, "note": note})
-    Path(path).write_text(dump_yaml(rec), encoding="utf-8")
-    return path
+    path.write_text(dump_yaml(rec), encoding="utf-8")
+    return str(path)
 
 
-def run_required_checks(unit_id, run_name=None, project_root="."):
+def run_required_checks(unit_id, run_name=None, project_root=".", task_id=None, dispatch_id=None):
     """spec.md 의 required_checks 를 문자열 그대로 순서대로 실행한다 — close 가 대조하는 명령과 정확히 일치시키기 위해."""
     from .close import required_checks
     udir = find_unit_dir(project_root, unit_id)
     _, body = frontmatter.read(udir / "spec.md")
     results = []
     for rc in required_checks(body):
-        results.append(run_command(unit_id, rc["command"], run_name=run_name, label=rc.get("id"), project_root=project_root))
+        results.append(run_command(unit_id, rc["command"], run_name=run_name, label=rc.get("id"),
+                                   project_root=project_root, task_id=task_id, dispatch_id=dispatch_id))
     return results

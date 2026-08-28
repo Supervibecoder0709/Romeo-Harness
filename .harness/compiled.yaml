@@ -5,21 +5,27 @@ schema_version: 1
 romeo_version: 0.1.0
 outputs:
 - .agents/skills/finishing-a-development-branch
+- .agents/skills/implement/SKILL.md
 - .agents/skills/plan-close/SKILL.md
 - .agents/skills/plan/SKILL.md
 - .agents/skills/receiving-code-review
 - .agents/skills/repo-archive
 - .agents/skills/requesting-code-review
+- .agents/skills/review/SKILL.md
 - .agents/skills/systematic-debugging
 - .agents/skills/test-driven-development
 - .agents/skills/using-git-worktrees
 - .agents/skills/verification-before-completion
+- .claude/agents/implementer.md
+- .claude/agents/reviewer.md
 - .claude/settings.json
 - .claude/skills/finishing-a-development-branch
+- .claude/skills/implement/SKILL.md
 - .claude/skills/plan-close/SKILL.md
 - .claude/skills/plan/SKILL.md
 - .claude/skills/receiving-code-review
 - .claude/skills/requesting-code-review
+- .claude/skills/review/SKILL.md
 - .claude/skills/systematic-debugging
 - .claude/skills/test-driven-development
 - .claude/skills/using-git-worktrees

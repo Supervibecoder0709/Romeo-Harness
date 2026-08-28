@@ -412,6 +412,139 @@ class TestCompile(unittest.TestCase):
             text = (self.root / f).read_text(encoding="utf-8")
             self.assertIn("실행은 완료가 아니다", text)
 
+    def test_new_workflows_are_projected_to_both_runtimes(self):
+        # 코어 절차가 늘어도 두 런타임이 같은 것을 받아야 한다 — 한쪽만 투영되면 역할 교체가 성립하지 않는다.
+        compile_all(self.root)
+        for skills_dir in (".claude/skills", ".agents/skills"):
+            for name in ("implement", "review"):
+                p = self.root / skills_dir / name / "SKILL.md"
+                self.assertTrue(p.is_file(), f"{p} 가 투영되지 않았다")
+                self.assertIn(f"core/workflows/{name}/SKILL.md", p.read_text(encoding="utf-8"),
+                              f"{p} 가 코어 원본을 가리키지 않는다")
+
+    def test_workflow_table_marks_non_entrypoints(self):
+        # 진입점은 하나다(K-60). implement·review 를 "라우터 진입점" 으로 인쇄하면 지침 파일이 코어와 반대말을 한다.
+        compile_all(self.root)
+        for f in ("CLAUDE.md", "AGENTS.md"):
+            rows = {}
+            for line in (self.root / f).read_text(encoding="utf-8").split("\n"):
+                if line.startswith("| `") and line.count("|") >= 4:
+                    cells = [c.strip() for c in line.split("|")]
+                    rows[cells[1].strip("`")] = cells[3]
+            for name in ("implement", "review"):
+                self.assertIn(name, rows, f"{f} 절차 표에 {name} 행이 없다")
+                self.assertEqual(rows[name], "승인 뒤 라우터가 켤 때만",
+                                 f"{f} 가 {name} 을 진입점처럼 인쇄했다")
+            for name in ("plan", "plan-close"):
+                self.assertEqual(rows[name], "라우터 진입점",
+                                 f"{f} 가 기존 진입점 행을 바꿨다")
+
+    # ── 역할 투영·바인딩 (리뷰 F-09 · F-11 · F-17 · F-31) ─────────────────────
+    def test_role_contract_reaches_both_runtimes(self):
+        # core/roles/*.yaml 을 읽는 코드가 테스트뿐이면 역할 계약은 어느 런타임에도 도달하지 않는다.
+        compile_all(self.root)
+        for f in ("CLAUDE.md", "AGENTS.md"):
+            text = (self.root / f).read_text(encoding="utf-8")
+            self.assertIn("core/roles/implementer.yaml", text, f"{f} 에 역할 계약 원본 링크가 없다")
+            self.assertIn("core/roles/reviewer.yaml", text)
+            self.assertIn("workspace-write", text, f"{f} 에 구현자 능력이 인쇄되지 않았다")
+            self.assertIn("docs/work/{unit_id}/", text, f"{f} 에 쓰기 범위가 인쇄되지 않았다")
+            self.assertIn("자기 역할의 산출물을 스스로 검토했다고 선언하는 것", text,
+                          f"{f} 에 역할 금지 항목이 인쇄되지 않았다")
+
+    def test_swap_enforcement_is_printed_in_both_directions(self):
+        # 교체 실행에서 검토자가 되는 런타임의 강제 수단이 정본에도 산출물에도 있어야 한다.
+        import yaml
+        bindings = yaml.safe_load((self.root / ".harness/bindings.yaml").read_text(encoding="utf-8"))
+        for key in ("roles", "parity_swap"):
+            for name, role in bindings[key].items():
+                self.assertTrue(isinstance(role, dict) and role.get("enforcement"),
+                                f"bindings.yaml {key}.{name} 에 강제 수단 선언이 없다")
+        compile_all(self.root)
+        for f in ("CLAUDE.md", "AGENTS.md"):
+            text = (self.root / f).read_text(encoding="utf-8")
+            for key in ("roles", "parity_swap"):
+                for name, role in bindings[key].items():
+                    self.assertIn(role["enforcement"], text,
+                                  f"{f} 에 {key}.{name} 의 강제 수단이 인쇄되지 않았다")
+            self.assertIn("미관측", text, f"{f} 가 미검증 강제 수단을 관측된 것처럼 인쇄했다")
+
+    def test_permission_ceiling_reaches_both_runtimes(self):
+        # 권한 상한이 한쪽 런타임에만 컴파일되면 동등성 비교의 전제가 깨진다(K-66).
+        import yaml
+        bindings = yaml.safe_load((self.root / ".harness/bindings.yaml").read_text(encoding="utf-8"))
+        ceiling = bindings["permission_ceiling"]
+        compile_all(self.root)
+        for f in ("CLAUDE.md", "AGENTS.md"):
+            text = (self.root / f).read_text(encoding="utf-8")
+            self.assertIn("## 권한 상한", text, f"{f} 에 권한 상한 절이 없다")
+            for cmd in ceiling["approval_required"] + ceiling["never"]:
+                self.assertIn(cmd, text, f"{f} 에 상한 항목 '{cmd}' 가 인쇄되지 않았다")
+        # 두 런타임 모두 '자기가 구현자일 때' 의 상한을 인쇄해야 한다 — 기본 실행과 교체 실행이 서로 다른 런타임이다.
+        claude = (self.root / "CLAUDE.md").read_text(encoding="utf-8")
+        agents = (self.root / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("기본 실행에서 이 런타임이 `implementer` 일 때", claude)
+        self.assertIn("교체 실행에서 이 런타임이 `implementer` 일 때", agents)
+
+    def test_claude_settings_ask_covers_declared_ceiling(self):
+        # 정본 상한과 런타임 패턴이 갈라지면 설정 파일이 상한을 덜 막는다.
+        import yaml
+        bindings = yaml.safe_load((self.root / ".harness/bindings.yaml").read_text(encoding="utf-8"))
+        adapter = yaml.safe_load((self.root / "adapters/claude/adapter.yaml").read_text(encoding="utf-8"))
+        patterns = " ".join(adapter["settings_ask"])
+        for cmd in bindings["permission_ceiling"]["approval_required"]:
+            self.assertIn(cmd, patterns,
+                          f"claude 어댑터의 settings_ask 가 상한 항목 '{cmd}' 를 덮지 않는다")
+
+    def test_role_agents_are_projected_in_verified_format_only(self):
+        compile_all(self.root)
+        from romeo import frontmatter as fm
+        for rid in ("implementer", "reviewer"):
+            p = self.root / ".claude/agents" / f"{rid}.md"
+            self.assertTrue(p.is_file(), f"{p} 가 투영되지 않았다")
+            meta, _body = fm.split(p.read_text(encoding="utf-8"))
+            self.assertEqual(meta.get("name"), rid)
+            self.assertIn("스스로 켜지지 않는다", meta.get("description", ""),
+                          f"{p} 의 description 에 K-60 방어 문장이 없다")
+            self.assertIn(f"core/roles/{rid}.yaml", p.read_text(encoding="utf-8"))
+        # 검토자는 읽기·검색만 한다(core/roles/reviewer.yaml capabilities). 쓰기·실행 도구를 주면 계약과 어긋난다.
+        reviewer = fm.split((self.root / ".claude/agents/reviewer.md").read_text(encoding="utf-8"))[0]
+        self.assertEqual([t.strip() for t in reviewer["tools"].split(",")], ["Read", "Grep", "Glob"])
+        # 형식을 확인하지 못한 런타임에는 파일을 만들지 않는다 — 읽히지 않는 산출물이 더 나쁘다.
+        self.assertFalse((self.root / ".codex").exists(),
+                         "확인되지 않은 형식의 에이전트 정의를 만들었다")
+
+    def test_role_agent_without_description_is_refused(self):
+        import yaml
+        from romeo.compile import CompileError
+        a = self.root / "adapters/claude/adapter.yaml"
+        data = yaml.safe_load(a.read_text(encoding="utf-8"))
+        data["role_agents"]["reviewer"].pop("description")
+        a.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+
+    def test_check_detects_hand_edited_role_agent(self):
+        compile_all(self.root)
+        p = self.root / ".claude/agents/reviewer.md"
+        p.write_text(p.read_text(encoding="utf-8").replace("Read, Grep, Glob", "Read, Write, Bash"),
+                     encoding="utf-8")
+        codes = sorted(f[0] for f in check_compiled(self.root))
+        self.assertIn("COMPILE_STALE", codes, "역할 산출물을 손으로 고친 것을 잡지 못했다")
+
+    def test_projected_new_skills_have_name_and_description(self):
+        # description 이 비면 doctor 가 "라우터가 켤 근거가 없다" 로 계상하고 discovery 가 안 된다.
+        from romeo import frontmatter as fm
+        compile_all(self.root)
+        for skills_dir in (".claude/skills", ".agents/skills"):
+            for name in ("implement", "review"):
+                p = self.root / skills_dir / name / "SKILL.md"
+                meta, _body = fm.split(p.read_text(encoding="utf-8"))
+                self.assertTrue(meta, f"{p} 에 frontmatter 가 없다")
+                self.assertEqual(meta.get("name"), name, f"{p} 의 name 이 폴더명과 다르다")
+                self.assertTrue((meta.get("description") or "").strip(),
+                                f"{p} 에 description 이 없다")
+
 
 if __name__ == "__main__":
     unittest.main()

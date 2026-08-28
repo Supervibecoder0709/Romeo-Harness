@@ -23,6 +23,56 @@ workflows:
       Romeo 종료 검사. docs/work/<id>/ 작업 단위의 evidence 신선도(HEAD SHA·작업 트리)·required_checks·수용 기준·
       open loop·링크를 검사해 통과하면 status 를 done 으로 확정한다. 사용자가 "/plan-close", "이 작업 마무리해",
       "완료 처리해줘", "close 해줘"라고 할 때 사용한다. 검사가 실패하면 완료라고 하지 않는다.
+  # 아래 둘은 진입점이 아니다. `when` 이 지침 파일의 절차 표에 그대로 인쇄된다(K-60).
+  implement:
+    mapping: adapters/claude/workflows/implement.md
+    when: 승인 뒤 라우터가 켤 때만
+    description: >-
+      승인된 Tech Spec 을 작업 계약으로 바꿔 구현하고 증거를 남긴다. 승인이 끝난 작업 단위를 실제로 구현할 때
+      라우터가 켤 때만 쓴다 — 스스로 켜지지 않는다. 기획을 다시 만들지 않고, 스스로 검토하지 않으며,
+      승인 없이 되돌리기 어려운 작업을 하지 않는다.
+  review:
+    mapping: adapters/claude/workflows/review.md
+    when: 승인 뒤 라우터가 켤 때만
+    description: >-
+      다른 런타임이 구현한 결과를 읽기만 하며 검토해 findings 와 게이트 판정을 낸다. 라우터가 검토자를 요구하는
+      패키지에서 구현이 끝난 뒤 라우터가 켤 때만 쓴다 — 스스로 켜지지 않는다. 파일을 고치지 않고,
+      기획을 바꾸지 않으며, 승인하지 않는다.
+
+# 역할 계약(core/roles/*.yaml)을 이 런타임이 이해하는 에이전트 정의 형식으로 투영한다.
+#
+# 형식 근거(추측이 아니라 실행으로 확인한 것, 2026-08-28):
+#   - 이 저장소의 `.claude/agents/repo-archive-coordinator.md` 를 이 런타임이 실제로 발견한다.
+#     없는 이름으로 실행하면 "Available agents:" 목록과 함께 거부되는데(종료 코드 1) 그 목록에
+#     이 파일 이름이 들어 있고, 그 이름으로 실행하면 정상 종료했다(종료 코드 0).
+#   - frontmatter 키는 그 파일이 쓰는 `name`·`description`·`tools` 를 그대로 따른다.
+#   - `tools` 는 이 런타임에서 실제로 도구 집합을 줄인다 — 검토자 조합으로 실행했을 때
+#     사용 가능한 도구가 Read·Grep·Glob 3개로 관찰됐고 쓰기가 실패했다.
+agents_dir: .claude/agents
+
+# description 은 이 런타임이 "언제 이 역할을 띄울지" 판단하는 문구다. K-60 방어 문장을 반드시 넣는다.
+role_agents:
+  implementer:
+    tools: "Read, Grep, Glob, Edit, Write, Bash"
+    description: >-
+      승인된 작업 계약을 받아 구현하고 증거를 남기는 역할이다. 라우터가 역할을 배정할 때만 쓴다 —
+      스스로 켜지지 않는다. 기획을 다시 만들지 않고, 스스로 검토하지 않으며, 승인 없이
+      되돌리기 어려운 작업을 하지 않는다.
+  reviewer:
+    # 역할 계약의 capabilities [read, search] 를 이 런타임의 도구 이름으로 옮긴 것이다.
+    # 쓰기·실행 도구를 넣으면 역할 계약과 어긋난다 — 테스트가 잡는다.
+    tools: "Read, Grep, Glob"
+    description: >-
+      구현 결과를 읽기만 하며 검토해 findings 와 게이트 판정을 내는 역할이다. 라우터가 역할을
+      배정할 때만 쓴다 — 스스로 켜지지 않는다. 파일을 고치지 않고, 기획을 바꾸지 않으며,
+      승인하지 않는다.
+
+# 권한 상한(.harness/bindings.yaml 의 permission_ceiling)을 이 런타임에서 어떻게 전달하는가.
+permission_ceiling:
+  kind: settings_file
+  delivery: >-
+    `.claude/settings.json` 의 permissions.ask·deny 로 내보낸다 — 지침 문구가 아니라 런타임이
+    실행 시점에 확인하는 설정이다.
 
 # 채택된 vendor 스킬을 이 런타임 경로로 투영한다(원문 그대로, 수정 0).
 project_vendor_skills: true

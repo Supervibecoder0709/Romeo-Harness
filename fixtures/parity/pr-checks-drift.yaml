@@ -1,0 +1,50 @@
+# 검사기가 검사 목록 차이를 실제로 잡는지 확인하는 음성 케이스.
+#
+# 한쪽이 required_checks 하나를 건너뛰었다. 판정이 같아도 같은 것을 검사한 것이 아니다.
+---
+id: pr-checks-drift
+title: 검사 표류 — 한쪽이 required_checks 하나를 건너뛴다
+unit_id: feat-20260828-license-field-a1b2
+status: executed
+expect: differ
+expect_codes: [CHECKS_DIFFER]
+
+baseline:
+  runtimes: {implementer: claude}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-e/task-implementer.json
+        sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+        - {id: check-2, command: python3 scripts/generate-archive-index.py --check, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-e.yaml
+
+swapped:
+  runtimes: {implementer: codex}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-f/task-implementer.json
+        sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-f.yaml
+
+source:
+  kind: authored
+  ref: docs/planning/implementation-plan.md §7 M2 (같은 required_checks 실행)
+  date: '2026-08-28'

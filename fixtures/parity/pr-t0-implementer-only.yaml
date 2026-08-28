@@ -1,0 +1,48 @@
+# 검토자가 없는 단위(T0)에서도 판정이 돈다 — 면의 역할이 하나뿐인 경우.
+#
+# 라우터가 T0 에 검토자를 붙이지 않으므로(K-32) 두 면 모두 구현자만 갖는다.
+---
+id: pr-t0-implementer-only
+title: 검토자 없는 T0 — 구현자만 있는 쌍도 같은 판정이 나온다
+unit_id: chg-20260828-brief-render-7k2q
+status: executed
+expect: same
+
+baseline:
+  runtimes: {implementer: claude}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: chg-20260828-brief-render-7k2q
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/chg-20260828-brief-render-7k2q/run-a/task-implementer.json
+        sha256: "5555555555555555555555555555555555555555555555555555555555555555"
+      checks:
+        - {id: check-1, command: bin/romeo validate, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/chg-20260828-brief-render-7k2q/evidence/run-a.yaml
+
+swapped:
+  runtimes: {implementer: codex}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: chg-20260828-brief-render-7k2q
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/chg-20260828-brief-render-7k2q/run-b/task-implementer.json
+        sha256: "6666666666666666666666666666666666666666666666666666666666666666"
+      checks:
+        - {id: check-1, command: bin/romeo validate, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/chg-20260828-brief-render-7k2q/evidence/run-b.yaml
+
+source:
+  kind: authored
+  ref: core/policy/packages.yaml (T0 는 검토자 없음)
+  date: '2026-08-28'

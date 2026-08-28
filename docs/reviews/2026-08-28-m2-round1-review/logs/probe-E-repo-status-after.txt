@@ -1,0 +1,41 @@
+ M .github/workflows/harness.yml
+ M .harness/bindings.yaml
+ M .harness/compiled.yaml
+ M AGENTS.md
+ M CLAUDE.md
+ M adapters/claude/adapter.yaml
+ M adapters/codex/adapter.yaml
+ M romeo/cli.py
+ M romeo/close.py
+ M romeo/compile.py
+ M romeo/evidence.py
+ M romeo/policy.py
+ M tests/test_compile.py
+ M tests/test_docs_evidence_close.py
+ M tests/test_doctor.py
+ M tests/test_policy.py
+?? .agents/skills/implement/
+?? .agents/skills/review/
+?? .claude/agents/implementer.md
+?? .claude/agents/reviewer.md
+?? .claude/skills/implement/
+?? .claude/skills/review/
+?? .harness/romeo.project.yaml
+?? adapters/claude/workflows/implement.md
+?? adapters/claude/workflows/review.md
+?? adapters/codex/workflows/implement.md
+?? adapters/codex/workflows/review.md
+?? adapters/orca/
+?? core/roles/
+?? core/schemas/result-envelope.json
+?? core/schemas/task-envelope.json
+?? core/templates/compact-brief.md
+?? core/workflows/implement/
+?? core/workflows/review/
+?? docs/reviews/2026-08-28-m2-round1-review/
+?? fixtures/parity/
+?? romeo/envelope.py
+?? romeo/parity.py
+?? tests/test_envelope.py
+?? tests/test_parity.py
+?? tests/test_roles_envelopes.py

@@ -1,0 +1,88 @@
+# 동등성 케이스 — 역할을 바꿔 다시 실행해도 같은 판정이 나오는가 (핵심 동등성 게이트, 계획 §7 M2).
+#
+# baseline 은 역할 바인딩의 기준 조합, swapped 는 같은 파일의 역할 교체 조합이다.
+# runtimes 는 판정에 쓰지 않는다 — 읽는 사람을 위한 기록이다.
+#
+# 검토자의 checks 는 비어 있다. 검토자 역할 계약(core/roles/reviewer.yaml)의 capabilities 에
+# run-command 가 없으므로 검사를 실행한 것으로 기록할 수 없다(K-66 · F19). 대신 구현자가 남긴
+# 증거를 evidence_ref 로 지목한다 — 지목할 증거가 있을 때만 PASS 다(review/SKILL.md 5번).
+#
+# 이 케이스는 손으로 쓴 합성 데이터다(source.kind: authored). 검사기가 도는지만 증명하고
+# 핵심 동등성 게이트를 통과시키지 못한다(D-b).
+---
+id: pr-license-field-t1
+title: 아카이브 라이선스 필드 T1 — 역할을 바꿔도 같은 판정이 나온다
+unit_id: feat-20260828-license-field-a1b2
+status: executed
+expect: same
+
+baseline:
+  runtimes: {implementer: claude, reviewer: codex}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-a/task-implementer.json
+        sha256: "1111111111111111111111111111111111111111111111111111111111111111"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+        - {id: check-2, command: python3 scripts/generate-archive-index.py --check, exit_code: 0}
+        - {id: check-3, command: python3 -m unittest tests.test_provenance, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
+    reviewer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: reviewer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-a/task-reviewer.json
+        sha256: "2222222222222222222222222222222222222222222222222222222222222222"
+      checks: []
+      gate_verdict: PASS
+      blocked_reason: null
+      findings:
+        - {summary: 인덱스 열 순서가 _source.md 의 필드 순서와 다르다 — 읽는 사람이 대조하기 어렵다, file: archive/README.md, line: 12}
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
+
+swapped:
+  runtimes: {implementer: codex, reviewer: claude}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-b/task-implementer.json
+        sha256: "3333333333333333333333333333333333333333333333333333333333333333"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+        - {id: check-2, command: python3 scripts/generate-archive-index.py --check, exit_code: 0}
+        - {id: check-3, command: python3 -m unittest tests.test_provenance, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
+    reviewer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: reviewer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-b/task-reviewer.json
+        sha256: "4444444444444444444444444444444444444444444444444444444444444444"
+      checks: []
+      gate_verdict: PASS
+      blocked_reason: null
+      findings:
+        - {summary: 라이선스 열의 빈칸 처리 규칙이 문서에 없다, file: archive/README.md, line: 14}
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
+
+note: findings 문장은 면마다 달라도 된다. 판정이 같으면 동등하다 — 프롬프트 동일성은 요구하지 않는다(C-C2).
+  evidence_ref 경로가 면마다 다른 것도 같다 — 실행이 다르면 증거 파일도 다르다. 비교하는 것은 checks 와 gate 판정이다.
+source:
+  kind: authored
+  ref: docs/planning/implementation-plan.md §7 M2 (관찰 가능한 결과)
+  date: '2026-08-28'

@@ -190,9 +190,103 @@ def check_conflicts(root=None):
     return findings, ran
 
 
+def _plain(value):
+    """YAML 이 만든 값을 JSON 으로 낼 수 있는 형태로 낮춘다.
+
+    `observed_at: 2026-08-28` 처럼 따옴표 없는 날짜는 date 객체가 되어 `doctor --json` 을 죽인다.
+    기록 파일은 사람이 손으로 쓰는 곳이므로, 읽는 쪽에서 막는다.
+    """
+    if isinstance(value, dict):
+        return {str(k): _plain(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain(v) for v in value]
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    return str(value)
+
+
+def _evidence_is_real(root, ref):
+    """관찰 기록이 지목한 증거가 저장소 안에 실재하는 파일인지 본다.
+
+    저장소 밖(절대 경로·상위 탈출)은 이 저장소의 관찰 기록이 될 수 없다 — 읽는 사람이 따라갈 수 없다."""
+    if not isinstance(ref, str) or not ref.strip():
+        return False
+    try:
+        p = Path(ref.strip())
+        if p.is_absolute() or ".." in p.parts:
+            return False
+        return (Path(root) / p).is_file()
+    except (OSError, ValueError):
+        return False
+
+
 def observations(root):
+    """관찰 기록을 읽고, 각 항목의 증거 포인터가 실재하는지 함께 기록한다(`evidence_exists`).
+
+    '관찰됨' 은 사람이 손으로 적은 자기 신고 위에 선다. 최소한 그 신고가 가리키는 증거가 저장소에
+    실재하는지는 검사한다 — 없거나 실재하지 않으면 대조할 수 없다(K-51)."""
     p = root / OBSERVATIONS_PATH
-    return (load_any(p) or {}).get("runtime_load") or {} if p.exists() else {}
+    data = _plain((load_any(p) or {}).get("runtime_load") or {}) if p.exists() else {}
+    for entry in data.values():
+        if isinstance(entry, dict):
+            entry["evidence_exists"] = _evidence_is_real(root, entry.get("evidence"))
+    return data
+
+
+def _observed_entry(entry):
+    """관찰 기록 한 항목을 (관찰한 스킬 이름 목록, 메모)로 읽는다.
+
+    이름 목록이 없는 기록(구조 이전의 자유 문자열)은 **대조할 수 없다** — 그때는 목록을 None 으로
+    돌려서 doctor 가 "관찰됨" 이라고 말하지 못하게 한다. 텍스트가 있다는 것은 관찰의 증거가 아니다.
+    실재하지 않는 증거 경로는 그대로 인쇄하지 않고 실재하지 않는다는 사실을 붙여 인쇄한다.
+    """
+    if entry is None:
+        return None, ""
+    if isinstance(entry, dict):
+        note = str(entry.get("note") or "").strip()
+        ref = str(entry.get("evidence") or "").strip()
+        if ref:
+            mark = "" if entry.get("evidence_exists") else " — 실재하지 않는다"
+            note = (note + f" (증거: {ref}{mark})").strip()
+        names = entry.get("skills")
+        if isinstance(names, list):
+            return sorted(str(n) for n in names), note
+        return None, note
+    return None, str(entry).strip()
+
+
+def runtime_load_mark(probe, entry):
+    """스킬 파일 목록과 관찰 기록을 **이름으로 대조**해 인쇄할 판정 토큰을 만든다.
+
+    관찰 기록이 덮지 못한 스킬이 하나라도 있으면 "관찰됨" 이라는 단어를 쓰지 않는다 —
+    10개를 관찰한 기록으로 12개의 로드를 주장할 수는 없다(K-51). 정직한 문장을 메모 안에 적어 두는
+    것으로는 부족하다: 한 줄 요약만 읽는 사람에게는 판정 토큰이 전부다.
+
+    이름 목록만으로도 부족하다 — 이름 두 개를 손으로 더하면 '관찰됨' 이 된다. 그래서 기록이 가리키는
+    증거(`evidence:`)를 요구하고 그 경로의 실재를 검사한다: 없거나 실재하지 않으면 대조 불가다.
+    실재 여부는 `observations()` 가 읽을 때 계산해 `evidence_exists` 로 넣어 둔다.
+    """
+    names, note = _observed_entry(entry)
+    if entry is None:
+        return "**미관찰**", note
+    if names is None:
+        return "**대조 불가** — 관찰 기록에 스킬 이름 목록(skills:)이 없다", note
+    ref = str((entry.get("evidence") if isinstance(entry, dict) else "") or "").strip()
+    seen = sorted(set(names) & set(probe["skills"]))
+    missing = sorted(set(probe["skills"]) - set(names))
+    extra = sorted(set(names) - set(probe["skills"]))
+    count = f"{len(seen)}/{probe['count']}개"
+    if missing:
+        mark = f"**부분 관찰** {count} · 미관찰 {' · '.join(missing)}"
+    elif not ref:
+        mark = f"**대조 불가** {count} — 이름은 다 덮지만 관찰 기록에 증거(evidence:)가 없다. 자기 신고뿐이다"
+    elif not entry.get("evidence_exists"):
+        mark = f"**대조 불가** {count} — 관찰 기록이 지목한 증거가 실재하지 않는다"
+    else:
+        mark = f"관찰됨 {count}"
+    if extra:
+        mark += f" · 기록에만 있는 이름 {' · '.join(extra)}"
+    return mark, note
 
 
 def doctor(root=None):
@@ -225,11 +319,14 @@ def format_report(rep):
 
     out += ["", "## 스킬 파일 (파일 수준. 실제 로드는 이 검사로 증명되지 않는다)"]
     observed = rep.get("observed_load") or {}
+    unproven = []
     for s in rep["skills"]:
-        seen = observed.get(s["runtime"])
-        mark = "관찰됨" if seen else "**미관찰**"
-        out.append(f"  {s['runtime']:<7} {s['count']}개 · {s['dir']} · 런타임 로드 {mark}"
-                   + (f" ({seen})" if seen else ""))
+        mark, note = runtime_load_mark(s, observed.get(s["runtime"]))
+        if "관찰됨" not in mark:
+            unproven.append(s["runtime"])
+        out.append(f"  {s['runtime']:<7} {s['count']}개 · {s['dir']} · 런타임 로드 {mark}")
+        if note:
+            out.append(f"      기록: {note}")
         for p in s["problems"]:
             out.append(f"      ✗ {p}")
 
@@ -257,6 +354,10 @@ def format_report(rep):
         out.append("저장소는 정상이다. 런타임 부재는 이 머신의 문제이지 저장소의 문제가 아니다(CI 러너에는 없는 것이 정상).")
     if not observed:
         out.append("주의: 런타임이 스킬을 실제로 로드하는지는 아직 관찰되지 않았다(A-11).")
+    elif unproven:
+        out.append(f"주의: {' · '.join(unproven)} 의 런타임 로드는 아직 대조되지 않았다 — "
+                   f"위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그 런타임에서 로드가 확인된 적이 "
+                   f"없다는 뜻이다(A-11).")
     return "\n".join(out)
 
 

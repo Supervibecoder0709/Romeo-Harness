@@ -12,7 +12,7 @@ from pathlib import Path
 
 from romeo.compile import compile_all
 from romeo.doctor import (check_conflicts, doctor, doctor_problem_count, format_report,
-                          probe_runtimes, probe_skill_files)
+                          observations, probe_runtimes, probe_skill_files, runtime_load_mark)
 from romeo.util import project_root
 
 REPO = project_root(Path(__file__).parent)
@@ -55,7 +55,115 @@ class TestRepoItself(unittest.TestCase):
         # 파일이 있다는 것과 런타임이 로드한다는 것은 다르다. 보고서가 그걸 숨기면 안 된다.
         rep = doctor(REPO)
         rep["observed_load"] = {}
-        self.assertIn("미관찰", format_report(rep))
+        text = format_report(rep)
+        self.assertIn("미관찰", text)
+        self.assertNotIn("관찰됨", text, "관찰 기록이 없는데 관찰됐다고 인쇄한다")
+
+
+class TestRuntimeLoadHonesty(unittest.TestCase):
+    """'관찰됨' 은 관찰 기록이 지금의 스킬 목록을 **이름으로** 다 덮고, 그 기록이 **실재하는 증거**를
+    가리킬 때만 쓴다(K-51).
+
+    기록의 존재만 보고 '관찰됨' 을 인쇄하면, 10개를 관찰한 기록으로 12개의 로드를 주장하게 된다.
+    이름 목록만 보는 것으로도 부족하다 — 손으로 이름 두 개를 더하면 '관찰됨' 이 된다.
+    정직한 문장을 관찰 텍스트 안에 적어 두는 것으로는 부족하다: 한 줄 요약만 읽는 사람에게는
+    헤더의 판정 토큰이 전부다.
+    """
+
+    def probe(self, names):
+        return {"runtime": "codex", "dir": ".agents/skills", "count": len(names),
+                "problems": [], "skills": sorted(names)}
+
+    def entry(self, names, **over):
+        """실재하는 증거를 가리키는 관찰 기록. `evidence_exists` 는 observations() 가 계산해 넣는다."""
+        rec = {"observed_at": "2026-08-28", "skills": names,
+               "evidence": "docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md",
+               "evidence_exists": True}
+        rec.update(over)
+        return rec
+
+    def test_full_name_match_with_real_evidence_is_observed(self):
+        probe = self.probe(["plan", "implement"])
+        mark, _ = runtime_load_mark(probe, self.entry(["implement", "plan"]))
+        self.assertIn("관찰됨", mark)
+        self.assertIn("2/2", mark)
+
+    def test_record_without_evidence_cannot_claim_observation(self):
+        """이름 목록은 손으로 쓴 자기 신고다. 증거를 지목하지 않으면 '관찰됨' 을 쓰지 않는다(A-11)."""
+        probe = self.probe(["plan", "implement"])
+        mark, _ = runtime_load_mark(probe, {"observed_at": "2026-08-28", "skills": ["implement", "plan"]})
+        self.assertNotIn("관찰됨", mark)
+        self.assertIn("대조 불가", mark)
+        self.assertIn("evidence", mark)
+
+    def test_record_whose_evidence_does_not_exist_cannot_claim_observation(self):
+        probe = self.probe(["plan", "implement"])
+        entry = self.entry(["implement", "plan"], evidence="docs/reviews/NEVER-EXISTED/PROOF.md",
+                           evidence_exists=False)
+        mark, note = runtime_load_mark(probe, entry)
+        self.assertNotIn("관찰됨", mark)
+        self.assertIn("실재하지 않는다", mark)
+        self.assertIn("실재하지 않는다", note, "없는 경로를 그대로 인쇄하면 증거처럼 읽힌다")
+
+    def test_observations_checks_that_the_evidence_pointer_is_real(self):
+        """실재 검사는 파일을 읽는 쪽(observations)이 한다 — 기록이 스스로 참이라고 말할 수 없다."""
+        with tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP")) as tmp:
+            root = Path(tmp)
+            (root / ".harness").mkdir()
+            (root / "docs").mkdir()
+            (root / "docs/PROOF.md").write_text("본 것", encoding="utf-8")
+            (root / ".harness/observations.yaml").write_text(
+                "runtime_load:\n"
+                "  claude:\n    skills: [plan]\n    evidence: docs/PROOF.md\n"
+                "  codex:\n    skills: [plan]\n    evidence: docs/없는것.md\n"
+                "  orca:\n    skills: [plan]\n    evidence: /etc/hosts\n",
+                encoding="utf-8")
+            obs = observations(root)
+            self.assertTrue(obs["claude"]["evidence_exists"])
+            self.assertFalse(obs["codex"]["evidence_exists"])
+            self.assertFalse(obs["orca"]["evidence_exists"], "저장소 밖은 이 저장소의 관찰 기록이 아니다")
+
+    def test_missing_name_is_partial_not_observed(self):
+        probe = self.probe(["plan", "implement", "review"])
+        mark, _ = runtime_load_mark(probe, {"observed_at": "2026-08-28", "skills": ["plan"]})
+        self.assertNotIn("관찰됨", mark, "관찰하지 않은 스킬이 있는데 '관찰됨' 이라고 인쇄한다")
+        self.assertIn("부분 관찰", mark)
+        self.assertIn("implement", mark)
+        self.assertIn("review", mark)
+
+    def test_same_count_but_different_names_is_partial(self):
+        # 개수만 대조하면 통과한다. 이름을 대조해야 잡힌다.
+        probe = self.probe(["plan", "implement"])
+        mark, _ = runtime_load_mark(probe, {"observed_at": "2026-08-28", "skills": ["plan", "repo-archive"]})
+        self.assertNotIn("관찰됨", mark)
+        self.assertIn("implement", mark)
+        self.assertIn("repo-archive", mark, "기록에만 있는 이름도 보여야 한다")
+
+    def test_free_text_record_cannot_be_compared(self):
+        # 구조 이전의 자유 문자열 기록. 텍스트가 있다는 것은 관찰의 증거가 아니다.
+        mark, note = runtime_load_mark(self.probe(["plan"]), "12개를 다 봤다")
+        self.assertNotIn("관찰됨", mark)
+        self.assertIn("대조 불가", mark)
+        self.assertIn("12개를 다 봤다", note)
+
+    def test_report_is_json_serializable(self):
+        # 관찰 기록은 사람이 손으로 쓰는 YAML 이다. 따옴표 없는 날짜가 date 객체가 되어
+        # `romeo doctor --json` 을 죽인 적이 있다 — 읽는 쪽에서 막는다.
+        json.dumps(doctor(REPO), ensure_ascii=False)
+
+    def test_repo_observations_do_not_claim_the_new_workflows_on_codex(self):
+        # 이 저장소의 사실: codex 쪽 관찰은 10개 시점이고 implement · review 는 미관찰이다.
+        # 두 스킬이 실제로 codex 세션 목록에서 관찰되어 .harness/observations.yaml 에 등록되면
+        # 이 테스트가 깨진다 — 그때 기대를 '관찰됨' 으로 바꾼다.
+        rep = doctor(REPO)
+        probe = {p["runtime"]: p for p in rep["skills"]}["codex"]
+        mark, _ = runtime_load_mark(probe, (rep["observed_load"] or {}).get("codex"))
+        self.assertNotIn("관찰됨", mark, "codex 관찰 기록이 새 스킬 2종까지 덮는다고 주장한다")
+        for name in ("implement", "review"):
+            self.assertIn(name, mark)
+        codex_line = [ln for ln in format_report(rep).splitlines() if ln.strip().startswith("codex")]
+        self.assertTrue(codex_line)
+        self.assertNotIn("관찰됨", codex_line[0])
 
 
 class TestProbes(unittest.TestCase):
@@ -71,6 +179,18 @@ class TestProbes(unittest.TestCase):
         # 채택 7종 + plan + plan-close
         self.assertGreaterEqual(probes["claude"]["count"], 9)
         self.assertIn("test-driven-development", probes["claude"]["skills"])
+
+    def test_new_workflows_have_loadable_frontmatter_in_both_skill_dirs(self):
+        # 이 테스트는 **디스크의 파일만** 읽는다. 파일이 투영됐다는 것과 런타임이 실제로 로드한다는
+        # 것은 다르다 — 'discovery' 라는 단어는 .harness/observations.yaml 이 소유한다.
+        # probe 는 frontmatter 를 읽으므로, 여기 이름이 뜨면 name·description 이 살아 있다는 뜻이다.
+        probes = {p["runtime"]: p for p in probe_skill_files(REPO)}
+        for runtime in ("claude", "codex"):
+            for name in ("implement", "review"):
+                self.assertIn(name, probes[runtime]["skills"],
+                              f"{runtime} 스킬 디렉터리의 {name} 에 로드 가능한 frontmatter 가 없다")
+            self.assertEqual(probes[runtime]["problems"], [],
+                             f"{runtime} 스킬 파일에 문제가 있다: {probes[runtime]['problems']}")
 
 
 class TestConflictFixtures(unittest.TestCase):

@@ -3,11 +3,18 @@
 입력: 사람이 확정한 분류 {unit, mode, intent, facets, gates, blast_radius, uncertainty, actions?, project_kind?}
 출력: profile·문서 패키지·섹션·검토·격리·차단·부품·가드·경고·fired_rules. 같은 입력 → 항상 같은 출력.
 LLM 제안(proposal)은 candidate 만 여기로 넘어온다(D-06 3분할)."""
+from pathlib import Path
+
+import yaml
+
 from . import HARNESS_ROOT
 from .schema import validate as _validate
 from .util import load_json, load_yaml
+from .util import project_root as _cwd_project_root
 
 LEVELS = ["quick", "standard", "deep"]
+PROJECT_STATE_FILE = ".harness/romeo.project.yaml"
+MODULE_STATUSES = ("active", "pending_gate")
 _CACHE = {}
 
 
@@ -28,6 +35,34 @@ def load_policy(harness_root=None):
         pol["version"] = pol["classification"]["policy_version"]
         _CACHE[key] = pol
     return _CACHE[key]
+
+
+def load_project_state(project_root=None):
+    """프로젝트 부착 상태(`.harness/romeo.project.yaml`)를 읽어 라우터에 넘길 형태로 돌려준다.
+
+    부품의 실제 부착 상태는 이 파일이 소유한다 — 부품 레지스트리(`core/policy/packages.yaml`)의
+    `status` 는 부착 전 기본값일 뿐이다(K-63). 파일이 없으면 `None` 을 돌려주고 라우터는
+    기본값(`pending_gate`)을 그대로 쓴다: 부착을 관찰하지 못한 것을 부착으로 세지 않는다(K-51).
+    값이 잘못 적혀 있으면 조용히 무시하지 않고 거부한다 — 오타 하나가 규율 부품을 통째로 끄기 때문이다.
+    캐시하지 않는다(파일이 바뀌면 다음 호출이 바로 반영된다)."""
+    root = Path(project_root) if project_root else Path(_cwd_project_root())
+    path = root / PROJECT_STATE_FILE
+    if not path.is_file():
+        return None
+    try:
+        data = load_yaml(path) or {}
+    except yaml.YAMLError as e:
+        raise ValueError(f"{PROJECT_STATE_FILE} 를 읽을 수 없다: {e}")
+    if not isinstance(data, dict):
+        raise ValueError(f"{PROJECT_STATE_FILE} 의 최상위가 맵이 아니다")
+    modules = data.get("modules") or {}
+    if not isinstance(modules, dict):
+        raise ValueError(f"{PROJECT_STATE_FILE}: modules 가 맵이 아니다")
+    for pid, status in modules.items():
+        if status not in MODULE_STATUSES:
+            raise ValueError(f"{PROJECT_STATE_FILE}: 부품 {pid!r} 의 상태 {status!r} 를 모른다 "
+                             f"(허용: {' · '.join(MODULE_STATUSES)})")
+    return data
 
 
 def _lvl(p):

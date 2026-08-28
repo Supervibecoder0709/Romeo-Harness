@@ -32,6 +32,7 @@ class CompileError(RuntimeError):
     """산출물을 쓰기 전에 멈춘다. 반쯤 쓴 상태를 만들지 않는다."""
 STATE_PATH = ".harness/compiled.yaml"
 ADAPTERS_DIR = "adapters"
+ROLES_DIR = "core/roles"
 GENERATED_NOTE = "<!-- 이 파일은 `romeo compile` 산출물이다. 직접 고치지 않는다 — 고칠 곳은 core/ 와 adapters/ 다. -->"
 
 
@@ -123,24 +124,132 @@ def accepted_vendor_skills(root):
     return sorted(out)
 
 
-def _render_instructions(root, adapter, bindings):
-    """지침 파일 managed block 본문 — 두 런타임이 같은 내용을 받는다."""
+def load_roles(root):
+    """역할 계약(`core/roles/*.yaml`). 벤더 중립이므로 두 런타임이 같은 것을 받는다."""
+    out = {}
+    d = Path(root) / ROLES_DIR
+    if not d.is_dir():
+        return out
+    for f in sorted(d.glob("*.yaml")):
+        data = load_any(f) or {}
+        if not isinstance(data, dict):
+            raise CompileError(f"{ROLES_DIR}/{f.name}: 역할 계약은 매핑이어야 한다")
+        rid = data.get("id") or f.stem
+        data["_source"] = f"{ROLES_DIR}/{f.name}"
+        out[rid] = data
+    return out
+
+
+def _binding_rows(bindings):
+    """(실행 이름, 역할 이름, 바인딩) — 기본 실행과 역할 교체 실행을 한 목록으로 편다.
+
+    옛 형식(`parity_swap: {implementer: codex}`)도 읽는다. 그때는 강제 수단이 비어 있고,
+    표에 **선언 없음** 으로 인쇄된다 — 조용히 통과시키지 않는다.
+    """
+    rows = []
+    for label, key in (("기본", "roles"), ("교체", "parity_swap")):
+        for name, role in (bindings.get(key) or {}).items():
+            rows.append((label, name, role if isinstance(role, dict) else {"runtime": role}))
+    return rows
+
+
+def _binding_for(bindings, runtime, role_name):
+    for label, name, role in _binding_rows(bindings):
+        if name == role_name and role.get("runtime") == runtime:
+            return label, role
+    return None, {}
+
+
+def _fmt_items(values):
+    if not values:
+        return "없음"
+    return " · ".join(f"`{v}`" for v in values)
+
+
+def _render_role_table(bindings):
+    lines = ["## 역할 (D-68)", "",
+             "역할이 무엇을 할 수 있는지는 아래 '역할 계약' 절이 정한다. 이 표가 정하는 것은",
+             "그 계약을 어느 런타임이 맡고, 그 런타임에서 **무엇이 그것을 강제하는가** 뿐이다.", "",
+             "| 실행 | 역할 | 런타임 | 쓰기 | 어떻게 강제하나 | 강제 관측 |",
+             "| --- | --- | --- | --- | --- | --- |"]
+    for label, name, role in _binding_rows(bindings):
+        enforce = role.get("enforcement") or "**선언 없음**"
+        seen = "관측됨" if role.get("enforcement_observed") else "**미관측**"
+        lines.append(f"| {label} | `{name}` | {role.get('runtime','?')} | "
+                     f"{'예' if role.get('write') else '**아니오**'} | {enforce} | {seen} |")
+    lines += ["",
+              "교체 실행에서도 같은 판정이 나와야 동등성 게이트를 통과한다. 네 칸의 강제 수단이 다르면",
+              "그 비교는 '권한 상한이 서로 다른 두 실행' 의 비교이므로 동등성의 증거가 아니다.",
+              "**미관측** 은 그 수단이 실제로 막는지 아직 실행으로 확인하지 않았다는 뜻이다 — 완료로 세지 않는다(K-51).",
+              ""]
+    return lines
+
+
+def _role_contract_lines(rid, role):
+    allowed = role.get("allowed_paths") or {}
+    outputs = role.get("outputs") or {}
+    lines = [f"- 능력: {_fmt_items(role.get('capabilities'))}"]
+    scope = f"- 쓰기 범위: `{allowed.get('scope', '?')}`"
+    if allowed.get("must_include"):
+        scope += f" — 반드시 포함: {_fmt_items(allowed.get('must_include'))}"
+    lines.append(scope)
+    lines.append(f"- 계약: `{role.get('consumes', '?')}` → `{role.get('produces', '?')}`")
+    lines.append(f"- 산출물: 증거 `{outputs.get('evidence', '?')}` · findings `{outputs.get('findings', '?')}`")
+    for item in (role.get("forbidden") or []):
+        lines.append(f"- 금지: {' '.join(str(item).split())}")
+    return lines
+
+
+def _render_role_contracts(roles):
+    if not roles:
+        return []
+    lines = ["## 역할 계약 (`core/roles/`)", "",
+             "원본은 각 역할의 계약 파일이다. 런타임 이름은 그 파일에 없다 — 위 표가 바인딩을 소유한다(D-68).",
+             "작업 계약의 `allowed_paths` 는 여기 적힌 범위를 넘을 수 없다(K-66).", ""]
+    for rid, role in roles.items():
+        lines += [f"### `{rid}` — `{role.get('_source', '?')}`", ""]
+        lines += _role_contract_lines(rid, role)
+        lines.append("")
+    return lines
+
+
+def _render_permission_ceiling(adapter, bindings):
+    """권한 상한을 이 런타임의 관점으로 인쇄한다 — 어느 런타임이 구현자든 같은 상한이 걸려야 한다(K-66)."""
+    ceiling = bindings.get("permission_ceiling") or {}
+    delivery = (adapter.get("permission_ceiling") or {}).get("delivery")
+    rows = [(label, name, role) for label, name, role in _binding_rows(bindings)
+            if role.get("runtime") == adapter.get("id")]
+    if not ceiling and not delivery and not rows:
+        return []
+    lines = ["## 권한 상한 (K-66)", "",
+             f"- 이 런타임에서의 전달 방식: {' '.join((delivery or '**선언 없음**').split())}"]
+    for label, name, role in rows:
+        seen = "관측됨" if role.get("enforcement_observed") else "**미관측**"
+        lines.append(f"- {label} 실행에서 이 런타임이 `{name}` 일 때: "
+                     f"{role.get('enforcement') or '**선언 없음**'} ({seen})")
+    if ceiling.get("approval_required"):
+        lines.append("- 승인 없이 실행하지 않는다: " + _fmt_items(ceiling["approval_required"]))
+    if ceiling.get("never"):
+        lines.append("- 승인으로도 정당화되지 않는다: " + _fmt_items(ceiling["never"]))
+    if ceiling.get("note"):
+        lines += ["", " ".join(str(ceiling["note"]).split())]
+    lines.append("")
+    return lines
+
+
+def _render_instructions(root, adapter, bindings, roles):
+    """지침 파일 managed block 본문 — 원칙·역할 계약은 두 런타임이 같은 것을 받고,
+    강제 수단과 권한 상한은 그 런타임의 것만 인쇄한다."""
     core = root / "core/principles/AGENTS.core.md"
     _, principles = _strip_frontmatter(core.read_text(encoding="utf-8"))
 
     lines = ["# Romeo 하네스 규칙 (자동 생성)", "",
              f"원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.",
              "**마커 안을 고치지 않는다** — 다음 컴파일에서 사라진다. 마커 밖에 쓴 내용은 보존된다.",
-             "", principles.rstrip(), "", "---", "", "## 역할 (D-68)", "",
-             "| 역할 | 런타임 | 쓰기 | 어떻게 강제하나 |", "| --- | --- | --- | --- |"]
-    for name, role in (bindings.get("roles") or {}).items():
-        enforce = role.get("enforcement") or ("작업 공간 쓰기 허용" if role.get("write") else "-")
-        lines.append(f"| `{name}` | {role.get('runtime','?')} | "
-                     f"{'예' if role.get('write') else '**아니오**'} | {enforce} |")
-    swap = bindings.get("parity_swap") or {}
-    if swap:
-        lines += ["", f"역할 교체 재실행: implementer={swap.get('implementer')} · "
-                      f"reviewer={swap.get('reviewer')}. 같은 판정이 나와야 동등성 게이트를 통과한다.", ""]
+             "", principles.rstrip(), "", "---", ""]
+    lines += _render_role_table(bindings)
+    lines += _render_role_contracts(roles)
+    lines += _render_permission_ceiling(adapter, bindings)
 
     overrides = bindings.get("overrides") or {}
     if overrides:
@@ -164,7 +273,9 @@ def _render_instructions(root, adapter, bindings):
     lines += ["## 이 저장소에서 켜져 있는 절차", "",
               "| 이름 | 출처 | 언제 |", "| --- | --- | --- |"]
     for name, cfg in (adapter.get("workflows") or {}).items():
-        lines.append(f"| `{name}` | `core/workflows/{name}/SKILL.md` | 라우터 진입점 |")
+        # 코어 워크플로가 전부 진입점인 것은 아니다. 언제 켜지는지는 어댑터의 `when` 이 정하고,
+        # 없으면 진입점으로 본다(기존 항목의 출력은 바이트 단위로 그대로다).
+        lines.append(f"| `{name}` | `core/workflows/{name}/SKILL.md` | {cfg.get('when') or '라우터 진입점'} |")
     if adapter.get("project_vendor_skills"):
         for name, _src in accepted_vendor_skills(root):
             lines.append(f"| `{name}` | vendor 원문 (수정 0) | 라우터가 켤 때만 |")
@@ -187,6 +298,44 @@ def _render_skill(root, adapter, name, cfg):
             f"# /{name} ({adapter['name']} 어댑터)\n\n"
             f"절차의 원본은 `{core_path}` 다. 이 파일은 그 절차를 {adapter['name']} 에서 어떻게 수행하는지만 적는다.\n")
     return replace_managed_block(head, mapping, source=cfg["mapping"])
+
+
+def _render_role_agent(adapter, rid, cfg, roles, bindings):
+    """역할 계약을 이 런타임이 이해하는 에이전트 정의 형식으로 투영한다.
+
+    형식(frontmatter 키·`tools` 목록)은 어댑터가 소유한다. 계약 본문은 `core/roles/` 원본에서 온다 —
+    여기서 새로 쓰지 않는다.
+    """
+    role = roles.get(rid)
+    if role is None:
+        raise CompileError(f"{adapter['id']}.role_agents.{rid}: `{ROLES_DIR}/{rid}.yaml` 이 없다")
+    desc = " ".join((cfg.get("description") or "").split())
+    if not desc:
+        raise CompileError(f"{adapter['id']}.role_agents.{rid}: description 이 없다 — "
+                           "런타임이 언제 이 역할을 띄울지 판단할 근거가 사라진다")
+    tools = cfg.get("tools")
+    label, binding = _binding_for(bindings, adapter["id"], rid)
+
+    body = _role_contract_lines(rid, role)
+    if binding:
+        body += ["", f"- 바인딩: {label} 실행 · 쓰기 {'허용' if binding.get('write') else '없음'}",
+                 f"- 강제 수단: `{binding.get('enforcement') or '선언 없음'}`",
+                 f"- 강제 관측: {'관측됨' if binding.get('enforcement_observed') else '**미관측**'}"]
+        if binding.get("defensive_check"):
+            body.append(f"- 방어 검사(강제 수단이 아니다): {binding['defensive_check']}")
+        if binding.get("enforcement_note"):
+            body.append(f"- 메모: {' '.join(str(binding['enforcement_note']).split())}")
+    else:
+        body += ["", "- 바인딩: **이 런타임에 이 역할이 바인딩돼 있지 않다**. "
+                     "라우터가 배정하지 않으면 쓰지 않는다."]
+
+    head = (f"---\nname: {rid}\ndescription: {desc}\n"
+            + (f"tools: {tools}\n" if tools else "")
+            + f"---\n\n{GENERATED_NOTE}\n\n"
+            f"# {rid} ({adapter['name']} 어댑터)\n\n"
+            f"역할 계약의 원본은 `{role.get('_source', '?')}` 이다. 이 파일은 그 계약을 "
+            f"{adapter['name']} 에서 어떻게 맡는지만 적는다.\n")
+    return replace_managed_block(head, "\n".join(body), source=role.get("_source", ROLES_DIR))
 
 
 def _owned_settings(adapter):
@@ -255,6 +404,7 @@ def plan_outputs(root):
     """(파일 산출물 dict{path: text}, 트리 산출물 list[(src, dst)]) 를 계산한다. 쓰지는 않는다."""
     root = Path(root)
     bindings = load_any(root / ".harness/bindings.yaml") if (root / ".harness/bindings.yaml").exists() else {}
+    roles = load_roles(root)
     files, trees = {}, []
     for adapter in load_adapters(root):
         instructions_file = _output_rel(
@@ -264,10 +414,22 @@ def plan_outputs(root):
         if adapter.get("settings_file"):
             settings_file = _output_rel(
                 root, adapter["settings_file"], f"{adapter['id']}.settings_file")
-        files[instructions_file] = ("managed", _render_instructions(root, adapter, bindings),
+        files[instructions_file] = ("managed", _render_instructions(root, adapter, bindings, roles),
                                     "core/principles/AGENTS.core.md")
         if settings_file and (adapter.get("settings_deny") or adapter.get("settings_ask")):
             files[settings_file] = ("settings", _owned_settings(adapter), None)
+        # 역할 계약의 런타임 투영. 형식이 확인되지 않은 런타임은 agents_dir 가 비어 있고,
+        # 그 런타임은 지침 파일 managed block 의 역할 계약 절로만 역할을 받는다.
+        role_agents = adapter.get("role_agents") or {}
+        if role_agents:
+            if not adapter.get("agents_dir"):
+                raise CompileError(f"{adapter['id']}.role_agents 가 있는데 agents_dir 가 없다")
+            agents_dir = _output_rel(root, adapter["agents_dir"], f"{adapter['id']}.agents_dir")
+            for rid, cfg in role_agents.items():
+                rel = _output_rel(root, f"{agents_dir}/{rid}.md",
+                                  f"{adapter['id']}.role_agents.{rid}")
+                files[rel] = ("full",
+                              _render_role_agent(adapter, rid, cfg or {}, roles, bindings), None)
         for name, cfg in (adapter.get("workflows") or {}).items():
             rel = _output_rel(root, f"{skills_dir}/{name}/SKILL.md",
                               f"{adapter['id']}.workflows.{name}")

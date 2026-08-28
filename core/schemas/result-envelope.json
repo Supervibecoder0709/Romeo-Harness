@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "romeo/result-envelope",
+  "title": "Romeo 결과 계약(ResultEnvelope)",
+  "description": "실행 런타임의 출력을 정규화한 결과 계약. 동등성 판정이 비교하는 대상이고 증거를 복제하지 않는다(C-C3·D-12·K-63). 구현자가 gate_verdict PASS 를 낼 때는 checks 가 1건 이상이고 evidence_ref 가 채워져 있어야 한다 — 실행하지 않은 것을 완료로 선언할 수 없다(K-51). 검토자는 검사를 실행하지 않으므로 그쪽 증거 규칙은 역할 계약이 소유하고 동등성 판정이 강제한다(K-63).",
+  "type": "object",
+  "required": [
+    "schema",
+    "unit_id",
+    "role",
+    "task_envelope_ref",
+    "checks",
+    "gate_verdict",
+    "blocked_reason",
+    "findings",
+    "evidence_ref"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "romeo/result-envelope@0.1.0"
+    },
+    "unit_id": {
+      "type": "string",
+      "pattern": "^(chg|feat|init)-[0-9]{8}-[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]{4}$"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "implementer",
+        "reviewer"
+      ]
+    },
+    "task_envelope_ref": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "command",
+          "exit_code"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "command": {
+            "type": "string",
+            "minLength": 1
+          },
+          "exit_code": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "gate_verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "FAIL",
+        "BLOCKED"
+      ]
+    },
+    "blocked_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "BLOCKED_CAPABILITY",
+        "BLOCKED_APPROVAL",
+        "BLOCKED_DOCS"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "summary"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "evidence_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "anyOf": [
+    {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {},
+        "unit_id": {},
+        "role": {
+          "const": "implementer"
+        },
+        "task_envelope_ref": {},
+        "checks": {
+          "minItems": 1
+        },
+        "gate_verdict": {
+          "const": "PASS"
+        },
+        "blocked_reason": {},
+        "findings": {},
+        "evidence_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {},
+        "unit_id": {},
+        "role": {
+          "const": "reviewer"
+        },
+        "task_envelope_ref": {},
+        "checks": {},
+        "gate_verdict": {},
+        "blocked_reason": {},
+        "findings": {},
+        "evidence_ref": {}
+      }
+    },
+    {
+      "additionalProperties": false,
+      "properties": {
+        "schema": {},
+        "unit_id": {},
+        "role": {},
+        "task_envelope_ref": {},
+        "checks": {},
+        "gate_verdict": {
+          "enum": [
+            "FAIL",
+            "BLOCKED"
+          ]
+        },
+        "blocked_reason": {},
+        "findings": {},
+        "evidence_ref": {}
+      }
+    }
+  ]
+}

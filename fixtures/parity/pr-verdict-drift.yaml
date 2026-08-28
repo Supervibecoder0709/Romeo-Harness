@@ -1,0 +1,49 @@
+# 검사기가 판정 차이를 실제로 잡는지 확인하는 음성 케이스.
+#
+# 같은 검사를 같은 결과로 돌렸는데 게이트 판정만 갈렸다. 이것을 통과시키면 동등성 게이트가 무의미해진다.
+---
+id: pr-verdict-drift
+title: 판정 표류 — 같은 검사인데 gate 판정이 갈린다
+unit_id: feat-20260828-license-field-a1b2
+status: executed
+expect: differ
+expect_codes: [VERDICT_DIFFERS]
+
+baseline:
+  runtimes: {implementer: claude}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-c/task-implementer.json
+        sha256: "9999999999999999999999999999999999999999999999999999999999999999"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-c.yaml
+
+swapped:
+  runtimes: {implementer: codex}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-d/task-implementer.json
+        sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+      gate_verdict: FAIL
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-d.yaml
+
+source:
+  kind: authored
+  ref: docs/planning/implementation-plan.md §7 M2 (같은 gate 판정)
+  date: '2026-08-28'

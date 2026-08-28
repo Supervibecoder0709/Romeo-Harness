@@ -1,4 +1,4 @@
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=250a43e1 -->
+<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=8d73dfb4 -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
@@ -61,12 +61,55 @@
 
 ## 역할 (D-68)
 
-| 역할 | 런타임 | 쓰기 | 어떻게 강제하나 |
-| --- | --- | --- | --- |
-| `implementer` | claude | 예 | 작업 공간 쓰기 허용 |
-| `reviewer` | codex | **아니오** | codex -s read-only |
+역할이 무엇을 할 수 있는지는 아래 '역할 계약' 절이 정한다. 이 표가 정하는 것은
+그 계약을 어느 런타임이 맡고, 그 런타임에서 **무엇이 그것을 강제하는가** 뿐이다.
 
-역할 교체 재실행: implementer=codex · reviewer=claude. 같은 판정이 나와야 동등성 게이트를 통과한다.
+| 실행 | 역할 | 런타임 | 쓰기 | 어떻게 강제하나 | 강제 관측 |
+| --- | --- | --- | --- | --- | --- |
+| 기본 | `implementer` | claude | 예 | .claude/settings.json 의 permissions.ask·deny (승인 게이트) | **미관측** |
+| 기본 | `reviewer` | codex | **아니오** | codex exec -s read-only | 관측됨 |
+| 교체 | `implementer` | codex | 예 | codex exec -s workspace-write -C <작업 공간> | **미관측** |
+| 교체 | `reviewer` | claude | **아니오** | claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config | 관측됨 |
+
+교체 실행에서도 같은 판정이 나와야 동등성 게이트를 통과한다. 네 칸의 강제 수단이 다르면
+그 비교는 '권한 상한이 서로 다른 두 실행' 의 비교이므로 동등성의 증거가 아니다.
+**미관측** 은 그 수단이 실제로 막는지 아직 실행으로 확인하지 않았다는 뜻이다 — 완료로 세지 않는다(K-51).
+
+## 역할 계약 (`core/roles/`)
+
+원본은 각 역할의 계약 파일이다. 런타임 이름은 그 파일에 없다 — 위 표가 바인딩을 소유한다(D-68).
+작업 계약의 `allowed_paths` 는 여기 적힌 범위를 넘을 수 없다(K-66).
+
+### `implementer` — `core/roles/implementer.yaml`
+
+- 능력: `read` · `search` · `run-command` · `workspace-write`
+- 쓰기 범위: `workspace` — 반드시 포함: `docs/work/{unit_id}/`
+- 계약: `core/schemas/task-envelope.json` → `core/schemas/result-envelope.json`
+- 산출물: 증거 `required` · findings `none`
+- 금지: 승인 없이 되돌리기 어려운 작업 (비용 발생·권한 확대·공개 전환·삭제·소유권 이전·운영 데이터 변경·저장소 밖으로의 반영)
+- 금지: 기획을 다시 만드는 것 (누락·모순은 질문한다, K-61)
+- 금지: 자기 역할의 산출물을 스스로 검토했다고 선언하는 것 (C-D3)
+
+### `reviewer` — `core/roles/reviewer.yaml`
+
+- 능력: `read` · `search`
+- 쓰기 범위: `none`
+- 계약: `core/schemas/task-envelope.json` → `core/schemas/result-envelope.json`
+- 산출물: 증거 `none` · findings `envelope`
+- 금지: 파일 수정·생성·삭제
+- 금지: 기획 변경 제안을 문서에 직접 반영하는 것
+- 금지: 승인 행위 (승인은 사람의 몫이다, D-27)
+- 금지: 저장소 밖 상태를 바꾸는 것 (K-66)
+
+## 권한 상한 (K-66)
+
+- 이 런타임에서의 전달 방식: 기동 플래그(샌드박스 모드)와 지침 파일 인쇄로 전달한다. 이 런타임에는 저장소에 커밋해 발견되는 권한 설정 파일이 없고, 비대화형 실행에는 승인 정책 플래그도 없다 — 승인 게이트는 하네스가 소유한다(승인 기록 없이 실행하지 않는다).
+- 기본 실행에서 이 런타임이 `reviewer` 일 때: codex exec -s read-only (관측됨)
+- 교체 실행에서 이 런타임이 `implementer` 일 때: codex exec -s workspace-write -C <작업 공간> (**미관측**)
+- 승인 없이 실행하지 않는다: `git push` · `gh pr create` · `gh pr merge` · `git worktree add` · `git worktree remove` · `git worktree prune` · `git branch -D` · `git reset --hard` · `git stash` · `gh api` · `gh pr comment` · `gh pr review`
+- 승인으로도 정당화되지 않는다: `rm -rf /` · `rm -rf ~` · `sudo rm` · `git push --force`
+
+이 상한은 역할이 아니라 실행에 붙는다. 역할 교체 실행에서 구현자가 바뀌어도 같은 목록이 적용되지 않으면, 그 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다. 설정 파일로 기계 강제할 수 없는 런타임에서는 지침 파일에 인쇄해 규칙으로만 강제한다 — 그 차이는 위 enforcement_observed 로 드러낸다.
 
 ## 부품 override (원문보다 이 규칙이 우선한다)
 
@@ -99,6 +142,8 @@
 | --- | --- | --- |
 | `plan` | `core/workflows/plan/SKILL.md` | 라우터 진입점 |
 | `plan-close` | `core/workflows/plan-close/SKILL.md` | 라우터 진입점 |
+| `implement` | `core/workflows/implement/SKILL.md` | 승인 뒤 라우터가 켤 때만 |
+| `review` | `core/workflows/review/SKILL.md` | 승인 뒤 라우터가 켤 때만 |
 | `finishing-a-development-branch` | vendor 원문 (수정 0) | 라우터가 켤 때만 |
 | `receiving-code-review` | vendor 원문 (수정 0) | 라우터가 켤 때만 |
 | `requesting-code-review` | vendor 원문 (수정 0) | 라우터가 켤 때만 |

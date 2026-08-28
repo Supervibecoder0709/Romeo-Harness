@@ -1,0 +1,1 @@
+Not able to determine if `/private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-mvp-planning/63d3a523-0c3b-4256-b694-23f32bfb0fcb/scratchpad/ro-probe/claude` 디렉토리가 있는지 확인할 수 없습니다 — Read 도구는 디렉토리를 읽을 수 없고, 파일이 없으면 `File does not exist` 만 나와서 디렉토리 존재 여부를 판단할 수 없습니다.

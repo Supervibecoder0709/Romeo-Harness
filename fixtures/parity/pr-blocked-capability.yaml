@@ -1,0 +1,46 @@
+# 차단 경로도 표현 가능하고 비교 가능하다 — 능력 부재로 양쪽이 같게 멈춘 경우.
+#
+# 명령을 하나도 실행하기 전에 멈췄으므로 checks 는 비고 evidence_ref 는 null 이다.
+---
+id: pr-blocked-capability
+title: 능력 부재 차단 — 양쪽이 같은 이유로 같게 멈춘다
+unit_id: feat-20260828-sim-screenshot-c3d4
+status: executed
+expect: same
+
+baseline:
+  runtimes: {implementer: claude, reviewer: codex}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-sim-screenshot-c3d4
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-sim-screenshot-c3d4/run-a/task-implementer.json
+        sha256: "7777777777777777777777777777777777777777777777777777777777777777"
+      checks: []
+      gate_verdict: BLOCKED
+      blocked_reason: BLOCKED_CAPABILITY
+      findings: []
+      evidence_ref: null
+
+swapped:
+  runtimes: {implementer: codex, reviewer: claude}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-sim-screenshot-c3d4
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-sim-screenshot-c3d4/run-b/task-implementer.json
+        sha256: "8888888888888888888888888888888888888888888888888888888888888888"
+      checks: []
+      gate_verdict: BLOCKED
+      blocked_reason: BLOCKED_CAPABILITY
+      findings: []
+      evidence_ref: null
+
+source:
+  kind: authored
+  ref: core/policy/execution-guards.yaml (차단 상수)
+  date: '2026-08-28'
