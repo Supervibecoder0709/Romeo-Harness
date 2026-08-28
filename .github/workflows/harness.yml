@@ -63,7 +63,17 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      # 전체 이력을 받는다. 기본값(fetch-depth: 1)은 얕은 클론이라
+      # 관측 parity 케이스의 앵커 검사가 도는 자리에서 base_sha 커밋을 찾지 못한다 —
+      # `TASK_ANCHORED` 는 작업 계약을 그 커밋의 spec 에서 **다시 계산해** 바이트로 대조하고
+      # `BASE_SHA` 는 그 커밋이 이 이력의 조상인지 본다. 둘 다 커밋 자체가 있어야 성립한다.
+      # 2026-08-29 실측: 얕은 클론에서 봉투 4개가 전부
+      # `base_sha 로 쓸 커밋을 찾을 수 없다` 로 PARITY_INVALID 가 됐다.
+      # 이 줄을 지우면 관측 케이스가 조용히 구조 오류가 되고, 그때 고치고 싶어지는 것은
+      # CI 가 아니라 케이스다 — 그것이 D-b 가 막으려는 행동이다.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
