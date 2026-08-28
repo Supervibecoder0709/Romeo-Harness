@@ -7,6 +7,9 @@
 # run-command 가 없으므로 검사를 실행한 것으로 기록할 수 없다(K-66 · F19). 대신 구현자가 남긴
 # 증거를 evidence_ref 로 지목한다 — 지목할 증거가 있을 때만 PASS 다(review/SKILL.md 5번).
 #
+# 검토자 면은 두 면이 **같은 산출물**을 봤을 때만 비교한다(D-73) — 검토자의 판정은 산출물의 함수다.
+# 합성 케이스는 면마다 product 로 산출물을 선언한다(관측 케이스는 증거에서 읽는다). 여기서는 같은 값이다.
+#
 # 이 케이스는 손으로 쓴 합성 데이터다(source.kind: authored). 검사기가 도는지만 증명하고
 # 핵심 동등성 게이트를 통과시키지 못한다(D-b).
 ---
@@ -18,6 +21,7 @@ expect: same
 
 baseline:
   runtimes: {implementer: claude, reviewer: codex}
+  product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
   results:
     implementer:
       schema: romeo/result-envelope@0.1.0
@@ -50,6 +54,7 @@ baseline:
 
 swapped:
   runtimes: {implementer: codex, reviewer: claude}
+  product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
   results:
     implementer:
       schema: romeo/result-envelope@0.1.0

@@ -35,6 +35,12 @@
     게이트가 비교하는 값이 바로 그 봉투다. 파일로 받아 **종료 검사와 같은 앵커 검사**를 태운다 —
     규칙이 두 벌이 되면 느슨한 쪽이 게이트를 연다(K-63). 그러므로 이 테스트의 관측 케이스도
     손으로 만들 수 없다: 승인 커밋 · 계약 생성 명령 · 증거 기록 명령이 남긴 산출물로만 만든다.
+18. **검토자 면은 두 면이 같은 산출물을 봤을 때만 비교한다(D-73).** 검토자의 판정은 자기가 본 산출물의 함수다 —
+    산출물이 다르면 판정이 갈리는 것이 옳고 그 차이는 런타임의 차이가 아니다. 검사기는 그 면을 `PRODUCT_DIFFERS` 로
+    분리해 게이트 판정에서 빼되 '비교 불가' 로 인쇄한다. 산출물이 같으면 지금처럼 비교한다(전제가 핑계가 되지 않는다).
+    구현자 면은 산출물과 무관하게 비교한다. 산출물 식별은 관측 케이스에서는 증거의 `head_sha`·`dirty_tree_hash` 에서
+    읽고(케이스 파일의 선언은 구조 오류), 합성 케이스에서는 면마다 `product:` 로 선언한다. 비교할 면이 하나도
+    남지 않은 관측은 게이트를 열지 못한다(미판정).
 """
 import contextlib
 import io
@@ -51,7 +57,8 @@ from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
 from romeo.evidence import run_command
-from romeo.parity import (ANCHOR_INVALID, CANON_REASON, NOT_APPLICABLE, WORK_DIR,
+from romeo.parity import (ANCHOR_INVALID, CANON_REASON, INCOMPARABLE_TEXT, NOT_APPLICABLE,
+                          PRODUCT_DIFFERS, PRODUCT_KEYS, PRODUCT_UNKNOWN, WORK_DIR,
                           check_parity_cases, compare_case, format_parity, load_parity_cases,
                           load_role_contracts, run_parity)
 from romeo.policy import route
@@ -71,6 +78,9 @@ FAKE_UNIT = "feat-20260828-license-field-a1b2"
 FAKE_EVIDENCE = f"{WORK_DIR}/{FAKE_UNIT}/evidence/run-a.yaml"
 
 AUTHORED = {"kind": "authored", "ref": "tests/test_parity.py", "date": "2026-08-28"}
+# 합성 케이스의 산출물 식별 — 검토자 면은 두 면이 같은 산출물을 봤을 때만 비교한다(D-73).
+PRODUCT = {"head_sha": "a" * 40, "dirty_tree_hash": "b" * 64}
+OTHER_PRODUCT = {"head_sha": "a" * 40, "dirty_tree_hash": "c" * 64}
 
 
 def git(*args, cwd):
@@ -88,7 +98,8 @@ class ObservedRun:
 
     RUNS = ("run-a", "run-b")
 
-    def __init__(self):
+    def __init__(self, reviewer=False):
+        """`reviewer=True` 면 run 마다 검토자 계약도 만들고 `review/` 자리를 연다 — 검토자 면을 가진 관측 케이스용."""
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
         self.root = Path(self.tmp.name)
         shutil.copytree(REPO / "core", self.root / "core")   # 정책표·역할 계약·스키마가 있어야 계약을 계산한다
@@ -115,18 +126,60 @@ class ObservedRun:
         git("add", ".", cwd=self.root)
         git("commit", "-q", "-m", "impl", cwd=self.root)
         self.task_sha = {}
+        self.review_sha = {}
         for run in self.RUNS:
             built = write_envelope(self.unit, "implementer", project_root=self.root,
                                    harness_root=self.root, base_sha=self.base_sha, run_name=run)
             self.task_sha[run] = built["sha256"]
+            if reviewer:
+                self.review_sha[run] = write_envelope(self.unit, "reviewer", project_root=self.root,
+                                                      harness_root=self.root, base_sha=self.base_sha,
+                                                      run_name=run)["sha256"]
             run_command(self.unit, "true", run_name=run, project_root=self.root)
         (self.root / "docs/work" / self.unit / "result").mkdir()
+        if reviewer:
+            (self.root / "docs/work" / self.unit / "review").mkdir()
 
     def cleanup(self):
         self.tmp.cleanup()
 
     def evidence(self, run):
         return f"{WORK_DIR}/{self.unit}/evidence/{run}.yaml"
+
+    def product(self, run):
+        """그 run 의 증거가 기록한 산출물 식별 — 검사기가 읽어야 하는 바로 그 값이다."""
+        rec = load_yaml(self.root / self.evidence(run))
+        return tuple(rec[k] for k in PRODUCT_KEYS)
+
+    def diverge(self, run, name="diverged.txt"):
+        """그 run 의 산출물을 다르게 만든다 — 작업 트리에 파일을 더하고 **증거 기록 명령**을 한 번 더 돌려
+        트리 해시가 실행으로 갱신되게 한다. 케이스 파일에는 아무것도 적지 않는다(D-b)."""
+        (self.root / name).write_text(f"{run}\n", encoding="utf-8")
+        run_command(self.unit, "true", run_name=run, project_root=self.root)
+
+    def review_envelope(self, run, **over):
+        """검토자 봉투 — 검사를 실행하지 않고 그 run 의 증거를 지목한다(core/roles/reviewer.yaml)."""
+        env = {
+            "schema": "romeo/result-envelope@0.1.0",
+            "unit_id": self.unit,
+            "role": "reviewer",
+            "task_envelope_ref": {"path": f"{WORK_DIR}/{self.unit}/task/{run}-reviewer.json",
+                                  "sha256": self.review_sha[run]},
+            "checks": [],
+            "gate_verdict": "PASS",
+            "blocked_reason": None,
+            "findings": [],
+            "evidence_ref": self.evidence(run),
+        }
+        env.update(over)
+        return env
+
+    def write_review(self, run, name=None, **over):
+        """검토자 결과 계약 파일을 `review/` 에 쓰고 케이스가 지목할 상대 경로를 돌려준다."""
+        rel_path = f"{WORK_DIR}/{self.unit}/review/{name or run}-reviewer.json"
+        (self.root / rel_path).write_text(
+            json.dumps(self.review_envelope(run, **over), ensure_ascii=False), encoding="utf-8")
+        return rel_path
 
     def envelope(self, run, **over):
         env = {
@@ -151,12 +204,21 @@ class ObservedRun:
             json.dumps(self.envelope(run, **over), ensure_ascii=False), encoding="utf-8")
         return rel_path
 
-    def case(self, base=None, swap=None, **kw):
+    def case(self, base=None, swap=None, base_review=None, swap_review=None, implementer=True, **kw):
+        """관측 케이스. `base_review`/`swap_review` 를 주면 검토자 면이 붙고, `implementer=False` 면 구현자 면을 뺀다."""
+        results = {"baseline": {}, "swapped": {}}
+        if implementer:
+            results["baseline"]["implementer"] = {"file": base or self.write_result("run-a")}
+            results["swapped"]["implementer"] = {"file": swap or self.write_result("run-b")}
+        if base_review:
+            results["baseline"]["reviewer"] = {"file": base_review}
+        if swap_review:
+            results["swapped"]["reviewer"] = {"file": swap_review}
         data = {
             "_path": "<메모리>", "id": "pr-observed", "title": "관측 케이스", "unit_id": self.unit,
             "expect": "same",
-            "baseline": {"results": {"implementer": {"file": base or self.write_result("run-a")}}},
-            "swapped": {"results": {"implementer": {"file": swap or self.write_result("run-b")}}},
+            "baseline": {"results": results["baseline"]},
+            "swapped": {"results": results["swapped"]},
             "source": {"kind": "observed", "ref": self.evidence("run-a"), "date": "2026-08-28"},
         }
         data.update(kw)
@@ -190,7 +252,8 @@ def reviewer_envelope(verdict="PASS", evidence=EVIDENCE):
     return envelope(role="reviewer", verdict=verdict, checks=[], evidence=evidence)
 
 
-def case(expect="same", base=None, swap=None, **kw):
+def case(expect="same", base=None, swap=None, base_product=PRODUCT, swap_product=PRODUCT, **kw):
+    """합성 케이스. 두 면은 기본으로 **같은 산출물**을 선언한다 — 검토자 면이 비교되려면 그래야 한다(D-73)."""
     data = {
         "_path": "<메모리>",
         "id": "pr-memory-case",
@@ -201,6 +264,10 @@ def case(expect="same", base=None, swap=None, **kw):
         "swapped": {"results": swap if swap is not None else {"implementer": envelope()}},
         "source": dict(AUTHORED),
     }
+    if base_product is not None:
+        data["baseline"]["product"] = dict(base_product)
+    if swap_product is not None:
+        data["swapped"]["product"] = dict(swap_product)
     data.update(kw)
     return data
 
@@ -981,6 +1048,233 @@ class TestCli(unittest.TestCase):
         code, out, _ = run_cli(["fixtures", "check"])
         self.assertEqual(code, 0, out)
         self.assertIn("PASS", out)
+
+
+class TestProductPrecondition(unittest.TestCase):
+    """검토자 면은 두 면이 같은 산출물을 봤을 때만 비교한다(D-73) — 메모리 케이스로 전제의 양쪽을 깨본다."""
+
+    def compare(self, c):
+        return compare_case(c, RESULT_SCHEMA)
+
+    def pair(self, base_verdict, swap_verdict, base_product=PRODUCT, swap_product=PRODUCT, **kw):
+        return case(base={"implementer": envelope(), "reviewer": reviewer_envelope(base_verdict)},
+                    swap={"implementer": envelope(), "reviewer": reviewer_envelope(swap_verdict)},
+                    base_product=base_product, swap_product=swap_product, **kw)
+
+    def test_reviewer_drift_on_the_same_product_is_a_mismatch(self):
+        """전제가 핑계가 되지 않는다 — 같은 것을 보고 갈렸으면 지금처럼 VERDICT_DIFFERS 다."""
+        row = self.compare(self.pair("PASS", "FAIL"))
+        self.assertIn("VERDICT_DIFFERS", row["codes"])
+        self.assertEqual(row["actual"], "differ")
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual(row["compared"], ["implementer", "reviewer"])
+
+    def test_reviewer_drift_on_different_products_is_incomparable_not_a_mismatch(self):
+        row = self.compare(self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT))
+        self.assertNotIn("VERDICT_DIFFERS", row["codes"], "다른 산출물에 대한 판정 차이는 런타임의 차이가 아니다")
+        self.assertEqual(row["actual"], "same", "구현자 면은 비교됐고 같다")
+        self.assertEqual(row["compared"], ["implementer"])
+        self.assertEqual([(i["role"], i["code"]) for i in row["incomparable"]], [("reviewer", PRODUCT_DIFFERS)])
+        self.assertIn(INCOMPARABLE_TEXT, row["incomparable"][0]["detail"])
+        self.assertFalse(row["ok"], "합성 케이스가 비교 불가를 선언하지 않았으면 ok 가 아니다 — 검사기가 그것을 잡는지도 검증 대상이다")
+
+    def test_declared_incomparable_face_makes_the_synthetic_case_ok(self):
+        row = self.compare(self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT,
+                                     expect_incomparable={"reviewer": PRODUCT_DIFFERS}))
+        self.assertTrue(row["ok"])
+        self.assertEqual(row["actual"], "same")
+
+    def test_declaring_incomparable_that_did_not_happen_is_not_ok(self):
+        row = self.compare(self.pair("PASS", "PASS", expect_incomparable={"reviewer": PRODUCT_DIFFERS}))
+        self.assertEqual(row["actual"], "same")
+        self.assertFalse(row["ok"], "선언한 비교 불가가 나오지 않았다 — 검사기가 빼지 말아야 할 면을 뺀 것이 아닌지 잡는다")
+
+    def test_same_verdict_on_different_products_is_still_incomparable(self):
+        """같은 판정도 증거가 아니다 — 다른 것을 보고 우연히 같았을 뿐이다."""
+        row = self.compare(self.pair("PASS", "PASS", swap_product=OTHER_PRODUCT))
+        self.assertEqual([i["code"] for i in row["incomparable"]], [PRODUCT_DIFFERS])
+        self.assertEqual(row["compared"], ["implementer"])
+
+    def test_implementer_face_ignores_the_product(self):
+        """두 구현자가 다른 바이트를 만드는 것은 정상이다 — 구현자 면은 계약·checks·판정만 본다."""
+        row = self.compare(case(base_product=PRODUCT, swap_product=OTHER_PRODUCT))
+        self.assertEqual(row["actual"], "same")
+        self.assertEqual(row["incomparable"], [])
+        self.assertTrue(row["ok"])
+
+    def test_reviewer_only_pair_on_different_products_compares_nothing(self):
+        row = self.compare(case(base={"reviewer": reviewer_envelope()}, swap={"reviewer": reviewer_envelope()},
+                                swap_product=OTHER_PRODUCT))
+        self.assertEqual(row["actual"], "incomparable")
+        self.assertEqual(row["compared"], [])
+        self.assertFalse(row["ok"], "비교한 면이 없는 케이스는 어떤 기대로도 ok 가 되지 않는다")
+
+    def test_unknown_product_is_incomparable_not_same(self):
+        """구조 검사를 건너뛴 경로에서도 산출물을 모르는 검토자 면을 '같다' 로 세지 않는다."""
+        row = self.compare(case(base={"reviewer": reviewer_envelope()}, swap={"reviewer": reviewer_envelope()},
+                                base_product=None, swap_product=None))
+        self.assertEqual([i["code"] for i in row["incomparable"]], [PRODUCT_UNKNOWN])
+        self.assertEqual(row["actual"], "incomparable")
+
+    def test_authored_case_with_reviewers_must_declare_products(self):
+        errs = check_parity_cases([case(base={"reviewer": reviewer_envelope()},
+                                        swap={"reviewer": reviewer_envelope()}, base_product=None)])
+        self.assertTrue(any("baseline.product" in e for e in errs.get("<메모리>", [])), errs)
+
+    def test_authored_case_without_reviewers_needs_no_product(self):
+        self.assertEqual(check_parity_cases([case(base_product=None, swap_product=None)]), {})
+
+    def test_expect_incomparable_must_name_roles_and_codes(self):
+        errs = check_parity_cases([self.pair("PASS", "PASS", expect_incomparable={"janitor": "X"})])
+        self.assertTrue(any("expect_incomparable" in e for e in errs.get("<메모리>", [])), errs)
+
+    def test_repo_fixtures_cover_both_sides_of_the_precondition(self):
+        """저장소 합성 케이스에 '산출물 다름 → 비교 불가' 와 '같은 산출물인데 갈림 → 불일치' 가 둘 다 있다."""
+        rows = {r["id"]: r for r in run_parity(load_parity_cases(CASE_DIR))["rows"]}
+        self.assertEqual([i["code"] for i in rows["pr-product-differs"]["incomparable"]], [PRODUCT_DIFFERS])
+        self.assertTrue(rows["pr-product-differs"]["ok"])
+        self.assertIn("VERDICT_DIFFERS", rows["pr-reviewer-drift"]["codes"])
+        self.assertEqual(rows["pr-reviewer-drift"]["incomparable"], [])
+        self.assertTrue(rows["pr-reviewer-drift"]["ok"])
+
+    def test_report_prints_the_partial_row_and_the_excluded_face(self):
+        rep = run_parity([self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT,
+                                    expect_incomparable={"reviewer": PRODUCT_DIFFERS})])
+        text = format_parity(rep)
+        self.assertEqual(rep["incomparable_faces"], 1)
+        self.assertEqual(rep["checker_verdict"], "PASS")
+        self.assertIn("✓ 부분", text)
+        self.assertIn(f"{INCOMPARABLE_TEXT} 면 1", text)
+        self.assertIn(PRODUCT_DIFFERS, text)
+        self.assertIn(f"implementer: {CANON_REASON}", text, "비교한 면과 뺀 면을 나란히 인쇄한다")
+
+
+class TestObservedSameProduct(unittest.TestCase):
+    """관측 케이스의 검토자 면 — 산출물이 같으면 지금처럼 비교하고, 식별은 케이스 파일이 아니라 증거에서 읽는다."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.obs = ObservedRun(reviewer=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.obs.cleanup()
+
+    def test_evidence_of_both_runs_records_the_same_product(self):
+        self.assertEqual(self.obs.product("run-a"), self.obs.product("run-b"), "같은 트리에서 기록했으니 같아야 한다")
+
+    def test_reviewers_agreeing_on_the_same_product_compare_as_same(self):
+        c = self.obs.case(base_review=self.obs.write_review("run-a"), swap_review=self.obs.write_review("run-b"))
+        self.assertEqual(self.obs.check(c), [])
+        rep = self.obs.report([c])
+        row = rep["rows"][0]
+        self.assertEqual(row["compared"], ["implementer", "reviewer"])
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual(rep["gate_verdict"], "PASS")
+
+    def test_reviewers_disagreeing_on_the_same_product_fail_the_gate(self):
+        """전제가 핑계가 되지 않는다 — 같은 산출물을 보고 갈린 검토자는 관측된 불일치다."""
+        c = self.obs.case(base_review=self.obs.write_review("run-a"),
+                          swap_review=self.obs.write_review("run-b", name="run-b-fail", gate_verdict="FAIL"),
+                          id="pr-observed-review-drift")
+        rep = self.obs.report([c])
+        row = rep["rows"][0]
+        self.assertIn("VERDICT_DIFFERS", row["codes"])
+        self.assertIn("VERDICT_DIFFERS reviewer", " ".join(row["detail"]))
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual(rep["gate_verdict"], "FAIL")
+
+    def test_observed_case_cannot_declare_its_product_inline(self):
+        c = self.obs.case(base_review=self.obs.write_review("run-a"), swap_review=self.obs.write_review("run-b"))
+        c["baseline"]["product"] = dict(PRODUCT)
+        self.assertTrue(any("baseline.product" in e and "인라인" in e for e in self.obs.check(c)))
+
+    def test_observed_case_cannot_expect_incomparable(self):
+        c = self.obs.case(expect_incomparable={"reviewer": PRODUCT_DIFFERS})
+        self.assertTrue(any("expect_incomparable" in e for e in self.obs.check(c)))
+
+
+class TestObservedDivergedProduct(unittest.TestCase):
+    """2026-08-29 관통의 모양 — 두 구현자가 다른 산출물을 만들었고 검토자 판정이 갈렸다.
+
+    검토자 면은 증거의 산출물 식별로 비교 불가가 되어 판정에서 빠지고, 구현자 면만으로 게이트가 선다.
+    빠졌다는 사실은 리포트·JSON 에 남는다.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.obs = ObservedRun(reviewer=True)
+        cls.obs.diverge("run-b")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.obs.cleanup()
+
+    def diverged_case(self, **kw):
+        return self.obs.case(base_review=self.obs.write_review("run-a"),
+                             swap_review=self.obs.write_review("run-b", name="run-b-fail", gate_verdict="FAIL",
+                                                               findings=[{"summary": "표 구분선이 깨졌다"}]),
+                             **kw)
+
+    def test_evidence_records_different_products(self):
+        self.assertNotEqual(self.obs.product("run-a"), self.obs.product("run-b"))
+
+    def test_reviewer_face_is_excluded_and_the_gate_stands_on_the_implementer_face(self):
+        c = self.diverged_case()
+        self.assertEqual(self.obs.check(c), [], "케이스 파일에는 아무것도 더 적지 않았다 — 구조 오류가 없어야 한다")
+        rep = self.obs.report([c])
+        row = rep["rows"][0]
+        self.assertEqual(row["compared"], ["implementer"])
+        self.assertEqual([(i["role"], i["code"]) for i in row["incomparable"]], [("reviewer", PRODUCT_DIFFERS)])
+        self.assertNotIn("VERDICT_DIFFERS", row["codes"])
+        self.assertEqual(row["actual"], "same")
+        self.assertTrue(row["ok"], "관측 케이스는 비교 불가를 기대로 선언할 수 없으므로 ok 에 넣지 않는다")
+        self.assertEqual(rep["gate_verdict"], "PASS")
+        self.assertEqual(rep["observed_incomparable_faces"], 1)
+
+    def test_the_hashes_in_the_report_come_from_the_evidence(self):
+        detail = self.obs.report([self.diverged_case()])["rows"][0]["incomparable"][0]["detail"]
+        for run in self.obs.RUNS:
+            head, tree = self.obs.product(run)
+            self.assertIn(f"{head[:7]}+{tree[:12]}", detail)
+
+    def test_the_report_says_the_pass_is_partial(self):
+        text = format_parity(self.obs.report([self.diverged_case()]))
+        self.assertIn("핵심 동등성 게이트: PASS", text)
+        self.assertIn("✓ 부분", text)
+        self.assertIn(f"{INCOMPARABLE_TEXT} — 관측 케이스의 1개 면을 판정에서 뺐다", text)
+        self.assertIn("비교한 면으로만 섰다", text)
+
+    def test_reviewer_only_observation_on_different_products_does_not_open_the_gate(self):
+        c = self.diverged_case(implementer=False, id="pr-observed-review-only")
+        rep = self.obs.report([c])
+        self.assertEqual(rep["rows"][0]["actual"], "incomparable")
+        self.assertEqual(rep["gate_verdict"], "UNDETERMINED", "비교한 면이 하나도 없는 관측은 판정 근거가 아니다")
+        text = format_parity(rep)
+        self.assertIn(f"관측 1건이 전부 {INCOMPARABLE_TEXT}", text)
+        self.assertNotIn("핵심 동등성 게이트: PASS", text)
+
+    def test_evidence_without_a_product_identity_is_a_structural_error(self):
+        """손으로 만든 증거 — 증거 기록 명령이 항상 쓰는 head_sha·dirty_tree_hash 가 없다."""
+        rec = load_yaml(self.obs.root / self.obs.evidence("run-b"))
+        del rec["dirty_tree_hash"]
+        edited = f"{WORK_DIR}/{self.obs.unit}/evidence/run-edited.yaml"
+        (self.obs.root / edited).write_text(dump_yaml(rec), encoding="utf-8")
+        swap = self.obs.write_review("run-b", name="run-b-edited", evidence_ref=edited)
+        errs = self.obs.check(self.obs.case(base_review=self.obs.write_review("run-a"), swap_review=swap))
+        self.assertTrue(any("산출물 식별" in e for e in errs), errs)
+
+    def test_cli_exits_zero_and_prints_the_excluded_face(self):
+        tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        try:
+            write_cases(tmp.name, [self.diverged_case(), {**case(), "id": "pr-authored"}])
+            code, out, err = run_cli(["fixtures", "parity", tmp.name, "--root", str(self.obs.root)])
+        finally:
+            tmp.cleanup()
+        self.assertEqual(code, 0, out + err)
+        self.assertIn("핵심 동등성 게이트: PASS", out)
+        self.assertIn(PRODUCT_DIFFERS, out)
+        self.assertIn("비교한 면으로만 섰다", out)
 
 
 if __name__ == "__main__":

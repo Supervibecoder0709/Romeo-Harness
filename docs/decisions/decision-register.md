@@ -129,6 +129,8 @@ authority: canonical
 | D-69 | **`writing-plans` 미채택 보상**: 스킬 전체를 들이면 계획 원본이 2개가 되므로(K-61) 채택하지 않되, 원문 `Task Structure` 의 두 규율만 Romeo Tech Spec 에 흡수한다 — **인터페이스 열**(소비 → 생산 시그니처 계약)과 **빈칸 금지 규칙**(`TBD`·"적절한 에러 처리 추가" 류를 `NEEDS_INPUT` 과 동일 취급). 재작성이며 원문 복사가 아니다 | accepted | 사용자 | `core/templates/tech-spec.md`, `provenance/imports.yaml#sp-writing-plans-absorbed` |
 | D-70 | **OpenWiki 시점 유지(G-M7)**: 코드→문서 자동 생성은 OpenWiki 가 맡고 M2 에서는 붙이지 않는다. 선행 조건을 추가한다 — OpenWiki 는 `openwiki/` 외에 루트 `AGENTS.md`·`CLAUDE.md` 블록과 `.github/workflows/openwiki-update.yml` 을 건드리는데, 같은 두 파일을 M2 어댑터가 managed block 으로 컴파일한다. **어댑터 마커 규약이 서고 K-68 검증을 통과한 뒤에만** G-M7 을 연다. 문서 3층 분리: 작업 문서=Romeo(`docs/work/<id>/`), 기획=CIS+Romeo, 코드 파생=OpenWiki(D-23 기획 미소유) | accepted | 사용자 | D-64 흐름 유지, `archive/langchain-ai-openwiki/02-workflow-summary.md` §1 |
 | D-71 | **사실 정정**: 계획 §6 표의 "고정 SHA `b36e082` 원문에서 본문 도구명 0건 확인"은 **오류다**. 실측 결과 6개 스킬에 도구명·런타임명이 있다 — `requesting-code-review:34`(`general-purpose`), `using-git-worktrees:53,164`(`EnterWorktree`·`WorktreeCreate`), `executing-plans:14`(Claude Code·Codex CLI·Codex App·Copilot CLI·Gemini CLI), `writing-plans:159,165`·`subagent-driven-development:6,506`·`dispatching-parallel-agents:71~73`(`Subagent`·`general-purpose`). C-C6 는 `core/` 에 적용되고 `vendor/` 는 원문 보존이므로 위반은 아니지만, **어댑터 투영 시 이름 치환이 필요**하다는 뜻이다. 채택 7종 중 해당하는 2건은 D-67 의 override 로 처리한다 | accepted | 자율(사실 확인) | 2026-08-27 고정 SHA 원문 grep. D-54 의 근거 일부를 정정 |
+| D-72 | **K-60 재정의(진입점 단일 → 기획 진입점 단일)**: 개발 규율 부품(TDD·디버깅·완료 검증·코드리뷰)이 구현 중 런타임에 직접 노출되고 스스로 선택되는 것을 **허용한다** — 그것이 규율을 채택한 이유다. 금지 대상은 부품이 라우터를 대체하는 경로다(자체 bootstrap·세션 시작 주입·"항상 나를 먼저" 규칙·기획 문서 생성·승인 창구 이중화). K-64 의 `superpowers:*` 접두사 요구는 `verbatim`(수정 0)과 양립할 수 없으므로 **논리 id(`sp-*`)는 imports.yaml 이, 런타임 이름은 원문이** 갖는 것으로 정리한다. 이름 충돌은 fixture c3 가 검출한다 | accepted | 사용자 | Codex 독립 리뷰 F-03 이 제기. 2026-08-28 사용자 확정 |
+| D-73 | **동등성 게이트의 검토자 면에 산출물 동일성 전제를 넣는다.** 구현자 면(계약·checks·판정)은 지금처럼 비교한다 — 두 구현자가 다른 바이트를 만드는 것은 정상이다. 검토자의 판정은 자기가 본 산출물의 함수이므로 **두 면의 산출물(`head_sha`+`dirty_tree_hash`, 봉투가 지목한 증거에서 읽는다)이 같을 때만** 비교하고, 다르면 `PRODUCT_DIFFERS` 로 분리해 **게이트 판정에서 빼되 '비교 불가' 로 정직하게 인쇄한다.** 관측 케이스의 `expect` 는 고치지 않는다(D-b 유지). 비교할 면이 하나도 남지 않으면 게이트는 미판정이다. 합성 케이스는 면마다 `product:` 를 선언하고 `expect_incomparable:` 로 검사기가 비교 불가를 잡는지 검증한다 — 관측 케이스는 둘 다 인라인으로 선언할 수 없다(구조 오류). **결과:** 2026-08-29 관측 케이스는 구현자 면으로 PASS, 검토자 면은 비교 불가 — 검토자 동등성은 같은 산출물을 두 검토자에게 보인 관측(RUNBOOK §6.6, 미실행)이 있어야 판정된다 | accepted | 사용자 | progress §10 체크리스트 30 이 제기한 세 선택지(정의 수정·구현자 면으로 축소·산출물 동일성 전제) 중 사용자가 셋째를 확정, 2026-08-29. `romeo/parity.py` · `fixtures/parity/pr-product-differs.yaml`·`pr-reviewer-drift.yaml` |
 
 ---
 
@@ -136,7 +138,6 @@ authority: canonical
 
 채택 여부를 다시 논의하지 않기 위해 남긴다. 되살리려면 새 결정이 필요하다.
 
-| D-72 | **K-60 재정의(진입점 단일 → 기획 진입점 단일)**: 개발 규율 부품(TDD·디버깅·완료 검증·코드리뷰)이 구현 중 런타임에 직접 노출되고 스스로 선택되는 것을 **허용한다** — 그것이 규율을 채택한 이유다. 금지 대상은 부품이 라우터를 대체하는 경로다(자체 bootstrap·세션 시작 주입·"항상 나를 먼저" 규칙·기획 문서 생성·승인 창구 이중화). K-64 의 `superpowers:*` 접두사 요구는 `verbatim`(수정 0)과 양립할 수 없으므로 **논리 id(`sp-*`)는 imports.yaml 이, 런타임 이름은 원문이** 갖는 것으로 정리한다. 이름 충돌은 fixture c3 가 검출한다 | accepted | 사용자 | Codex 독립 리뷰 F-03 이 제기. 2026-08-28 사용자 확정 |
 | 아이디어 | 폐기 사유 | 근거 |
 | --- | --- | --- |
 | relay v2 (heartbeat·5초 폴링·role swap) | Orca와 책임 중복. 실제 유실이 관찰될 때만 재검토 | S01 KEEL 리뷰, S04 리뷰 #7 |
