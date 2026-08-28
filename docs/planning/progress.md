@@ -41,10 +41,12 @@ authority: derived
 | 15 | 충돌 fixture 3종 (K-68) | 완료 | `fixtures/conflicts/` — c1 외부 계획 경로·c2 자동 트리거·c3 이름/마커 충돌. **c1 이 게이트에서 놓친 실제 충돌 1건을 잡았다** (`requesting-code-review:60` → `docs/superpowers/plans/`). `overrides.output_paths` 로 흡수 후 충돌 0 |
 | 16 | Codex 독립 리뷰 반영 | 완료 | `docs/reviews/2026-08-28-codex-m2-review/` — gpt-5.6-sol(effort max)이 반례를 실행해 Important 9 · Minor 1 보고. 8건 수정(F-01·02·04·05·06·07·09·10), fixture c4 추가, 테스트 80→95. F-03·F-08·F-07 upstream 재조회는 미해결 |
 | 17 | K-60 재정의(D-72) | 완료 | 리뷰 F-03 → 사용자 확정. 개발 규율 부품의 런타임 직접 노출을 허용하고, 금지 대상을 "라우터 대체 경로"로 좁혔다. K-64 는 논리 id(`sp-*`)와 런타임 이름(원문)을 분리 |
-| 18~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
+| 18 | F-08 원자적 컴파일 · F-07 upstream 대조 | 완료 | **Codex(codex-m2-review 워크트리)가 구현**. staging + `os.replace` + 예외 시 역순 롤백, settings 기대값의 순환 의존 제거(하네스 소유 ask·deny 만 비교), `romeo vendor verify-upstream` 신설. 테스트 95 → 107. 사람 검증: 위조(파일+manifest 동시) 시 `UPSTREAM_BLOB_MISMATCH` exit 1 · 깨진 소스 주입 시 산출물 지문 무변경 |
+| 19~ | 역할 실행·envelope·Orca 위임·parity | 미착수 | 계획 §7 M2. `adapters/orca/RUNBOOK.md` 는 envelope 스키마와 함께 만든다 |
 
 ## 세션 기록
 
+- **2026-08-28 (리뷰 잔여 구현 — Codex 위임)** — F-08·F-07 을 리뷰어였던 Codex 세션에 그대로 맡겼다. 지적한 사람이 고치게 하니 맥락 전달 비용이 없었다. 결과를 맹목 수용하지 않고 반례 3종을 직접 재현해 확인했다 — 위조 탐지·settings 오탐 없음·실패 시 쓰기 0건. 기존 95개 테스트는 한 줄도 고쳐지지 않았다.
 - **2026-08-28 (doctor·충돌 fixture·독립 리뷰 세션)** — `romeo doctor` 와 충돌 fixture 를 만들었고, c1 이 게이트에서 놓친 K-62 충돌을 즉시 잡았다. 별도 워크트리에서 Codex(gpt-5.6-sol, effort max)에게 독립 리뷰를 맡겨 Important 9건을 받았고, 검증 후 8건을 고쳤다 — 그중 F-05(문서의 명령이 실제로 실행 불가)는 모든 검사가 PASS 인데도 수직 흐름이 닫히지 않던 상태였다. 같은 세션에서 Codex 의 스킬 목록을 받아 A-11 을 해소했다.
 - **2026-08-28 (어댑터 세션)** — `romeo compile` 을 만들어 코어 → 두 런타임 산출물 경로를 세웠다. TDD 로 계약을 먼저 고정했고, 그 과정에서 실제 버그 2건을 잡았다 — 디렉터리 심링크에 `rmtree` 가 실패하는 문제와, `--check` 가 디렉터리 심링크를 PASS 로 통과시키던 문제. 실행 가드는 계획의 deny 대신 **ask/deny 분리**로 넣었다(K-66 은 금지가 아니라 승인 요구다). 테스트 39 → 63. **컴파일 직후 같은 세션에서 채택 7종이 전부 Claude 스킬 목록에 나타나는 것을 관찰**했다(A-11 Claude 쪽).
 - **2026-08-28 (vendor 복사 세션)** — LICENSE 를 Apache-2.0 으로 교체하고 `vendor/obra-superpowers@b36e082/` 에 15파일(스킬 7종 14파일 + MIT 사본)을 원문 복사했다(blob SHA 15/15 일치). `romeo vendor`·`romeo notices` 를 추가해 수정 0 대조와 고지 생성을 자동화하고, CI 워크플로 `harness.yml` 로 강제했다. 검사기가 `core/workflows/plan/SKILL.md` 의 미등록 출처(anthropics/skills SKILL.md 형식)를 잡아내 `imports.yaml` 에 기록했다. 테스트 23 → 39. CI(python 3.11) 첫 실행 success(run `33095164296`).
@@ -60,4 +62,4 @@ authority: derived
 - `.agents/skills` 투영·Codex discovery(A-11)·Orca dispatch(A-06)는 M2 에서 실측한다.
 - **A-11 해소 — 두 런타임 모두 discovery 확인.** Claude 는 컴파일 직후 같은 세션에서 9개, Codex 는 별도 워크트리의 독립 세션에서 10개(+repo-archive)가 스킬 목록에 나타났고 `romeo doctor` 가 센 목록과 이름까지 일치한다. 보류·제외한 스킬은 어느 쪽에도 나타나지 않았다(K-68 ② 부분 증거). 증거는 `.harness/observations.yaml` 과 `docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md`. **남은 것은 "목록에 뜬다" 가 아니라 "규율이 실제로 지켜지는가" 다.**
 - override 는 **8건**이다(`output_paths` 는 fixture c1 이, `reviewer_workspace`·`external_writes`·`destructive_tdd` 는 Codex 리뷰가 찾아냈다). **원문의 지시와 override 가 충돌할 때 에이전트가 실제로 override 를 따르는지는 여전히 미검증**이다 — fixture 는 "override 가 존재하는가" 만 검사한다. 실제 T1 관통에서 관찰해야 한다.
-- **미해결 리뷰 지적 2건**(F-03 은 D-72 로 해소): **F-08** — 컴파일이 원자적이지 않다. 중간 실패(디스크·권한·깨진 소스) 시 두 런타임이 다른 세대의 규칙을 읽을 수 있고 state 가 없을 수 있다. staging 트리 + 파일 단위 atomic replace 가 필요하다. **F-07 후반** — `vendor check` 는 upstream 재조회가 아니라 **로컬 자기일관성** 검사다. vendor 파일과 manifest 해시를 같은 변경에서 함께 바꾸면 통과한다. 고정 커밋 대조는 채택 게이트·업데이트 때 사람이 수행한다(모듈 docstring 에 한계 명시).
+- **리뷰 지적 10건 전부 처리됨** (F-03 은 D-72 로 재정의, F-08·F-07 은 Codex 가 구현). 남은 한계는 **crash recovery** 다 — 개별 파일 교체는 원자적이고 예외 시 롤백하지만, 프로세스 강제 종료·전원 손실처럼 롤백 코드 자체가 실행되지 않는 경우는 미검증이다. 여러 파일 전체를 하나의 OS 트랜잭션으로 만들지는 않았다. `verify-upstream` 의 rate limit·네트워크 단절 분기는 고정 실패 주입으로만 검증했고 실제로 발생시키지는 않았다.

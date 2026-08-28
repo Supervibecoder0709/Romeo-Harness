@@ -53,7 +53,14 @@ bin/romeo compile --check                               # 산출물이 코어와
 bin/romeo vendor check                                  # vendor/ 원문 대조(수정 0) + provenance id
 bin/romeo notices --check                               # THIRD_PARTY_NOTICES.md 신선도
 bin/romeo doctor                                        # 부착 검증 — 프로브 + 충돌 fixture (K-68)
+bin/romeo vendor verify-upstream                        # 고정 커밋과 대조 (네트워크 필요, 게이트·업데이트 때)
 ```
+
+`vendor check` 와 `verify-upstream` 은 다릅니다. 앞의 것은 **로컬 자기일관성** 검사라
+vendor 파일과 manifest 해시를 같은 변경에서 함께 바꾸면 통과합니다 — CI 가 매번 도는 것은 이쪽입니다.
+뒤의 것은 upstream **고정 커밋의 tree** 를 조회해 blob SHA 와 파일 모드를 대조하고 결과를
+`provenance/upstream-verification.json` 에 증거로 남깁니다. 네트워크가 필요하므로 채택 게이트와
+업데이트 시점에 사람이 실행합니다.
 
 `doctor` 는 확인할 수 있는 것만 PASS 로 셉니다. 런타임이 스킬을 **실제로 로드하는지**는 파일 검사로
 증명되지 않으므로 `.harness/observations.yaml` 에 사람이 관찰한 것만 기록하고, 그 외에는 "미관찰" 로 인쇄합니다.
