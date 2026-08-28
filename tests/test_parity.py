@@ -49,7 +49,7 @@ from romeo.parity import (ANCHOR_INVALID, CANON_REASON, NOT_APPLICABLE, WORK_DIR
                           load_role_contracts, run_parity)
 from romeo.policy import route
 from romeo.schema import validate
-from romeo.util import load_json, load_yaml, project_root
+from romeo.util import dump_yaml, load_json, load_yaml, project_root
 
 REPO = project_root(Path(__file__).parent)
 CASE_DIR = REPO / "fixtures/parity"
@@ -749,6 +749,89 @@ class TestStructuralChecks(unittest.TestCase):
     def test_differ_case_must_declare_codes(self):
         errs = check_parity_cases([case(expect="differ")])["<메모리>"]
         self.assertTrue(any("expect_codes" in e for e in errs))
+
+
+class TestEnvelopeClaimsAreComparedToEvidence(unittest.TestCase):
+    """4차 리뷰 구멍 B — 결과 계약을 손으로 타이핑하되 **진짜** 작업 계약·**진짜** 증거를 가리키게 하면
+    다섯 앵커 검사가 전부 통과하고 게이트가 교차 실행 0회로 열렸다. 실행된 적 없는 `pytest -q tests/` 를
+    적어도 아무도 반박하지 않았다 — 앵커가 *파일이 진짜인지*만 보고 *봉투의 주장이 그 파일과 맞는지*는
+    보지 않았기 때문이다.
+
+    대조를 붙이는 자리는 **한 곳**이다(`close._evidence_anchor`). 종료 검사·`romeo envelope check`·
+    동등성 판정이 모두 그 함수를 지나간다 — 규칙이 두 벌이 되면 느슨한 쪽이 게이트를 연다(K-63).
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.obs = ObservedRun()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.obs.cleanup()
+
+    def errs(self, c):
+        return self.obs.check(c)
+
+    def test_claiming_a_command_that_was_never_run_is_a_structural_error(self):
+        """구멍 B 의 반례 그대로 — 진짜 증거를 가리키면서 실행된 적 없는 검사를 주장한다."""
+        forged = self.obs.write_result("run-a", name="run-주장",
+                                       checks=[{"id": "check-1", "command": "pytest -q tests/", "exit_code": 0},
+                                               {"id": "check-2", "command": "npm run build", "exit_code": 0}])
+        errs = self.errs(self.obs.case(base=forged))
+        self.assertTrue(any("EVIDENCE_ANCHORED" in e and "실행 기록이 없다" in e for e in errs), errs)
+
+    def test_claiming_a_different_exit_code_than_the_evidence_is_a_structural_error(self):
+        """명령은 실제로 돌았지만 결과를 바꿔 적었다 — 종료 코드까지 대조해야 주장이 증거에 묶인다."""
+        forged = self.obs.write_result("run-a", name="run-코드",
+                                       checks=[{"id": "check-1", "command": "true", "exit_code": 1}])
+        errs = self.errs(self.obs.case(base=forged))
+        self.assertTrue(any("EVIDENCE_ANCHORED" in e and "종료 코드가 증거와 다르다" in e for e in errs), errs)
+
+    def test_the_task_contract_must_sit_in_the_units_contract_place(self):
+        """부수 사항 — 앵커가 바이트에 묶여 있어 진짜 계약을 어디로 복사해 두고 가리켜도 통과했다.
+        증거 포인터와 같은 자리 규약(K-62)을 계약 포인터에도 건다."""
+        outside = self.obs.root / "계약복사본.json"
+        shutil.copy(self.obs.root / WORK_DIR / self.obs.unit / "task/run-a-implementer.json", outside)
+        forged = self.obs.write_result("run-a", name="run-자리",
+                                       task_envelope_ref={"path": "계약복사본.json",
+                                                          "sha256": self.obs.task_sha["run-a"]})
+        errs = self.errs(self.obs.case(base=forged))
+        self.assertTrue(any("TASK_ANCHORED" in e and "밖이다" in e for e in errs), errs)
+
+    def test_evidence_edited_to_match_the_claim_is_caught_by_the_raw_log(self):
+        """또 한 겹 옆 — 봉투를 증거에 맞추는 대신 **증거를 봉투에 맞춰** 고친다.
+        원시 로그가 그 체크아웃에 남아 있으면 명령 문자열이 어긋나는 것으로 드러난다."""
+        epath = self.obs.root / self.obs.evidence("run-b")
+        rec = load_yaml(epath)
+        original = dump_yaml(rec)
+        rec["commands"][0]["command"] = "pytest -q tests/"
+        epath.write_text(dump_yaml(rec), encoding="utf-8")
+        try:
+            forged = self.obs.write_result("run-b", name="run-증거고침",
+                                           checks=[{"id": "check-1", "command": "pytest -q tests/",
+                                                    "exit_code": 0}])
+            errs = self.errs(self.obs.case(swap=forged))
+            self.assertTrue(any("EVIDENCE_ANCHORED" in e and "원시 로그" in e for e in errs), errs)
+        finally:
+            epath.write_text(original, encoding="utf-8")
+
+    def test_an_honest_envelope_still_anchors(self):
+        """대조를 붙여도 실제 실행이 남긴 봉투는 그대로 통과한다 — 앵커를 막히게 하지 않았다."""
+        self.assertEqual(self.errs(self.obs.case()), [])
+
+    def test_the_gate_does_not_open_on_typed_claims(self):
+        """게이트 층에서 본다: 손으로 타이핑한 주장 하나로 관측 케이스가 서지 않는다."""
+        forged = self.obs.write_result("run-a", name="run-게이트",
+                                       checks=[{"id": "check-1", "command": "pytest -q tests/", "exit_code": 0}])
+        rep = self.obs.report([self.obs.case(base=forged, id="pr-typed")])
+        self.assertEqual(rep["gate_verdict"], "FAIL")
+        self.assertIn(ANCHOR_INVALID, rep["rows"][0]["codes"])
+
+    def test_the_report_says_the_gate_does_not_re_execute(self):
+        """게이트가 통과할 때 무엇 위에 서 있는지 말한다 — 재실행 대조는 여기서 하지 않는다(K-51)."""
+        text = format_parity(self.obs.report([case(), self.obs.case()]))
+        self.assertIn("핵심 동등성 게이트: PASS", text)
+        self.assertIn("여기서 명령을 다시 실행하지는 않는다", text)
 
 
 class TestCli(unittest.TestCase):

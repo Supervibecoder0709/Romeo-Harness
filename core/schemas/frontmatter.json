@@ -84,6 +84,29 @@
         ]
       }
     },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "escalate",
+          "expose",
+          "iam",
+          "merge",
+          "ownership",
+          "pr",
+          "publish",
+          "push",
+          "send",
+          "share",
+          "token-scope",
+          "transfer",
+          "upload",
+          "worktree-remove"
+        ]
+      },
+      "description": "되돌리기 어려운 행위. execution-guards.yaml 의 trigger 와 대조해 실행 가드를 발동시킨다(K-66). 선언하지 않으면 가드가 걸리지 않는다 — 종료 검사가 승인을 요구하지 않는다."
+    },
     "profile": {
       "type": "string",
       "enum": [

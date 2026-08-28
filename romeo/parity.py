@@ -68,6 +68,9 @@ RUN_CAPABILITY = "run-command"
 # 관측 케이스의 앵커가 실재해야 하는 자리.
 WORK_DIR = "docs/work"
 EVIDENCE_SUFFIX = ".yaml"
+# 작업 계약이 놓이는 자리(K-62). 계약 생성 명령이 여기에만 쓴다.
+TASK_DIR = "task"
+TASK_SUFFIX = ".json"
 # 관측 케이스가 봉투를 받는 자리. 결과 계약도 그 작업 단위 안에 있다(K-62).
 RESULT_DIRS = ("result", "review")
 RESULT_SUFFIX = ".json"
@@ -153,6 +156,21 @@ def evidence_ref_error(unit_id, ref):
     if not text.startswith(prefix) or not text.endswith(EVIDENCE_SUFFIX):
         return (f"{prefix}*{EVIDENCE_SUFFIX} 밖이다 — 증거는 그 작업 단위 안에 있고 증거 기록 명령이 만든다"
                 f"(K-62). 판정 대상으로 받은 문서는 '읽은 증거'가 아니다")
+    return None
+
+
+def task_ref_error(unit_id, ref):
+    """작업 계약 포인터가 **그 작업 단위의 계약 자리**를 가리키는지 본다. 규칙은 여기 한 곳에만 있다.
+
+    재계산 대조는 계약의 *바이트*에 묶여 있어서 파일 이름을 보지 않는다 — 진짜 계약을 다른 이름·다른
+    디렉터리로 복사해 두고 그것을 가리켜도 통과한다. 위조로서는 값이 낮지만(내용이 이미 올바른 계약이다)
+    '산출물은 작업 단위 안에 둔다'(K-62)를 증거 쪽에서만 강제하고 계약 쪽에서 놓아 둘 이유가 없다.
+    증거 포인터와 같은 모양의 자리 규약을 계약 포인터에도 건다."""
+    prefix = f"{WORK_DIR}/{unit_id}/{TASK_DIR}/"
+    text = str(ref).replace("\\", "/")
+    if not text.startswith(prefix) or not text.endswith(TASK_SUFFIX):
+        return (f"{prefix}*{TASK_SUFFIX} 밖이다 — 작업 계약은 그 작업 단위 안에 있고 "
+                f"계약 생성 명령이 만든다(K-62)")
     return None
 
 
@@ -558,6 +576,13 @@ def format_parity(rep):
                      f"실제 교차 실행 관측이 1건 이상 있어야 판정한다(D-b·K-51).")
     else:
         lines.append(f"핵심 동등성 게이트: {GATE_TEXT[rep['gate_verdict']]} — 관측 {rep['observed']}건으로 판정했다.")
+        # 이 판정이 무엇 위에 서 있는지 말한다. 동등성 판정은 **다른 곳에서 끝난 실행**의 결과 계약을 비교한다 —
+        # 그 명령들을 여기서 다시 실행할 수는 없다. 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사가 한다.
+        # 확인하지 못한 것을 확인한 것처럼 인쇄하지 않는다(K-51).
+        lines.append("이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 "
+                     "증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을 다시 실행하지는 "
+                     "않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 "
+                     "체크아웃의 종료 검사(`romeo close`)가 한다.")
     if rep["gate_verdict"] == "PASS" and rep["checker_verdict"] != "PASS":
         # 두 층이 모두 서야 통과다. 검사기가 옳은지 확인하지 못한 실행은 게이트 통과를 주장할 수 없다(D-b).
         lines.append("게이트는 관측으로 PASS 이지만 검사기 자기 검증이 서지 않았다 — "

@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 from . import HARNESS_ROOT, __version__
+from .evidence import RERUN_TIMEOUT
 from .util import load_any, project_root as _project_root, dump_yaml
 
 
@@ -219,7 +220,8 @@ def cmd_envelope(args):
 
 def cmd_close(args):
     from .close import close_unit, format_close
-    res = close_unit(args.unit, project_root=_root(args), dry_run=args.dry_run)
+    res = close_unit(args.unit, project_root=_root(args), dry_run=args.dry_run,
+                     rerun=not args.no_rerun, rerun_timeout=args.rerun_timeout)
     print(format_close(res))
     return 0 if res["verdict"] == "PASS" else 1
 
@@ -418,6 +420,11 @@ def build_parser():
     s.add_argument("--unit", required=True)
     s.add_argument("--dry-run", action="store_true")
     s.add_argument("--root")
+    s.add_argument("--no-rerun", action="store_true",
+                   help="required_checks 를 다시 실행하지 않는다 — 기록만 읽은 판정이 되므로 "
+                        "그 검사는 미검증으로 인쇄되고 done 을 선언하지 않는다")
+    s.add_argument("--rerun-timeout", type=int, default=RERUN_TIMEOUT,
+                   help=f"재실행 대조 한 건의 상한(초, 기본 {RERUN_TIMEOUT}). 초과하면 미검증이다")
     s.set_defaults(fn=cmd_close)
 
     s = sub.add_parser("id", help="ID 생성")

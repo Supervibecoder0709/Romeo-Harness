@@ -14,9 +14,9 @@ from romeo.cli import main
 from romeo.close import close_unit, format_close
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
-from romeo.evidence import add_approval, run_command
+from romeo.evidence import add_approval, parse_log_exit_code, run_command, run_required_checks
 from romeo.policy import route
-from romeo.util import load_yaml, sha256_file
+from romeo.util import dump_yaml, load_yaml, sha256_file
 from romeo.validate import validate_doc
 
 
@@ -239,6 +239,162 @@ class TestVerticalSlice(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("required_checks", err.getvalue())
         self.assertNotIn("Traceback", out.getvalue() + err.getvalue())
+
+
+class TestEvidenceIsReExecuted(unittest.TestCase):
+    """4차 리뷰 구멍 A — 증거 YAML 을 손으로 고치면 close 가 뒤집혔다.
+
+    `required_checks` 의 명령이 `false`(exit 1)인 단위에서 `exit_code: 1` 을 `0` 으로 고치자
+    전 항목 PASS · EXIT 0 이 났다. 로컬 파일은 위조 불가로 만들 수 없으므로 세 겹으로 닫는다:
+
+    1. **재실행 대조(종점).** close 가 `required_checks` 를 다시 실행해 기록과 대조한다.
+       기록을 고쳐도 명령을 다시 돌린 결과는 고칠 수 없다 — AGENTS.core §4 가 요구하는 것이 이것이다.
+    2. **원시 로그의 종료 코드.** 같은 사실이 두 곳에 적혀 있으면 한 곳만 고친 것이 드러난다.
+    3. **`log_sha256` 을 읽는다.** 지금까지 쓰기만 하고 아무도 읽지 않았다 — 로그까지 고친 것을 잡는다.
+
+    재실행으로 확인할 수 없는 경우는 막지 않고 **미검증으로 인쇄한다** — 통과로 세지 않으므로 done 이 아니다."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "재실행 대조 T0", "rerun-t0", "실패하는 검사를 가진 단위",
+                          project_root=self.root, date="20260828")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _prepare(self, command="false"):
+        """검증 계획의 명령이 `command` 인 승인된 단위를 만들고 그 명령을 실제로 실행해 증거를 남긴다."""
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', f'command: "{command}"')
+        frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
+        approve_unit(self.unit, "tester", project_root=self.root)
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "approve", cwd=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "impl", cwd=self.root)
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        self.epath = self.spec.parent / "evidence" / "run-a.yaml"
+        self.log = self.root / ".harness" / "runs" / self.unit / "run-a" / "01-check-1.log"
+
+    def _close(self, **kw):
+        r = close_unit(self.unit, project_root=self.root, dry_run=True, **kw)
+        return r, {c["id"] for c in r["checks"] if not c["ok"] and c["level"] == "error"}, \
+            {c["id"] for c in r["checks"] if c["level"] == "unverified"}
+
+    def _tamper_yaml(self, exit_code=0):
+        rec = load_yaml(self.epath)
+        for c in rec["commands"]:
+            c["exit_code"] = exit_code
+        self.epath.write_text(dump_yaml(rec), encoding="utf-8")
+        return rec
+
+    def test_the_raw_log_records_the_exit_code(self):
+        """로그에 종료 코드가 없으면 뒤의 두 겹이 설 자리가 없다."""
+        self._prepare("false")
+        self.assertEqual(parse_log_exit_code(self.log.read_text(encoding="utf-8")), 1)
+        rec = load_yaml(self.epath)
+        self.assertEqual(rec["commands"][0]["log_sha256"], sha256_file(self.log))
+
+    def test_hand_edited_exit_code_no_longer_flips_close(self):
+        """구멍 A 의 반례 그대로: evidence YAML 의 exit_code 1 → 0."""
+        self._prepare("false")
+        _r, failed, _u = self._close()
+        self.assertIn("REQUIRED_CHECK", failed)          # 정직한 상태에서는 검사 자체가 실패다
+        self._tamper_yaml(0)
+        r, failed, _u = self._close()
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertIn("REQUIRED_CHECK_RERUN", failed, r["checks"])
+        self.assertIn("EVIDENCE_LOG", failed, r["checks"])
+        self.assertIn("다시 실행하니 exit 1", format_close(r))
+
+    def test_editing_the_log_too_is_caught_by_the_seal(self):
+        """한 겹 옆: 원시 로그의 종료 코드 줄까지 고친다 — log_sha256 과 어긋난다."""
+        self._prepare("false")
+        self._tamper_yaml(0)
+        self.log.write_text(self.log.read_text(encoding="utf-8").replace("--- exit 1 ---", "--- exit 0 ---"),
+                            encoding="utf-8")
+        r, failed, _u = self._close()
+        self.assertIn("EVIDENCE_LOG", failed)
+        self.assertIn("원시 로그가 기록 이후 바뀌었다", format_close(r))
+        self.assertIn("REQUIRED_CHECK_RERUN", failed)
+
+    def test_resealing_the_log_still_does_not_survive_re_execution(self):
+        """또 한 겹 옆: 로그도 고치고 log_sha256 도 다시 계산한다. 세 겹을 다 맞춰도 재실행이 남는다."""
+        self._prepare("false")
+        rec = self._tamper_yaml(0)
+        text = self.log.read_text(encoding="utf-8").replace("--- exit 1 ---", "--- exit 0 ---")
+        self.log.write_text(text, encoding="utf-8")
+        rec["commands"][0]["log_sha256"] = sha256_file(self.log)
+        self.epath.write_text(dump_yaml(rec), encoding="utf-8")
+        r, failed, _u = self._close()
+        self.assertNotIn("EVIDENCE_LOG", failed, "봉인까지 맞췄으므로 로그 대조는 통과한다")
+        self.assertIn("REQUIRED_CHECK_RERUN", failed, "그래도 재실행 결과는 고칠 수 없다")
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_a_missing_log_is_unverified_not_passed(self):
+        """`.harness` 는 커밋되지 않는다 — 로그가 없는 것은 어긴 것이 아니지만 통과도 아니다(K-51)."""
+        self._prepare("true")
+        self.log.unlink()
+        r, failed, unverified = self._close()
+        self.assertNotIn("EVIDENCE_LOG", failed)
+        self.assertIn("EVIDENCE_LOG", unverified)
+        self.assertIn("[UNVERIFIED] EVIDENCE_LOG", format_close(r))
+        self.assertEqual(r["verdict"], "FAIL", "미검증은 완료가 아니다")
+
+    def test_skipping_the_rerun_is_printed_not_counted_as_pass(self):
+        """재실행 대조를 건너뛰면 '기록만 읽은 판정' 이다 — 미검증으로 인쇄하고 done 을 선언하지 않는다."""
+        self._prepare("true")
+        r, _f, unverified = self._close(rerun=False)
+        self.assertIn("REQUIRED_CHECK_RERUN", unverified)
+        self.assertNotIn("[PASS] REQUIRED_CHECK_RERUN", format_close(r))
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_a_check_declared_unrerunnable_is_unverified_with_its_reason(self):
+        """부작용·비결정 때문에 다시 돌릴 수 없는 검사는 검증 계획이 선언한다. 막지 않고 드러낸다 —
+        선언했다고 통과가 되지는 않는다."""
+        self._prepare("true")
+        fm, body = frontmatter.read(self.spec)
+        frontmatter.write(self.spec, fm, body.replace(
+            '    expect: exit 0', '    expect: exit 0\n    rerun: false\n    rerun_reason: "배포는 두 번 하지 않는다"'))
+        r, _f, unverified = self._close()
+        self.assertIn("REQUIRED_CHECK_RERUN", unverified)
+        self.assertIn("배포는 두 번 하지 않는다", format_close(r))
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_an_honest_run_still_closes(self):
+        """세 겹을 붙여도 실제로 실행하고 통과한 단위는 그대로 done 이 된다 — 검사를 막히게 하지 않았다."""
+        self._prepare("true")
+        r, failed, unverified = self._close()
+        self.assertEqual((failed, unverified), (set(), set()), r["checks"])
+        self.assertEqual(r["verdict"], "PASS")
+        text = format_close(r)
+        for cid in ("REQUIRED_CHECK", "EVIDENCE_LOG", "REQUIRED_CHECK_RERUN", "CHECK_PLAN_COMMITTED"):
+            self.assertIn(f"[PASS] {cid}", text)
+
+    def test_editing_the_approved_check_plan_is_rejected(self):
+        """재실행 대조를 붙이자 위조가 한 겹 옆으로 갔다 — 실패하는 검사를 지우고 통과하는 검사로 바꾼 뒤
+        그것을 진짜로 실행하면 기록·로그·재실행이 전부 맞는다. 고쳐진 것은 증거가 아니라 주장이다.
+        `docs/work/<unit>/` 는 신선도 계산에서 제외돼 있어 이 편집은 어디에도 걸리지 않았다."""
+        self._prepare("false")
+        fm, body = frontmatter.read(self.spec)
+        frontmatter.write(self.spec, fm, body.replace('command: "false"', 'command: "true"'))
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        r, failed, _u = self._close()
+        self.assertIn("CHECK_PLAN_COMMITTED", failed, r["checks"])
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertIn("HEAD 에 커밋된 것과 다르다", format_close(r))
 
 
 class TestCloseReviewVerdict(unittest.TestCase):
@@ -553,6 +709,31 @@ class TestCloseReviewVerdict(unittest.TestCase):
             evidence_ref="docs/work/chg-20260101-other-abcd/evidence/run-x.yaml"))
         ids, _ = self._failed()
         self.assertIn("REVIEW_EVIDENCE_ANCHORED", ids)
+
+    # ── 봉투의 주장과 증거를 대조한다 (4차 리뷰 구멍 B) ─────────────────────────
+    def test_close_uses_the_same_claim_check_as_the_parity_gate(self):
+        """구멍 B 의 규칙은 한 곳(`close._evidence_anchor`)에 있고 종료 검사도 그것을 지나간다.
+        실행된 적 없는 검사를 실은 봉투는 역할 계약뿐 아니라 **증거 대조**에서도 걸린다 —
+        규칙이 두 벌이 되면 느슨한 쪽이 done 을 만든다(K-63)."""
+        self._write_review("run-test-reviewer.json", self._envelope(
+            checks=[{"id": "check-1", "command": "pytest -q tests/", "exit_code": 0}]))
+        ids, r = self._failed()
+        self.assertIn("REVIEW_EVIDENCE_ANCHORED", ids, r["checks"])
+        self.assertIn("실행 기록이 없다", self._detail(r, "REVIEW_EVIDENCE_ANCHORED"))
+        self.assertIn("REVIEW_ROLE_CONTRACT", ids)
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_task_contract_copied_outside_the_units_task_place_is_rejected(self):
+        """앵커가 파일 이름이 아니라 바이트에 묶여 있어 진짜 계약을 어디로 복사해 가리켜도 통과했다.
+        증거 포인터와 같은 자리 규약(K-62)을 계약 포인터에도 건다."""
+        copied = self.root / "계약복사본.json"
+        copied.write_bytes(self.task_path.read_bytes())
+        self._write_review("run-test-reviewer.json", self._envelope(
+            task_envelope_ref={"path": "계약복사본.json", "sha256": self.task_sha}))
+        ids, r = self._failed()
+        self.assertIn("REVIEW_TASK_ANCHORED", ids)
+        self.assertIn("밖이다", self._detail(r, "REVIEW_TASK_ANCHORED"))
+        self._assert_unverified(r, "REVIEW_BASE_SHA")
 
     # ── 여러 봉투를 합칠 때 PASS 가 UNVERIFIED 를 덮지 않는다 (4차 리뷰 J03) ────────
     def test_a_pass_envelope_does_not_cover_another_envelopes_unverified(self):

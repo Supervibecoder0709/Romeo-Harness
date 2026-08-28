@@ -36,7 +36,7 @@ orca worktree current --json
 | `base_sha` | 승인된 `spec.md` 가 들어 있는 커밋이다(§3.1). 새 워크트리는 `--base-branch <그 커밋이 tip 인 브랜치>`, 기존 워크트리는 `orca worktree current --json` 의 `head` 로 확인만 한다. 두 역할이 같은 값을 받아야 한다 | D-a, 계획 :573 |
 | `allowed_paths: []` (검토자) | `roles.reviewer.enforcement` 의 명령형(`codex exec -s read-only`)을 `orca terminal create --command` 로 띄우고 그 핸들을 `worker-start --terminal` 로 채택한다(§3.7). `worker-start --agent` 에는 샌드박스 플래그도 명령 passthrough 도 없다(실측) | `codex exec --help`, `terminal create --help`, `worker-start --help`, D-68 |
 | `output_schema` | Codex `--output-schema <파일경로>` + `-o <파일>` · Claude `--json-schema <스키마>` | 두 CLI `--help` |
-| `required_checks` | 워커 안에서 `bin/romeo evidence checks --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>` 로 실행한다. 위임 계층이 대신 실행하지 않는다 | K-51, §5 |
+| `required_checks` | 워커 안에서 `bin/romeo evidence checks --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>` 로 실행한다. 위임 계층이 대신 실행하지 않는다. **`<dispatch-id>` 는 §3.5 가 돌아온 뒤에야 존재한다** — 그 값을 돌고 있는 워커에게 넣는 자리는 §3.5.2 이고, 워커는 그 전에 증거 기록을 시작하지 않는다 | K-51, §3.5.2, §5 |
 | `guards` | §8. M2 는 `bin/romeo evidence approve` 로 기록한다 | `core/policy/execution-guards.yaml` |
 
 `--model` 과 `--effort` 는 **넘기지 않는다** — 계정 기본값을 쓴다(K-12). `--effort` 는 `--model` 을 요구하고, 둘 다 `--terminal` 과 결합할 수 없다(실측).
@@ -197,6 +197,16 @@ orca orchestration task-create --run <run-id> \
 그 출력의 **형식**(`core/schemas/result-envelope.json`), 그리고 봉투에 적을 `evidence_ref`
 (`docs/work/<id>/evidence/<run-id>.yaml`). 여기에 검사를 증거 기록 명령으로 돌리라는 조건과 §5 의 식별자 플래그,
 그리고 절차 문서(`core/workflows/{implement,review}/SKILL.md`)를 함께 넣는다 — 이것도 **자기 작업 루트 기준 상대 경로**다.
+
+**이 시점에 아는 식별자는 둘뿐이다 — `<run-id>` 와 `<task-id>`.** `<dispatch-id>` 는 §3.5 의 `worker-start` 가
+돌아오면서 발급하므로 지금 `--spec` 에 넣을 값이 없다. 없는 값을 자리표로 적어 넘기면 워커가 그 문자열을 그대로
+증거에 기록하고, 그 증거는 어느 위임에서 나왔는지 말하지 못한다. 그래서 `--spec` 에는 값 대신 **받는 방법**을 적는다:
+
+- 「`<dispatch-id>` 는 기동 뒤에 전달된다. 받기 전에는 `bin/romeo evidence run`·`evidence checks` 를 시작하지 않는다.」
+- 「전달이 늦으면 `orca orchestration dispatch-show --task <task-id> --json` 으로 스스로 조회한다」
+  (`dispatch-show --help` 실측: `--task <task_id>` 를 받는다. **반환 JSON 의 어느 필드가 dispatch id 인지는 미확인**이다 — §11).
+- 「두 식별자는 증거 레코드에 run 당 한 번만 기록된다. 먼저 `--task-id` 만 붙은 실행이 있어도,
+  나중 실행에 `--dispatch-id` 를 붙이면 같은 레코드에 채워진다」(`romeo/evidence.py` 의 `_stamp_ids` — 빈 자리는 채우고 다른 값만 거부한다).
 이 단계에서는 자식 워크트리(`$W`)가 아직 없어 절대 경로를 쓸 수 없고, 쓸 필요도 없다: 워커는 그 워크트리 안에서 돌고
 그 트리는 `<base-sha>` 의 체크아웃이라 미커밋 변경이 없다. 그 문서가 그 커밋 안에 있다는 것은 §3.1 확인 2 가 보장한다.
 
@@ -292,6 +302,32 @@ ls "$W/docs/work/<id>/task/<run-id>-implementer.json" \
 동시에 구현자 계약이 그 자리에 실재하는지 눈으로 대조하는 자리다(위 확인 3).
 이 쓰기가 신선도 검사를 흔들지도 않는다 — `docs/work/<id>/` 는 evidence 의 `dirty_tree_hash`·`changed_files` 계산에서
 빠지고(`romeo/evidence.py` 의 `exclusions()`), §4 의 방어 검사도 같은 경로를 명시적으로 제외한다.
+
+### 3.5.2 위임 식별자를 돌고 있는 워커에게 전달한다 — §3.4 가 넘기지 못한 값
+
+`<dispatch-id>` 는 §3.5 가 발급하므로 §3.4 의 `--spec` 에 들어갈 수 없었다(§3.4). 워커는 이미 돌고 있고,
+그 값 없이 증거를 기록하면 그 증거는 어느 위임에서 나왔는지 말하지 못한다. 그래서 기동 직후에 전달한다.
+
+```bash
+orca orchestration send \
+  --to dispatch:<구현자 dispatch-id> \
+  --run <run-id> \
+  --task-id <implementer-task-id> \
+  --dispatch-id <구현자 dispatch-id> \
+  --subject "위임 식별자 — <작업 단위 id>" \
+  --body "evidence 기록에 --run <run-id> --task-id <implementer-task-id> --dispatch-id <구현자 dispatch-id> 를 붙인다" \
+  --json
+```
+
+`--to dispatch:<id>` 는 그 시도에 한정된 조정 지시를 워커 쪽으로 durable 하게 중계하는 형식이다(`send --help` Notes 실측).
+`--task-id`·`--dispatch-id` 는 payload JSON 에 그 값을 싣는 전용 플래그다(같은 Notes: raw `--payload` 보다 이쪽을 쓴다).
+
+관찰 가능한 성공 신호: 종료 코드 0 과 `.ok == true`. **이것은 "보냈다" 의 신호이지 "워커가 읽고 반영했다" 의 신호가 아니다.**
+반영됐는지는 §3.8 의 식별자 검사가 판정한다 — 그 검사가 이 단계의 게이트다. 그 전까지 이 단계는 미확인이다.
+
+전달이 워커에 닿지 않으면 워커 쪽에서 스스로 조회하는 길이 있다 — `orca orchestration dispatch-show --task <task-id> --json`
+(`--help` 실측: `--task <task_id>` 를 받는다). **두 명령 모두 반환 JSON 의 필드 이름은 미확인이다**(§11) —
+첫 실행에서 §3.7 (1) 의 (a)~(c) 와 같은 방법으로 확인한다.
 
 ### 3.6 대기
 
@@ -433,6 +469,68 @@ orca orchestration worker-read --dispatch <검토자 dispatch-id> --source auto 
 `REVIEW_ENVELOPE_VALID` 가 FAIL 이며, **`gate_verdict` 가 `PASS` 가 아닌 판정이 하나라도 남아 있으면 `REVIEW_VERDICT` 가 FAIL 이다**(D-c).
 빈 파일 하나로 통과하던 예전 동작이 아니다. 검토자가 FAIL 을 냈으면 고친 뒤 다시 검토받는다 — 낡은 FAIL 봉투를 남겨 두면 close 는 계속 거부한다.
 
+**위임 식별자가 실제로 워커에 닿았는지 여기서 판정한다(§3.5.2 의 게이트).** §3.5.2 의 `send` 가 종료 코드 0 을 냈다는 것은
+보냈다는 뜻일 뿐이다. 워커가 받아 반영했는지는 그 워커가 남긴 증거에만 나타난다.
+
+```bash
+python3 - "$W/docs/work/<id>/evidence/<run-id>.yaml" <implementer-task-id> <구현자 dispatch-id> <<'PY'
+import sys, yaml
+rec = yaml.safe_load(open(sys.argv[1]))
+got = (rec.get("task_id"), rec.get("dispatch_id"))
+print(f"task_id={got[0]} dispatch_id={got[1]}")
+ok = got == (sys.argv[2], sys.argv[3])
+print("일치" if ok else "불일치 — 워커가 위임 식별자를 받지 못했거나 다른 값을 기록했다")
+sys.exit(0 if ok else 1)
+PY
+```
+
+성공 신호: 종료 코드 0 과 `일치`. 둘 중 하나가 `None` 이면 §3.5.2 의 전달이 닿지 않은 것이다 —
+그 증거는 실행되기는 했지만 **어느 위임에서 나왔는지 말하지 못한다.** 조용히 지나가지 않는다.
+값이 다르면 그 run 이 두 위임에 걸쳐 있다는 뜻이므로(`_stamp_ids` 는 다른 값을 거부한다) 새 `--run` 으로 다시 돌린다.
+
+**종료 검사를 실행한다.** 이 절이 여기서 끝나지 않는다 — 결과 계약이 검사를 통과했다는 것과 그 작업 단위가 완료라는 것은 다르다.
+종료 검사는 **구현자 워크트리에서** 돈다. 거기에 evidence·`review/`·`task/` 가 있고, 그 체크아웃의 git 이력으로 `base_sha` 를 대조하기 때문이다.
+
+```bash
+"$W/bin/romeo" close --unit <작업 단위 id> --root "$W" --dry-run
+"$W/bin/romeo" close --unit <작업 단위 id> --root "$W"
+```
+
+`close` 가 받는 플래그는 `--unit`·`--dry-run`·`--root`·`--no-rerun`·`--rerun-timeout` 이다(`--help` 실측).
+`--dry-run` 은 판정만 인쇄하고 문서를 고치지 않는다.
+`--root "$W"` 를 빼면 위임한 쪽 체크아웃을 검사한다 — 거기에는 이 실행의 evidence 도 `review/` 봉투도 없어 판정이 성립하지 않는다.
+
+관찰 가능한 성공 신호: **종료 코드 0** 과 첫 줄 `romeo close <id> → PASS`, 그리고 각 검사가 `[PASS]` 로 인쇄되는 것.
+`[FAIL]` 은 어긴 것이고 **`[UNVERIFIED]` 는 대조가 성립하지 않은 것**이다 — 어느 쪽이든 종료 코드 1 이고 `status: done` 은 붙지 않는다.
+미검증을 통과로 접지 않는다(K-51).
+
+**종료 검사는 기록을 믿지 않고 주장을 다시 실행해 대조한다.** 다시 실행되는 것은 `spec.md` 검증 계획의 `required_checks` 명령이다 —
+evidence 에 적힌 종료 코드를 읽는 것으로 끝내지 않고, 같은 명령 문자열을 이 체크아웃에서 새로 실행해 그 종료 코드를 기록과 맞춰 본다
+(`REQUIRED_CHECK_RERUN`). 그래서 이 단계에는 조건이 넷 붙는다.
+
+- **워크트리가 살아 있어야 한다.** 그러니 §3.9 해제보다 **먼저** 돌린다. 해제는 워크트리를 지우지 않지만(§3.9),
+  워크트리를 정리한 뒤에는 재실행할 자리가 없다.
+- **재실행이 작업 트리를 바꾸면 안 된다.** 바뀌면 `REQUIRED_CHECK_RERUN` 이
+  `재실행이 작업 트리를 바꿨다` 로 **미검증**이 된다 — 재실행 전에 계산한 신선도 판정이 더 이상 그 트리를 말하지 않기 때문이다.
+  (`docs/work/<id>/` 와 `.harness/` 는 신선도 계산에서 빠지지만, 그 밖의 산출물은 빠지지 않는다.)
+- **검증 계획이 그 체크아웃의 HEAD 에 커밋돼 있어야 한다**(`CHECK_PLAN_COMMITTED`). 지금 읽는 `required_checks` 와
+  HEAD 에 커밋된 `spec.md` 의 것이 다르면 FAIL 이다 — 실행할 검사를 바꾸는 것은 증거가 아니라 **주장**을 바꾸는 것이다.
+  구현자가 수용 기준 체크박스를 채우는 것은 문제가 없지만(대조는 `id`·`command`·`expect` 만 본다) 검증 계획 자체는 건드리지 않는다.
+- **재실행할 수 없는 명령은 막지 않고 드러낸다.** 부작용이 있어 두 번 돌릴 수 없거나 돌릴 때마다 결론이 달라지는 검사는
+  검증 계획에서 `rerun: false` 로 선언하고 `rerun_reason` 에 이유를 적는다. 그러면 `재실행으로 확인되지 않았다 (rerun: false — <이유>)` 로
+  **미검증** 인쇄되고 통과로 세지 않는다 — close 는 done 을 선언하지 않는다. 대조하지 못했다는 사실을 PASS 로 인쇄하는 것보다 낫다.
+  상한 시간(`--rerun-timeout`, 기본 300초)을 넘겨도 같다. `--no-rerun` 도 같다 — 그것은 "기록만 읽은 판정" 이라고 인쇄된다.
+  이 세 자리 중 하나라도 걸리면 그 작업 단위는 done 이 되지 않는다. 그게 정직한 결과다.
+
+같은 라운드에 붙은 검사가 하나 더 있다 — `EVIDENCE_LOG` 는 evidence YAML 의 명령들을 `.harness/runs/` 의 원시 로그
+(종료 코드 줄 `--- exit N ---` 과 `log_sha256`)와 대조한다. `.harness/` 는 커밋되지 않으므로 **로그가 없는 체크아웃에서는
+실패가 아니라 미검증**이다. 그래서 종료 검사는 로그가 남아 있는 그 워크트리에서 돌린다 — 다른 체크아웃에서 돌리면
+이 검사가 미검증이 되어 done 이 서지 않는다.
+
+**FRESH_HEAD·FRESH_TREE 때문에 순서가 있다.** 두 검사는 evidence 의 `head_sha`·`dirty_tree_hash` 를 지금의 `$W` 와 대조한다.
+§3.8 의 회수·검사가 끝난 뒤 `$W` 를 건드리면 이 둘이 어긋난다. 검토자 판정 파일을 `review/` 에 쓰는 것과 계약을 만드는 것은
+`docs/work/<id>/` 안이라 계산에서 빠지지만(`romeo/evidence.py` 의 `exclusions()`), 그 밖의 파일은 빠지지 않는다.
+
 ### 3.9 해제
 
 ```bash
@@ -441,6 +539,9 @@ orca orchestration worker-release --dispatch <dispatch-id> --json
 
 성공 신호: `retained` · `release_pending` · `already_released` 는 전부 종료 코드 0 이고, `release_unknown` 만 1 이다(실측 Notes). 반복 호출은 멱등이다.
 해제 전에 출력 아카이브가 보존되므로 해제 뒤에도 `worker-read` 는 계속 읽힌다. 그래도 **검증 결과와 결과 계약이 파일로 남은 뒤에** 해제한다.
+**§3.8 의 종료 검사까지 끝낸 뒤에 해제한다** — 종료 검사는 기록을 믿지 않고 `required_checks` 를 그 체크아웃에서 다시 실행하므로,
+그 체크아웃이 살아 있고 트리가 그대로일 때만 판정이 성립한다. 해제 자체는 워크트리를 지우지 않지만(위 실측),
+워크트리 정리(§7 의 `orca worktree rm`, 승인 대상)까지 가 버리면 재실행할 자리가 없다.
 `worker-release` 는 setup 터미널·설정된 탭·재사용된 터미널·사람이 넘겨받은 터미널·신원이 증명되지 않은 터미널을 건드리지 않는다.
 
 ## 4. 권한 상한을 실제로 거는 명령형
@@ -574,11 +675,125 @@ bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --no
    검토자를 `--agent` 로 띄우는 경로는 교체 실행에서도 쓰지 않는다(§2 표 · §3.7 · §10).
    승인 커밋(§3.1)은 다시 하지 않는다 — 같은 커밋을 가리켜야 두 실행이 같은 것을 본다.
    작업 계약은 `--run` 이 달라 파일 이름이 다르지만, `--base-sha` 가 같으므로 **내용은 바이트까지 같다**. 다르면 그 비교는 성립하지 않는다.
-3. 결과 계약 4개(기준 2 + 교체 2)를 역할별로 짝지어 비교한다. 판정은 하네스의 동등성 검사기가 한다 — 사람이 눈으로 비교하지 않는다.
-4. 검사기는 손으로 쓴 케이스로 자기 자신만 검증한다. 게이트를 판정하려면 위 1~3 에서 나온 **관측 케이스가 1건 이상** 있어야 한다(D-b).
+3. **결과 계약 4개(기준 2 + 교체 2)를 한 체크아웃으로 모은다.** 이 단계를 빼면 뒤가 전부 실행 불가다 —
+   4개는 서로 다른 두 자식 워크트리에 흩어져 있는데, 동등성 검사기는 **한 `project_root` 아래에서만** 파일을 찾는다
+   (`romeo/parity.py` 의 `_repo_path` 는 저장소 안의 상대 경로만 앵커로 인정한다).
+4. **관측 케이스를 등록한다.** 게이트는 케이스 파일을 통해서만 관측을 센다 — 모아 두기만 하면 게이트는 계속 미판정이다.
+5. **판정을 실행한다.** 판정은 하네스의 동등성 검사기가 한다 — 사람이 눈으로 비교하지 않는다.
+   검사기는 손으로 쓴 합성 케이스로 자기 자신만 검증한다. 게이트를 판정하려면 위 1~4 에서 나온 **관측 케이스가 1건 이상** 있어야 한다(D-b).
 
 비교하는 것은 세 가지뿐이다: 결과 계약이 스키마를 통과하는가 · 같은 `required_checks` 를 실행했는가 · 같은 게이트 판정이 나왔는가. 프롬프트 동일성은 요구하지 않는다(C-C2).
 교체 실행은 기준 실행의 워크트리를 재사용하지 않는다. 재사용하면 두 번째 실행이 첫 번째의 변경 위에서 돌아 같은 `base_sha` 라는 전제가 깨진다.
+
+**여기서 비교하는 `required_checks` 는 두 실행의 주장이다.** 그 주장이 실제 실행과 맞는지는 §3.8 의 종료 검사가 재실행으로 대조한다 —
+동등성 게이트와 종료 검사는 서로를 대신하지 않는다. 같은 거짓을 두 번 적으면 양면이 같아지므로, 동등성만으로는 참이 되지 않는다.
+
+#### 6.3 모으기 — 어디로, 무엇을
+
+모으는 자리는 **`fixtures/parity/` 가 있는 체크아웃**이다. 관측 케이스 파일이 거기 놓여야 하고,
+케이스 목록은 `--root` 가 아니라 **호출된 `bin/romeo` 의 저장소**에서 읽히기 때문이다(`romeo/cli.py` 의
+`load_parity_cases(HARNESS_ROOT/"fixtures/parity")`). 두 값을 같은 체크아웃으로 맞춘다.
+
+모으는 것은 **실행이 남긴 산출물 3종뿐**이다. 작업 계약은 복사하지 않고 그 자리에서 다시 만든다(계약은 결정적이다 — §3.3).
+
+```bash
+P=<위임한 쪽 체크아웃 절대경로>          # fixtures/parity/ 가 있는 곳
+U=docs/work/<작업 단위 id>
+W1=<기준 실행의 구현자 워크트리>;  R1=<기준 실행 Run id>
+W2=<교체 실행의 구현자 워크트리>;  R2=<교체 실행 Run id>
+
+mkdir -p "$P/$U/evidence" "$P/$U/result" "$P/$U/review"
+cp "$W1/$U/evidence/$R1.yaml"           "$P/$U/evidence/$R1.yaml"
+cp "$W1/$U/result/$R1-implementer.json" "$P/$U/result/$R1-implementer.json"
+cp "$W1/$U/review/$R1-reviewer.json"    "$P/$U/review/$R1-reviewer.json"
+cp "$W2/$U/evidence/$R2.yaml"           "$P/$U/evidence/$R2.yaml"
+cp "$W2/$U/result/$R2-implementer.json" "$P/$U/result/$R2-implementer.json"
+cp "$W2/$U/review/$R2-reviewer.json"    "$P/$U/review/$R2-reviewer.json"
+```
+
+두 실행의 Run id 가 달라서(§6 2번) 파일 이름이 겹치지 않는다 — 같은 Run id 로 두 번 돌렸다면 여기서 서로를 덮어쓴다.
+`cp` 는 덮어쓰기이므로 모으기 전에 `R1 != R2` 를 눈으로 확인한다.
+
+작업 계약은 그 자리에서 다시 만든다. 복사하지 않는 이유는 §3.5.1 과 같다 — 앵커는 커밋된 원본에서 **다시 계산해** 바이트로 대조하므로,
+다른 하네스 커밋에서 만든 계약을 복사해 두면 지금 여기서 그것이 드러난다.
+
+```bash
+for R in "$R1" "$R2"; do
+  "$P/bin/romeo" envelope build --unit <작업 단위 id> --role implementer --base-sha <base-sha> --run "$R" --root "$P"
+  "$P/bin/romeo" envelope build --unit <작업 단위 id> --role reviewer    --base-sha <base-sha> --run "$R" --root "$P"
+done
+```
+
+모은 4개가 앵커 검사를 통과하는지 **여기서** 본다. 통과하지 못하는 봉투는 관측으로 세지 않으므로(`_resolve_face`),
+케이스를 등록한 뒤에 알면 원인이 케이스인지 봉투인지 구분되지 않는다.
+
+```bash
+"$P/bin/romeo" envelope check --unit <작업 단위 id> --role implementer --root "$P" \
+  "$P/$U/result/$R1-implementer.json" "$P/$U/result/$R2-implementer.json"
+
+"$P/bin/romeo" envelope check --unit <작업 단위 id> --role reviewer --root "$P" \
+  "$P/$U/review/$R1-reviewer.json" "$P/$U/review/$R2-reviewer.json"
+```
+
+관찰 가능한 성공 신호: 두 줄 모두 **종료 코드 0** 이고 파일마다 다섯 검사가 전부 `[PASS]` 다.
+**2 는 검사 불가**이지 통과가 아니다(§3.8). `[FAIL]` 이 났을 때의 뜻:
+
+| 검사 | 무엇이 어긋났나 | 무엇을 한다 |
+| --- | --- | --- |
+| `TASK_ANCHORED` … `바이트로 다르다` | `$P` 의 하네스(정책표·역할 계약·스키마·`.harness/romeo.project.yaml`)가 계약을 만들 때와 다르다 | `$P` 를 그 리비전 상태로 맞추거나, `orca worktree create --base-branch <승인 커밋이 tip 인 브랜치>` 로 그 리비전의 체크아웃을 만들어 거기로 모은다. raw `git worktree add` 는 쓰지 않는다(§10) |
+| `BASE_SHA` | `<base-sha>` 가 `$P` 의 HEAD 이력에 없다 | 승인 커밋이 이력에 있는 브랜치에서 모은다 |
+| `EVIDENCE_ANCHORED` | evidence YAML 을 빠뜨렸거나 다른 자리에 놓았다 | 위 `cp` 3줄 중 evidence 줄을 확인한다 |
+
+#### 6.4 등록 — 관측 케이스 파일
+
+자리표가 이미 있다: `fixtures/parity/pr-license-field-t1-observed.yaml`. 새 파일을 만들지 말고 그것을 채운다.
+**봉투를 인라인으로 적지 않는다** — 게이트가 비교하는 값을 케이스 작성자가 타이핑할 수 있으면 게이트는 아무것도 지키지 않는다(D-b).
+한 역할은 `{file: <상대 경로>}` 한 줄만 받는다.
+
+```yaml
+id: pr-<케이스 이름>-observed          # ^pr-[a-z0-9]+(-[a-z0-9]+)*$
+title: <작업 단위 한 줄 설명> — 실제 교차 실행 관측
+unit_id: <실제 T1 작업 단위 id>        # docs/work/ 에 실재해야 한다. 자리표의 값이 아니다
+status: executed                       # pending 이 아니다. pending_reason 줄은 지운다
+expect: same
+
+baseline:
+  runtimes: {implementer: <기준 구현자 런타임>, reviewer: <기준 검토자 런타임>}
+  results:
+    implementer: {file: docs/work/<작업 단위 id>/result/<R1>-implementer.json}
+    reviewer:    {file: docs/work/<작업 단위 id>/review/<R1>-reviewer.json}
+swapped:
+  runtimes: {implementer: <교체 구현자 런타임>, reviewer: <교체 검토자 런타임>}
+  results:
+    implementer: {file: docs/work/<작업 단위 id>/result/<R2>-implementer.json}
+    reviewer:    {file: docs/work/<작업 단위 id>/review/<R2>-reviewer.json}
+
+source:
+  kind: observed                       # planned 가 아니다 — 이 한 단어가 게이트를 여는 열쇠다
+  ref: docs/work/<작업 단위 id>/evidence/<R1>.yaml   # 저장소 안의 실재 파일이어야 한다
+  date: '<YYYY-MM-DD>'
+```
+
+`source.kind: observed` 로 바꾸면 검사기가 **관측물의 실재**를 함께 검사한다(`_anchor_errors`) —
+`source.ref` 가 실재 파일이 아니거나 `unit_id` 가 `docs/work/` 에 없으면 미판정이 아니라 **구조 오류**(`PARITY_INVALID`)다.
+`runtimes` 는 판정에 쓰이지 않는다 — 어느 런타임이 어느 역할을 맡았는지 사람이 읽는 기록이다.
+
+**하네스는 이것들을 커밋하지 않는다.** 모아 온 산출물과 채운 케이스 파일을 커밋할지, 어느 브랜치에 올릴지는 사람이 정한다(§3.1 과 같은 이유).
+커밋 전에도 `fixtures parity` 는 작업 트리를 읽으므로 판정은 난다 — 다만 커밋하지 않으면 그 관측은 다음 체크아웃에 남지 않는다.
+
+#### 6.5 판정
+
+```bash
+"$P/bin/romeo" fixtures parity --report
+```
+
+관찰 가능한 성공 신호: **종료 코드 0** 과 마지막 줄
+`핵심 동등성 게이트: PASS — 관측 1건으로 판정했다`, 그리고 그 앞줄의 `검사기 자기 검증: PASS`.
+**두 층이 다 서야 종료 코드 0 이다** — 게이트가 관측으로 PASS 여도 검사기 자기 검증이 서지 않으면 1 이고, 리포트가 그 사실을 인쇄한다.
+`핵심 동등성 게이트: 미판정 — 관측 케이스 0건` 이 계속 나오면 6.4 의 `status`·`source.kind` 둘 중 하나가 아직 자리표 값이다.
+
+`--root` 는 스키마와 앵커를 찾는 루트이고, 케이스 목록은 호출된 `bin/romeo` 의 저장소에서 읽는다 —
+그래서 위 명령은 `$P/bin/romeo` 로 부른다. 두 값이 갈리면 "케이스는 여기 있는데 관측물은 저기 있다" 가 된다.
 
 ## 7. 실패와 복구 — 남는 상태를 어떻게 정리하는가
 
@@ -668,19 +883,26 @@ orca orchestration gate-list --json
 - 작업 계약 JSON 을 손으로 쓰는 것. 계약은 `bin/romeo envelope build` 만 만든다 — 손으로 쓰면 "같은 입력이면 같은 계약" 이 성립하지 않는다(§3.3).
 - 검사 결과 파일을 셸 리다이렉션으로 만드는 것. 증거는 증거 기록 명령으로만 만든다(K-51 · §4).
 - 승인된 `spec.md` 를 커밋하지 않은 채 워커를 띄우는 것. 그 워커는 승인을 보지 못한다(D-a · §3.1).
+- 위임 식별자를 자리표로 적어 `--spec` 에 넘기는 것. `<dispatch-id>` 는 기동 뒤에 생긴다 — 없는 값을 적으면 그 문자열이 그대로 증거에 남는다(§3.4 · §3.5.2).
+- 기록된 종료 코드만 읽고 완료를 주장하는 것. 종료 검사는 그 주장을 **다시 실행해** 대조한다(§3.8).
+- 다시 실행할 수 없는 명령(부작용·비결정·상한 시간 초과)을 `required_checks` 에 넣는 것. 그런 단계는 가드 승인(§8)과 증거로 남긴다.
+- 결과 계약을 한 체크아웃으로 모으지 않은 채 동등성 게이트를 말하는 것. 모으고 등록하지 않으면 관측 케이스가 생기지 않고 게이트는 계속 미판정이다(§6.3·§6.4).
 
 ## 11. 미검증
 
 아래는 이 문서를 쓰면서 **확인하지 못한** 것이다. 상태를 바꾸는 명령을 실행하지 않았기 때문이다.
 
-- `run-create`·`task-create`·`worker-start`·`check --wait`·`worker-release`·`terminal create` 의 실제 반환 JSON 구조. 필드 이름은 각 명령의 `--help` 와 Notes 에서만 읽었다. 관측한 JSON 은 `orca status --json`·`orca worktree current --json`·`orca orchestration run-current --json` 셋뿐이다.
+- `run-create`·`task-create`·`worker-start`·`check --wait`·`worker-release`·`terminal create`·`send`·`dispatch-show` 의 실제 반환 JSON 구조. 필드 이름은 각 명령의 `--help` 와 Notes 에서만 읽었다. 관측한 JSON 은 `orca status --json`·`orca worktree current --json`·`orca orchestration run-current --json` 셋뿐이다.
+- **§3.5.2 의 식별자 전달이 워커에 실제로 닿는지.** `send --to dispatch:<id>` 가 "그 시도에 한정된 조정 지시를 워커 쪽으로 durable 하게 중계한다" 는 것은 `--help` Notes 의 문장이고, 돌고 있는 워커가 그 메시지를 읽어 evidence 플래그에 반영하는 것은 관측하지 못했다. 판정 수단은 §3.8 의 식별자 검사다 — 그 검사가 `불일치` 를 내면 이 경로가 닫히지 않은 것이다.
+- **종료 검사의 재실행 대조를 위임 실행에서 관측하지 않았다.** 플래그(`--no-rerun`·`--rerun-timeout`)와 검사 이름(`REQUIRED_CHECK_RERUN`·`CHECK_PLAN_COMMITTED`·`EVIDENCE_LOG`)은 `romeo close --help` 와 `romeo/close.py` 로 실측했지만, 자식 워크트리에서 close 를 돌려 본 적이 없다. 특히 (a) 워커가 남긴 검사가 그 워크트리에서 다시 실행 가능한지, (b) 재실행이 트리를 바꾸지 않는지, (c) `.harness/runs/` 의 로그가 그 체크아웃에 있어 `EVIDENCE_LOG` 가 미검증으로 떨어지지 않는지는 실행해야 안다.
+- **§6.3 모으기 · §6.4 등록 · §6.5 판정을 실행하지 않았다.** 명령과 실패 메시지는 `romeo/parity.py`·`romeo/close.py`·`romeo/cli.py` 의 코드와 `--help` 로 대조했지만, 두 자식 워크트리가 실제로 갈라진 상태에서 모아 본 적은 없다. 특히 `TASK_ANCHORED` 가 모으는 체크아웃에서 통과하는지는 실행해야 안다.
 - `--worktree` selector 형식(`path:`·`id:<repoId>::<path>`·`name:`·`branch:`)이 실제로 어떻게 해석되는지. 도움말이 나열한 형식을 그대로 옮겼다.
 - `check --types` 가 받는 값의 전체 목록. `worker_done`·`escalation`·`question` 만 실제 사용 사례에서 확인했다.
 - `--agent` 가 받는 id 의 전체 목록, `--effort` 가 받는 값의 전체 목록.
 - `--base-branch` 가 브랜치 이름 대신 커밋 SHA 를 그대로 받는지. 도움말은 `<ref>` 라고만 한다. 그래서 §3.5 는 승인 커밋이 tip 인 **브랜치 이름**을 넘기고, 기동 뒤 `head == <base-sha>` 를 확인하게 한다.
 - `codex exec -s read-only` 아래에서 `-o` 가 파일을 쓰는지. 샌드박스가 **모델이 만든 셸 명령**을 막는다는 것은 관찰했지만(`patch rejected: writing is blocked by read-only sandbox`), CLI 자신이 여는 `-o` 대상 파일은 그 경로가 아니다. 그래서 §4 의 방어 검사를 지우지 않는다.
 - **구현자 쪽 권한 상한이 런타임마다 다르다.** §4 표의 구현자 두 칸은 종류가 다른 수단이고(설정 파일 승인 게이트 vs 샌드박스 플래그) 둘 다 `enforcement_observed: false` 다. 비대화형 실행에는 승인 정책 플래그가 없는 런타임도 있어, 그때 승인 게이트는 런타임이 아니라 하네스가 소유한다. 지금 동등성 판정은 이 비대칭 위에서 돈다.
-- 동등성 게이트 판정. 검사기는 손으로 쓴 케이스로 자기 검증만 하고 있고 관측 케이스는 0건이다 — `bin/romeo fixtures parity --report` 는 "미판정" 을 인쇄하고 종료 코드 1 로 끝난다(D-b). §6 을 실제로 두 번 돌려야 판정이 생긴다.
+- 동등성 게이트 판정. 검사기는 손으로 쓴 케이스로 자기 검증만 하고 있고 관측 케이스는 0건이다 — `bin/romeo fixtures parity --report` 는 "미판정" 을 인쇄하고 종료 코드 1 로 끝난다(D-b). §6 을 두 번 돌리는 것만으로는 판정이 생기지 않는다 — §6.3 으로 모으고 §6.4 로 등록해야 관측 케이스가 생긴다.
 - **§3.7 의 `terminal create --command` → `worker-start --terminal` 경로 전체가 미관측이다.** 두 명령의 `--help` 시그니처와
   택일 관계(`(--agent <agent> | --terminal <handle>)`)는 실측했지만, (a) `terminal create --json` 이 어느 필드로 핸들을 돌려주는지,
   (b) `--command` 문자열이 터미널 쪽 셸에 그대로 전달되는지(중간에 다시 해석되는지), (c) `worker-start --terminal` 이 그 핸들을

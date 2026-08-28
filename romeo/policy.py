@@ -115,6 +115,9 @@ def classification_from_frontmatter(fm):
         "intent": fm.get("intent"),
         "facets": list(fm.get("facets") or []),
         "gates": list(fm.get("gates") or []),
+        # actions 를 빠뜨리면 종료 검사에서 실행 가드가 한 번도 발동하지 않는다 —
+        # GUARD_APPROVED 가 조용히 죽은 검사가 된다(K-66).
+        "actions": list(fm.get("actions") or []),
         "blast_radius": fm.get("blast_radius"),
         "uncertainty": fm.get("uncertainty"),
     }

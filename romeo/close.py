@@ -8,9 +8,10 @@ import yaml
 
 from . import HARNESS_ROOT, frontmatter
 from .docs import find_unit_dir
-from .evidence import exclusions, dirty_tree_hash_excluding, list_runs
+from .evidence import (RERUN_TIMEOUT, command_log_state, dirty_tree_hash_excluding, exclusions,
+                       list_runs, replay)
 from .gitinfo import head_sha
-from .parity import _envelope_defects, evidence_ref_error, load_role_contracts
+from .parity import _envelope_defects, evidence_ref_error, load_role_contracts, task_ref_error
 from .policy import classification_from_frontmatter, load_policy, load_project_state, route
 from .schema import validate as validate_schema
 from .util import dump_yaml, load_json, load_yaml, now_iso, rel, sha256_bytes, sha256_file, today
@@ -36,7 +37,127 @@ def required_checks(body):
     return data.get("required_checks") or []
 
 
-def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False):
+def _plan_key(plan):
+    """검증 계획을 대조용 형태로 줄인다 — 무엇을 어떤 기대로 실행하기로 했는가."""
+    return [(str((rc or {}).get("id")), str((rc or {}).get("command")), str((rc or {}).get("expect")))
+            for rc in plan]
+
+
+def _check_plan_committed(check, project_root, spec, plan):
+    """지금 읽고 있는 검증 계획이 **커밋된 계획**과 같은지 본다.
+
+    재실행 대조를 붙이자 위조가 한 겹 옆으로 갔다: 실패하는 검사(`false`)를 지우고 `true` 로 바꾼 뒤
+    그것을 진짜로 실행하면 기록도 로그도 재실행도 전부 맞는다. 고쳐진 것은 증거가 아니라 **주장 자체**다.
+    `docs/work/<unit>/` 는 신선도 계산에서 제외돼 있어(기록 행위가 트리를 바꾸므로) 이 편집은 어디에도 걸리지 않았다.
+
+    그래서 계획만은 커밋된 것과 대조한다 — 커밋되지 않은 계획은 어느 이력에도 없고 되짚을 수 없다.
+    **이것은 절반의 앵커다**: 계획을 고치고 커밋한 경우는 여전히 통과한다. 계획이 *승인 시점의* 계획인지까지
+    묶으려면 승인 기록이 그때의 계획을 남겨야 하고, 그것은 승인을 기록하는 쪽의 일이다."""
+    relpath = rel(spec, project_root)
+    proc = subprocess.run(["git", "show", f"HEAD:{relpath}"], cwd=str(project_root), capture_output=True)
+    if proc.returncode != 0:
+        check("CHECK_PLAN_COMMITTED", UNVERIFIED,
+              f"HEAD 에 {relpath} 가 없다 — 커밋되지 않은 검증 계획은 대조할 원본이 없다. "
+              f"승인된 spec.md 를 커밋한 뒤 다시 실행한다(D-a)")
+        return
+    _fm, committed_body = frontmatter.split(proc.stdout.decode("utf-8", "replace"))
+    try:
+        committed = required_checks(committed_body)
+    except Exception as e:
+        check("CHECK_PLAN_COMMITTED", UNVERIFIED, f"HEAD 의 {relpath} 에서 검증 계획을 읽을 수 없다 ({e})")
+        return
+    if _plan_key(committed) != _plan_key(plan):
+        check("CHECK_PLAN_COMMITTED", False,
+              f"검증 계획이 HEAD 에 커밋된 것과 다르다 — 커밋 {_plan_key(committed)} vs 지금 {_plan_key(plan)}. "
+              f"실행할 검사를 바꾸는 것은 증거가 아니라 주장을 바꾸는 것이다: 승인을 다시 받고 커밋한다")
+        return
+    check("CHECK_PLAN_COMMITTED", True, f"검사 {len(plan)}건이 HEAD 의 spec.md 와 같다")
+
+
+def _check_evidence_logs(check, project_root, ev):
+    """증거 기록의 명령들을 **원시 로그와 대조한다**(4차 리뷰 구멍 A, 2·3겹).
+
+    close 는 지금까지 evidence yaml 만 읽었다 — 그래서 `exit_code: 1` 을 `0` 으로 고치는 것만으로
+    전 항목 PASS 가 났다. 같은 사실이 원시 로그에도 적혀 있고 `log_sha256` 이 그 로그를 봉인한다.
+    `log_sha256` 은 지금까지 **쓰기만 하고 아무도 읽지 않았다** — 여기서 읽는다.
+
+    로그가 없는 경우(다른 체크아웃 — `.harness` 는 커밋되지 않는다)는 실패가 아니라 미검증이다.
+    없는 것을 어긴 것으로도, 통과로도 세지 않는다(K-51)."""
+    cmds = ev.get("commands") or []
+    if not cmds:
+        check("EVIDENCE_LOG", UNVERIFIED, "이 run 에는 실행 기록이 0건이다 — 로그와 대조할 것이 없다")
+        return
+    states, details = [], []
+    for c in cmds:
+        state, why = command_log_state(project_root, c)
+        states.append(state)
+        if why:
+            details.append(why)
+    detail = "; ".join(details)
+    if False in states:
+        check("EVIDENCE_LOG", False, detail)
+    elif None in states:
+        check("EVIDENCE_LOG", UNVERIFIED, detail)
+    else:
+        check("EVIDENCE_LOG", True, f"{len(cmds)}건이 원시 로그·log_sha256 과 일치")
+
+
+def _skip_rerun(check, plan, why):
+    """재실행을 하지 **않은** 이유를 검사 항목으로 남긴다.
+
+    조용히 건너뛰면 '재실행 대조를 했다' 와 구분되지 않는다. 재실행이 없었다는 사실은 미검증이지
+    통과가 아니다 — 그래서 UNVERIFIED 로 인쇄하고 done 을 막는다(K-51)."""
+    for rc in plan:
+        check("REQUIRED_CHECK_RERUN", UNVERIFIED, f"{rc.get('id')}: {why} — {rc.get('command', '')}")
+
+
+def _check_rerun(check, project_root, unit_id, plan, cmds, rerun, timeout):
+    """`required_checks` 를 **다시 실행해서** 기록된 종료 코드와 대조한다(4차 리뷰 구멍 A, 1겹 = 종점).
+
+    로컬 파일을 위조 불가로 만들 수는 없다 — 기록도 로그도 해시도 그 기계를 쓰는 사람이 고칠 수 있다.
+    고칠 수 없는 것은 **명령을 다시 돌린 결과**뿐이다. AGENTS.core §4 가 이미 그렇게 적혀 있다:
+    "완료는 증거로만 선언한다 — 주장에 맞는 명령을 새로 실행하고, 그 출력·종료 코드를 기록해야 한다."
+
+    재실행이 성립하지 않는 경우는 **막지 않고 드러낸다**: 부작용·비결정 때문에 다시 돌릴 수 없는 검사는
+    검증 계획에서 `rerun: false` 로 선언하고 이유를 적는다. 그러면 미검증으로 인쇄되고 통과로 세지 않는다 —
+    close 는 done 을 선언하지 않는다. 대조하지 못했다는 사실을 PASS 로 인쇄하는 것보다 낫다(K-51)."""
+    before = dirty_tree_hash_excluding(project_root, exclusions(unit_id))
+    ran = False
+    for rc in plan:
+        cmd = rc.get("command", "")
+        cid = rc.get("id")
+        rec = cmds.get(cmd)
+        if rec is None:
+            check("REQUIRED_CHECK_RERUN", UNVERIFIED,
+                  f"{cid}: evidence 에 기록이 없어 재실행과 대조할 값이 없다 — {cmd}")
+            continue
+        if rc.get("rerun") is False:
+            why = rc.get("rerun_reason") or "검증 계획이 재실행 대조를 선언하지 않았다"
+            check("REQUIRED_CHECK_RERUN", UNVERIFIED,
+                  f"{cid}: 재실행으로 확인되지 않았다 (rerun: false — {why}) — {cmd}")
+            continue
+        if not rerun:
+            check("REQUIRED_CHECK_RERUN", UNVERIFIED,
+                  f"{cid}: 재실행 대조를 건너뛰라고 했다(--no-rerun) — 기록만 읽은 판정이다: {cmd}")
+            continue
+        code, why = replay(project_root, cmd, timeout=timeout)
+        ran = True
+        if code is None:
+            check("REQUIRED_CHECK_RERUN", UNVERIFIED, f"{cid}: {why} — {cmd}")
+        elif code != rec.get("exit_code"):
+            check("REQUIRED_CHECK_RERUN", False,
+                  f"{cid}: evidence 는 exit {rec.get('exit_code')} 인데 지금 다시 실행하니 exit {code} 다 — "
+                  f"기록이 실행과 다르다. 증거를 다시 만든다(romeo evidence checks): {cmd}")
+        else:
+            check("REQUIRED_CHECK_RERUN", True, f"{cid}: 재실행도 exit {code} — {cmd}")
+    if ran and dirty_tree_hash_excluding(project_root, exclusions(unit_id)) != before:
+        check("REQUIRED_CHECK_RERUN", UNVERIFIED,
+              "재실행이 작업 트리를 바꿨다 — 부작용이 있는 검사이므로 재실행 전에 계산한 신선도 판정이 "
+              "더는 성립하지 않는다. 그 검사는 검증 계획에서 rerun: false 로 선언하고 이유를 적는다")
+
+
+def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
+               rerun=True, rerun_timeout=RERUN_TIMEOUT):
     project_root = Path(project_root).resolve()
     harness_root = Path(harness_root or HARNESS_ROOT)
     pol = load_policy(harness_root)
@@ -81,18 +202,33 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False):
             check("REQUIRED_CHECK", False, f"{rc.get('id')}: evidence 에 명령 없음 — {cmd}")
         else:
             check("REQUIRED_CHECK", rec["exit_code"] == 0, f"{rc.get('id')}: exit {rec['exit_code']} — {cmd}")
+    _check_evidence_logs(check, project_root, ev)
+    # 라우팅과 가드 승인은 **재실행보다 먼저** 판정한다. 재실행은 spec.md 의 셸 명령을 실제로 돌리므로,
+    # 승인되지 않은 가드가 걸린 단위에서 그것을 먼저 돌리면 K-66(승인 없이 실행하지 않는다)을 어긴다.
+    # dry-run 도 마찬가지다 — 읽기만 한다고 알려진 명령이 부작용을 내면 안 된다.
+    out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
+    unapproved = []
+    for g in out["guards"]:
+        approved = any(a.get("guard") == g["id"] for r in runs for a in r.get("approvals", []))
+        check("GUARD_APPROVED", approved, f"{g['id']} ({g['name']}) 승인 기록 없음")
+        if not approved:
+            unapproved.append(g["id"])
+    if plan:
+        _check_plan_committed(check, project_root, spec, plan)
+        if unapproved:
+            _skip_rerun(check, plan,
+                        "승인되지 않은 실행 가드가 있어 재실행하지 않았다 — 승인 없이 실행하지 않는다(K-66): "
+                        + ", ".join(unapproved))
+        else:
+            _check_rerun(check, project_root, unit_id, plan, cmds, rerun, rerun_timeout)
     check("AC_ALL_CHECKED", not UNCHECKED_RE.search(body), f"미체크 {len(UNCHECKED_RE.findall(body))}개")
     check("NO_OPEN_LOOP", "NEEDS_INPUT" not in body, f"NEEDS_INPUT {body.count('NEEDS_INPUT')}곳")
     check("HAS_CHANGE", bool(ev.get("changed_files")), f"changed_files {ev.get('changed_files')}" if ev.get("changed_files") else "changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다")
     spec_sha = sha256_file(spec)
     spec_same = (ev.get("spec_ref") or {}).get("sha256") == spec_sha
     check("SPEC_UNCHANGED_SINCE_EVIDENCE", spec_same, "" if spec_same else "spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.", level="warning")
-    out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
     if out["reviewer"] != "none":
         _check_review(check, udir, fm.get("id") or unit_id, harness_root, project_root)
-    for g in out["guards"]:
-        approved = any(a.get("guard") == g["id"] for r in runs for a in r.get("approvals", []))
-        check("GUARD_APPROVED", approved, f"{g['id']} ({g['name']}) 승인 기록 없음")
     return _finish(checks, fm, body, spec, runs, dry_run, project_root)
 
 
@@ -128,6 +264,9 @@ def _task_anchor(project_root, unit_id, env, harness_root):
     path = _inside(project_root, raw)
     if path is None:
         return None, f"task_envelope_ref.path 가 저장소 밖이다 ({raw})"
+    place = task_ref_error(unit_id, raw)
+    if place is not None:
+        return None, f"task_envelope_ref.path 가 {place} ({raw})"
     if not path.is_file():
         return None, f"task_envelope_ref.path 가 실재하지 않는다 ({raw}) — 계약은 손으로 쓰지 않고 계약 생성 명령이 만든다"
     data = path.read_bytes()
@@ -187,12 +326,67 @@ def _evidence_ref(env):
     return raw.strip() if isinstance(raw, str) and raw.strip() else None
 
 
+def _claimed_checks_vs_evidence(project_root, path, env):
+    """봉투가 **주장한 검사**가 그 증거에 실제로 기록돼 있는지 본다. 어긋나면 이유, 맞으면 None(4차 리뷰 구멍 B).
+
+    앵커가 '증거 파일이 실재하는가' 에서 멈추면, 진짜 증거를 가리키면서 실행된 적 없는 명령을 적을 수 있다 —
+    `pytest -q tests/` exit 0 을 손으로 타이핑해도 아무도 반박하지 않았다. 파일이 진짜인지만 보고
+    **봉투의 주장이 그 파일과 맞는지**는 보지 않았기 때문이다.
+
+    대조 키는 명령 문자열이다. id 는 기록하는 쪽이 붙이는 이름이라 달라질 수 있지만, 무엇을 실행했다고
+    주장하는지는 명령이 말한다. 같은 명령을 여러 번 실행했으면 그 중 하나와 종료 코드가 맞으면 된다.
+    봉투가 증거보다 적게 주장하는 것은 막지 않는다 — 이 검사가 막는 것은 **없는 것을 주장하는 쪽**이다."""
+    claims = env.get("checks") or []
+    if not claims:
+        return None                      # 주장한 검사가 없다 — 증거와 어긋날 것도 없다
+    try:
+        rec = load_yaml(path)
+    except Exception as e:
+        return f"evidence_ref 를 증거 기록으로 읽을 수 없다 ({e}) — 주장한 검사를 대조할 수 없다"
+    if not isinstance(rec, dict):
+        return "evidence_ref 가 증거 기록(YAML 매핑)이 아니다 — 주장한 검사를 대조할 수 없다"
+    recorded = {}
+    for c in rec.get("commands") or []:
+        if isinstance(c, dict) and isinstance(c.get("command"), str):
+            recorded.setdefault(c["command"], []).append(c)
+    bad = []
+    for c in claims:
+        cmd, code = (c or {}).get("command"), (c or {}).get("exit_code")
+        hits = recorded.get(cmd) or []
+        if not hits:
+            bad.append(f"{(c or {}).get('id')}: {cmd!r} 는 증거에 실행 기록이 없다")
+            continue
+        codes = [h.get("exit_code") for h in hits]
+        if code not in codes:
+            bad.append(f"{(c or {}).get('id')}: {cmd!r} 의 종료 코드가 증거와 다르다 "
+                       f"(봉투 {code} vs 증거 {codes})")
+            continue
+        # 원시 로그가 그 체크아웃에 남아 있으면 거기까지 본다. **없는 것은 어긴 것이 아니다** —
+        # .harness 는 커밋되지 않으므로 결과를 모은 체크아웃에는 로그가 없을 수 있다.
+        # 로그가 있는데 어긋나는 경우만 잡는다: 증거 파일이 손으로 고쳐졌다는 뜻이다.
+        for h in hits:
+            if h.get("exit_code") != code:
+                continue
+            state, why = command_log_state(project_root, h)
+            if state is False:
+                bad.append(f"{(c or {}).get('id')}: 증거 기록이 원시 로그와 어긋난다 — {why}")
+            break
+    if bad:
+        return ("봉투가 주장한 검사가 evidence_ref 의 기록과 맞지 않는다 — " + "; ".join(bad)
+                + ". 실행하지 않은 검사를 주장할 수 없다(K-51)")
+    return None
+
+
 def _evidence_anchor(project_root, udir, unit_id, env):
-    """판정이 지목한 증거가 이 작업 단위의 **증거 산출물**로 실재하는지 본다(K-51·K-62).
+    """판정이 지목한 증거가 이 작업 단위의 **증거 산출물**로 실재하고, **봉투의 주장이 그 증거와 맞는지** 본다
+    (K-51·K-62).
 
     실재하는 아무 파일이나 인정하면 검토자가 자기 입력인 spec.md 를 '읽은 증거' 로 지목해도 통과한다.
+    실재만 확인하고 멈추면 진짜 증거를 가리키면서 실행된 적 없는 검사를 주장해도 통과한다 —
+    앵커는 파일이 진짜인지와 **주장이 그 파일과 맞는지** 둘 다여야 한다.
     자리 규약은 동등성 판정과 같은 함수(`parity.evidence_ref_error`)에서 온다 — 같은 필드를 두 검사기가
-    다르게 보면 느슨한 쪽이 done 을 만든다(K-63).
+    다르게 보면 느슨한 쪽이 done 을 만든다(K-63). 이 함수를 종료 검사·`romeo envelope check`·
+    동등성 판정이 모두 지나간다.
 
     비어 있는 경우는 여기서 보지 않는다 — 부르는 쪽이 '검사 불가' 로 인쇄하고,
     PASS 를 주장한 봉투라면 역할 계약 검사가 EVIDENCE_MISSING 으로 잡는다."""
@@ -211,7 +405,7 @@ def _evidence_anchor(project_root, udir, unit_id, env):
         path.resolve().relative_to(udir.resolve())
     except ValueError:
         return f"evidence_ref 가 이 작업 단위 밖을 가리킨다 ({raw}) — 등록되지 않은 산출물은 인정하지 않는다"
-    return None
+    return _claimed_checks_vs_evidence(project_root, path, env)
 
 
 def envelope_checks(env, unit_id, role, project_root, udir, roles, schema, side="review",
