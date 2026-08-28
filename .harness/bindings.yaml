@@ -72,20 +72,22 @@ parity_swap:
 # 여기 목록이 정본이고, 런타임별 표현(설정 파일 패턴·기동 플래그)은 어댑터가 소유한다.
 permission_ceiling:
   # 승인 없이 실행하지 않는다. 되돌리기 어렵지만 정당할 수 있는 것들이다.
+  # 2026-08-29 사용자 결정으로 범위를 좁혔다. 남긴 기준은 **되돌릴 수 없는 유실**이다 —
+  # 지워진 작업 공간·브랜치·미커밋 변경은 복구할 방법이 없고, 병합은 이력을 바꾼다.
+  # 뺀 것들(git push · gh pr create · gh pr comment · gh pr review · gh api · git stash ·
+  # git worktree add · git worktree prune)은 되돌리는 방법이 있거나 파일을 지우지 않는다.
+  #
+  # 이 목록이 비었다고 그 행동이 자유로워지는 것은 아니다 — 런타임 프롬프트가 사라질 뿐,
+  # "되돌리기 어려운 작업은 영향 범위와 복구 방법을 설명하고 승인을 받는다" 는 규칙(K-66)은
+  # 지침으로 남아 있고 AGENTS.core §8 이 그것을 인쇄한다. 기계 강제와 규칙 강제의 차이다.
   approval_required:
-    - git push
-    - gh pr create
     - gh pr merge
-    - git worktree add
     - git worktree remove
-    - git worktree prune
     - git branch -D
     - git reset --hard
-    - git stash
-    - gh api
-    - gh pr comment
-    - gh pr review
   # 승인으로도 정당화되지 않는다.
+  # 대상은 **그 경로 자체**다 — 그 아래 임시 폴더를 지우는 것까지 막으면
+  # 정당한 정리가 막히고, 막힌 이유가 "위험해서" 가 아니라 "패턴이 넓어서" 가 된다.
   never:
     - rm -rf /
     - rm -rf ~

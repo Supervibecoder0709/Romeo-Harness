@@ -164,16 +164,33 @@ class TestCompile(unittest.TestCase):
         codes = sorted(f[0] for f in check_compiled(self.root))
         self.assertIn("COMPILE_SYMLINK", codes, "디렉터리 심링크를 통과시키면 안 된다")
 
+    def adapter_patterns(self):
+        """어댑터가 선언한 ask·deny 패턴. 목록 자체는 사람이 바꾸는 값이므로 여기에 고정하지 않는다."""
+        from romeo.util import load_yaml
+        cfg = load_yaml(self.root / "adapters/claude/adapter.yaml")
+        return cfg.get("settings_ask") or [], cfg.get("settings_deny") or []
+
     def test_settings_deny_is_written(self):
+        """어댑터가 선언한 패턴이 그대로 나가고, 두 분류가 겹치지 않는다.
+
+        특정 명령 이름을 여기에 적지 않는다 — 목록은 사람이 정하는 값이라
+        적어 두면 상한을 조정할 때마다 테스트가 깨지고, 그때 고치고 싶어지는 것은
+        정본이 아니라 테스트다. 이 검사가 지키는 것은 **목록의 내용이 아니라 배선**이다:
+        어댑터가 선언한 것이 빠짐없이 나가는가, ask 와 deny 가 섞이지 않는가.
+        """
         compile_all(self.root)
         import json
         data = json.loads((self.root / ".claude/settings.json").read_text(encoding="utf-8"))
         perms = data["permissions"]
-        # 되돌릴 수 있지만 승인이 필요한 것은 ask, 승인으로도 정당화 못 하는 것은 deny
-        self.assertIn("Bash(git push:*)", perms["ask"])
-        self.assertIn("Bash(gh pr merge:*)", perms["ask"])
+        ask, deny = self.adapter_patterns()
+        self.assertTrue(ask, "어댑터의 settings_ask 가 비었다 — 승인 게이트가 통째로 사라졌다")
+        self.assertTrue(deny, "어댑터의 settings_deny 가 비었다 — 자동 거부가 통째로 사라졌다")
+        self.assertEqual(perms["ask"], ask, "어댑터가 선언한 ask 와 산출물이 다르다")
+        self.assertEqual(perms["deny"], deny, "어댑터가 선언한 deny 와 산출물이 다르다")
+        self.assertEqual(set(perms["ask"]) & set(perms["deny"]), set(),
+                         "같은 패턴이 ask 와 deny 에 동시에 있다 — 어느 쪽이 이기는지 알 수 없다")
+        # deny 는 승인으로도 정당화되지 않는 것이다. 그중 하나는 반드시 관리자 권한 삭제다.
         self.assertIn("Bash(sudo rm:*)", perms["deny"])
-        self.assertNotIn("Bash(git push:*)", perms["deny"])
 
     def test_settings_preserves_other_keys(self):
         import json
@@ -185,14 +202,17 @@ class TestCompile(unittest.TestCase):
         data = json.loads(p.read_text(encoding="utf-8"))
         self.assertEqual(data["model"], "opus", "하네스가 소유하지 않는 키를 지웠다")
         self.assertEqual(data["permissions"]["allow"], ["Bash(ls:*)"])
-        self.assertIn("Bash(git push:*)", data["permissions"]["ask"])
+        ask, _ = self.adapter_patterns()
+        self.assertEqual(data["permissions"]["ask"], ask,
+                         "사용자 키를 보존하면서 하네스 소유 키도 그대로 나가야 한다")
 
     def test_check_detects_removed_deny_rule(self):
         import json
         compile_all(self.root)
         p = self.root / ".claude/settings.json"
         data = json.loads(p.read_text(encoding="utf-8"))
-        data["permissions"]["ask"] = [d for d in data["permissions"]["ask"] if "git push" not in d]
+        # 어느 한 줄을 지우든 잡혀야 한다 — 무엇을 지웠는지가 아니라 지웠다는 사실이 판정 대상이다.
+        data["permissions"]["ask"] = data["permissions"]["ask"][1:]
         p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         codes = sorted(f[0] for f in check_compiled(self.root))
         self.assertIn("COMPILE_STALE", codes)

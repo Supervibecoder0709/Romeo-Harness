@@ -88,22 +88,21 @@ local_skills: []
 # ask  = 되돌리기 어렵지만 정당한 작업. "승인 없이 실행하지 않는다" 를 그대로 구현한다 — 매번 확인한다.
 # deny = 승인으로도 정당화되지 않는 것. 프롬프트 없이 거부한다.
 settings_ask:
-  - "Bash(git push:*)"
-  - "Bash(gh pr create:*)"
   - "Bash(gh pr merge:*)"
   - "Bash(git worktree remove:*)"
-  - "Bash(git worktree prune:*)"
   - "Bash(git branch -D:*)"
   - "Bash(git reset --hard:*)"
-  - "Bash(git stash:*)"
-  - "Bash(gh api:*)"
-  - "Bash(gh pr comment:*)"
-  - "Bash(gh pr review:*)"
-  - "Bash(git worktree add:*)"
 
+# deny 는 **그 경로 자체**만 잡는다. `rm -rf /*` 처럼 쓰면 와일드카드가
+# 절대 경로 전부를 삼켜 `rm -rf /var/folders/<임시>` 같은 정당한 정리까지 막는다
+# (2026-08-29 실측: 임시 디렉터리 정리가 거부됐다). 막으려던 것은 루트와 홈 그 자체다.
 settings_deny:
-  - "Bash(rm -rf /*)"
-  - "Bash(rm -rf ~/*)"
+  - "Bash(rm -rf /)"
+  - "Bash(rm -rf / )"
+  - "Bash(rm -rf ~)"
+  - "Bash(rm -rf ~/)"
+  - "Bash(rm -fr /)"
+  - "Bash(rm -fr ~)"
   - "Bash(sudo rm:*)"
   - "Bash(git push --force:*)"
   - "Bash(git push -f:*)"

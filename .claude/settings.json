@@ -1,22 +1,18 @@
 {
   "permissions": {
     "ask": [
-      "Bash(git push:*)",
-      "Bash(gh pr create:*)",
       "Bash(gh pr merge:*)",
       "Bash(git worktree remove:*)",
-      "Bash(git worktree prune:*)",
       "Bash(git branch -D:*)",
-      "Bash(git reset --hard:*)",
-      "Bash(git stash:*)",
-      "Bash(gh api:*)",
-      "Bash(gh pr comment:*)",
-      "Bash(gh pr review:*)",
-      "Bash(git worktree add:*)"
+      "Bash(git reset --hard:*)"
     ],
     "deny": [
-      "Bash(rm -rf /*)",
-      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf / )",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/)",
+      "Bash(rm -fr /)",
+      "Bash(rm -fr ~)",
       "Bash(sudo rm:*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"

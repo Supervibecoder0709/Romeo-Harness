@@ -1,4 +1,4 @@
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=8d73dfb4 -->
+<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=22018f86 -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
@@ -106,7 +106,7 @@
 - 이 런타임에서의 전달 방식: 기동 플래그(샌드박스 모드)와 지침 파일 인쇄로 전달한다. 이 런타임에는 저장소에 커밋해 발견되는 권한 설정 파일이 없고, 비대화형 실행에는 승인 정책 플래그도 없다 — 승인 게이트는 하네스가 소유한다(승인 기록 없이 실행하지 않는다).
 - 기본 실행에서 이 런타임이 `reviewer` 일 때: codex exec -s read-only (관측됨)
 - 교체 실행에서 이 런타임이 `implementer` 일 때: codex exec -s workspace-write -C <작업 공간> (**미관측**)
-- 승인 없이 실행하지 않는다: `git push` · `gh pr create` · `gh pr merge` · `git worktree add` · `git worktree remove` · `git worktree prune` · `git branch -D` · `git reset --hard` · `git stash` · `gh api` · `gh pr comment` · `gh pr review`
+- 승인 없이 실행하지 않는다: `gh pr merge` · `git worktree remove` · `git branch -D` · `git reset --hard`
 - 승인으로도 정당화되지 않는다: `rm -rf /` · `rm -rf ~` · `sudo rm` · `git push --force`
 
 이 상한은 역할이 아니라 실행에 붙는다. 역할 교체 실행에서 구현자가 바뀌어도 같은 목록이 적용되지 않으면, 그 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다. 설정 파일로 기계 강제할 수 없는 런타임에서는 지침 파일에 인쇄해 규칙으로만 강제한다 — 그 차이는 위 enforcement_observed 로 드러낸다.

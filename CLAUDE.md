@@ -18,7 +18,7 @@
 
 작업 결과는 완료한 내용, 변경된 항목, 검증 방법과 결과, 미검증 사항과 남은 위험, 다음 우선 작업을 중심으로 보고한다. 변동하는 요구사항, 구현 계획과 진행 상태는 프로젝트 인덱스와 개별 문서에서 관리한다.
 
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=1e32aec6 -->
+<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=1d8426dd -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
@@ -126,7 +126,7 @@
 - 이 런타임에서의 전달 방식: `.claude/settings.json` 의 permissions.ask·deny 로 내보낸다 — 지침 문구가 아니라 런타임이 실행 시점에 확인하는 설정이다.
 - 기본 실행에서 이 런타임이 `implementer` 일 때: .claude/settings.json 의 permissions.ask·deny (승인 게이트) (**미관측**)
 - 교체 실행에서 이 런타임이 `reviewer` 일 때: claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config (관측됨)
-- 승인 없이 실행하지 않는다: `git push` · `gh pr create` · `gh pr merge` · `git worktree add` · `git worktree remove` · `git worktree prune` · `git branch -D` · `git reset --hard` · `git stash` · `gh api` · `gh pr comment` · `gh pr review`
+- 승인 없이 실행하지 않는다: `gh pr merge` · `git worktree remove` · `git branch -D` · `git reset --hard`
 - 승인으로도 정당화되지 않는다: `rm -rf /` · `rm -rf ~` · `sudo rm` · `git push --force`
 
 이 상한은 역할이 아니라 실행에 붙는다. 역할 교체 실행에서 구현자가 바뀌어도 같은 목록이 적용되지 않으면, 그 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다. 설정 파일로 기계 강제할 수 없는 런타임에서는 지침 파일에 인쇄해 규칙으로만 강제한다 — 그 차이는 위 enforcement_observed 로 드러낸다.
