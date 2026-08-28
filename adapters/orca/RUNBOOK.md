@@ -35,9 +35,18 @@ orca worktree current --json
 | `role` | 구현자는 `--agent <.harness/bindings.yaml 의 roles.implementer.runtime>`. 검토자는 `--agent` 를 쓰지 않는다 — 강제 수단을 걸어야 하므로 §3.7 의 `--terminal <handle>` 경로로 간다. 하드코딩하지 않고, 교체 실행은 `parity_swap.<role>` 을 쓴다 | D-68, `worker-start --help` |
 | `base_sha` | 승인된 `spec.md` 가 들어 있는 커밋이다(§3.1). 새 워크트리는 `--base-branch <그 커밋이 tip 인 브랜치>`, 기존 워크트리는 `orca worktree current --json` 의 `head` 로 확인만 한다. 두 역할이 같은 값을 받아야 한다 | D-a, 계획 :573 |
 | `allowed_paths: []` (검토자) | `roles.reviewer.enforcement` 의 명령형(`codex exec -s read-only`)을 `orca terminal create --command` 로 띄우고 그 핸들을 `worker-start --terminal` 로 채택한다(§3.7). `worker-start --agent` 에는 샌드박스 플래그도 명령 passthrough 도 없다(실측) | `codex exec --help`, `terminal create --help`, `worker-start --help`, D-68 |
-| `output_schema` | Codex `--output-schema <파일경로>` + `-o <파일>` · Claude `--json-schema <스키마>` | 두 CLI `--help` |
+| `output_schema` | **넘기지 않는다.** 형식 검증은 §3.8 의 `envelope check` 가 원본 스키마로 한다 — 그쪽이 더 강한 강제다(앵커 검사 5개). 출력 회수는 Codex `-o <파일>` · Claude `--output-format json` 으로만 한다 | 2026-08-29 관통 실측 — 아래 경고 |
 | `required_checks` | 워커 안에서 `bin/romeo evidence checks --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>` 로 실행한다. 위임 계층이 대신 실행하지 않는다. **`<dispatch-id>` 는 §3.5 가 돌아온 뒤에야 존재한다** — 그 값을 돌고 있는 워커에게 넣는 자리는 §3.5.2 이고, 워커는 그 전에 증거 기록을 시작하지 않는다 | K-51, §3.5.2, §5 |
 | `guards` | §8. M2 는 `bin/romeo evidence approve` 로 기록한다 | `core/policy/execution-guards.yaml` |
+
+**`--output-schema` 를 쓰지 않는 이유 — 이 저장소의 스키마로는 실행이 거부된다(2026-08-29 실측).**
+`codex exec --output-schema core/schemas/result-envelope.json` 은 HTTP 400 으로 끝난다:
+`Invalid schema for response_format 'codex_output_schema': In context=('anyOf','0','properties','schema'), schema must have a 'type' key.`
+`core/schemas/result-envelope.json` 의 `anyOf` 절은 역할별 제약을 표현하려고 `"schema": {}` 같은 **빈 하위 스키마**를 쓰는데,
+그 런타임이 요구하는 형식은 모든 property 에 `type` 키를 요구한다. JSON Schema 로는 완전히 유효하므로
+스키마 검사기로는 잡히지 않고 **그 CLI 를 실제로 호출해야만** 드러난다.
+형식을 강제할 자리는 여기가 아니다 — §3.8 의 `envelope check` 가 같은 원본 스키마로 검증하고 앵커 검사 4개를 더 건다.
+그래서 이 문서는 `--output-schema` 를 넘기지 않고, 출력 **형식**은 워커 프롬프트가 지시하고 **검증**은 종료 경로가 한다.
 
 `--model` 과 `--effort` 는 **넘기지 않는다** — 계정 기본값을 쓴다(K-12). `--effort` 는 `--model` 을 요구하고, 둘 다 `--terminal` 과 결합할 수 없다(실측).
 
@@ -350,6 +359,30 @@ passthrough(`--`) 도 없다(실측). 즉 §4 가 정본이라고 선언한 강�
 `--agent` 로 띄우면 검토자는 아무 샌드박스 없이 기동된다. 그래서 **강제 수단이 걸린 명령을 터미널로 띄우고, 그 터미널을 워커로 채택**한다.
 두 명령 모두 `--help` 실측이고, `worker-start` 는 `(--agent <agent> | --terminal <handle>)` 로 택일이다.
 
+**`--command` 에 넣는 것은 비대화형 실행이 아니라 대화형(TUI) 실행이다 — 2026-08-29 관통에서 확정.**
+같은 강제 수단(`-s read-only`)을 두 형태로 시험했고 결과가 정반대였다.
+
+| `--command` 에 넣은 것 | `worker-start --terminal` 결과 |
+| --- | --- |
+| `codex exec -s read-only …` (비대화형) | **실패** — `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled` |
+| `codex -s read-only` (TUI) | **성공** — `state: ready` · `stage: input_accepted` |
+
+이유는 두 명령이 프롬프트를 받는 자리가 다르기 때문이다. `worker-start --terminal` 은 채택한 터미널에
+**task spec 과 lifecycle 프리앰블을 입력으로 주입**한다. 비대화형 실행은 프롬프트를 argv 로 이미 받고 입력을 더 받지 않으므로
+그 주입이 갈 곳이 없다. 그 실행은 계속 돌지만(argv 로 받은 일은 한다) **Dispatch 는 실패로 settle 되고
+`worker_done`·heartbeat·`ask` 가 전부 없다** — 즉 §3.6 의 대기가 그 워커에게는 영원히 오지 않는다.
+
+따라서 검토자는 **TUI 로 띄운다.** 그러면 세 가지가 동시에 성립한다.
+
+1. 강제가 걸린다 — 그 런타임의 TUI 도 같은 `-s/--sandbox` 플래그를 받는다(`codex --help` 실측).
+2. lifecycle 이 산다 — 주입을 받을 수 있으므로 `worker_done` 을 보낼 수 있고 §3.6 의 대기가 성립한다.
+3. **§3.4 의 `--spec` 이 검토자에게 실제로 도달한다.** 비대화형 경로에서는 `--spec` 이 오케스트레이션 DB 에만 남고
+   프롬프트로 가지 않아, 절차 문서(`core/workflows/review/SKILL.md`)를 가리키는 문장이 워커에 닿지 않았다.
+
+비대화형 형태를 굳이 쓸 이유가 있다면(예: 그 실행 자체를 관측하고 싶을 때) 워커로 채택하지 말고
+터미널만 만들어 `-o` 출력으로 회수한다. 그때 그 Task 는 orchestration 이 완료로 표시하지 못하므로
+**`task-update` 로 사람이 정리해야 한다** — lifecycle 을 포기하는 선택임을 알고 해야 한다.
+
 **기동 전 조건.** §3.1 의 확인 3개를 통과했고, **§3.5.1 의 확인 3개(종료 코드·sha256 일치·`ls` 2행)를 통과했으며**,
 검토자 기동 **직전**의 §4 방어 검사(`review-tree-before`)를 이미 기록했다.
 계약이 `$W` 안에 없으면 아래 `$(cat '$T')` 가 빈 문자열이 되어 검토자가 프롬프트 없이 돈다 — 그 실패는 조용하다.
@@ -359,10 +392,15 @@ passthrough(`--`) 도 없다(실측). 즉 §4 가 정본이라고 선언한 강�
 ```bash
 W=<구현자 워크트리 절대경로>
 T=$W/docs/work/<id>/task/<run-id>-reviewer.json      # §3.5.1 이 이 워크트리 안에 실재시킨 검토자 계약
-R=<위임한 쪽이 지정한 검토자 출력 파일의 절대경로>       # 검토자가 고르지 않는다(§4)
-SCHEMA=$W/core/schemas/result-envelope.json                 # §3.1 확인 2 가 이 파일이 그 트리에 있음을 보장한다
 
-CMD="codex exec -s read-only -C '$W' --output-schema '$SCHEMA' -o '$R' \"\$(cat '$T')\""
+# 검토자에게 갈 프롬프트 = 절차 지시 + 계약 JSON. 두 파일을 이어 붙여 한 프롬프트로 넘긴다.
+# 절차 파일은 검토 대상 워크트리 **밖**에 둔다 — 안에 두면 §4 방어 검사가 그 파일 때문에 무효가 된다.
+P=<절차 지시 파일의 절대경로>                                # §3.4 의 검토자 --spec 과 같은 내용
+
+# 그 절차 파일에는 계약의 sha256 을 **위임한 쪽이 계산해** 적어 둔다(아래 상자 참조).
+shasum -a 256 "$T" | cut -d' ' -f1
+
+CMD="codex -s read-only -C '$W' \"\$(cat '$P'; cat '$T')\""
 
 orca terminal create \
   --worktree "path:$W" \
@@ -380,12 +418,45 @@ orca terminal create \
 `\$(cat '$T')` 의 `\$` 는 바깥 셸의 확장을 막는 것이다. 계약 JSON 을 여기서 펼치지 않고 **문자열 그대로** 넘겨,
 터미널 쪽 셸이 자기 워크트리에서 그 파일을 읽게 한다. 바깥에서 펼치면 계약 본문의 따옴표가 명령 문자열을 깨뜨린다.
 
-**미확인 — 반환 JSON 의 어느 필드가 핸들인가.** 상태를 바꾸는 명령이라 실행하지 않았다(§11).
-첫 실행에서 이렇게 확인한다. (a) `terminal create ... --json` 출력에서 핸들처럼 보이는 값을 고른다.
-(b) 그 값을 `orca terminal show --terminal <값> --json` 에 넣는다. 방금 만든 터미널(같은 `--title`, 같은 워크트리)이
-종료 코드 0 으로 돌아오면 그 필드가 핸들이다. 돌아오지 않으면 (c) `orca terminal list --worktree "path:$W" --json` 에서
-같은 제목의 행을 찾아 그 행의 핸들 필드를 쓰고, 다시 (b) 로 확인한다. **확인되기 전에는 (2) 로 넘어가지 않는다** —
-핸들을 짐작해 넣으면 실패가 "강제 없이 기동됨" 과 구분되지 않는다.
+**핸들은 `.result.terminal.handle` 이다(2026-08-29 실측).** 반환 JSON 은
+`{ok, result: {terminal: {handle, tabId, paneKey, ptyId, worktreeId, title, executionHostId, hostPlatform, surface}}}` 이고
+`handle` 이 `term_<uuid>` 형태다. 확인 절차는 그대로 둔다 — 판이 바뀌면 필드도 바뀔 수 있고, 짐작해 넣은 실패는
+"강제 없이 기동됨" 과 구분되지 않기 때문이다. (a) 그 값을 고른다. (b) `orca terminal show --terminal <값> --json` 에 넣어
+방금 만든 터미널(같은 `--title`, 같은 워크트리)이 종료 코드 0 으로 돌아오는지 본다. 돌아오지 않으면
+(c) `orca terminal list --worktree "path:$W" --json` 에서 같은 제목의 행을 찾아 다시 (b) 로 확인한다.
+**확인되기 전에는 (2) 로 넘어가지 않는다.**
+
+TUI 는 기동에 시간이 걸리므로 (2) 전에 준비를 기다린다 — 기다리지 않고 채택하면 주입이 기동과 경쟁한다.
+
+```bash
+orca terminal wait --terminal "$HANDLE" --for tui-idle --timeout-ms 90000 --json
+```
+
+성공 신호: `.result.wait.satisfied == true` 이고 `.result.wait.status == "running"`(실측).
+
+**절차 파일에 계약 해시를 적어 준다 — 적지 않으면 두 런타임의 판정이 갈린다(2026-08-29 관통에서 확정).**
+
+결과 계약 스키마는 검토자에게 `task_envelope_ref.sha256` 을 요구한다. 그런데 검토자의 역할 계약
+(`core/roles/reviewer.yaml` 의 `capabilities: [read, search]`)과 절차 문서(`core/workflows/review/SKILL.md` 2번)는
+**명령 실행을 금지**한다. 해시 계산은 명령 실행이므로, 계약을 지키는 검토자는 그 필드를 채울 수 없다.
+
+두 실행에서 실제로 갈렸다.
+
+| 검토자 | 강제 수단 | 명령 실행 | 역할 계약 | 결과 |
+| --- | --- | --- | --- | --- |
+| codex | `-s read-only` | **가능** — 샌드박스는 쓰기만 막고 읽기 명령은 막지 않는다(프로브로 확인: `shasum` 이 `succeeded in 0ms` 로 정확한 해시를 냈다) | **위반** | 해시를 스스로 계산해 판정을 냈다 |
+| claude | `--tools "Read" "Grep" "Glob"` | 불가 — 도구 목록에 실행이 없다 | 준수 | 해시를 채우지 못해 `BLOCKED_CAPABILITY` · 그 봉투는 `TASK_ANCHORED` 에서 거부됐다 |
+
+**계약을 지킨 쪽이 판정을 못 내고 어긴 쪽이 냈다.** 그 상태로는 동등성 비교가 성립하지 않는다 —
+비교되는 것이 두 런타임의 판정이 아니라 **두 런타임의 권한 초과 여부**이기 때문이다.
+
+그래서 해시는 **위임한 쪽이 계산해 프롬프트에 적어 준다.** 검토자에게는 "직접 계산하지 마라, 이 값을 옮겨 적어라" 를
+명시한다. 이렇게 하면 역할 계약을 약화시키지 않고 앵커 검사(`TASK_ANCHORED` 의 재계산 대조)도 그대로 강하다 —
+검토자가 옮겨 적은 값이 틀리면 §3.8 의 `envelope check` 가 잡는다.
+
+**`-s read-only` 가 강제하지 못하는 것을 여기 적어 둔다.** 그 플래그는 **모델이 만든 셸 명령의 쓰기**를 막을 뿐,
+명령 실행 자체를 막지 않는다. 역할 계약의 "명령을 실행하지 않는다" 는 그 수단으로 강제되지 않고 **지침으로만 존재한다**.
+§4 표의 `강제 수단` 칸이 덮는 범위가 역할 계약보다 좁다는 뜻이다 — 그 차이를 아는 것이 이 문단의 목적이다.
 
 (2) 그 터미널을 워커로 채택한다. `HANDLE` 은 (1) 에서 **확인이 끝난** 값이다.
 
@@ -437,8 +508,16 @@ ls "$W/docs/work/<id>/result/<run-id>-implementer.json"
 계약은 실행이 만들고, 손으로 만든 파일은 §3.1 의 재계산 대조를 통과하지 못한다.
 
 **검토자는 자기 결과를 스스로 쓰지 않는다.** 검토자를 띄운 쪽이 위 경로에 쓴다. 그래야 read-only 강제와 종료 검사와 K-62 가 동시에 성립한다.
-받아오는 자리는 둘이고 순서가 있다 — §3.7 이 지정한 `-o "$R"` 파일이 실제로 만들어졌으면 그 내용을 `review/` 경로에 쓰고,
-없으면 `worker-read` 로 회수해 쓴다. `-o` 가 read-only 아래에서 파일을 쓰는지는 §11 의 미검증 항목이라 두 자리를 다 남겨 둔다.
+받아오는 자리는 둘이고, §3.7 을 어느 형태로 띄웠는지가 어느 자리를 쓸지 정한다.
+
+- **TUI 로 띄워 워커로 채택한 경우**(§3.7 의 권장 경로): 판정은 `worker_done` 과 함께 오고,
+  본문은 `worker-read --dispatch <검토자 dispatch-id>` 로 회수한다.
+- **비대화형으로 띄워 워커로 채택하지 않은 경우**: 판정은 `-o` 가 지정한 파일에 떨어진다.
+  **그 파일은 read-only 아래에서도 만들어진다**(2026-08-29 실측 — 검토 대상 워크트리 **밖** 경로에 855바이트를 썼다).
+  `-s` 는 **모델이 만든 셸 명령**에만 걸리고 CLI 자신이 여는 출력 파일에는 걸리지 않기 때문이다.
+  그래서 `-o` 대상은 검토 대상 워크트리 **밖**에 둔다 — 안에 두면 §4 의 방어 검사가 그 파일 때문에 무효가 된다.
+
+어느 자리에서 받았든 `review/` 경로에 쓰는 것은 위임한 쪽이다. 검토자가 그 파일을 쓰지 않는다.
 
 ```bash
 orca orchestration worker-read --dispatch <검토자 dispatch-id> --source auto --limit 400 --json
@@ -553,14 +632,33 @@ orca orchestration worker-release --dispatch <dispatch-id> --json
 
 | 실행 | 역할 | 정본 키 | 강제 수단 | 단독 프로브 | §3 기동 경로 |
 | --- | --- | --- | --- | --- | --- |
-| 기본 | 검토자 | `roles.reviewer.enforcement` | `codex exec -s read-only` | 예 | **아니오 — 미관측**(§3.7 의 2단계는 아직 실행하지 않았다) |
-| 교체 | 검토자 | `parity_swap.reviewer.enforcement` | `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config` | 예 | **아니오 — 미관측** |
+| 기본 | 검토자 | `roles.reviewer.enforcement` | `-s read-only` | 예 | **예 — 2026-08-29 관통** (§4 방어 검사가 `유효`) |
+| 교체 | 검토자 | `parity_swap.reviewer.enforcement` | `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config` | 예 | 같은 관통의 교체 실행에서 방어 검사로 판정 |
 | 기본 | 구현자 | `roles.implementer.enforcement` | `.claude/settings.json` 의 `permissions.ask`·`deny` | **아니오** | **아니오** |
-| 교체 | 구현자 | `parity_swap.implementer.enforcement` | `codex exec -s workspace-write -C <작업 공간>` | **아니오** | **아니오** |
+| 교체 | 구현자 | `parity_swap.implementer.enforcement` | `-s workspace-write` | **부분** — 아래 | **부분** — 아래 |
 
 검토자 두 행의 앞칸이 `예` 인 것은 `.harness/bindings.yaml` 의 `enforcement_observed: true` 와 같은 관찰이다 —
-빈 디렉터리에 파일 생성을 지시한 단독 프로브였고, `worker-start` 로 기동한 워커에 대한 관찰이 아니다.
-구현자 쪽 두 칸은 서로 다른 종류의 수단이고(설정 파일 승인 게이트 vs 샌드박스 플래그) 둘 다 미관찰이다 — §11 에 남긴다.
+빈 디렉터리에 파일 생성을 지시한 단독 프로브였다.
+
+**기본 검토자의 오른쪽 칸이 `예` 로 바뀐 근거**(2026-08-29): §3.7 로 기동한 검토자가 도는 동안
+§4 의 방어 검사가 `유효` 를 냈다 — `review-tree-before` 와 `review-tree-after` 의 `log_sha256` 이 같은 값
+(`2bc7dad48f31…`)이었다. 검토자가 그 워크트리에서 아무것도 바꾸지 않았다는 뜻이다. 이것은 **강제가 작동했다는 사후 확인**이지
+강제 그 자체가 아니다 — 검토자가 쓰기를 시도했다가 막힌 것을 본 것은 단독 프로브 쪽이다.
+
+**교체 구현자가 `부분` 인 이유 — 샌드박스는 걸렸지만 무엇을 막는지는 절반만 봤다.**
+`codex -s workspace-write` 로 띄운 워커가 `orca orchestration send --type worker_done` 을 실행하자
+`runtime_unavailable: Could not connect to the running Orca app.` 로 실패했다. 같은 명령이 위임한 쪽 셸에서는
+정상 동작하므로, 이것은 **그 샌드박스가 실제로 프로세스에 적용됐다는 관측**이다(작업 공간 밖 IPC 를 막았다).
+그러나 이 관통이 보지 못한 것이 둘 있다 — (a) 작업 공간 **밖 파일 쓰기**를 막는지, (b) 승인 대상 명령을 막는지.
+두 구현자 모두 승인 대상 명령을 시도하지 않았으므로 그 칸은 여전히 미관측이다.
+
+**그리고 이 관측은 대가를 드러낸다.** 구현자에게 샌드박스 강제를 걸면 그 워커는 오케스트레이터에게 보고할 수 없다 —
+`worker_done`·heartbeat·`ask` 가 전부 같은 IPC 를 쓰기 때문이다. 그때 Task 는 스스로 완료되지 못하고
+위임한 쪽이 `worker-abandon` → `task-update --status completed` 로 정리해야 한다(실측 경로).
+`worker-stop` 은 `terminal create` 로 만든 터미널을 "external" 로 보아 정리하지 못한다
+(`stop_unknown` · `The worker terminal is external; no terminal was closed.`).
+즉 **강제와 lifecycle 은 이 조합에서 동시에 성립하지 않는다.** 어느 쪽을 포기할지는 역할 바인딩의 결정이고,
+포기한 쪽은 `enforcement_observed` 와 이 문단이 드러낸다.
 오른쪽 칸이 전부 `아니오` 인 지금, 강제가 실제로 걸렸는지 아는 유일한 수단은 아래 방어 검사다.
 승인 대상 명령 목록(`permission_ceiling`)은 역할이 아니라 실행에 붙는다. 어느 런타임이 구현자든 같은 목록이 걸려야 한다(K-66).
 
@@ -888,32 +986,46 @@ orca orchestration gate-list --json
 - 다시 실행할 수 없는 명령(부작용·비결정·상한 시간 초과)을 `required_checks` 에 넣는 것. 그런 단계는 가드 승인(§8)과 증거로 남긴다.
 - 결과 계약을 한 체크아웃으로 모으지 않은 채 동등성 게이트를 말하는 것. 모으고 등록하지 않으면 관측 케이스가 생기지 않고 게이트는 계속 미판정이다(§6.3·§6.4).
 
-## 11. 미검증
+## 11. 관측된 것과 아직 미검증인 것
 
-아래는 이 문서를 쓰면서 **확인하지 못한** 것이다. 상태를 바꾸는 명령을 실행하지 않았기 때문이다.
+2026-08-29 에 이 문서의 §3 을 **두 번 관통했다** — 기준 실행(구현자 claude · 검토자 codex)과
+역할 교체 실행(구현자 codex · 검토자 claude). 아래 목록은 그 실행 전후로 나뉜다.
+`관측` 은 실행해서 봤다는 뜻이고, `미검증` 은 아직 실행으로 확인하지 못했다는 뜻이다(K-51).
 
-- `run-create`·`task-create`·`worker-start`·`check --wait`·`worker-release`·`terminal create`·`send`·`dispatch-show` 의 실제 반환 JSON 구조. 필드 이름은 각 명령의 `--help` 와 Notes 에서만 읽었다. 관측한 JSON 은 `orca status --json`·`orca worktree current --json`·`orca orchestration run-current --json` 셋뿐이다.
-- **§3.5.2 의 식별자 전달이 워커에 실제로 닿는지.** `send --to dispatch:<id>` 가 "그 시도에 한정된 조정 지시를 워커 쪽으로 durable 하게 중계한다" 는 것은 `--help` Notes 의 문장이고, 돌고 있는 워커가 그 메시지를 읽어 evidence 플래그에 반영하는 것은 관측하지 못했다. 판정 수단은 §3.8 의 식별자 검사다 — 그 검사가 `불일치` 를 내면 이 경로가 닫히지 않은 것이다.
-- **종료 검사의 재실행 대조를 위임 실행에서 관측하지 않았다.** 플래그(`--no-rerun`·`--rerun-timeout`)와 검사 이름(`REQUIRED_CHECK_RERUN`·`CHECK_PLAN_COMMITTED`·`EVIDENCE_LOG`)은 `romeo close --help` 와 `romeo/close.py` 로 실측했지만, 자식 워크트리에서 close 를 돌려 본 적이 없다. 특히 (a) 워커가 남긴 검사가 그 워크트리에서 다시 실행 가능한지, (b) 재실행이 트리를 바꾸지 않는지, (c) `.harness/runs/` 의 로그가 그 체크아웃에 있어 `EVIDENCE_LOG` 가 미검증으로 떨어지지 않는지는 실행해야 안다.
-- **§6.3 모으기 · §6.4 등록 · §6.5 판정을 실행하지 않았다.** 명령과 실패 메시지는 `romeo/parity.py`·`romeo/close.py`·`romeo/cli.py` 의 코드와 `--help` 로 대조했지만, 두 자식 워크트리가 실제로 갈라진 상태에서 모아 본 적은 없다. 특히 `TASK_ANCHORED` 가 모으는 체크아웃에서 통과하는지는 실행해야 안다.
-- `--worktree` selector 형식(`path:`·`id:<repoId>::<path>`·`name:`·`branch:`)이 실제로 어떻게 해석되는지. 도움말이 나열한 형식을 그대로 옮겼다.
-- `check --types` 가 받는 값의 전체 목록. `worker_done`·`escalation`·`question` 만 실제 사용 사례에서 확인했다.
+### 11.1 관측된 것 (2026-08-29 관통)
+
+| 무엇 | 관측 결과 |
+| --- | --- |
+| `run-create` 반환 구조 | `.result.run.id` = `run_<12hex>` |
+| `task-create` 반환 구조 | `.result.task.{id,status,task_title,spec}` · `--deps` 를 준 태스크는 `status: pending`, 의존 없는 쪽은 `ready` |
+| `worker-start` 반환 구조 | `.result.{dispatchId,state,stage,setup,launch,timeoutMs,effects,residualResources}`. **자식 워크트리 경로는 `effects[]` 의 `kind: worktree` 행 `id` 에 `<repoId>::<절대경로>` 로 실린다** |
+| `terminal create` 반환 구조 | `.result.terminal.handle` = `term_<uuid>` (§3.7) |
+| `terminal wait` 반환 구조 | `.result.wait.{satisfied,status,exitCode}` |
+| `worker-read` 반환 구조 | `.result.{source,provider,transcript.messages[],cursor,fallbackReason}`. 훅 transcript 가 있으면 `source: "transcript"` |
+| `check --wait` 반환 구조 | `.result.{deliveryId,messages[],count,timedOut,acknowledged}` · `worker_done` 의 `payload` 에 `taskId`·`dispatchId`·`outcome`·`filesModified` |
+| `worker-release` | `retained` 로 종료 코드 0 — 워크트리는 지워지지 않는다 |
+| `--base-branch` | 브랜치 이름을 받는다. 기동 뒤 자식 워크트리의 `head` 가 `<base-sha>` 와 일치했다 |
+| **§3.5.2 의 식별자 전달이 워커에 닿는가** | **닿는다.** 두 실행 모두 워커의 evidence 에 `run_id`·`task_id`·`dispatch_id` 세 값이 그대로 기록됐고 §3.8 의 식별자 검사가 `일치` 를 냈다. TUI 로 띄운 워커에도 닿았다 |
+| **종료 검사의 재실행 대조** | **성립한다.** `REQUIRED_CHECK_RERUN` 5건이 자식 워크트리에서 전부 재실행돼 기록과 일치했고, 재실행이 트리를 바꾸지 않았다. `EVIDENCE_LOG` 는 `.harness/runs/` 원시 로그와 14건을 대조해 PASS — 로그가 남아 있는 그 워크트리에서 돌렸기 때문이다 |
+| **§3.1 의 (a)·(b) 가 실제 위임 실행에서 걸리는가** | **걸린다.** 두 체크아웃이 갈라진 상태에서 `REVIEW_TASK_ANCHORED`·`REVIEW_BASE_SHA`·`REVIEW_EVIDENCE_ANCHORED`·`REVIEW_ROLE_CONTRACT` 가 전부 PASS 로 인쇄됐다 — 실물 검토자 봉투로 이 앵커들이 작동한 첫 관측이다 |
+| **`--output-schema` 로 이 저장소의 스키마를 넘길 수 있는가** | **없다.** HTTP 400 — `anyOf` 의 빈 하위 스키마 때문이다. §2 의 경고 문단 참조 |
+| **`-o` 가 read-only 아래에서 파일을 쓰는가** | **쓴다.** 검토 대상 워크트리 **밖** 경로(`/private/tmp/...`)에 855바이트를 썼다. 샌드박스는 모델이 만든 셸 명령에만 걸리고 CLI 자신의 출력 파일에는 걸리지 않는다 |
+| **`worker-start --terminal` 이 비대화형 실행을 워커로 채택하는가** | **못 한다.** `codex exec` → `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled`. TUI(`codex -s read-only`) → `state: ready` · `stage: input_accepted`. §3.7 의 표 참조 |
+| **§3.7 로 기동한 검토자에 read-only 강제가 걸리는가** | **걸린다.** §4 의 방어 검사가 `유효` 를 냈다 — `review-tree-before` 와 `review-tree-after` 의 `log_sha256` 이 같은 값이었다. 검토자가 실행되는 동안 작업 트리가 바뀌지 않았다 |
+| 자식 워크트리에서 close 를 돌릴 수 있는가 | **있다.** `--root "$W"` 로 돌렸고 신선도·재실행·로그 대조가 모두 그 체크아웃 기준으로 성립했다 |
+
+### 11.2 아직 미검증인 것
+
+- `check --types` 가 받는 값의 전체 목록. `worker_done`·`escalation`·`question` 만 실제로 썼다.
 - `--agent` 가 받는 id 의 전체 목록, `--effort` 가 받는 값의 전체 목록.
-- `--base-branch` 가 브랜치 이름 대신 커밋 SHA 를 그대로 받는지. 도움말은 `<ref>` 라고만 한다. 그래서 §3.5 는 승인 커밋이 tip 인 **브랜치 이름**을 넘기고, 기동 뒤 `head == <base-sha>` 를 확인하게 한다.
-- `codex exec -s read-only` 아래에서 `-o` 가 파일을 쓰는지. 샌드박스가 **모델이 만든 셸 명령**을 막는다는 것은 관찰했지만(`patch rejected: writing is blocked by read-only sandbox`), CLI 자신이 여는 `-o` 대상 파일은 그 경로가 아니다. 그래서 §4 의 방어 검사를 지우지 않는다.
-- **구현자 쪽 권한 상한이 런타임마다 다르다.** §4 표의 구현자 두 칸은 종류가 다른 수단이고(설정 파일 승인 게이트 vs 샌드박스 플래그) 둘 다 `enforcement_observed: false` 다. 비대화형 실행에는 승인 정책 플래그가 없는 런타임도 있어, 그때 승인 게이트는 런타임이 아니라 하네스가 소유한다. 지금 동등성 판정은 이 비대칭 위에서 돈다.
-- 동등성 게이트 판정. 검사기는 손으로 쓴 케이스로 자기 검증만 하고 있고 관측 케이스는 0건이다 — `bin/romeo fixtures parity --report` 는 "미판정" 을 인쇄하고 종료 코드 1 로 끝난다(D-b). §6 을 두 번 돌리는 것만으로는 판정이 생기지 않는다 — §6.3 으로 모으고 §6.4 로 등록해야 관측 케이스가 생긴다.
-- **§3.7 의 `terminal create --command` → `worker-start --terminal` 경로 전체가 미관측이다.** 두 명령의 `--help` 시그니처와
-  택일 관계(`(--agent <agent> | --terminal <handle>)`)는 실측했지만, (a) `terminal create --json` 이 어느 필드로 핸들을 돌려주는지,
-  (b) `--command` 문자열이 터미널 쪽 셸에 그대로 전달되는지(중간에 다시 해석되는지), (c) `worker-start --terminal` 이 그 핸들을
-  워커로 채택하는지는 실행해야 알 수 있다. 확인 방법은 §3.7 (1) 의 (a)~(c) 절차에 적어 두었다.
-- **§3.7 로 기동한 검토자에 read-only 강제가 실제로 걸린 것을 아직 관측하지 못했다.** §4 표의 검토자 두 행에서
-  `단독 프로브`는 `예` 지만 `§3 기동 경로`는 `아니오` 다. 그동안 강제가 실제로 작동했는지 아는 유일한 수단은 §4 의 방어 검사다 —
-  그 검사가 `무효` 를 내면 판정을 `review/` 에 기록하지 않는다.
-- `codex exec` 의 `-o` 대상 파일을 위임한 쪽이 지정한 경로에 만들 때, 그 경로가 검토 대상 워크트리 **밖**이어도 되는지.
-  `-s read-only` 가 CLI 자신의 파일 쓰기를 막지 않는다는 것까지만 확인했고 경로 제약은 확인하지 않았다.
-- 이 문서의 §3 관통. `--help` 와 romeo CLI 계약까지만 대조했고, 상태를 바꾸는 오케스트레이션 명령은 실행하지 않았다.
-- **§3.1 의 (a)·(b) 가 실제 위임 실행에서 걸리는 것.** 두 조건은 `romeo/close.py` 의 `_task_anchor` 를 읽어 확정했고
-  (재계산 대조 → `romeo/envelope.py` 의 `build_envelope`·`envelope_text`), 경로 규약(§3.0)은 같은 파일의 `_inside` 로 확정했다.
-  단위 수준에서는 확인했지만, 두 체크아웃(위임한 쪽·자식 워크트리)이 실제로 갈라진 상태에서 이 조건들이 어떻게 인쇄되는지는
-  §3 을 한 번 관통해야 관측된다.
+- `--worktree` selector 형식 중 `path:` 만 썼다. `id:<repoId>::<path>`·`name:`·`branch:` 는 도움말이 나열한 것을 옮긴 것이다.
+- `dispatch-show` 반환 JSON 의 어느 필드가 dispatch id 인지. 두 실행 모두 §3.5.2 의 `send` 가 닿아 이 폴백 경로를 쓰지 않았다.
+- **구현자 쪽 권한 상한은 두 실행 모두 미관측이다.** §4 표의 구현자 두 칸(`.claude/settings.json` 의 승인 게이트 · `-s workspace-write`)이
+  실제로 무엇을 막는지 이번 관통은 시험하지 않았다 — 두 구현자 모두 승인 대상 명령을 시도하지 않았기 때문이다.
+  강제가 있었는지 없었는지 이 실행으로는 구분되지 않는다. **그 두 칸은 여전히 `enforcement_observed: false` 다.**
+- 교체 실행의 검토자 강제(`claude -p --tools … --allowedTools … --strict-mcp-config`)가 **§3 기동 경로**에서 걸리는 것.
+  단독 프로브는 관측했다(§4). 이번 관통에서의 관측 여부는 §4 표가 소유한다.
+- **동등성 게이트가 이 관통으로 열리는지.** 관측 케이스 등록(§6.4)과 판정(§6.5)의 결과는 `fixtures/parity/` 와
+  `docs/planning/progress.md` 가 소유한다 — 이 문서가 아니다.
+- 이 문서가 지시하는 실패·복구 경로(§7) 중 실제로 밟은 것은 `worker-start` 실패 1건(`agent_prompt_stalled`)뿐이다.
+  `residualResources` 가 비어 있지 않은 경우, `worker-stop`·`worker-abandon` 은 밟지 않았다.

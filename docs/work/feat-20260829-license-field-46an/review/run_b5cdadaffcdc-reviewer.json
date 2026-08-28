@@ -1,0 +1,25 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260829-license-field-46an",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260829-license-field-46an/task/run_b5cdadaffcdc-reviewer.json",
+    "sha256": "f79f4bc1283a7e027b8ff088fdcd86c08416f57c6dea9d382c59180ec1bdfefd"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "evidence의 spec_ref.sha256(c1e1d9de1e6ba0dd7bd1e08e31261c261dfcba79b025b4aa97a232cad90bd3e4)이 implementer/reviewer 태스크 계약이 참조하는 spec.md의 sha256(67d6b7de91247873d1e59de299f6118ec7fb67ece8a10b320688abee2a474b0e)과 다르다. 같은 경로(docs/work/feat-20260829-license-field-46an/spec.md)를 가리키면서 해시가 다르므로, required_checks가 실제로 승인·배포된 spec.md 본문을 기준으로 실행됐다는 것을 증거로 확인할 수 없다 — 증거가 현재 승인 상태에 묶여 있지 않다(재실행 대조 취지 위반).",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_b5cdadaffcdc.yaml",
+      "line": 10
+    },
+    {
+      "summary": "archive/README.md의 목록 표 헤더(16행)는 6개 열(아카이브/원본 레포/고정 커밋/라이선스/분석일/요약)인데 구분선(17행)은 4개 셀뿐이라 마크다운 표 구조가 깨진다. 원인은 scripts/generate-archive-index.py의 render()에서 헤더 문자열(199행)에 라이선스 열을 추가했지만 구분선 문자열(200행)은 갱신하지 않은 것 — check-4(--check)는 파일 내용의 자기 일치성만 비교하므로 이 결함을 잡지 못한다.",
+      "file": "archive/README.md",
+      "line": 17
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260829-license-field-46an/evidence/run_b5cdadaffcdc.yaml"
+}

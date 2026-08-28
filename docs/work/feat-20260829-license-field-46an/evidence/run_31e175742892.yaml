@@ -1,0 +1,219 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_31e175742892
+task_id: task_9839fd1b1d84
+dispatch_id: ctx_fb22954680e4
+unit_id: feat-20260829-license-field-46an
+spec_ref:
+  path: docs/work/feat-20260829-license-field-46an/spec.md
+  sha256: 67d6b7de91247873d1e59de299f6118ec7fb67ece8a10b320688abee2a474b0e
+base_sha: 9d181a55095e3db36ad4aab5884bf91369d0bed1
+head_sha: 6e5290012dd8f088d3ede4b78f4c9e7c31877609
+dirty_tree_hash: 7b035490df840dce0acb7b070ecae1a61b7566e65d8e93f31843e84dc4744d21
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260829-license-field-46an
+started_at: '2026-08-29T01:24:47+09:00'
+finished_at: '2026-08-29T02:53:51+09:00'
+commands:
+- id: check-1
+  command: bash scripts/validate-repo-archive.sh archive/obra-superpowers
+  exit_code: 0
+  started_at: '2026-08-29T01:24:47+09:00'
+  finished_at: '2026-08-29T01:24:47+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/01-check-1.log
+  log_sha256: 5f656fcf8fdbfbce5cd91a1f55e54740711d53a0e7a109b885d9d57ea2e139a7
+  stdout_tail: 'PASS: archive/obra-superpowers'
+- id: check-2
+  command: test 18 = 18
+  exit_code: 0
+  started_at: '2026-08-29T01:24:50+09:00'
+  finished_at: '2026-08-29T01:24:51+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/02-check-2.log
+  log_sha256: fcde34b4fae8039af125d8941283dc8d3ce36519e62c970389a8aedc9e9c0c26
+  stdout_tail: ''
+- id: check-3
+  command: 'bash -c t=$(mktemp -d) && cp -R archive/obra-superpowers/. "$t" && grep -v "^- License: "
+    "$t/_source.md" > "$t/_source.tmp" && mv "$t/_source.tmp" "$t/_source.md" && ! bash scripts/validate-repo-archive.sh
+    "$t"'
+  exit_code: 1
+  started_at: '2026-08-29T01:24:55+09:00'
+  finished_at: '2026-08-29T01:24:55+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/03-check-3.log
+  log_sha256: cb7055b2efc0b3d2b284aa98cd8064b94a00c5974f271c31df3c04f3d5c3d5c2
+  stdout_tail: ''
+- id: check-3
+  command: /tmp/check3.sh
+  exit_code: 0
+  started_at: '2026-08-29T01:25:07+09:00'
+  finished_at: '2026-08-29T01:25:08+09:00'
+  seconds: 0.418
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/04-check-3.log
+  log_sha256: 19954772fcdbecac7f54b0920b03047a1d28f4804a18c3e8f65b1dc1b78e7c98
+  stdout_tail: ''
+- id: check-4
+  command: python3 scripts/generate-archive-index.py --check
+  exit_code: 1
+  started_at: '2026-08-29T01:25:11+09:00'
+  finished_at: '2026-08-29T01:25:11+09:00'
+  seconds: 0.044
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/05-check-4.log
+  log_sha256: cfcb69a9d28507e6017256827fa7a14f9b2b13821beaad8311129c45ebf6fd91
+  stdout_tail: ''
+- id: check-4
+  command: python3 scripts/generate-archive-index.py --check
+  exit_code: 0
+  started_at: '2026-08-29T01:25:17+09:00'
+  finished_at: '2026-08-29T01:25:17+09:00'
+  seconds: 0.038
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/06-check-4.log
+  log_sha256: 407b6be3dd00d5f89a95d0c2f452d2c171bccf7b8b9a53fd010b42052efb4a93
+  stdout_tail: 'PASS: archive/README.md 는 최신입니다 (18개).'
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-29T01:25:20+09:00'
+  finished_at: '2026-08-29T01:25:56+09:00'
+  seconds: 36.257
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/07-check-5.log
+  log_sha256: e1abacac44b0ac4478b8edd60df7cdaa549fbc7c2dece03f62a578d4f86042ae
+  stdout_tail: ''
+- id: check-1
+  command: bash scripts/validate-repo-archive.sh archive/obra-superpowers
+  exit_code: 0
+  started_at: '2026-08-29T01:25:59+09:00'
+  finished_at: '2026-08-29T01:25:59+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/08-check-1.log
+  log_sha256: 5f656fcf8fdbfbce5cd91a1f55e54740711d53a0e7a109b885d9d57ea2e139a7
+  stdout_tail: 'PASS: archive/obra-superpowers'
+- id: check-2
+  command: 'test "$(grep -l ''^- License: '' archive/*/_source.md | wc -l | tr -d '' '')" = "$(ls -d archive/*/
+    | wc -l | tr -d '' '')"'
+  exit_code: 0
+  started_at: '2026-08-29T01:25:59+09:00'
+  finished_at: '2026-08-29T01:25:59+09:00'
+  seconds: 0.008
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/09-check-2.log
+  log_sha256: b05a3054f4db3699743e078db3298c67f87d869c784c0d3a60477696363dc3cb
+  stdout_tail: ''
+- id: check-3
+  command: 't=$(mktemp -d) && cp -R archive/obra-superpowers/. "$t" && grep -v ''^- License: '' "$t/_source.md"
+    > "$t/_source.tmp" && mv "$t/_source.tmp" "$t/_source.md" && ! bash scripts/validate-repo-archive.sh
+    "$t"'
+  exit_code: 0
+  started_at: '2026-08-29T01:25:59+09:00'
+  finished_at: '2026-08-29T01:25:59+09:00'
+  seconds: 0.024
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/10-check-3.log
+  log_sha256: b9c5e84f16c0ec8d06f6cdf587f3f6fc525f96e9fb0af397060a51c47482a387
+  stdout_tail: ''
+- id: check-4
+  command: python3 scripts/generate-archive-index.py --check
+  exit_code: 0
+  started_at: '2026-08-29T01:25:59+09:00'
+  finished_at: '2026-08-29T01:25:59+09:00'
+  seconds: 0.038
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/11-check-4.log
+  log_sha256: 407b6be3dd00d5f89a95d0c2f452d2c171bccf7b8b9a53fd010b42052efb4a93
+  stdout_tail: 'PASS: archive/README.md 는 최신입니다 (18개).'
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-29T01:25:59+09:00'
+  finished_at: '2026-08-29T01:26:35+09:00'
+  seconds: 35.873
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/12-check-5.log
+  log_sha256: c88bc15caf1fa7960af11dccb875f834ce09e61fe3130ef6e532dcfc0e3e3b68
+  stdout_tail: ''
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T01:27:49+09:00'
+  finished_at: '2026-08-29T01:27:49+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/13-review-tree-before.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T01:36:28+09:00'
+  finished_at: '2026-08-29T01:36:28+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/14-review-tree-after.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T02:49:17+09:00'
+  finished_at: '2026-08-29T02:49:17+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/15-review-tree-before.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T02:53:51+09:00'
+  finished_at: '2026-08-29T02:53:51+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260829-license-field-46an/run_31e175742892/16-review-tree-after.log
+  log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+  stdout_tail: "ify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? 00-exploration.md\n?? 01-docs/\n?? 02-workflow-summary.md\n?? 03-components/\n?? 04-components-table.md\n\
+    ?? 05-pm-harness-notes.md\n?? 06-source-evidence.md\n?? _source.md"
+changed_files:
+- 00-exploration.md
+- 01-docs/AGENTS.ko.md
+- 01-docs/README.ko.md
+- 01-docs/testing.ko.md
+- 02-workflow-summary.md
+- 03-components/runtime-adapters.ko.md
+- 03-components/skills.ko.md
+- 03-components/visual-companion.ko.md
+- 04-components-table.md
+- 05-pm-harness-notes.md
+- 06-source-evidence.md
+- _source.md
+- archive/Leonxlnx-taste-skill/_source.md
+- archive/MengTo-Skills/_source.md
+- archive/README.md
+- archive/anthropics-skills/_source.md
+- archive/bmad-code-org-bmad-module-creative-intelligence-suite/_source.md
+- archive/design-tokens-community-group/_source.md
+- archive/dyoshikawa-rulesync/_source.md
+- archive/farion1231-cc-switch/_source.md
+- archive/first-fluke-oh-my-agent/_source.md
+- archive/langchain-ai-openwiki/_source.md
+- archive/nextlevelbuilder-ui-ux-pro-max-skill/_source.md
+- archive/nexu-io-open-design/_source.md
+- archive/obra-superpowers/_source.md
+- archive/orca-cli-orca/_source.md
+- archive/pbakaus-impeccable/_source.md
+- archive/sindresorhus-slugify/_source.md
+- archive/storybookjs-storybook/_source.md
+- archive/vercel-labs-web-interface-guidelines/_source.md
+- archive/w3c-aria-practices/_source.md
+- scripts/generate-archive-index.py
+- scripts/validate-repo-archive.sh
+artifact_hash: cf6540080690fb6fb8f66fe72bf0ce6de245633d117236399003374c6983c6ab
+reviewer: null
+verdict: null
+approvals: []

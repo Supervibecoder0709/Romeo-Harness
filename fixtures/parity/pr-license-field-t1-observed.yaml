@@ -1,30 +1,30 @@
-# 실제 T1 교차 실행이 채울 자리표 — 아직 관측이 없다.
+# 실제 T1 교차 실행의 관측 케이스 — 2026-08-29 에 adapters/orca/RUNBOOK.md §3 을 두 번 관통해 얻었다.
 #
-# 이 케이스는 일치로 세지 않는다. 미실행을 통과로 세면 게이트가 아무것도 증명하지 못한다.
+# 봉투를 인라인으로 적지 않는다(D-b). 한 역할은 {file: <상대 경로>} 한 줄만 받고,
+# 그 파일은 종료 검사와 같은 앵커 검사(스키마·작업 단위·역할·작업 계약 재계산·base_sha·증거 자리·역할 계약)를
+# 그대로 받는다 — 넷이 전부 통과한 봉투만 비교 대상이 된다.
 #
-# 실행 뒤 채우는 방법(관측 케이스의 형식은 합성 케이스와 다르다):
-#   status: executed · source.kind: observed · source.ref: 관측을 기록한 실재 파일의 상대 경로
-#   results.<역할>: {file: docs/work/<unit>/result|review/<run-id>-<역할>.json}  ← 한 줄만 적는다
-# 봉투를 케이스 파일 안에 인라인으로 적지 않는다. 게이트가 비교하는 값이 바로 그 봉투이므로,
-# 손으로 적을 수 있으면 게이트는 아무것도 지키지 않는다. 파일로 지목하면 종료 검사와 같은 앵커 검사
-# (스키마·작업 단위·역할·작업 계약 재계산·base_sha·증거 자리·역할 계약 능력)를 그대로 받는다(K-63).
-# 그 다섯이 전부 통과한 봉투만 비교 대상이 된다 — 하나라도 어긋나면 PARITY_INVALID 다.
+# 두 실행은 같은 base_sha(6e5290012dd8f088d3ede4b78f4c9e7c31877609)를 보고,
+# 작업 계약은 --run 만 다르고 내용은 바이트까지 같다(cmp identical 로 확인).
 ---
 id: pr-license-field-t1-observed
 title: 아카이브 라이선스 필드 T1 — 실제 교차 실행 관측
-unit_id: feat-20260828-license-field-a1b2
-status: pending
+unit_id: feat-20260829-license-field-46an
+status: executed
 expect: same
-pending_reason: 실제 교차 실행 미수행 — 두 배치의 결과 계약 파일이 아직 없다. 실행 뒤 results 를 파일 경로로 채우고 executed 로 바꾼다
 
 baseline:
   runtimes: {implementer: claude, reviewer: codex}
-  results: {}
+  results:
+    implementer: {file: docs/work/feat-20260829-license-field-46an/result/run_31e175742892-implementer.json}
+    reviewer:    {file: docs/work/feat-20260829-license-field-46an/review/run_31e175742892-reviewer.json}
 swapped:
   runtimes: {implementer: codex, reviewer: claude}
-  results: {}
+  results:
+    implementer: {file: docs/work/feat-20260829-license-field-46an/result/run_b5cdadaffcdc-implementer.json}
+    reviewer:    {file: docs/work/feat-20260829-license-field-46an/review/run_b5cdadaffcdc-reviewer.json}
 
 source:
-  kind: planned
-  ref: docs/planning/implementation-plan.md §7 M2 (역할 교체 재실행)
-  date: '2026-08-28'
+  kind: observed
+  ref: docs/work/feat-20260829-license-field-46an/evidence/run_31e175742892.yaml
+  date: '2026-08-29'

@@ -14,6 +14,13 @@
 11. **판정이 두 층이다(D-b).** 손으로 쓴 합성 케이스(`source.kind: authored`)는 검사기 자기 검증만 하고
     게이트를 통과시키지 못한다. 게이트는 실제 교차 실행 관측(`source.kind: observed`)이 1건 이상일 때만 판정한다.
     관측 0건이면 게이트는 `UNDETERMINED`(미판정)이고 종료 코드는 1 이다(K-51).
+    **2026-08-29 에 실제 T1 교차 관통으로 관측 1건이 생겨 게이트가 미판정을 벗어났다.**
+    그래서 이 파일의 기대는 게이트 값을 고정하지 않고 **관측 건수와 게이트의 관계**만 본다 —
+    관측 0건이면 반드시 미판정, 1건 이상이면 반드시 판정. 종료 코드는 어느 쪽이든 게이트를 따른다.
+    값을 고정하면 관측이 늘 때마다 테스트가 깨지고, 그때 고치고 싶어지는 것은 테스트가 아니라
+    케이스의 `expect` 다 — 그것이 D-b 가 막으려는 행동이다. 그래서 2번 계약(기대 대조)은
+    **합성 케이스만** 본다. 관측의 expect 불일치는 검사기의 버그가 아니라 현실의 결과이고,
+    그 자리는 `gate_verdict` 가 소유한다.
 12. **증거 없는 PASS 는 '동일'이 아니라 '판정 불가'다.** checks 0건·evidence_ref 0건인 PASS 쌍은 양면이 똑같아도
     동등성을 판정하지 못한다(`EVIDENCE_MISSING`).
 13. **역할 계약에 없는 능력을 쓴 봉투는 판정 불가다.** 실행 능력(`run-command`)이 없는 역할이 checks 를 실었으면
@@ -225,17 +232,35 @@ class TestRepoCases(unittest.TestCase):
         self.assertGreaterEqual(len(self.cases), 3, "케이스가 3건 미만이면 게이트가 아무것도 증명하지 못한다")
         self.assertEqual(check_parity_cases(self.cases), {})
 
-    def test_actual_outcome_matches_declared_expectation(self):
+    def test_synthetic_outcome_matches_declared_expectation(self):
+        """합성 케이스만 본다 — 그것이 검사기의 정확성을 재는 자리다(G12).
+
+        관측 케이스의 expect 불일치는 검사기의 버그가 아니라 현실의 결과이고,
+        그 자리는 gate_verdict 가 소유한다. 여기서 함께 보면 관측이 어긋날 때마다
+        expect 를 고치고 싶어지고, 그것이 D-b 가 막으려는 행동이다.
+        """
+        checked = 0
         for row in self.rep["rows"]:
-            if row["status"] == "pending":
+            if row["status"] == "pending" or row["kind"] == "observed":
                 continue
+            checked += 1
             self.assertTrue(row["ok"], f"{row['id']}: 기대 {row['expect']} · 실제 {row['actual']} · {row['detail']}")
+        self.assertGreaterEqual(checked, 3, "합성 케이스가 3건 미만이면 검사기 자기 검증이 성립하지 않는다")
         self.assertEqual(self.rep["checker_verdict"], "PASS")
 
-    def test_repo_gate_is_undetermined_until_a_real_run_is_observed(self):
-        # D-b: 손으로 쓴 케이스만으로는 게이트를 판정하지 않는다. 관측이 생기면 이 기대가 PASS 로 바뀐다.
-        self.assertEqual(self.rep["observed"], 0, "관측 케이스가 생겼다 — 게이트 기대값을 다시 계산한다")
-        self.assertEqual(self.rep["gate_verdict"], "UNDETERMINED")
+    def test_gate_is_determined_only_by_observed_cases(self):
+        """D-b: 손으로 쓴 케이스만으로는 게이트를 판정하지 않는다.
+
+        관측 0건이면 반드시 미판정이고, 1건 이상이면 반드시 판정이 선다.
+        어느 쪽이든 종료 코드는 게이트를 따른다 — 이 관계가 D-b 의 전부다.
+        2026-08-29 에 실제 T1 교차 관통으로 관측 1건이 생겨 게이트가 UNDETERMINED 를 벗어났다.
+        """
+        if self.rep["observed"] == 0:
+            self.assertEqual(self.rep["gate_verdict"], "UNDETERMINED",
+                             "관측이 0건인데 게이트가 판정을 냈다 — 합성 케이스가 게이트를 열고 있다")
+        else:
+            self.assertIn(self.rep["gate_verdict"], ("PASS", "FAIL"),
+                          "관측이 있는데 게이트가 미판정이다 — 관측 케이스가 비교되지 않았다")
         self.assertEqual(self.rep["verdict"], self.rep["gate_verdict"], "명령의 종료 코드는 게이트를 따른다")
 
     def test_differ_cases_produce_declared_codes(self):
@@ -249,8 +274,13 @@ class TestRepoCases(unittest.TestCase):
     def test_same_case_prints_canon_sentence(self):
         text = format_parity(self.rep)
         self.assertIn(CANON_REASON, text, "정본이 요구하는 관찰 가능한 문장이 리포트에서 사라졌다")
-        self.assertIn("핵심 동등성 게이트: 미판정", text)
         self.assertIn("검사기 자기 검증: PASS", text)
+        if self.rep["observed"] == 0:
+            self.assertIn("핵심 동등성 게이트: 미판정", text)
+        else:
+            self.assertIn(f"핵심 동등성 게이트: {self.rep['gate_verdict']}", text)
+            self.assertIn("관측 1건으로 판정했다" if self.rep["observed"] == 1
+                          else f"관측 {self.rep['observed']}건으로 판정했다", text)
 
     def test_report_prints_observed_and_synthetic_counts(self):
         text = format_parity(self.rep)
@@ -258,9 +288,15 @@ class TestRepoCases(unittest.TestCase):
         self.assertIn(f"합성 {self.rep['synthetic']}건", text)
 
     def test_report_counts_pending_apart_from_matched(self):
+        """자리표(pending)와 실행된 케이스는 따로 센다.
+
+        자리표가 1건 이상이어야 한다는 요구는 **관측이 0건일 때만** 성립한다 —
+        자리표의 목적이 '실제 실행이 채울 자리' 이므로, 채워지고 나면 0건이 정상이다.
+        """
         self.assertEqual(self.rep["total"], self.rep["executed"] + self.rep["pending"])
-        self.assertGreaterEqual(self.rep["pending"], 1, "실제 실행이 채울 자리표 케이스가 있어야 한다")
-        self.assertIn("미실행", format_parity(self.rep))
+        if self.rep["observed"] == 0:
+            self.assertGreaterEqual(self.rep["pending"], 1, "실제 실행이 채울 자리표 케이스가 있어야 한다")
+            self.assertIn("미실행", format_parity(self.rep))
 
     def test_repo_cases_have_no_role_contract_violation(self):
         for row in self.rep["rows"]:
@@ -855,12 +891,20 @@ class TestCli(unittest.TestCase):
         write_cases(self.dir, cases)
         return run_cli(["fixtures", "parity", str(self.dir), "--root", str(self.obs.root)])
 
-    def test_repo_parity_exits_one_while_the_gate_is_undetermined(self):
-        # D-b: 관측 0건이면 통과가 아니다. 관측이 생기면 이 기대가 0 으로 바뀐다.
+    def test_repo_parity_exit_code_follows_the_gate(self):
+        """종료 코드는 게이트를 따른다 — PASS 만 0, 미판정도 FAIL 도 1 이다(K-51).
+
+        관측 0건(미판정)과 관측 있는 FAIL 은 **둘 다 1** 이지만 같은 뜻이 아니다.
+        앞은 아무것도 증명하지 못한 것이고 뒤는 판정이 선 것이다 — 리포트 문장이 그것을 구분한다.
+        """
         code, out, _ = run_cli(["fixtures", "parity", "--report"])
-        self.assertEqual(code, 1, out)
         self.assertIn(CANON_REASON, out)
-        self.assertIn("핵심 동등성 게이트: 미판정", out)
+        if "핵심 동등성 게이트: PASS" in out:
+            self.assertEqual(code, 0, out)
+        else:
+            self.assertEqual(code, 1, out)
+            self.assertTrue("핵심 동등성 게이트: 미판정" in out or "핵심 동등성 게이트: FAIL" in out,
+                            "게이트 문장이 미판정도 FAIL 도 PASS 도 아니다 — 판정을 읽을 수 없다")
 
     def test_observed_with_a_verified_checker_exits_zero(self):
         code, out, err = self.parity([self.obs.case(), {**case(), "id": "pr-authored"}])
@@ -922,11 +966,16 @@ class TestCli(unittest.TestCase):
     def test_json_output_is_machine_readable(self):
         import json
         code, out, _ = run_cli(["fixtures", "parity", "--json"])
-        self.assertEqual(code, 1)
+        self.assertIn(code, (0, 1))
         rep = json.loads(out)
         self.assertEqual(rep["schema"], "core/schemas/result-envelope.json")
         self.assertEqual(rep["checker_verdict"], "PASS")
-        self.assertEqual(rep["gate_verdict"], "UNDETERMINED")
+        # 게이트 값은 저장소의 관측 건수에 달려 있다 — 값을 고정하지 않고 D-b 의 관계만 본다.
+        if rep["observed"] == 0:
+            self.assertEqual(rep["gate_verdict"], "UNDETERMINED")
+        else:
+            self.assertIn(rep["gate_verdict"], ("PASS", "FAIL"))
+        self.assertEqual(rep["verdict"], rep["gate_verdict"])
 
     def test_fixtures_check_still_defaults_to_requests(self):
         code, out, _ = run_cli(["fixtures", "check"])
