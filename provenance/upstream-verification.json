@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "command": "romeo vendor verify-upstream",
+  "provider": "GitHub Git Trees API",
+  "verified_at": "2026-08-28T09:06:27+09:00",
+  "status": "PASS",
+  "vendors": [
+    {
+      "id": "obra-superpowers",
+      "source_repo": "obra/superpowers",
+      "source_sha": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797",
+      "result": "PASS",
+      "comparisons": [
+        {
+          "path": "LICENSE",
+          "expected_blob": "abf0390320aa14406af7a520b9b0739fdda9bf08",
+          "actual_blob": "abf0390320aa14406af7a520b9b0739fdda9bf08",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/finishing-a-development-branch/SKILL.md",
+          "expected_blob": "fa8aecaf8813f1b19d19996f7957d1b0121f2d9c",
+          "actual_blob": "fa8aecaf8813f1b19d19996f7957d1b0121f2d9c",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/receiving-code-review/SKILL.md",
+          "expected_blob": "950da7b74bf6dbed6b8726d12ddadd65a9f5fda7",
+          "actual_blob": "950da7b74bf6dbed6b8726d12ddadd65a9f5fda7",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/requesting-code-review/SKILL.md",
+          "expected_blob": "fa4f2f9965591d6d8a7ef4ad47e6ba4d5ac344d0",
+          "actual_blob": "fa4f2f9965591d6d8a7ef4ad47e6ba4d5ac344d0",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/requesting-code-review/code-reviewer.md",
+          "expected_blob": "b898cb982e8a368e847d31136ac106001173b1d5",
+          "actual_blob": "b898cb982e8a368e847d31136ac106001173b1d5",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/SKILL.md",
+          "expected_blob": "095d194ac041502905f15b01d22d294fb94db8b2",
+          "actual_blob": "095d194ac041502905f15b01d22d294fb94db8b2",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/condition-based-waiting-example.ts",
+          "expected_blob": "703a06b653160d060bbf46ab5c6e0cd7446bd592",
+          "actual_blob": "703a06b653160d060bbf46ab5c6e0cd7446bd592",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/condition-based-waiting.md",
+          "expected_blob": "70994f777c586f7d4c43033aac34c7cf0da6688b",
+          "actual_blob": "70994f777c586f7d4c43033aac34c7cf0da6688b",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/defense-in-depth.md",
+          "expected_blob": "e2483354dc2b62478a2624e34ca18bc0efe887b2",
+          "actual_blob": "e2483354dc2b62478a2624e34ca18bc0efe887b2",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/find-polluter.sh",
+          "expected_blob": "985f5d08ccf8a3f2d40739cfcaf4413bb24bf1cb",
+          "actual_blob": "985f5d08ccf8a3f2d40739cfcaf4413bb24bf1cb",
+          "expected_mode": "100755",
+          "actual_mode": "100755",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/systematic-debugging/root-cause-tracing.md",
+          "expected_blob": "12ef5222e24e19ab92172b82b69ef1b0c30d9bfa",
+          "actual_blob": "12ef5222e24e19ab92172b82b69ef1b0c30d9bfa",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/test-driven-development/SKILL.md",
+          "expected_blob": "4320d8879a639d0536c2239bb80c9d7257ad8947",
+          "actual_blob": "4320d8879a639d0536c2239bb80c9d7257ad8947",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/test-driven-development/writing-good-tests.md",
+          "expected_blob": "d3c4482fd30b4f9084bb61545fe73939a7502c28",
+          "actual_blob": "d3c4482fd30b4f9084bb61545fe73939a7502c28",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/using-git-worktrees/SKILL.md",
+          "expected_blob": "1381dacb3516b94382dd6ec736ede21ee8ede2b3",
+          "actual_blob": "1381dacb3516b94382dd6ec736ede21ee8ede2b3",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        },
+        {
+          "path": "skills/verification-before-completion/SKILL.md",
+          "expected_blob": "7d45333cc4a49c57a80df6c1fe2fa777a207afbc",
+          "actual_blob": "7d45333cc4a49c57a80df6c1fe2fa777a207afbc",
+          "expected_mode": "100644",
+          "actual_mode": "100644",
+          "actual_type": "blob",
+          "result": "PASS"
+        }
+      ],
+      "tree_sha": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"
+    }
+  ],
+  "counts": {
+    "vendors": 1,
+    "files": 15,
+    "findings": 0
+  }
+}

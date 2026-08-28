@@ -208,8 +208,25 @@ def cmd_doctor(args):
 
 
 def cmd_vendor(args):
-    from .provenance import check_vendor, check_provenance_ids
+    from .provenance import (UPSTREAM_EVIDENCE_PATH, check_vendor, check_provenance_ids,
+                             verify_upstream)
     root = _root(args)
+    if args.action == "verify-upstream":
+        findings, evidence = verify_upstream(root)
+        if args.json:
+            print(json.dumps(evidence, ensure_ascii=False, indent=1))
+        else:
+            for code, who, what, why in findings:
+                print(f"{code} {who} :: {what} — {why}", file=sys.stderr)
+            status = evidence["status"]
+            counts = evidence["counts"]
+            commits = ", ".join(
+                f"{item['source_repo']}@{item['source_sha']}" for item in evidence["vendors"])
+            print(f"upstream 검증 {status} · vendors={counts['vendors']} files={counts['files']} "
+                  f"findings={counts['findings']} · commits={commits} · "
+                  f"evidence={UPSTREAM_EVIDENCE_PATH}")
+        return 0 if not findings else 1
+
     findings, counts = check_vendor(root)
     id_findings, id_counts = check_provenance_ids(root)
     findings = findings + id_findings
@@ -336,8 +353,8 @@ def build_parser():
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_doctor)
 
-    s = sub.add_parser("vendor", help="vendor/ 원문 대조(수정 0) + provenance id 검사")
-    s.add_argument("action", nargs="?", default="check", choices=["check"])
+    s = sub.add_parser("vendor", help="vendor 로컬 검사 또는 고정 upstream commit 대조")
+    s.add_argument("action", nargs="?", default="check", choices=["check", "verify-upstream"])
     s.add_argument("--root")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_vendor)

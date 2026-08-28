@@ -10,15 +10,28 @@
 `THIRD_PARTY_NOTICES.md` 도 이 파일에서 생성한다. 손으로 고치지 않는다.
 """
 import hashlib
+import json
+import os
+import re
+import tempfile
+import urllib.error
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
-from .util import load_any, project_root as _project_root
+from .util import load_any, now_iso, project_root as _project_root
 
 IMPORTS_PATH = "provenance/imports.yaml"
 NOTICES_PATH = "THIRD_PARTY_NOTICES.md"
+UPSTREAM_EVIDENCE_PATH = "provenance/upstream-verification.json"
+GITHUB_API = "https://api.github.com"
 
 # frontmatter 의 provenance id 를 검사할 대상. vendor/ 는 원문이라 제외한다.
 CORE_GLOBS = ("core/**/*.md", "core/**/*.yaml", "adapters/**/*.md", "adapters/**/*.yaml")
+
+
+class UpstreamVerificationError(RuntimeError):
+    """upstream 을 완전하게 확인하지 못했으므로 PASS 로 간주할 수 없다."""
 
 
 def blob_sha(data: bytes) -> str:
@@ -35,6 +48,211 @@ def load_imports(root=None):
     data.setdefault("vendors", [])
     data.setdefault("imports", [])
     return root, data
+
+
+def fetch_github_tree(source_repo, source_sha, timeout=30):
+    """GitHub Git Trees API 에서 고정 commit 의 recursive tree 를 조회한다."""
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", source_repo or ""):
+        raise UpstreamVerificationError(f"잘못된 GitHub 저장소 이름: {source_repo!r}")
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", source_sha or ""):
+        raise UpstreamVerificationError(f"고정 commit SHA 가 40자리 hex 가 아니다: {source_sha!r}")
+    repo = urllib.parse.quote(source_repo, safe="/")
+    sha = urllib.parse.quote(source_sha, safe="")
+    url = f"{GITHUB_API}/repos/{repo}/git/trees/{sha}?recursive=1"
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "romeo-harness-upstream-verifier",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read()
+    except urllib.error.HTTPError as exc:
+        remaining = exc.headers.get("X-RateLimit-Remaining", "?") if exc.headers else "?"
+        reset = exc.headers.get("X-RateLimit-Reset", "?") if exc.headers else "?"
+        detail = ""
+        try:
+            payload = json.loads(exc.read().decode("utf-8"))
+            detail = str(payload.get("message") or "")
+        except Exception:
+            pass
+        raise UpstreamVerificationError(
+            f"GitHub tree 조회 실패 HTTP {exc.code} ({source_repo}@{source_sha}); "
+            f"rate_remaining={remaining} rate_reset={reset} {detail}".rstrip()) from exc
+    except urllib.error.URLError as exc:
+        raise UpstreamVerificationError(
+            f"GitHub tree 네트워크 실패 ({source_repo}@{source_sha}): {exc.reason}") from exc
+    except OSError as exc:
+        raise UpstreamVerificationError(
+            f"GitHub tree 조회 실패 ({source_repo}@{source_sha}): {exc}") from exc
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, ValueError) as exc:
+        raise UpstreamVerificationError(
+            f"GitHub tree 응답이 올바른 JSON 이 아니다 ({source_repo}@{source_sha}): {exc}") from exc
+    return payload
+
+
+def parse_upstream_tree(payload):
+    """GitHub 응답을 path → blob/mode/type 으로 정규화한다. 네트워크 호출은 하지 않는다."""
+    if not isinstance(payload, dict):
+        raise UpstreamVerificationError("GitHub tree 응답 최상위가 object 가 아니다")
+    if payload.get("truncated") is not False:
+        raise UpstreamVerificationError("GitHub tree 응답이 잘렸거나 truncated 상태를 확인할 수 없다")
+    tree_sha = payload.get("sha")
+    if not isinstance(tree_sha, str) or not re.fullmatch(r"[0-9a-fA-F]{40}", tree_sha):
+        raise UpstreamVerificationError("GitHub tree 응답의 tree sha 가 올바르지 않다")
+    tree = payload.get("tree")
+    if not isinstance(tree, list):
+        raise UpstreamVerificationError("GitHub tree 응답의 tree 가 목록이 아니다")
+    entries = {}
+    for index, item in enumerate(tree):
+        if not isinstance(item, dict):
+            raise UpstreamVerificationError(f"GitHub tree[{index}] 가 object 가 아니다")
+        path = item.get("path")
+        mode = str(item.get("mode") or "")
+        kind = item.get("type")
+        sha = item.get("sha")
+        if (not isinstance(path, str) or not path or path.startswith("/")
+                or ".." in Path(path).parts):
+            raise UpstreamVerificationError(f"GitHub tree[{index}] path 가 올바르지 않다")
+        if path in entries:
+            raise UpstreamVerificationError(f"GitHub tree 에 중복 path 가 있다: {path}")
+        if not re.fullmatch(r"[0-7]{6}", mode):
+            raise UpstreamVerificationError(f"GitHub tree mode 가 올바르지 않다: {path}={mode!r}")
+        if kind not in ("blob", "tree", "commit"):
+            raise UpstreamVerificationError(f"GitHub tree type 이 올바르지 않다: {path}={kind!r}")
+        if not isinstance(sha, str) or not re.fullmatch(r"[0-9a-fA-F]{40}", sha):
+            raise UpstreamVerificationError(f"GitHub tree sha 가 올바르지 않다: {path}")
+        entries[path] = {"mode": mode, "type": kind, "sha": sha.lower()}
+    return {"tree_sha": tree_sha.lower(), "entries": entries}
+
+
+def compare_vendor_to_upstream(vendor, entries):
+    """manifest 의 선택 파일 blob·mode 를 정규화된 upstream tree 와 대조한다."""
+    vid = vendor.get("id", "?")
+    files = vendor.get("files")
+    modes = vendor.get("modes")
+    if not isinstance(files, dict) or not isinstance(modes, dict):
+        raise UpstreamVerificationError(f"{vid}: imports.yaml files·modes 는 mapping 이어야 한다")
+    findings = []
+    comparisons = []
+    for rel, expected_sha in sorted(files.items()):
+        expected_mode = str(modes.get(rel)) if rel in modes else None
+        upstream = entries.get(rel)
+        item_findings = []
+        if expected_mode is None:
+            item_findings.append(("MANIFEST_MODE_MISSING", vid, rel,
+                                  "imports.yaml modes 에 파일 mode 가 없다"))
+        if upstream is None:
+            item_findings.append(("UPSTREAM_FILE_MISSING", vid, rel,
+                                  f"고정 commit {vendor.get('source_sha')} tree 에 없다"))
+            actual_sha = actual_mode = actual_type = None
+        else:
+            actual_sha = upstream["sha"]
+            actual_mode = upstream["mode"]
+            actual_type = upstream["type"]
+            if actual_type != "blob":
+                item_findings.append(("UPSTREAM_TYPE_MISMATCH", vid, rel,
+                                      f"expected=blob actual={actual_type}"))
+            if str(expected_sha).lower() != actual_sha:
+                item_findings.append(("UPSTREAM_BLOB_MISMATCH", vid, rel,
+                                      f"expected={expected_sha} actual={actual_sha}"))
+            if expected_mode is not None and expected_mode != actual_mode:
+                item_findings.append(("UPSTREAM_MODE_MISMATCH", vid, rel,
+                                      f"expected={expected_mode} actual={actual_mode}"))
+        findings.extend(item_findings)
+        comparisons.append({
+            "path": rel,
+            "expected_blob": str(expected_sha).lower(),
+            "actual_blob": actual_sha,
+            "expected_mode": expected_mode,
+            "actual_mode": actual_mode,
+            "actual_type": actual_type,
+            "result": "FAIL" if item_findings else "PASS",
+        })
+    for rel in sorted(set(modes) - set(files)):
+        findings.append(("MANIFEST_MODE_ORPHAN", vid, rel,
+                         "imports.yaml files 에 없는 mode 기록이다"))
+    return findings, comparisons
+
+
+def _write_upstream_evidence(root: Path, evidence):
+    path = root / UPSTREAM_EVIDENCE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_name = None
+    try:
+        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=str(path.parent),
+                                         prefix=".upstream-", suffix=".json", delete=False) as fh:
+            json.dump(evidence, fh, ensure_ascii=False, indent=2)
+            fh.write("\n")
+            fh.flush()
+            os.fsync(fh.fileno())
+            temp_name = fh.name
+        os.replace(temp_name, path)
+    finally:
+        if temp_name and os.path.exists(temp_name):
+            os.unlink(temp_name)
+    return path
+
+
+def verify_upstream(root=None, fetcher=None, verified_at=None):
+    """모든 vendor manifest 를 고정 upstream tree 와 대조하고 감사 증거를 남긴다."""
+    root, data = load_imports(root)
+    fetcher = fetcher or fetch_github_tree
+    evidence = {
+        "schema_version": 1,
+        "command": "romeo vendor verify-upstream",
+        "provider": "GitHub Git Trees API",
+        "verified_at": verified_at or now_iso(),
+        "status": "PASS",
+        "vendors": [],
+    }
+    findings = []
+    for vendor in data["vendors"]:
+        record = {
+            "id": vendor.get("id", "?"),
+            "source_repo": vendor.get("source_repo"),
+            "source_sha": vendor.get("source_sha"),
+            "result": "UNVERIFIED",
+            "comparisons": [],
+        }
+        evidence["vendors"].append(record)
+        try:
+            payload = fetcher(vendor.get("source_repo"), vendor.get("source_sha"))
+            parsed = parse_upstream_tree(payload)
+            vendor_findings, comparisons = compare_vendor_to_upstream(vendor, parsed["entries"])
+            record["tree_sha"] = parsed["tree_sha"]
+            record["comparisons"] = comparisons
+            record["result"] = "FAIL" if vendor_findings else "PASS"
+            findings.extend(vendor_findings)
+        except Exception as exc:
+            record["error"] = str(exc)
+            evidence["status"] = "ERROR"
+            try:
+                _write_upstream_evidence(root, evidence)
+            except OSError as write_exc:
+                raise UpstreamVerificationError(
+                    f"upstream 확인 실패 후 증거 기록도 실패했다: {exc}; evidence={write_exc}") from write_exc
+            raise UpstreamVerificationError(
+                f"{record['id']} upstream 을 확인하지 못했다; PASS 아님: {exc}; "
+                f"evidence={UPSTREAM_EVIDENCE_PATH}") from exc
+    if findings:
+        evidence["status"] = "FAIL"
+    evidence["counts"] = {
+        "vendors": len(evidence["vendors"]),
+        "files": sum(len(item["comparisons"]) for item in evidence["vendors"]),
+        "findings": len(findings),
+    }
+    try:
+        _write_upstream_evidence(root, evidence)
+    except OSError as exc:
+        raise UpstreamVerificationError(f"upstream 증거를 기록하지 못했다: {exc}") from exc
+    return findings, evidence
 
 
 def check_vendor(root=None):

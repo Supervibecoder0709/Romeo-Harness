@@ -30,6 +30,27 @@ def make_tree(dst: Path):
     return dst
 
 
+def snapshot_outputs(root: Path):
+    """컴파일이 소유하거나 보존 병합하는 경로의 바이트·종류·mode 스냅샷."""
+    entries = {}
+    for rel in ("AGENTS.md", "CLAUDE.md", ".agents", ".claude", ".harness/compiled.yaml"):
+        start = root / rel
+        paths = [start]
+        if start.is_dir() and not start.is_symlink():
+            paths.extend(sorted(start.rglob("*")))
+        for path in paths:
+            key = str(path.relative_to(root))
+            if path.is_symlink():
+                entries[key] = ("symlink", os.readlink(path))
+            elif path.is_dir():
+                entries[key] = ("dir", path.stat().st_mode & 0o777)
+            elif path.is_file():
+                entries[key] = ("file", path.stat().st_mode & 0o777, path.read_bytes())
+            else:
+                entries[key] = ("missing",)
+    return entries
+
+
 class TestManagedBlock(unittest.TestCase):
     """마커 치환 자체의 계약. 파일 전체를 다루기 전에 이것부터 맞아야 한다."""
 
@@ -176,6 +197,84 @@ class TestCompile(unittest.TestCase):
         codes = sorted(f[0] for f in check_compiled(self.root))
         self.assertIn("COMPILE_STALE", codes)
 
+    def test_settings_user_keys_are_ignored_by_check_but_preserved_by_compile(self):
+        import json
+        compile_all(self.root)
+        p = self.root / ".claude/settings.json"
+        data = json.loads(p.read_text(encoding="utf-8"))
+        data["model"] = "sonnet"
+        data["permissions"]["allow"] = ["Bash(ls:*)"]
+        p.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n",
+                     encoding="utf-8")
+
+        self.assertEqual(check_compiled(self.root), [],
+                         "사용자 소유 키 변경을 하네스 산출물 stale 로 취급했다")
+
+        data["permissions"]["deny"] = []
+        p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        self.assertIn("COMPILE_STALE", sorted(f[0] for f in check_compiled(self.root)),
+                      "사용자 키 변경이 하네스 소유 키 훼손을 가렸다")
+
+        compile_all(self.root)
+        repaired = json.loads(p.read_text(encoding="utf-8"))
+        self.assertEqual(repaired["model"], "sonnet")
+        self.assertEqual(repaired["permissions"]["allow"], ["Bash(ls:*)"])
+        self.assertTrue(repaired["permissions"]["deny"])
+
+    def test_broken_source_symlink_is_rejected_before_outputs_change(self):
+        from romeo.compile import CompileError
+        compile_all(self.root)
+        before = snapshot_outputs(self.root)
+        broken = self.root / "skills/repo-archive/broken-reference.md"
+        broken.symlink_to("missing-reference.md")
+
+        failure = None
+        try:
+            compile_all(self.root)
+        except Exception as exc:
+            failure = exc
+
+        self.assertEqual(snapshot_outputs(self.root), before)
+        self.assertIsInstance(failure, CompileError)
+
+    def test_invalid_existing_settings_is_rejected_before_outputs_change(self):
+        from romeo.compile import CompileError
+        compile_all(self.root)
+        settings = self.root / ".claude/settings.json"
+        settings.write_text("{ invalid json\n", encoding="utf-8")
+        core = self.root / "core/principles/AGENTS.core.md"
+        core.write_text(core.read_text(encoding="utf-8") + "\n새 원칙\n", encoding="utf-8")
+        before = snapshot_outputs(self.root)
+
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+
+        self.assertEqual(snapshot_outputs(self.root), before)
+
+    def test_mid_commit_replace_failure_rolls_back_every_output(self):
+        from unittest import mock
+        from romeo.compile import CompileError
+        compile_all(self.root)
+        core = self.root / "core/principles/AGENTS.core.md"
+        core.write_text(core.read_text(encoding="utf-8") + "\n교체될 새 원칙\n", encoding="utf-8")
+        before = snapshot_outputs(self.root)
+        real_replace = os.replace
+        calls = []
+
+        def fail_third_replace(src, dst):
+            calls.append((str(src), str(dst)))
+            if len(calls) == 3:
+                raise PermissionError("injected replace denial")
+            return real_replace(src, dst)
+
+        with mock.patch.object(os, "replace", side_effect=fail_third_replace):
+            with self.assertRaises(CompileError):
+                compile_all(self.root)
+
+        self.assertGreaterEqual(len(calls), 5, "실패 전 교체와 그 뒤 롤백이 모두 실행되지 않았다")
+        self.assertEqual(snapshot_outputs(self.root), before)
+        self.assertEqual(list(self.root.glob(".compile-*")), [])
+
     def test_deferred_skill_is_removed_on_recompile(self):
         # 채택을 취소하면 산출물이 남아 있으면 안 된다 — 남으면 라우터 게이트 없이 discovery 된다.
         import yaml
@@ -211,6 +310,20 @@ class TestCompile(unittest.TestCase):
         with self.assertRaises(CompileError):
             compile_all(self.root)
         self.assertEqual(outside.exists(), before, "저장소 밖 파일을 건드렸다")
+
+    def test_absolute_output_path_is_refused_before_staging_writes(self):
+        import yaml
+        from romeo.compile import CompileError
+        a = self.root / "adapters/claude/adapter.yaml"
+        data = yaml.safe_load(a.read_text(encoding="utf-8"))
+        absolute = self.root / "ABSOLUTE-OUTPUT.md"
+        data["instructions_file"] = str(absolute)
+        a.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+
+        with self.assertRaises(CompileError):
+            compile_all(self.root)
+
+        self.assertFalse(absolute.exists(), "staging 이 절대경로를 따라 실제 산출물에 먼저 썼다")
 
     def test_managed_marker_inside_code_fence_is_not_touched(self):
         p = self.root / "CLAUDE.md"

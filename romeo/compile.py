@@ -10,8 +10,11 @@ vendor 스킬은 원문 그대로 복사한다(수정 0). 원문을 고쳐야 �
 override 로 적고, 컴파일이 그것을 지침 파일에 인쇄한다 — 그래야 원문을 건드리지 않고도 규칙이 실제로 읽힌다.
 """
 import hashlib
+import json
+import os
 import re
 import shutil
+import tempfile
 from pathlib import Path
 
 from . import __version__
@@ -186,43 +189,42 @@ def _render_skill(root, adapter, name, cfg):
     return replace_managed_block(head, mapping, source=cfg["mapping"])
 
 
-def _render_settings(root, adapter):
-    """permissions.deny 만 하네스가 소유한다. 나머지 키는 디스크의 것을 그대로 둔다."""
-    import json
-    ask = list(adapter.get("settings_ask") or [])
-    deny = list(adapter.get("settings_deny") or [])
-    path = root / adapter["settings_file"]
-    data = {}
-    if path.exists():
-        try:
-            data = json.loads(path.read_text(encoding="utf-8")) or {}
-        except ValueError:
-            data = {}
-    perms = dict(data.get("permissions") or {})
-    if ask:
-        perms["ask"] = ask
-    perms["deny"] = deny
-    data["permissions"] = perms
-    return json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+def _owned_settings(adapter):
+    """하네스가 소유하는 settings 부분. 사용자 파일을 읽지 않는 순수한 기대값이다."""
+    return {
+        "ask": list(adapter.get("settings_ask") or []),
+        "deny": list(adapter.get("settings_deny") or []),
+    }
 
 
-def _copy_tree_as_files(src: Path, dst: Path):
-    """심링크를 따라가 실제 파일로 복사한다 — Windows 에서 심링크가 깨지기 때문."""
-    # 디렉터리 심링크는 rmtree 로 지울 수 없다. 기존 심링크를 실제 파일로 바꾸는 것이 이 함수의 목적이므로
-    # 링크 자체를 먼저 끊는다.
-    if dst.is_symlink():
-        dst.unlink()
-    elif dst.exists():
-        shutil.rmtree(dst)
-    dst.mkdir(parents=True)
-    for f in sorted(src.rglob("*")):
-        if f.is_dir():
-            continue
-        target = dst / f.relative_to(src)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(f, target, follow_symlinks=True)
-        if f.stat().st_mode & 0o111:
-            target.chmod(target.stat().st_mode | 0o111)
+def _load_settings(path: Path):
+    """사용자 settings JSON 을 보존 병합용 입력으로 엄격하게 읽는다."""
+    if not path.exists():
+        if path.is_symlink():
+            raise CompileError(f"{path}: 깨진 settings 심링크다")
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise CompileError(f"{path}: settings JSON 을 읽을 수 없다: {exc}") from exc
+    if not isinstance(data, dict):
+        raise CompileError(f"{path}: settings 최상위 값은 JSON object 여야 한다")
+    permissions = data.get("permissions", {})
+    if permissions is None:
+        permissions = {}
+    if not isinstance(permissions, dict):
+        raise CompileError(f"{path}: permissions 는 JSON object 여야 한다")
+    return data
+
+
+def _render_settings(data, owned):
+    """사용자 키는 보존하고 permissions.ask·deny 만 하네스 기대값으로 병합한다."""
+    out = dict(data)
+    permissions = dict(out.get("permissions") or {})
+    permissions["ask"] = list(owned["ask"])
+    permissions["deny"] = list(owned["deny"])
+    out["permissions"] = permissions
+    return json.dumps(out, ensure_ascii=False, indent=2) + "\n"
 
 
 def _inside(root: Path, target: Path, what: str) -> Path:
@@ -240,30 +242,46 @@ def _inside(root: Path, target: Path, what: str) -> Path:
     return joined
 
 
+def _output_rel(root: Path, target, what: str) -> str:
+    """staging 결합을 우회하지 못하도록 출력 경로를 단순한 저장소 상대경로로 제한한다."""
+    raw = Path(target)
+    if raw.is_absolute() or not raw.parts or ".." in raw.parts:
+        raise CompileError(f"{what}: '{target}' 은 저장소 상대경로여야 하고 '..'를 포함할 수 없다")
+    _inside(root, raw, what)
+    return str(raw)
+
+
 def plan_outputs(root):
     """(파일 산출물 dict{path: text}, 트리 산출물 list[(src, dst)]) 를 계산한다. 쓰지는 않는다."""
     root = Path(root)
     bindings = load_any(root / ".harness/bindings.yaml") if (root / ".harness/bindings.yaml").exists() else {}
     files, trees = {}, []
     for adapter in load_adapters(root):
-        _inside(root, adapter["instructions_file"], f"{adapter['id']}.instructions_file")
-        _inside(root, adapter["skills_dir"], f"{adapter['id']}.skills_dir")
+        instructions_file = _output_rel(
+            root, adapter["instructions_file"], f"{adapter['id']}.instructions_file")
+        skills_dir = _output_rel(root, adapter["skills_dir"], f"{adapter['id']}.skills_dir")
+        settings_file = None
         if adapter.get("settings_file"):
-            _inside(root, adapter["settings_file"], f"{adapter['id']}.settings_file")
-        files[adapter["instructions_file"]] = ("managed", _render_instructions(root, adapter, bindings),
-                                               "core/principles/AGENTS.core.md")
-        if adapter.get("settings_file") and (adapter.get("settings_deny") or adapter.get("settings_ask")):
-            files[adapter["settings_file"]] = ("full", _render_settings(root, adapter), None)
-        skills_dir = adapter["skills_dir"]
+            settings_file = _output_rel(
+                root, adapter["settings_file"], f"{adapter['id']}.settings_file")
+        files[instructions_file] = ("managed", _render_instructions(root, adapter, bindings),
+                                    "core/principles/AGENTS.core.md")
+        if settings_file and (adapter.get("settings_deny") or adapter.get("settings_ask")):
+            files[settings_file] = ("settings", _owned_settings(adapter), None)
         for name, cfg in (adapter.get("workflows") or {}).items():
-            files[f"{skills_dir}/{name}/SKILL.md"] = ("full", _render_skill(root, adapter, name, cfg), None)
+            rel = _output_rel(root, f"{skills_dir}/{name}/SKILL.md",
+                              f"{adapter['id']}.workflows.{name}")
+            files[rel] = ("full", _render_skill(root, adapter, name, cfg), None)
         if adapter.get("project_vendor_skills"):
             for sname, src in accepted_vendor_skills(root):
-                trees.append((src, root / skills_dir / sname))
+                rel = _output_rel(root, f"{skills_dir}/{sname}",
+                                  f"{adapter['id']}.project_vendor_skills")
+                trees.append((src, root / rel))
         for local in (adapter.get("local_skills") or []):
             src = _inside(root, local["source"], f"{adapter['id']}.local_skills.source")
-            dst = _inside(root, f"{skills_dir}/{local['name']}", f"{adapter['id']}.local_skills.name")
-            trees.append((src, dst))
+            rel = _output_rel(root, f"{skills_dir}/{local['name']}",
+                              f"{adapter['id']}.local_skills.name")
+            trees.append((src, root / rel))
     return files, trees
 
 
@@ -271,49 +289,292 @@ def _previous_outputs(root):
     p = root / STATE_PATH
     if not p.exists():
         return None
-    return set((load_any(p) or {}).get("outputs") or [])
+    try:
+        data = load_any(p) or {}
+    except Exception as exc:
+        raise CompileError(f"{STATE_PATH}: compiled state 를 읽을 수 없다: {exc}") from exc
+    outputs = data.get("outputs")
+    if not isinstance(outputs, list) or not all(isinstance(rel, str) and rel for rel in outputs):
+        raise CompileError(f"{STATE_PATH}: outputs 는 비어 있지 않은 경로 문자열 목록이어야 한다")
+    return set(outputs)
 
 
-def compile_all(root=None, prune=True):
-    """산출물을 만든다. 더 이상 대상이 아닌 이전 산출물은 지운다(채택 취소 시 잔존 방지)."""
-    root = Path(root) if root else _project_root()
-    files, trees = plan_outputs(root)          # 경로 검증이 여기서 끝난다 — 실패하면 아무것도 안 쓴다
-    planned = set(files) | {str(dst.relative_to(root)) for _s, dst in trees}
-    previous = _previous_outputs(root)
-    if prune and previous:
-        for rel in sorted(previous - planned):
-            _inside(root, rel, "prune")        # 이전 state 가 오염됐어도 저장소 밖은 지우지 않는다
-            target = root / rel
-            if target.is_symlink() or target.is_file():
-                target.unlink()
-            elif target.is_dir():
-                shutil.rmtree(target)
-    written = []
-    for rel, (mode, content, source) in sorted(files.items()):
-        path = root / rel
-        path.parent.mkdir(parents=True, exist_ok=True)
-        if mode == "managed":
-            old = path.read_text(encoding="utf-8") if path.exists() else ""
-            path.write_text(replace_managed_block(old, content, source=source), encoding="utf-8")
-        else:
-            path.write_text(content, encoding="utf-8")
-        written.append(rel)
-    for src, dst in trees:
-        _copy_tree_as_files(src, dst)
-        written.append(str(dst.relative_to(root)))
+def _exists(path: Path) -> bool:
+    return path.exists() or path.is_symlink()
 
+
+def _remove_path(path: Path):
+    if path.is_symlink() or path.is_file():
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(path)
+
+
+def _validate_parent_chain(root: Path, target: Path, what: str):
+    parent = target.parent
+    while parent != root:
+        if _exists(parent) and not parent.is_dir():
+            raise CompileError(f"{what}: 상위 경로 '{parent}' 가 디렉터리가 아니다")
+        parent = parent.parent
+
+
+def _read_source_tree(root: Path, src: Path):
+    """source tree 를 메모리로 동결한다. 이후 staging 은 원본을 다시 읽지 않는다."""
+    if src.is_symlink():
+        raise CompileError(f"source tree '{src}' 가 디렉터리 심링크다")
+    if not src.is_dir():
+        raise CompileError(f"source tree '{src}' 가 디렉터리가 아니다")
+    entries = []
+    try:
+        paths = sorted(src.rglob("*"))
+        for path in paths:
+            read_from = path
+            if path.is_symlink():
+                try:
+                    read_from = path.resolve(strict=True)
+                except (OSError, RuntimeError) as exc:
+                    raise CompileError(f"source '{path}' 가 깨진 심링크다: {exc}") from exc
+                _inside(root, read_from, "source symlink")
+                if not read_from.is_file():
+                    raise CompileError(f"source '{path}' 심링크가 일반 파일을 가리키지 않는다")
+            elif path.is_dir():
+                continue
+            elif not path.is_file():
+                raise CompileError(f"source '{path}' 가 일반 파일이 아니다")
+            entries.append((str(path.relative_to(src)), read_from.read_bytes(),
+                            bool(read_from.stat().st_mode & 0o111)))
+    except CompileError:
+        raise
+    except OSError as exc:
+        raise CompileError(f"source tree '{src}' 를 읽을 수 없다: {exc}") from exc
+    return entries
+
+
+def _state_bytes(written):
     state = {
         "schema_version": 1,
         "romeo_version": __version__,
         "outputs": sorted(written),
     }
-    state_path = root / STATE_PATH
-    state_path.parent.mkdir(parents=True, exist_ok=True)
-    state_path.write_text(
-        "# `romeo compile` 산출물 목록. 손으로 고치지 않는다.\n"
-        "# 여기 있는 경로는 언제든 다시 생성되므로, 고칠 곳은 core/ 와 adapters/ 다.\n---\n"
-        + dump_yaml(state), encoding="utf-8")
-    return sorted(written)
+    text = ("# `romeo compile` 산출물 목록. 손으로 고치지 않는다.\n"
+            "# 여기 있는 경로는 언제든 다시 생성되므로, 고칠 곳은 core/ 와 adapters/ 다.\n"
+            "---\n" + dump_yaml(state))
+    return text.encode("utf-8")
+
+
+def _prepare_compile(root: Path, prune: bool):
+    """모든 입력·경로를 읽고 검증해 메모리 계획으로 만든다. 출력은 쓰지 않는다."""
+    files, trees = plan_outputs(root)
+    tree_rels = [str(dst.relative_to(root)) for _src, dst in trees]
+    if len(tree_rels) != len(set(tree_rels)):
+        raise CompileError("같은 skill destination 이 두 번 계획됐다")
+    if set(files) & set(tree_rels):
+        raise CompileError("파일 산출물과 tree 산출물 경로가 충돌한다")
+
+    planned = set(files) | set(tree_rels)
+    previous = _previous_outputs(root)
+    pruned = sorted((previous or set()) - planned) if prune else []
+    for rel in sorted(planned | set(pruned) | {STATE_PATH}):
+        target = _inside(root, rel, "compile output")
+        _validate_parent_chain(root, target, rel)
+
+    rendered = {}
+    for rel, (mode, content, source) in sorted(files.items()):
+        path = root / rel
+        if _exists(path) and path.is_dir() and not path.is_symlink():
+            raise CompileError(f"{rel}: 파일 산출물 자리에 디렉터리가 있다")
+        try:
+            if mode == "managed":
+                old = path.read_text(encoding="utf-8") if _exists(path) else ""
+                text = replace_managed_block(old, content, source=source)
+            elif mode == "settings":
+                text = _render_settings(_load_settings(path), content)
+            elif mode == "full":
+                text = content
+            else:
+                raise CompileError(f"{rel}: 알 수 없는 산출물 mode '{mode}'")
+        except CompileError:
+            raise
+        except (OSError, UnicodeError) as exc:
+            raise CompileError(f"{rel}: 기존 산출물을 읽을 수 없다: {exc}") from exc
+        rendered[rel] = text.encode("utf-8")
+
+    frozen_trees = []
+    for src, dst in trees:
+        frozen_trees.append((str(dst.relative_to(root)), _read_source_tree(root, src)))
+
+    return {
+        "files": rendered,
+        "trees": frozen_trees,
+        "pruned": pruned,
+        "written": sorted(planned),
+        "state": _state_bytes(planned),
+    }
+
+
+def _stage_compile(root: Path, plan):
+    """완성본과 파일 rollback 사본을 저장소와 같은 파일시스템에 만든다."""
+    stage = Path(tempfile.mkdtemp(prefix=".compile-", dir=str(root)))
+    try:
+        new = stage / "new"
+        for rel, data in {**plan["files"], STATE_PATH: plan["state"]}.items():
+            path = new / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+        for rel, entries in plan["trees"]:
+            tree = new / rel
+            tree.mkdir(parents=True, exist_ok=True)
+            for item_rel, data, executable in entries:
+                path = tree / item_rel
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
+                path.chmod(0o755 if executable else 0o644)
+
+        old = stage / "old"
+        for rel in list(plan["files"]) + [STATE_PATH]:
+            source = root / rel
+            if not _exists(source):
+                continue
+            backup = old / rel
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            if source.is_symlink():
+                backup.symlink_to(os.readlink(source))
+            else:
+                shutil.copy2(source, backup)
+        return stage
+    except Exception:
+        shutil.rmtree(stage, ignore_errors=True)
+        raise
+
+
+def _ensure_parent(root: Path, parent: Path, created):
+    missing = []
+    cursor = parent
+    while cursor != root and not _exists(cursor):
+        missing.append(cursor)
+        cursor = cursor.parent
+    for path in reversed(missing):
+        path.mkdir()
+        created.append(path)
+
+
+def _rollback(actions, created):
+    errors = []
+    for action in reversed(actions):
+        try:
+            target = action["target"]
+            if action["kind"] == "file":
+                if not action["installed"]:
+                    continue
+                if action["had_old"]:
+                    os.replace(action["backup"], target)
+                else:
+                    _remove_path(target)
+            elif action["kind"] == "tree":
+                if action["installed"]:
+                    _remove_path(target)
+                if action["old_moved"]:
+                    os.replace(action["displaced"], target)
+            elif action["kind"] == "prune" and action["old_moved"]:
+                os.replace(action["displaced"], target)
+        except Exception as exc:
+            errors.append(f"{action['target']}: {exc}")
+    for path in sorted(created, key=lambda p: len(p.parts), reverse=True):
+        try:
+            path.rmdir()
+        except OSError:
+            pass
+    return errors
+
+
+def _commit_stage(root: Path, plan, stage: Path):
+    actions = []
+    created = []
+    displaced_root = stage / "displaced"
+    try:
+        for rel in sorted(plan["files"]):
+            target = root / rel
+            _ensure_parent(root, target.parent, created)
+            action = {
+                "kind": "file", "target": target, "installed": False,
+                "had_old": _exists(target), "backup": stage / "old" / rel,
+            }
+            actions.append(action)
+            os.replace(stage / "new" / rel, target)
+            action["installed"] = True
+
+        for index, (rel, _entries) in enumerate(sorted(plan["trees"])):
+            target = root / rel
+            _ensure_parent(root, target.parent, created)
+            displaced = displaced_root / f"tree-{index}"
+            displaced.parent.mkdir(parents=True, exist_ok=True)
+            action = {
+                "kind": "tree", "target": target, "installed": False,
+                "old_moved": False, "displaced": displaced,
+            }
+            actions.append(action)
+            if _exists(target):
+                os.replace(target, displaced)
+                action["old_moved"] = True
+            os.replace(stage / "new" / rel, target)
+            action["installed"] = True
+
+        for index, rel in enumerate(plan["pruned"]):
+            target = root / rel
+            displaced = displaced_root / f"prune-{index}"
+            displaced.parent.mkdir(parents=True, exist_ok=True)
+            action = {
+                "kind": "prune", "target": target, "old_moved": False,
+                "displaced": displaced,
+            }
+            actions.append(action)
+            if _exists(target):
+                os.replace(target, displaced)
+                action["old_moved"] = True
+
+        target = root / STATE_PATH
+        _ensure_parent(root, target.parent, created)
+        action = {
+            "kind": "file", "target": target, "installed": False,
+            "had_old": _exists(target), "backup": stage / "old" / STATE_PATH,
+        }
+        actions.append(action)
+        os.replace(stage / "new" / STATE_PATH, target)
+        action["installed"] = True
+    except Exception as exc:
+        rollback_errors = _rollback(actions, created)
+        if rollback_errors:
+            error = CompileError("compile 반영과 rollback 이 모두 실패했다; staging 보존: "
+                                 f"{stage}; rollback={'; '.join(rollback_errors)}")
+            error.preserve_stage = True
+            raise error from exc
+        raise CompileError(f"compile 반영 실패; 원래 상태로 rollback 했다: {exc}") from exc
+
+
+def compile_all(root=None, prune=True):
+    """완성본을 staging 한 뒤 원자 교체한다. 실패하면 모든 기존 산출물을 복구한다."""
+    root = Path(root) if root else _project_root()
+    try:
+        plan = _prepare_compile(root, prune)
+    except CompileError:
+        raise
+    except Exception as exc:
+        raise CompileError(f"compile 입력 검증 실패: {exc}") from exc
+
+    stage = None
+    preserve_stage = False
+    try:
+        stage = _stage_compile(root, plan)
+        _commit_stage(root, plan, stage)
+    except CompileError as exc:
+        preserve_stage = bool(getattr(exc, "preserve_stage", False))
+        raise
+    except Exception as exc:
+        raise CompileError(f"compile staging 실패; 산출물은 바뀌지 않았다: {exc}") from exc
+    finally:
+        if stage is not None and not preserve_stage:
+            shutil.rmtree(stage, ignore_errors=True)
+    return plan["written"]
 
 
 def check_compiled(root=None):
@@ -327,9 +588,20 @@ def check_compiled(root=None):
         if not path.exists():
             findings.append(("COMPILE_MISSING", rel, "", "산출물이 없다"))
             continue
-        current = path.read_text(encoding="utf-8")
-        expected = replace_managed_block(current, content, source=source) if mode == "managed" else content
-        if current != expected:
+        if mode == "settings":
+            try:
+                data = _load_settings(path)
+            except CompileError as exc:
+                findings.append(("COMPILE_STALE", rel, "", str(exc)))
+                continue
+            permissions = data.get("permissions") or {}
+            stale = (permissions.get("ask") != content["ask"]
+                     or permissions.get("deny") != content["deny"])
+        else:
+            current = path.read_text(encoding="utf-8")
+            expected = replace_managed_block(current, content, source=source) if mode == "managed" else content
+            stale = current != expected
+        if stale:
             findings.append(("COMPILE_STALE", rel, "",
                              "코어가 바뀌었거나 산출물을 손으로 고쳤다 — `romeo compile` 로 재생성"))
 
