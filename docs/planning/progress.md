@@ -27,9 +27,7 @@ authority: derived
   다만 그 PASS 는 **구현자 면으로만** 선 것이다: 검토자 면은 한쪽이 `PRODUCT_DIFFERS`(산출물이 다르다, D-73),
   다른 한쪽이 `VERDICT_UNSTABLE`(같은 산출물에 같은 런타임을 다시 돌려도 판정이 갈린다, D-74)로 빠졌다.
   **검토자 면의 동등성은 아직 한 번도 판정된 적이 없다.** M3~M7 미착수.
-- **CI:** 마지막 push(`8c6a2d1`)는 ❌ (run `33228924066` — 그때는 게이트가 FAIL 이었다). 그 뒤 커밋 5개
-  (`f7f16c3`·`831a1ad`·`7e14583`·`0f7d73f`·`f4c8d10`)는 **아직 push 하지 않았다** — push 는 승인 대상(K-66).
-  **지금 push 하면 게이트 스텝은 초록불이 된다**(로컬 `fixtures parity` EXIT=0).
+- **CI:** ✅ **게이트 스텝이 처음으로 CI 에서 통과했다** — run `33234498547`(`fb4cceb`) success · `gate_verdict=PASS · checker_verdict=PASS · 관측 2건 · 합성 9건 · 판정에서 뺀 면 2`. 직전까지 CI 는 게이트 FAIL 로 빨간불이었다(run `33228924066`). 같은 실행에서 CI 경고 문구의 결함도 드러나 고쳤다 — `PRODUCT_DIFFERS` 를 하드코딩해 실제로 뺀 이유(`VERDICT_UNSTABLE`)와 어긋났다.
 - **로컬 검사 (2026-08-29):** unittest **349 OK** · `fixtures parity --report` **EXIT=0**
   (`gate_verdict=PASS · checker_verdict=PASS · 관측 2 · 합성 9 · 판정에서 뺀 면 2`) ·
   `compile --check`·`notices --check`·`vendor check`·`doctor`·`validate` 전부 EXIT=0.
