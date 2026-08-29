@@ -1,0 +1,78 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_410f3f12a645
+task_id: task_0474d80e0a82
+dispatch_id: null
+unit_id: feat-20260829-license-field-46an
+spec_ref:
+  path: docs/work/feat-20260829-license-field-46an/spec.md
+  sha256: bc29d233130fedadbfe48ae01821f5fcd1cae5fa5ebb1832232ded7ea64079c7
+base_sha: 0f7d73fdd84a8c40ab63b0b5da71d7844d4f4854
+head_sha: c237ea9d54cd5ee6dae3af4e10ef8c4eb39a2dd5
+dirty_tree_hash: ae2611588d7a48373544f0f8c83fa5128ea14e613ee478485f2ba195ea5223bb
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl3-feat-20260829-license-field-46an
+started_at: '2026-08-29T14:24:44+09:00'
+finished_at: '2026-08-29T14:29:35+09:00'
+commands:
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T14:24:44+09:00'
+  finished_at: '2026-08-29T14:24:44+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260829-license-field-46an/run_410f3f12a645/01-review-tree-before.log
+  log_sha256: 65fb8625ab17741c6d98732fad23555964b4414f7b3cdb77a3a846cfa2cd51d8
+  stdout_tail: "ra-superpowers/_source.md\n M archive/orca-cli-orca/_source.md\n M archive/pbakaus-impeccable/_source.md\n\
+    \ M archive/sindresorhus-slugify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? scripts/check-archive-licenses.py"
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260829-license-field-46an'
+  exit_code: 0
+  started_at: '2026-08-29T14:29:35+09:00'
+  finished_at: '2026-08-29T14:29:35+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260829-license-field-46an/run_410f3f12a645/02-review-tree-after.log
+  log_sha256: 65fb8625ab17741c6d98732fad23555964b4414f7b3cdb77a3a846cfa2cd51d8
+  stdout_tail: "ra-superpowers/_source.md\n M archive/orca-cli-orca/_source.md\n M archive/pbakaus-impeccable/_source.md\n\
+    \ M archive/sindresorhus-slugify/_source.md\n M archive/storybookjs-storybook/_source.md\n M archive/vercel-labs-web-interface-guidelines/_source.md\n\
+    \ M archive/w3c-aria-practices/_source.md\n M scripts/generate-archive-index.py\n M scripts/validate-repo-archive.sh\n\
+    ?? scripts/check-archive-licenses.py"
+changed_files:
+- .github/workflows/harness.yml
+- archive/Leonxlnx-taste-skill/_source.md
+- archive/MengTo-Skills/_source.md
+- archive/README.md
+- archive/anthropics-skills/_source.md
+- archive/bmad-code-org-bmad-module-creative-intelligence-suite/_source.md
+- archive/design-tokens-community-group/_source.md
+- archive/dyoshikawa-rulesync/_source.md
+- archive/farion1231-cc-switch/_source.md
+- archive/first-fluke-oh-my-agent/_source.md
+- archive/langchain-ai-openwiki/_source.md
+- archive/nextlevelbuilder-ui-ux-pro-max-skill/_source.md
+- archive/nexu-io-open-design/_source.md
+- archive/obra-superpowers/_source.md
+- archive/orca-cli-orca/_source.md
+- archive/pbakaus-impeccable/_source.md
+- archive/sindresorhus-slugify/_source.md
+- archive/storybookjs-storybook/_source.md
+- archive/vercel-labs-web-interface-guidelines/_source.md
+- archive/w3c-aria-practices/_source.md
+- docs/planning/implementation-plan.md
+- docs/planning/progress.md
+- romeo/envelope.py
+- scripts/check-archive-licenses.py
+- scripts/generate-archive-index.py
+- scripts/validate-repo-archive.sh
+- tests/test_docs_evidence_close.py
+- tests/test_envelope.py
+- tests/test_parity.py
+artifact_hash: 6e7237b8a48383a1be2b8ea39e28dc2832378177d1d579097e028e621f2da14a
+reviewer: null
+verdict: null
+approvals: []

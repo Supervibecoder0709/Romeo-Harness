@@ -1,0 +1,20 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260829-license-field-46an",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260829-license-field-46an/task/run_6c143185ea1b-reviewer.json",
+    "sha256": "eebccd2302f9799082547ee57e4bb2a4171073c1040e9197b28948afbce2d94a"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "AC-4 미충족: required check-5는 exit 0이 요구되지만 구현 증거에서 exit 1로 기록됐다. 따라서 기존 하네스 테스트 회귀 없음이 증명되지 않았다.",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_5a5a894aa26d.yaml",
+      "line": 60
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260829-license-field-46an/evidence/run_5a5a894aa26d.yaml"
+}

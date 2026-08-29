@@ -1,0 +1,50 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260829-license-field-46an",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260829-license-field-46an/task/run_26fbe9fb7fab-reviewer.json",
+    "sha256": "eebccd2302f9799082547ee57e4bb2a4171073c1040e9197b28948afbce2d94a"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "AC-4('기존 하네스 테스트가 그대로 통과한다') 를 뒷받침하는 증거가 없다. 증거 기록의 check-5 는 expect 가 exit 0 인데 exit_code 1 로 남았다 — 수용 기준 하나가 증거로 지목되지 않으므로 미검증이다(K-51).",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_5a5a894aa26d.yaml",
+      "line": 62
+    },
+    {
+      "summary": "구현자 결과 계약 자신이 gate_verdict FAIL 이고 checks 의 check-5 exit_code 가 1 이다. 이 판정과 모순되는 완료 주장은 산출물 어디에도 없으나, 반대로 통과를 지목할 증거도 없다.",
+      "file": "docs/work/feat-20260829-license-field-46an/result/run_5a5a894aa26d-implementer.json",
+      "line": 41
+    },
+    {
+      "summary": "'회귀 0' 의 근거인 착수 전 baseline 실행이 증거 기록에 없다. evidence 의 commands 에는 check-5 가 1건(exit 1)뿐이고, 변경 전후 비교표는 notes 마크다운에 손으로 쓴 것이다. 증거 기록 명령으로 만들어지지 않은 주장은 재실행으로 확인될 수 없으므로 PASS 의 근거가 아니다(K-51 · AGENTS.core §4).",
+      "file": "docs/work/feat-20260829-license-field-46an/result/run_5a5a894aa26d-implementer-notes.md",
+      "line": 13
+    },
+    {
+      "summary": "사실 확인(읽기로만): check-5 실패 3건은 test_parity 의 케이스 구조·앵커 검사이고, 실패 사유는 docs/work/** 의 옛 작업 계약 봉투다. 이 단위가 건드린 archive/** · scripts/** 는 실패 로그 어디에도 나타나지 않는다. 이는 회귀 부재의 정황이지 AC-4 충족의 증거는 아니다.",
+      "file": ".harness/runs/feat-20260829-license-field-46an/run_5a5a894aa26d/05-check-5.log",
+      "line": 21
+    },
+    {
+      "summary": "완료가 막히는 자리: 실패를 만드는 관측 케이스가 참조하는 run_31e175742892 봉투는 spec sha 67d6b7de… 이고 이번 계약의 승인된 spec sha 는 bc29d233… 이다 — 다른 spec 리비전의 산출물을 가리킨다. fixtures/parity/ 는 구현자 계약의 allowed_paths 밖이라 이 실행으로는 해소할 수 없다. 이 단위의 변경을 어떻게 고쳐도 check-5 는 exit 1 로 남는다.",
+      "file": "docs/work/feat-20260829-license-field-46an/task/run_31e175742892-implementer.json",
+      "line": 7
+    },
+    {
+      "summary": "판정 근거(충족 쪽): AC-1 은 check-6 가 계획 §1.3 표를 파싱해 18개 값을 대조하고 exit 0 · 'PASS: 아카이브 18개의 라이선스가 계획 §1.3 표와 일치한다' 로 기록됐다. AC-2 는 check-3 (License 줄을 지운 사본에서 그 사유로 FAIL), AC-3 은 check-4 (README 최신 18개)로 지목 가능하다. 여섯 검사는 모두 작업 트리를 바꾸지 않고 재실행해도 결론이 같아 종료 검사의 재실행 대조를 견딘다 — check-3 은 mktemp -d 사본에서만 쓰고 test -n 가드가 있다.",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_5a5a894aa26d.yaml",
+      "line": 69
+    },
+    {
+      "summary": "판정 근거(범위·가드): 이 단위의 작업 트리 변경은 archive/*/_source.md · archive/README.md · scripts/{validate-repo-archive.sh,generate-archive-index.py,check-archive-licenses.py} 로 구현자 계약의 allowed_paths 안이고, guards 는 비어 있어 승인 대상 행동은 없다. required_checks 는 spec 검증 계획 · 구현자 계약 · 이번 검토자 계약 셋이 6개 항목 모두 문자열까지 같아 실행 도중 검증 계획이 바뀐 흔적이 없다(D-27).",
+      "file": "docs/work/feat-20260829-license-field-46an/spec.md",
+      "line": 71
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260829-license-field-46an/evidence/run_5a5a894aa26d.yaml"
+}

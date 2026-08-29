@@ -1,21 +1,24 @@
-# 검토자-only 재실행의 관측 케이스 — 2026-08-29 에 adapters/orca/RUNBOOK.md §6.6 을 실행해 얻었다(D-73·D-74).
+# 검토자-only 재실행의 관측 케이스 — 2026-08-29 재관통에서 RUNBOOK §6.6 을 실행해 얻었다(D-73·D-74).
 #
-# 2026-08-29 의 교차 관통(pr-license-field-t1-observed)은 두 구현자가 다른 산출물을 만들어 검토자 면이 비교 불가였다.
-# 검토자 동등성을 판정하려면 **같은 산출물**을 두 검토자에게 보여야 하므로, 기준 실행(run_31e175742892 · 구현자 claude ·
-# 검토자 codex)의 구현자 워크트리를 그대로 두고(트리 7b035490df84…) 그 위에서 검토자만 다시 띄웠다.
+# 교차 관통(pr-license-field-t1-observed)은 두 구현자가 다른 산출물을 만들어 검토자 면이 비교 불가다.
+# 검토자 동등성을 판정하려면 **같은 산출물**을 두 검토자에게 보여야 하므로, 기준 실행(run_5a5a894aa26d ·
+# 구현자 claude)의 구현자 워크트리를 그대로 두고(트리 ae2611588d7a…) 그 위에서 검토자만 다시 띄웠다.
 # 구현자 면은 이 케이스에 없다 — 구현은 한 번뿐이었다.
 #
-# **표본이 각 면 1건이던 것을 n건으로 늘렸다(D-74).** 처음 두 실행(codex run_31e175742892 PASS · claude run_5fc794f15236 FAIL)만으로
-# 게이트가 VERDICT_DIFFERS 를 냈는데, Q-08 재현성 측정이 그 해석을 무너뜨렸다: 같은 산출물에 같은 런타임을 다시 돌리자
-# codex 는 FAIL(1건)·FAIL(4건)을, claude 는 PASS(8건)를 냈다. **두 런타임 다 자기 안에서 흔들린다.**
-# 그래서 이 케이스는 이제 각 면의 표본을 모두 담고, 검사기가 VERDICT_UNSTABLE 로 판정에서 빼는 것이 옳다.
+# **각 면 2건씩의 표본을 담는다(D-74).** 한 번의 판정은 그 런타임의 판정이 아니라 그 실행의 판정이다.
+# 앞선 라운드(base_sha 6e52900)에서는 codex 가 PASS(0)·FAIL(1)·FAIL(4) 로, claude 가 FAIL(6)·PASS(8) 로
+# **양쪽 다 자기 안에서 흔들려** 게이트가 VERDICT_UNSTABLE 로 판정에서 뺐다.
+# 이번 라운드의 네 실행은 각 면이 자기 안에서 일관하고 두 면도 같다 — 전부 FAIL 이다.
+# 다만 이번에는 check-5(unittest)가 exit 1 이라는 명백한 실패가 산출물에 있었다.
+# **판정 난이도가 낮아진 것과 런타임이 안정된 것은 다르고, 이 관측만으로는 구분되지 않는다.**
 #
-# 네 실행이 같은 것을 봤다는 근거는 케이스 파일이 아니라 실행이 남긴 값이다 — 계약 sha256 f79f4bc1… 이 cmp identical 이고,
-# 봉투가 지목한 증거의 head_sha·dirty_tree_hash 가 같으며, review-tree-before/after 의 log_sha256 이 2bc7dad48f31… 로 전부 같다.
+# 네 실행이 같은 것을 봤다는 근거는 케이스 파일이 아니라 실행이 남긴 값이다 — 검토자 계약 네 개가
+# cmp identical(sha256 eebccd2302f9…)이고, 봉투가 지목한 증거가 모두 기준 실행의 evidence 이며,
+# 각 실행의 review-tree-before/after 가 같은 log_sha256 을 냈다(방어 검사 전부 '유효').
 # 봉투를 인라인으로 적지 않는다(D-b). expect 는 관측 결과에 맞춰 고치지 않는다(D-b).
 ---
 id: pr-license-field-t1-reviewer-observed
-title: 아카이브 라이선스 필드 T1 — 같은 산출물을 본 두 검토자 (검토자-only 재실행 관측)
+title: 아카이브 라이선스 필드 T1 — 같은 산출물을 본 두 검토자 (검토자-only 재실행 관측 · 재관통)
 unit_id: feat-20260829-license-field-46an
 status: executed
 expect: same
@@ -23,22 +26,21 @@ expect: same
 baseline:
   runtimes: {reviewer: codex}
   results:
-    # PASS(findings 0) · FAIL(findings 1) · FAIL(findings 4) — 같은 산출물에 세 번 돌린 결과다
+    # FAIL(findings 1) · FAIL(findings 1) — 같은 산출물에 두 번 돌린 결과다
     reviewer:
       files:
-        - docs/work/feat-20260829-license-field-46an/review/run_31e175742892-reviewer.json
-        - docs/work/feat-20260829-license-field-46an/review/run_241a35112ca3-reviewer.json
-        - docs/work/feat-20260829-license-field-46an/review/run_5dd1b2c232c7-reviewer.json
+        - docs/work/feat-20260829-license-field-46an/review/run_5a5a894aa26d-reviewer.json
+        - docs/work/feat-20260829-license-field-46an/review/run_6c143185ea1b-reviewer.json
 swapped:
   runtimes: {reviewer: claude}
   results:
-    # FAIL(findings 6) · PASS(findings 8) — 같은 산출물에 두 번 돌린 결과다
+    # FAIL(findings 5) · FAIL(findings 7) — 같은 산출물에 두 번 돌린 결과다
     reviewer:
       files:
-        - docs/work/feat-20260829-license-field-46an/review/run_5fc794f15236-reviewer.json
-        - docs/work/feat-20260829-license-field-46an/review/run_222f508b5541-reviewer.json
+        - docs/work/feat-20260829-license-field-46an/review/run_410f3f12a645-reviewer.json
+        - docs/work/feat-20260829-license-field-46an/review/run_26fbe9fb7fab-reviewer.json
 
 source:
   kind: observed
-  ref: docs/work/feat-20260829-license-field-46an/evidence/run_5fc794f15236.yaml
+  ref: docs/work/feat-20260829-license-field-46an/evidence/run_6c143185ea1b.yaml
   date: '2026-08-29'

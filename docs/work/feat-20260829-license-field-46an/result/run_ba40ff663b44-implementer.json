@@ -1,0 +1,45 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260829-license-field-46an",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260829-license-field-46an/task/run_ba40ff663b44-implementer.json",
+    "sha256": "0bfa0d4f847bcdaf250b9fd8e86c5094b250faa7a0d24d5314a8535692266101"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "bash scripts/validate-repo-archive.sh archive/obra-superpowers",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "test \"$(grep -l '^- License: ' archive/*/_source.md | wc -l | tr -d ' ')\" = \"$(ls -d archive/*/ | wc -l | tr -d ' ')\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "t=$(mktemp -d) && test -n \"$t\" && cp -R archive/obra-superpowers/. \"$t\" && grep -v '^- License: ' \"$t/_source.md\" > \"$t/_source.tmp\" && mv \"$t/_source.tmp\" \"$t/_source.md\" && bash scripts/validate-repo-archive.sh \"$t\" 2>&1 | grep -q 'does not contain a License field'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 scripts/generate-archive-index.py --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 1
+    },
+    {
+      "id": "check-6",
+      "command": "python3 scripts/check-archive-licenses.py",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260829-license-field-46an/evidence/run_ba40ff663b44.yaml"
+}

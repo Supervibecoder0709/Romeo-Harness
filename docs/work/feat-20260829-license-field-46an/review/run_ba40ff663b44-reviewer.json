@@ -1,0 +1,60 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260829-license-field-46an",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260829-license-field-46an/task/run_ba40ff663b44-reviewer.json",
+    "sha256": "eebccd2302f9799082547ee57e4bb2a4171073c1040e9197b28948afbce2d94a"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "AC-4 미충족 — required_checks 의 check-5(`python3 -m unittest discover -s tests`)가 exit 1 이다. 두 번 실행해 두 번 다 exit 1 로 같은 3건이 깨졌다(테스트 349건 중 errors=1·failures=2, 전부 test_parity). 수용 기준 '기존 하네스 테스트가 그대로 통과한다(회귀 없음)'를 뒷받침하는 증거가 없고, 구현자 자신도 결과 계약에 gate_verdict FAIL 을 냈다. 이 한 항목만으로 게이트는 FAIL 이다(K-51).",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_ba40ff663b44.yaml",
+      "line": 62
+    },
+    {
+      "summary": "실패 원인은 라이선스 변경이 아니라 '작업 계약 재계산' 앵커다(사실). 현재 계약 생성기는 allowed_paths 를 spec 「변경 범위」에서 계산하는데(romeo/envelope.py:99-119), 과거 관측 실행의 계약 파일은 옛 규칙으로 만들어져 allowed_paths 가 [\"docs/work/…/\", \".\"] 다. 재계산 결과가 바이트로 달라 TASK_ANCHORED 가 FAIL 하고(romeo/close.py:297-301), 그 봉투를 지목한 관측 파리티 케이스가 구조 오류가 된다(romeo/parity.py:355-363).",
+      "file": "docs/work/feat-20260829-license-field-46an/task/run_31e175742892-implementer.json",
+      "line": 10
+    },
+    {
+      "summary": "그 결과 fixtures/parity 의 관측 케이스 두 건(pr-license-field-t1-observed·pr-license-field-t1-reviewer-observed)이 지목한 봉투가 전부 앵커 검사에서 탈락해 비교 대상이 0건이 된다. test_repo_cases_are_structurally_valid 가 직접 실패하고, TestCli 의 두 실패는 CLI 가 PARITY_INVALID 로 stdout 을 비운 데서 나온 같은 원인의 증상이다(test_parity.py:991·1060 의 빈 출력).",
+      "file": "fixtures/parity/pr-license-field-t1-observed.yaml",
+      "line": 19
+    },
+    {
+      "summary": "이 실패는 이 실행의 변경분에 귀속되지 않는다(추론, 근거 있음). 재계산 앵커는 커밋된 spec·현재 core/·계약 파일만 읽고, 이 실행의 미커밋 변경(archive/*/_source.md · scripts/*)은 그 계산에 들어가지 않는다. 즉 라이선스 변경을 되돌려도 check-5 는 같은 이유로 실패한다 — base_sha c237ea9 시점에 이미 존재하는 상태로 보인다. 다만 검토자는 명령을 실행하지 않으므로 '변경 전에도 실패했다'는 것 자체는 미검증이며, 확인은 종료 검사의 재실행 몫이다.",
+      "file": "romeo/envelope.py",
+      "line": 99
+    },
+    {
+      "summary": "권고 — AC-4 는 이 작업 단위의 계약 안에서 고칠 수 없다. 고쳐야 할 자리(romeo/envelope.py · romeo/close.py · fixtures/parity/)가 구현자 allowed_paths 밖이라, 여기서 손대면 K-66 위반이다. 별도 단위로 분리하거나(체크리스트 34 의 후속), 이 단위의 검증 계획에서 check-5 를 빼는 대신 그 변경을 승인 절차에 태워야 한다(D-27) — 실패하는 검사를 구현 중 재량으로 지우는 것은 금지다.",
+      "file": "docs/work/feat-20260829-license-field-46an/task/run_ba40ff663b44-implementer.json",
+      "line": 10
+    },
+    {
+      "summary": "AC-1·AC-2·AC-3 은 증거로 뒷받침된다(사실). check-6 이 계획 §1.3 표의 「`_source.md` 에 적는 값」 열과 18개 헤더 값을 대조해 PASS 했고(로그: 'PASS: 아카이브 18개의 라이선스가 계획 §1.3 표와 일치한다'), 스크립트는 값을 하드코딩하지 않고 표를 파싱해 대조하며 표에 없는 아카이브도 실패로 센다(scripts/check-archive-licenses.py:110-123). 검증기의 License 검사(scripts/validate-repo-archive.sh:49-51)와 인덱스 라이선스 열(scripts/generate-archive-index.py:165·198·207, archive/README.md:16)도 확인했다. 이 셋만으로는 게이트가 열리지 않는다 — AC-4 가 남는다.",
+      "file": ".harness/runs/feat-20260829-license-field-46an/run_ba40ff663b44/06-check-6.log",
+      "line": 3
+    },
+    {
+      "summary": "검증 계획이 실행 도중 바뀐 흔적은 없다(사실). 승인된 spec 의 required_checks 6개와 작업 계약의 6개가 id·명령까지 일치하고, 실패한 check-5 를 지우거나 무해한 명령으로 바꾸지 않고 실패 그대로 기록했다. check-3 강화(`test -n` 가드 + 실패 사유 문자열 대조)와 check-6 신설은 승인된 spec 안에 들어 있다. 여섯 검사 모두 재실행 가능하고 작업 트리를 바꾸지 않는다 — check-3 은 mktemp -d 사본에서만 쓴다(임시 디렉터리를 지우지 않는 것은 재실행에 영향 없는 경미 사항).",
+      "file": "docs/work/feat-20260829-license-field-46an/spec.md",
+      "line": 71
+    },
+    {
+      "summary": "정보성 — 증거의 changed_files 목록(.github/workflows/harness.yml · romeo/envelope.py · tests/* · docs/planning/*)은 allowed_paths 위반이 아니다. 그 목록은 spec frontmatter 의 base_sha(0f7d73f)를 기준으로 계산되어 이 실행 이전 커밋들의 변경까지 포함한다(romeo/evidence.py:38·99). 이 실행이 실제로 바꾼 것은 review-tree-before 로그의 git status 가 보여주며(archive/*/_source.md 18개 · archive/README.md · scripts 3개), 전부 allowed_paths 안이다. 다만 changed_files 를 범위 준수 판정에 쓸 수 없다는 점은 기록해 둔다.",
+      "file": ".harness/runs/feat-20260829-license-field-46an/run_ba40ff663b44/09-review-tree-before.log",
+      "line": 3
+    },
+    {
+      "summary": "경미 — 증거의 base_sha(0f7d73f, spec frontmatter 유래)와 작업 계약의 base_sha(c237ea9)가 다르다. 증거의 head_sha 는 c237ea9 로 계약과 같으므로 같은 리비전 위에서 실행된 것으로 읽히지만, 두 값이 서로 다른 뜻이라는 것을 알고 봐야 추적이 성립한다. 가드는 선언되지 않았고(guards: []) 승인이 필요한 행동의 흔적도 없다.",
+      "file": "docs/work/feat-20260829-license-field-46an/evidence/run_ba40ff663b44.yaml",
+      "line": 11
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260829-license-field-46an/evidence/run_ba40ff663b44.yaml"
+}
