@@ -17,26 +17,33 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `ecb4819` · 2026-08-29)
+## 지금 상태 (기준 `3639e69` · 2026-08-29 밤)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline ecb4819..HEAD` 가 비어 있지 않으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline 3639e69..HEAD` 가 비어 있지 않으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
-- **마일스톤:** M2 진행 중 — 하네스 결함 6건(37~42) + 반박 검증 28건(43~45) 반영 완료. **3차 관통 기준 실행 완료**(46): 구현자 claude PASS 6/6 ·
-  검토자 codex(`gpt-5.6-sol`) PASS · impl5 에서 close 전 항목 PASS(검토 표본 1건만 D-75 미확정). 교체 실행은 **준비만 끝나고 미기동**.
-- **CI:** 이 세션의 커밋들은 push 하지 않았다(승인 대상, K-66). 마지막 CI 는 run `33237273401`(`b53f08c`) success. 로컬: unittest **397 OK** · `compile --check`·`parity`(게이트 PASS·EXIT 0)·`validate`·`doctor` PASS.
-- **다음 세션이 이어갈 자리 (순서대로):**
-  1. 사용자 확정: **D-75**(검토 표본 1건 vs 2건 — 추천 2건) · **Q-11**(승인 서명) · **push 승인**.
-  2. **교체 실행 기동** — Run `run_e82929ee03da`, 워크트리 `impl6-feat-20260829-license-field-46an`(head `7f8ecd7`), 구현자 task `task_b1d012fbd58e`, 검토자 task `task_a88167812224`.
-     spec/브리프는 `impl6-…/.harness/runs/<id>/run_e82929ee03da/`. 구현자는 `orca terminal create --worktree path:<impl6> --command "codex -s workspace-write -a never -m gpt-5.6-sol"`(argv 프롬프트 없이 idle 로 띄운다) →
-     `terminal wait --for tui-idle` → `worker-start --run run_e82929ee03da --task task_b1d012fbd58e --worktree path:<impl6> --terminal <handle>` 로 채택(spec 은 주입된다). 채택이 `dispatch_input` 에서 실패하면(46 의 관측) 워커의 transcript(`worker-read --source transcript`)로 진행을 보고 `result/<run>-implementer.json` 실재로 완료를 판정한다.
-     `-s workspace-write` 아래에서는 codex 가 Orca IPC 를 못 쓴다(§4) — 완료 뒤 `task-update` 로 정리. 검토자 claude 는 §3.7 교체 형태(3플래그, `--output-format json`, 브리프 `--runtime claude` 로 다시 채워 `.harness/runs/<id>/<run>/` 에).
-  3. **§6.6 표본** — impl5 산출물(`7f8ecd7+7439ee6383d1`)에 codex 1회 더·claude 2회(각각 새 run: `envelope build --role reviewer --run <new>` → 방어 검사 before → 브리프(`--mode rerun --evidence-run run_42710f6ac93b`) → 검토 → after → `review record` → `envelope check`). 교체 산출물(impl6)에도 같은 방식으로 런타임당 2건.
-  4. **close 실제 실행**(`"$W/bin/romeo" close --unit <id> --root "$W"` — 재실행 포함, 로그가 있는 그 워크트리에서) → §6.3 모으기(evidence·result·review 를 mvp_planning 으로, 계약은 재생성) → §6.4 관측 케이스 갱신(`pr-license-field-t1-observed`·`pr-license-field-t1-reviewer-observed` 에 3차 run 들을 표본으로) → §6.5 `fixtures parity --report` EXIT 0 → progress·observations 갱신 → 커밋.
-- **이번 세션에 끝난 것:** 37~45(하네스) · 46 기준 실행. 자세한 것은 체크리스트 행과 세션 기록.
-- **낡은 워크트리:** `impl-`·`impl2-`·`impl3-`·`impl4-`(관측 표본의 원본, 지우지 않는다) · `impl5-`(3차 기준 — 산출물·증거·로그의 원본) · `impl6-`(3차 교체 — 준비됨). 정리는 승인 대상이다(K-66).
-- **문서 지연:** 「미검증·남은 위험」의 「4차 리뷰」 이하 소절은 2026-08-28 기준이다. 맨 위 두 소절만 최신이다.
+- **마일스톤:** M2 **일시 정지 — 근본 원인 재검토 뒤 사용자 결정 대기.** 사용자가 "왜 3일째 안 닫히나, 설계·계획이 처음부터 틀렸나, 불필요한 단계는" 을 물어
+  교체 실행(impl6) 기동을 **멈추고** 독립 재검토를 받았다: [`docs/reviews/2026-08-29-codex-m2-rootcause-review/`](../reviews/2026-08-29-codex-m2-rootcause-review/README.md)
+  (Codex `gpt-5.6-sol`·max 진단 `REVIEW_FINDINGS.md` + 수정 계획 `REVISED_PLAN.md` + Claude 17 에이전트 교차 대조 `CROSSCHECK_CLAUDE.md` + 코디네이터 검증 `README.md`).
+  **실측 한 줄:** 지금 HEAD 의 `bin/romeo` 로 impl5 를 `close --dry-run` 하면 **EXIT 0** — 검사 6·재실행 6·EVIDENCE_LOG 16·AC·REVIEW_VERDICT(run_42710f6ac93b PASS) 전부 PASS, WARN 3(`APPROVAL_CHAIN`·`REVIEW_SUPERSEDED`·`REVIEW_SAMPLE`).
+  **페이로드는 지금 닫을 수 있다.** 막는 것은 하네스가 아니라 계획이 스스로 얹은 단계(impl6 전체 교체·§6.6 표본 8회·D-75 (a))다.
+- **재검토의 결론(요지):** 원 요구 "역할 교체 뒤 동일 게이트 판정" 은 '게이트 판정' 이 결정적 검사인지 LLM 검토 판정인지 정하지 않았고, 구현은 후자까지 포함했다.
+  같은 산출물에서도 판정이 흔들리는 관측(D-74) 뒤 요구를 되묻는 대신 게이트의 기계(D-73→D-74→D-75, 표본·제외·봉인)를 바꿨고, 리뷰→반영→재리뷰 루프에 정지 규칙이 없었다.
+  뼈대(얇은 spine·수직 슬라이스·역할 2개·재실행 대조)는 옳고 동작한다 — 전면 재작성 대상이 아니다. 두 분석의 인과 순위는 갈렸고 반박 단계가 양쪽 서사를 모두 과장으로 판정했다(README §2).
+- **CI:** 변화 없음 — 이 세션도 push 하지 않았다(승인 대상, K-66). 마지막 CI run `33237273401`(`b53f08c`) success. 로컬 unittest **398 OK**(종전 397 은 낡은 숫자) · `compile --check`·`validate`·`parity --report`(EXIT 0) PASS.
+- **사용자 결정 대기 — 이것이 다음 작업이다. 확정 전에는 impl6 기동·§6.6 표본·새 하드닝·하네스 코드 변경을 시작하지 않는다:**
+  1. **M2 완료 정의 개정** — 동등성 게이트를 결정적 요소(봉투 스키마·`required_checks`·권한 상한·AC)로 한정, LLM 검토 판정 일치는 리포트 항목(advisory). `v1-scope.md` 문구 변경이라 승인 필요. **추천: 개정.**
+  2. **D-75** — **추천 (b)** 현재 산출물 PASS 1건 + `REVIEW_SAMPLE` WARN(지금 구현 그대로). 바뀐 산출물만 새 검토 1회.
+  3. **impl6 교체 실행** — **추천: M2 게이트 조건에서 뺀다.** 원하면 1회만(구현자 codex 1·검토자 claude 1·§6.6 표본 없음), 실패해도 M2 를 막지 않는다. Run `run_e82929ee03da`·task `task_b1d012fbd58e`/`task_a88167812224` 는 그대로 있다.
+  4. **Q-11 승인 서명** — **추천: 미룸**(2인 이상·감사·공유 CI 가 생길 때).
+  5. **push** — close·통합 뒤 **별도 승인**.
+- **확정되면 순서(`REVISED_PLAN.md` 세션 1·2):** 정본 개정(v1-scope·D-75 accepted·D-76 신설·Q-10/Q-11) → parity 판정 축소(D-74 코드는 비활성 프로파일로 보존) → 하네스 동결 검사 →
+  impl5 를 canonical 로 `"$PWD/bin/romeo" close --unit feat-20260829-license-field-46an --root <impl5>` → 페이로드 22파일을 mvp_planning 에 반영·커밋 → 관측 케이스에 3차 run 등록 → progress "M2 완료"(v1 전체 완료와 분리).
+  그 뒤 **별도 작업 단위**로 RUNBOOK 자동화(`romeo run-unit`)·check-5(하네스 unittest)를 페이로드 검사에서 분리·Q-10 FAIL 사유 열거·문서 다이어트.
+- **이번 세션에 끝난 것:** 근본 원인 재검토(Codex 25분) + 교차 대조(Claude 17 에이전트·29분) + 핵심 주장 5건 재현(README §1). 실행 상태 변경: 워크트리 `codex-m2-rootcause` 신설(리뷰 원본, 브랜치 `Supervibecoder0709/codex-m2-rootcause`)뿐 — impl6 미기동, Run/Task 그대로.
+- **낡은 워크트리:** `impl-`~`impl4-`(관측 표본 원본) · `impl5-`(3차 기준 — **close 후보**, 산출물·증거·로그 원본) · `impl6-`(준비만) · `codex-m2-review` · `codex-m2-rootcause`. 정리는 승인 대상이다(K-66).
+- **문서 지연:** 「미검증·남은 위험」의 「4차 리뷰」 이하 소절은 2026-08-28 기준이다. 맨 위 두 소절만 최신이다. §10 체크리스트 46 행은 3차 기준 실행까지만 적혀 있다(이 정지는 이 블록과 세션 기록에만 있다).
 
 ## 마일스톤
 
@@ -100,6 +107,7 @@ authority: derived
 
 ## 세션 기록
 
+- **2026-08-29 (밤 · 근본 원인 재검토 — 교체 실행을 멈추고 "왜 안 닫히나" 를 물었다)** — 사용자가 M2 가 3일째 안 닫히는 이유를 기획서부터 다시 보라고 해, 준비된 impl6 교체 실행을 기동하지 않고 Codex(`gpt-5.6-sol`·max, 별도 워크트리 `codex-m2-rootcause`)에게 유저스토리 단위 진단과 수정 계획을 맡겼고, 같은 질문을 Claude 에이전트 17개(4렌즈→합성→주장별 반박 3인)에게 독립적으로 물어 교차 대조했다([폴더](../reviews/2026-08-29-codex-m2-rootcause-review/README.md)). 두 분석이 합의한 사실 — 게이트의 검토자 면이 LLM 자유 판정 일치를 요구해 "같은 실패" 도 PASS 로 세고, 관측이 전제를 깨자 요구를 되묻는 대신 게이트 기계를 세 번 바꿨으며, 리뷰 루프에 정지 규칙이 없었다 — 는 코디네이터가 재현으로 확인했다. 인과 순위는 갈렸고 반박 단계가 양쪽 서사를 과장으로 판정했다. **가장 큰 실측:** impl5 는 지금 HEAD 의 `bin/romeo` 로 `close --dry-run` EXIT 0 이다 — 페이로드는 닫을 수 있고, 막는 것은 계획이 얹은 단계다. 결과는 사용자 결정 5건(완료 정의 개정·D-75·impl6·Q-11·push)으로 좁혀 상태 블록에 올렸다.
 - **2026-08-29 (잔여 결함 6건 반영 — 설계를 먼저 반박시켰다)** — 재관통이 남긴 결함 37~42 를 한 세션에 반영했다. 순서가 이번 세션의 방법이다: 설계 메모를 쓰고, 구현 **전에** 세 시선(위조 저항·결정 정합·운영 실측)의 독립 검토를 병렬로 돌려 반박을 받고, 그 다음 구현했다. 반박이 잡은 것 중 가장 큰 것은 41 의 첫 설계에 있던 **새 위조 경로**였다 — 검토 판정을 산출물에 묶자 봉투의 `evidence_ref` 가 판정에 결정적인 필드가 됐는데, 그것을 실재하는 옛 run 으로 돌리기만 하면 FAIL 이 낡은 것으로 빠졌다(검토자가 실제로 `envelope check` 5개 PASS 로 재현했다). 대응은 "판정이 본 산출물은 봉투 작성자가 고르는 포인터가 아니라 하네스가 검토 시점에 기록한 값에서 읽는다" 다 — §4 의 방어 검사가 그 값이고, 그래서 방어 검사는 이제 선택이 아니다. 같은 라운드에서 38 의 본체(명시 `--base-sha` 로 옛 승인의 계약이 그대로 나온다), `CHECK_PLAN_COMMITTED` 의 절반짜리 앵커(HEAD 와 대조), 확인란 편집 허용의 짝(문장 불변 검사)이 함께 닫혔다. 반영하지 않은 제안 셋은 체크리스트 43 에 이유와 함께 적었고, 정책 성격의 하나(검토 룰렛 → 표본 수)는 D-75 로 사용자에게 올렸다. **다음 세션이 기억할 것:** 이 세션은 하네스를 고쳤지 작업 단위를 닫지 못했다 — `c237ea9` 위의 어떤 구현도 `check-5` 를 통과할 수 없으므로(하네스 테스트의 순환) 31 은 새 base 의 3차 관통으로만 닫힌다. 그리고 42 의 채움 스크립트와 44 의 로그 봉인은 테스트로만 검증됐다 — 실제 검토자가 그 정본으로 돈 적은 아직 없다.
 - **2026-08-29 (검토자-only 재실행 — 게이트가 처음으로 런타임의 차이를 잡았다)** — D-73 을 push 해 CI 가 초록이 된 직후, 그 초록이 서 있지 않은 자리(검토자 면)를 관측하러 갔다. RUNBOOK §6.6 을 처음 실행했다 — 기준 실행의 구현자 워크트리를 그대로 두고(트리 해시가 baseline 증거와 같음을 먼저 확인) 새 Run 에 검토자 계약을 다시 만들어(`cmp` identical) claude 검토자만 3플래그로 띄웠다. 방어 검사는 `유효` 였고 그 `log_sha256` 은 기준 실행의 값과 같았다 — **두 검토자가 본 것은 바이트까지 같은 트리다.** 결과는 `FAIL`(findings 6) 대 `PASS`(findings 0). claude 가 잡은 것은 작업 루트에 남은 `archive/obra-superpowers/` 사본 11개(미추적)이고, 그 원인까지 짚었다 — `check-3` 의 첫 실행에서 `bash -c` 가 `&&` 앞에서 잘려 `$t` 가 빈 채로 `cp` 가 루트에 복사한 것(증거 `03-check-3.log` 5행). 그 파일들은 codex 검토자의 자기 스냅샷(`13-review-tree-before.log`)에도 있었다. 관측 케이스로 등록하자 게이트는 `FAIL — 관측 2건` 이 됐다. **이번 FAIL 은 D-73 이 가려낸 종류가 아니다** — 산출물이 같으므로 남는 설명은 런타임(또는 그 시도)의 차이뿐이고, 그것이 이 게이트가 존재하는 이유다. 표본이 각 1건이라 재현성은 모른다(Q-08). 이 세션은 판정을 고치지 않았고, 다음 세션이 할 일은 Q-08 의 결정과 findings 가 구체화한 작업 단위 완료(삭제는 승인 대상)다.
 - **2026-08-29 (게이트 정의 보완 — D-73)** — 8/29 관통이 남긴 `핵심 동등성 게이트: FAIL` 은 검사기의 버그도 런타임의 차이도 아니었다. 두 구현자가 **다른 산출물**을 만들었고 두 검토자는 각자 본 것을 옳게 판정했는데, 게이트가 검토자 판정을 산출물과 떼어 놓고 비교하고 있었다. 사용자가 세 선택지 중 **"검토자 면에 산출물 동일성을 전제로 넣는다"** 를 확정했다(D-73). 구현의 기준은 3차 라운드와 같다 — *빼는 근거도 실재에 묶는다.* 산출물 식별은 케이스 파일이 아니라 봉투가 지목한 증거의 `head_sha`·`dirty_tree_hash` 에서 읽고, 관측 케이스에 그것을 손으로 적는 길은 구조 오류로 막았다. 뺐다는 사실은 표(`✓ 부분`)·게이트 줄 다음 문장·JSON(`observed_incomparable_faces`)·CI `::warning::` 네 곳에 인쇄된다. **다음 세션이 기억할 것:** 이 PASS 는 구현자 면 위에만 서 있다. 검토자 동등성을 말하려면 **같은 산출물을 두 검토자에게** 보이는 관측(RUNBOOK §6.6)이 따로 있어야 하고, 그 절차는 아직 한 번도 실행되지 않았다.
