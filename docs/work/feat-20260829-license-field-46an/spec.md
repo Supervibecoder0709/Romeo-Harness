@@ -11,9 +11,9 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-29T01:19:27+09:00'
+approved_at: '2026-08-29T12:34:57+09:00'
 approved_by: Supervibecoder0709
-base_sha: 9d181a55095e3db36ad4aab5884bf91369d0bed1
+base_sha: 0f7d73fdd84a8c40ab63b0b5da71d7844d4f4854
 closed_at: null
 parent: null
 inputs: []
@@ -39,7 +39,7 @@ updated: '2026-08-29'
 - **왜 지금:** 지금은 18개 중 3개만 본문 어딘가에 라이선스를 언급하고, 헤더 필드로는 0개다. 부품을 가져올 때 라이선스를 매번 GitHub API로 다시 조회해야 하고(K-40~K-42가 요구하는 추적), 아카이브만 보고는 재사용 가능 여부를 알 수 없다. 값은 이미 `docs/planning/implementation-plan.md` §1.3에서 API와 고정 SHA 실물 대조로 확인해 두었다.
 - **기대 결과:** `archive/<이름>/_source.md` 를 열면 헤더 5줄째에 라이선스가 보이고, `archive/README.md` 표에 라이선스 열이 생기며, 라이선스 줄이 없는 새 아카이브는 `validate-repo-archive.sh` 가 FAIL 시킨다.
 - **수용 기준:**
-  - [ ] AC-1 `archive/*/_source.md` 18개 전부에 `- License: <값>` 줄이 있고, 값이 계획 §1.3 표와 일치한다
+  - [ ] AC-1 `archive/*/_source.md` 18개 전부에 `- License: <값>` 줄이 있고, 값이 계획 §1.3 표의 **「`_source.md` 에 적는 값」 열**과 글자까지 일치한다 (그 열이 없던 것이 1차 검토의 지적이었다 — 이제 18개 모두 확정 값이 있다)
   - [ ] AC-2 라이선스 줄이 없는 아카이브 사본은 `validate-repo-archive.sh` 가 FAIL 한다 (검사가 실제로 동작한다)
   - [ ] AC-3 `archive/README.md` 목록 표에 라이선스 열이 있고 `generate-archive-index.py --check` 가 PASS 한다
   - [ ] AC-4 기존 하네스 테스트가 그대로 통과한다 (회귀 없음)
@@ -48,7 +48,7 @@ updated: '2026-08-29'
 
 ## 변경 범위
 
-- 바뀌는 파일·모듈: `archive/*/_source.md` 18개(헤더 1줄 추가) · `scripts/validate-repo-archive.sh`(검사 1개 추가) · `scripts/generate-archive-index.py`(`collect` 에 license 추출, `render` 표에 열 추가) · `archive/README.md`(생성물, 재생성)
+- 바뀌는 파일·모듈: `archive/*/_source.md` 18개(헤더 1줄 추가) · `scripts/validate-repo-archive.sh`(검사 1개 추가) · `scripts/generate-archive-index.py`(`collect` 에 license 추출, `render` 표에 열 추가) · `archive/README.md`(생성물, 재생성) · `scripts/check-archive-licenses.py`(신규 — AC-1 을 기계로 대조한다)
 - 영향을 받는 부분: `/repo` 아카이브 파이프라인의 회수 검증 · CI `.github/workflows/archive-index.yml` 의 stale 검사
 - 바꾸지 않는 것(비범위): 아카이브 본문(`00`~`06`, `01-docs/`, `03-components/`) · `THIRD_PARTY_NOTICES.md` 와 `provenance/imports.yaml`(vendor 채택물의 라이선스는 그쪽이 원본이고 여기는 아카이브 스키마다) · `.github/workflows/` 파일 자체 · `core/` 정책표
 
@@ -61,10 +61,11 @@ updated: '2026-08-29'
 | 1 | 헤더 필드 backfill | `archive/*/_source.md` 18개의 `- Analysis timestamp:` 줄 **앞**에 `- License: <SPDX 또는 실물 이름>` 을 넣는다. 값은 `docs/planning/implementation-plan.md` §1.3 표 그대로 — 그 표의 "라이선스" 열에 API 값과 실물이 다르게 적힌 항목은 **실물** 값을 쓴다 | 소비: 계획 §1.3 표 → 생산: `- License:` 헤더 필드 18개 | `grep -c '^- License: ' archive/*/_source.md` 가 18줄 모두 1 | `git revert` |
 | 2 | 검증 스크립트 검사 | `scripts/validate-repo-archive.sh` 에 `matches '^[-*] License: .+$'` 검사를 Commit SHA 검사 뒤에 추가하고, 실패 메시지는 기존 형식(`FAIL: _source.md ...`)을 따른다. `matches()` 폴백을 그대로 쓴다 | 소비: 1번의 헤더 필드 → 생산: 검사 1개 | 정상 아카이브 PASS · License 줄을 지운 사본 FAIL | `git revert` |
 | 3 | 인덱스 열 | `scripts/generate-archive-index.py` 의 `collect()` 반환 dict 에 `license` 키를 추가한다 — 값은 기존 `field(src, "License")` 로 뽑아 백틱을 제거하고 공백을 다듬은 것, 비면 em dash. `render()` 의 목록 표는 헤더와 각 행 모두 `고정 커밋` 다음 `분석일` 앞에 라이선스 칸을 넣고, 값은 파이프 이스케이프 함수 `cell()` 을 거친다. 생성 시각을 넣지 않는 결정성은 유지한다 | 소비: 1번의 헤더 필드 → 생산: README 표의 라이선스 열 | `python3 scripts/generate-archive-index.py` 후 `--check` PASS | `git revert` |
+| 4 | 값 대조 검사 | `scripts/check-archive-licenses.py` 를 새로 만든다 — `docs/planning/implementation-plan.md` §1.3 표에서 `아카이브` 열과 **`_source.md` 에 적는 값** 열을 파싱하고, `archive/*/_source.md` 의 `- License: ` 값과 대조해 하나라도 다르거나 표에 없는 아카이브가 있으면 그 목록을 인쇄하고 종료 코드 1 을 낸다. 표를 읽으므로 값을 스크립트에 하드코딩하지 않는다 | 소비: 계획 §1.3 표 + 1번의 헤더 필드 → 생산: AC-1 을 실행 가능한 검사로 | 정상 상태에서 exit 0 · 값 하나를 바꾼 사본에서 exit 1 과 그 이름 인쇄 | `git revert` |
 
 ## 검증 계획
 
-required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대조하고, 같은 명령을 그 체크아웃에서 **다시 실행**해 종료 코드를 맞춰 본다. 아래 넷은 모두 재실행해도 결론이 같고 작업 트리를 바꾸지 않는다.
+required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대조하고, 같은 명령을 그 체크아웃에서 **다시 실행**해 종료 코드를 맞춰 본다. 아래 **여섯**은 모두 재실행해도 결론이 같고 작업 트리를 바꾸지 않는다. (1차 검토가 두 가지를 지적했다: ① 어떤 검사도 AC-1 의 「값이 표와 일치」를 대조하지 않았다 → `check-6` 신설 ② `check-3` 이 임시 디렉터리 변수가 비어도 그대로 진행해 작업 트리에 쓸 수 있었고 실패 **사유**를 확인하지 않았다 → 두 결함을 함께 고쳤다.)
 
 ```yaml
 required_checks:
@@ -75,14 +76,17 @@ required_checks:
     command: "test \"$(grep -l '^- License: ' archive/*/_source.md | wc -l | tr -d ' ')\" = \"$(ls -d archive/*/ | wc -l | tr -d ' ')\""
     expect: exit 0
   - id: check-3
-    command: "t=$(mktemp -d) && cp -R archive/obra-superpowers/. \"$t\" && grep -v '^- License: ' \"$t/_source.md\" > \"$t/_source.tmp\" && mv \"$t/_source.tmp\" \"$t/_source.md\" && ! bash scripts/validate-repo-archive.sh \"$t\""
-    expect: exit 0 (License 줄이 없으면 검증기가 FAIL 해야 통과)
+    command: "t=$(mktemp -d) && test -n \"$t\" && cp -R archive/obra-superpowers/. \"$t\" && grep -v '^- License: ' \"$t/_source.md\" > \"$t/_source.tmp\" && mv \"$t/_source.tmp\" \"$t/_source.md\" && bash scripts/validate-repo-archive.sh \"$t\" 2>&1 | grep -q 'does not contain a License field'"
+    expect: exit 0 (License 줄을 지운 사본에서 검증기가 **그 사유로** FAIL 해야 통과. `test -n` 이 임시 디렉터리 변수가 비었을 때 작업 트리에 쓰는 것을 막는다)
   - id: check-4
     command: "python3 scripts/generate-archive-index.py --check"
     expect: exit 0
   - id: check-5
     command: "python3 -m unittest discover -s tests"
     expect: exit 0
+  - id: check-6
+    command: "python3 scripts/check-archive-licenses.py"
+    expect: exit 0 (18개 값이 계획 §1.3 표의 「`_source.md` 에 적는 값」 열과 전부 일치해야 통과 — AC-1 을 대조하는 유일한 검사다)
 ```
 
 ## 증거

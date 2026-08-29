@@ -67,26 +67,26 @@ authority: derived
 
 아카이브 문서 자체에는 18개 중 2개만 라이선스가 적혀 있어(C-H3 "부분"이 사실) GitHub API(`license.spdx_id`, 현재 기본 브랜치)와 고정 SHA 트리의 LICENSE 파일을 읽기 전용으로 대조했다.
 
-| 아카이브 (`archive/<name>`) | 고정 SHA | 라이선스 (API / 고정 SHA 실물) |
-| --- | --- | --- |
-| obra-superpowers | `b36e082` | MIT |
-| first-fluke-oh-my-agent | `7a2b46e` | MIT |
-| dyoshikawa-rulesync | `c3accea` | MIT |
-| farion1231-cc-switch | `5ca9459` | MIT |
-| langchain-ai-openwiki | `a525ed8` | MIT |
-| bmad-…-creative-intelligence-suite | `0e4ff92` | API NOASSERTION / **실물 `LICENSE` = MIT (BMad Code, LLC)** |
-| anthropics-skills | `3b3fad9` | API NONE / **루트 LICENSE 없음, 스킬별 `LICENSE.txt`** → 스킬 단위로 확인 필요 |
-| orca-cli-orca | `5beeefc` | MIT (K-13: 기반 삼지 않음) |
-| sindresorhus-slugify | `7c318bd` | MIT |
-| pbakaus-impeccable | `56f4452` | Apache-2.0 |
-| Leonxlnx-taste-skill | `72e2995` | MIT |
-| vercel-labs-web-interface-guidelines | `e3d624b` | MIT |
-| w3c-aria-practices | `7e4034b` | API NOASSERTION / 실물 **W3C Software and Document License** |
-| design-tokens-community-group | `16c902d` | API NOASSERTION / 실물 **W3C Software and Document License** |
-| nextlevelbuilder-ui-ux-pro-max-skill | `bc826e2` | 루트 MIT, 단 `cli/README.md`는 CC-BY-NC-4.0 표기(아카이브 `05` 메모의 불일치 지적) → 코드 포함 보류(K-42) |
-| nexu-io-open-design | `35a38ab` | Apache-2.0 |
-| MengTo-Skills | `4c716b5` | MIT |
-| storybookjs-storybook | `db12626` | MIT |
+| 아카이브 (`archive/<name>`) | 고정 SHA | 라이선스 (API / 고정 SHA 실물) | `_source.md` 에 적는 값 (AC 대조용) |
+| --- | --- | --- | --- |
+| obra-superpowers | `b36e082` | MIT | `MIT` |
+| first-fluke-oh-my-agent | `7a2b46e` | MIT | `MIT` |
+| dyoshikawa-rulesync | `c3accea` | MIT | `MIT` |
+| farion1231-cc-switch | `5ca9459` | MIT | `MIT` |
+| langchain-ai-openwiki | `a525ed8` | MIT | `MIT` |
+| bmad-…-creative-intelligence-suite | `0e4ff92` | API NOASSERTION / **실물 `LICENSE` = MIT (BMad Code, LLC)** | `MIT` |
+| anthropics-skills | `3b3fad9` | API NONE / **루트 LICENSE 없음, 스킬별 `LICENSE.txt`** → 스킬 단위로 확인 필요 (단일 SPDX 값이 없다) | `루트 LICENSE 없음 · 스킬별 LICENSE.txt` |
+| orca-cli-orca | `5beeefc` | MIT (K-13: 기반 삼지 않음) | `MIT` |
+| sindresorhus-slugify | `7c318bd` | MIT | `MIT` |
+| pbakaus-impeccable | `56f4452` | Apache-2.0 | `Apache-2.0` |
+| Leonxlnx-taste-skill | `72e2995` | MIT | `MIT` |
+| vercel-labs-web-interface-guidelines | `e3d624b` | MIT | `MIT` |
+| w3c-aria-practices | `7e4034b` | API NOASSERTION / 실물 **W3C Software and Document License** | `W3C Software and Document License` |
+| design-tokens-community-group | `16c902d` | API NOASSERTION / 실물 **W3C Software and Document License** | `W3C Software and Document License` |
+| nextlevelbuilder-ui-ux-pro-max-skill | `bc826e2` | 루트 MIT, 단 `cli/README.md`는 CC-BY-NC-4.0 표기(아카이브 `05` 메모의 불일치 지적) → 코드 포함 보류(K-42) | `MIT` |
+| nexu-io-open-design | `35a38ab` | Apache-2.0 | `Apache-2.0` |
+| MengTo-Skills | `4c716b5` | MIT | `MIT` |
+| storybookjs-storybook | `db12626` | MIT | `MIT` |
 
 ### 1.4 확인 범위와 미확인 항목
 
