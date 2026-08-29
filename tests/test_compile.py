@@ -13,8 +13,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from romeo.compile import (MANAGED_END, MANAGED_START, check_compiled, compile_all,
-                           replace_managed_block)
+from romeo.compile import (MANAGED_END, MANAGED_START, _strip_frontmatter, check_compiled,
+                           compile_all, replace_managed_block)
 from romeo.provenance import blob_sha
 from romeo.util import project_root
 
@@ -107,6 +107,35 @@ class TestCompile(unittest.TestCase):
         text = (self.root / "CLAUDE.md").read_text(encoding="utf-8")
         self.assertIn("사용자가 직접 쓴 규칙이다.", text)
         self.assertIn(MANAGED_START, text)
+
+    def test_project_index_reaches_both_runtimes(self):
+        """프로젝트 인덱스는 원본 하나에서 두 지침 파일로 간다(체크리스트 32).
+
+        마커 밖에 손으로 유지하면 한쪽 런타임만 인덱스를 보는 상태가 만들어지고, 그 어긋남을
+        검사하는 게이트가 없다. 같은 것을 보지 않는 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다."""
+        compile_all(self.root)
+        _, index = _strip_frontmatter(
+            (self.root / "core/principles/PROJECT.core.md").read_text(encoding="utf-8"))
+        index = index.strip()
+        self.assertIn("## 문서 인덱스", index, "인덱스 원본이 비었다 — 이 테스트가 아무것도 지키지 못한다")
+        for name in ("CLAUDE.md", "AGENTS.md"):
+            text = (self.root / name).read_text(encoding="utf-8")
+            self.assertIn(index, text, f"{name} 에 프로젝트 인덱스 원본이 그대로 들어있지 않다")
+
+    def test_both_runtimes_get_the_same_core_sections(self):
+        """두 지침 파일의 공통 절(인덱스 + 행동 규칙)은 바이트까지 같아야 한다.
+
+        다른 것은 역할 표·권한 상한처럼 그 런타임의 강제 수단을 인쇄하는 자리뿐이다."""
+        compile_all(self.root)
+        _, index = _strip_frontmatter(
+            (self.root / "core/principles/PROJECT.core.md").read_text(encoding="utf-8"))
+        _, principles = _strip_frontmatter(
+            (self.root / "core/principles/AGENTS.core.md").read_text(encoding="utf-8"))
+        shared = index.strip() + "\n\n---\n\n" + principles.strip()
+        claude = (self.root / "CLAUDE.md").read_text(encoding="utf-8")
+        agents = (self.root / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn(shared, claude)
+        self.assertIn(shared, agents)
 
     def test_second_run_changes_nothing(self):
         compile_all(self.root)

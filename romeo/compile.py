@@ -238,15 +238,22 @@ def _render_permission_ceiling(adapter, bindings):
 
 
 def _render_instructions(root, adapter, bindings, roles):
-    """지침 파일 managed block 본문 — 원칙·역할 계약은 두 런타임이 같은 것을 받고,
-    강제 수단과 권한 상한은 그 런타임의 것만 인쇄한다."""
+    """지침 파일 managed block 본문 — 프로젝트 인덱스·원칙·역할 계약은 두 런타임이 같은 것을 받고,
+    강제 수단과 권한 상한은 그 런타임의 것만 인쇄한다.
+
+    인덱스를 이 블록에 넣는 이유: 마커 밖에 손으로 유지하면 한쪽 런타임만 그것을 보는 상태가 만들어지고,
+    그 어긋남을 검사하는 게이트가 없다. 같은 것을 보지 않는 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다."""
+    index_src = root / "core/principles/PROJECT.core.md"
     core = root / "core/principles/AGENTS.core.md"
+    _, index = _strip_frontmatter(index_src.read_text(encoding="utf-8"))
     _, principles = _strip_frontmatter(core.read_text(encoding="utf-8"))
 
     lines = ["# Romeo 하네스 규칙 (자동 생성)", "",
-             f"원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.",
+             "원본은 `core/principles/PROJECT.core.md`(이 저장소의 인덱스)와 "
+             "`core/principles/AGENTS.core.md`(행동 규칙)이고 이 블록은 `romeo compile` 이 만든다.",
              "**마커 안을 고치지 않는다** — 다음 컴파일에서 사라진다. 마커 밖에 쓴 내용은 보존된다.",
-             "", principles.rstrip(), "", "---", ""]
+             "", index.rstrip(), "", "---", "",
+             principles.rstrip(), "", "---", ""]
     lines += _render_role_table(bindings)
     lines += _render_role_contracts(roles)
     lines += _render_permission_ceiling(adapter, bindings)
@@ -415,7 +422,7 @@ def plan_outputs(root):
             settings_file = _output_rel(
                 root, adapter["settings_file"], f"{adapter['id']}.settings_file")
         files[instructions_file] = ("managed", _render_instructions(root, adapter, bindings, roles),
-                                    "core/principles/AGENTS.core.md")
+                                    "core/principles/{PROJECT,AGENTS}.core.md")
         if settings_file and (adapter.get("settings_deny") or adapter.get("settings_ask")):
             files[settings_file] = ("settings", _owned_settings(adapter), None)
         # 역할 계약의 런타임 투영. 형식이 확인되지 않은 런타임은 agents_dir 가 비어 있고,

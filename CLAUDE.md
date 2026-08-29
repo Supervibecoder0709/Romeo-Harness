@@ -1,10 +1,18 @@
-# CLAUDE.md
+<!-- romeo:managed start v0.1.0 source=core/principles/{PROJECT,AGENTS}.core.md sha=0e85c89e -->
+# Romeo 하네스 규칙 (자동 생성)
+
+원본은 `core/principles/PROJECT.core.md`(이 저장소의 인덱스)와 `core/principles/AGENTS.core.md`(행동 규칙)이고 이 블록은 `romeo compile` 이 만든다.
+**마커 안을 고치지 않는다** — 다음 컴파일에서 사라진다. 마커 밖에 쓴 내용은 보존된다.
+
+이 문서는 **이 저장소가 무엇이고 어디에 무엇이 있는지**를 담는다. 행동 규범은 담지 않는다 —
+그것은 `core/principles/AGENTS.core.md` 가 소유하고 이 블록 아래에 이어진다.
+
+`romeo compile` 이 이 파일을 **두 런타임의 지침 파일에 같은 managed block 으로** 넣는다.
+한쪽 런타임만 인덱스를 보는 상태를 만들지 않기 위해서다 — 같은 것을 보지 않는 두 실행의 판정이 같다는 것은
+동등성의 증거가 아니다. 런타임 고유 매핑은 어댑터가 붙인다(C-C6).
 
 이 저장소는 여러 프로젝트에 부착할 AI 작업 하네스를 만든다. 목표는 에이전트와 규칙을 쌓는 것이
 아니라, 요청을 이해하고 필요한 작업 방식만 골라 계획·실행·검증·기록까지 일관되게 수행하는 체계다.
-
-**아래 「Romeo 하네스 규칙」은 자동 생성 블록이다.** 원본은 `core/principles/AGENTS.core.md` 이고
-두 런타임이 똑같이 따른다. 그 9개 규칙이 이 저장소의 행동 규범이며, 이 서문은 그것을 반복하지 않는다.
 
 ## 충돌 해소 순서
 
@@ -17,7 +25,7 @@
 | --- | --- | --- |
 | ① | 지금 상태·다음 작업 | `docs/planning/progress.md` 상단 「지금 상태」 블록 |
 | ② | 그 블록이 최신인지 | `git log --oneline <기준SHA>..HEAD` — 그 사이 커밋이 상태를 바꿨으면 실측한다 |
-| ③ | CI 빨간불 여부 | `gh run list --limit 1` |
+| ③ | CI 빨간불 여부 | 저장소의 CI 실행 목록에서 최신 1건 |
 
 ## 문서 인덱스
 
@@ -30,13 +38,14 @@
 | v1 범위·능력 지도·제약 | `docs/requirements/` |
 | 독립 리뷰 findings 원문 | `docs/reviews/<날짜>-<라운드>/` |
 | 작업 단위 (spec·evidence·result·review) | `docs/work/<unit_id>/` |
-| 코어 규칙 원본 (자동 생성 블록의 출처) | `core/principles/AGENTS.core.md` |
+| 이 인덱스의 원본 | `core/principles/PROJECT.core.md` |
+| 코어 규칙 원본 (아래 규칙 절의 출처) | `core/principles/AGENTS.core.md` |
 | 라우터 정책표 (분류·패키지·실행 가드) | `core/policy/*.yaml` |
 | 역할 계약·스키마·템플릿 | `core/roles/` · `core/schemas/` · `core/templates/` |
 | 부품 출처·라이선스·채택 판정 | `provenance/imports.yaml` |
-| Orca 위임 절차 | `adapters/orca/RUNBOOK.md` |
+| 위임 절차 (런타임 고유) | `adapters/orca/RUNBOOK.md` |
 | 역할↔런타임 바인딩·권한 상한 정본 | `.harness/bindings.yaml` |
-| 런타임 관찰 기록 (discovery·로드) | `.harness/observations.yaml` |
+| 런타임 관찰 기록 (discovery·로드·재현성) | `.harness/observations.yaml` |
 | 동등성 게이트 케이스 | `fixtures/parity/` |
 
 ## 이 저장소에만 해당하는 것
@@ -48,14 +57,8 @@
   출처·라이선스·기준 버전·수정 여부를 `provenance/imports.yaml` 에 남긴다.
 - **조사 비용을 아낀다.** 큰 문서를 통째로 열지 말고 목차(`grep -n "^## "`)나 표의 특정 열부터 읽는다.
   `docs/planning/progress.md` 는 46KB 다.
-- **`AGENTS.md` 에는 이 서문이 없다.** 위 인덱스·충돌 해소 순서는 지금 이 런타임만 본다 —
-  해소 예정 작업은 `docs/planning/progress.md` §10 체크리스트 32 번이다.
 
-<!-- romeo:managed start v0.1.0 source=core/principles/AGENTS.core.md sha=1d8426dd -->
-# Romeo 하네스 규칙 (자동 생성)
-
-원본은 `core/principles/AGENTS.core.md` 이고 이 블록은 `romeo compile` 이 만든다.
-**마커 안을 고치지 않는다** — 다음 컴파일에서 사라진다. 마커 밖에 쓴 내용은 보존된다.
+---
 
 이 문서는 **두 런타임(Claude·Codex)이 똑같이 따라야 하는 규칙**만 담는다. 도구명·모델명을 쓰지 않는다(C-C6).
 런타임별 매핑("사람에게 묻는 방법", "명령을 실행하는 방법")은 각 어댑터가 붙인다.
