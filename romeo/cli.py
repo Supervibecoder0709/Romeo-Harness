@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · close · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -148,10 +148,13 @@ def cmd_fixtures(args):
 
 def cmd_approve(args):
     from .docs import approve_unit
-    fm = approve_unit(args.unit, args.by, project_root=_root(args))
-    print(f"approved {fm['id']} at {fm['approved_at']} by {fm['approved_by']} base_sha={fm.get('base_sha')}")
-    print("  다음: 승인된 spec.md 를 커밋한다. 위임된 실행 공간은 커밋된 것만 본다 — "
-          f"romeo envelope build --unit {fm['id']} --role implementer --base-sha <승인 커밋 SHA> (D-a)")
+    fm = approve_unit(args.unit, args.by, project_root=_root(args), reapprove=args.reapprove, reason=args.reason)
+    what = "reapproved" if args.reapprove else "approved"
+    print(f"{what} {fm['id']} at {fm['approved_at']} by {fm['approved_by']}"
+          + (f" (이전 승인 {len(fm['approval_history'])}건은 approval_history 에 남았다)" if args.reapprove else ""))
+    print("  다음: 승인된 spec.md 를 커밋한다. 위임된 실행 공간은 커밋된 것만 본다(D-a). "
+          "base_sha 는 적지 않았다 — 그 커밋의 SHA 가 base_sha 이고, "
+          f"romeo envelope build --unit {fm['id']} --role implementer 는 --base-sha 를 생략하면 이력에서 승인 커밋을 스스로 찾는다")
     return 0
 
 
@@ -216,6 +219,16 @@ def cmd_envelope(args):
               f"· 계약 sha256 {res['sha256'][:12]} · workspace {env['workspace']} "
               f"· guards {[g['id'] for g in env['guards']]} · required_checks {len(env['required_checks'])}건")
     return 0
+
+
+def cmd_review(args):
+    from .evidence import record_review_envelope
+    res = record_review_envelope(args.unit, args.run, args.source, project_root=_root(args))
+    c = res["command"]
+    print(f"recorded → {res['path']} (sha256 {res['sha256'][:12]}) · evidence {res['evidence']} · "
+          f"{c['id']} exit {c['exit_code']}")
+    print("  다음: romeo envelope check --unit <id> --role reviewer <그 파일> 로 앵커 5개를 본다")
+    return 0 if c["exit_code"] == 0 else 1
 
 
 def cmd_close(args):
@@ -357,9 +370,12 @@ def build_parser():
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_fixtures)
 
-    s = sub.add_parser("approve", help="승인 사건 기록 (approved_at·base_sha·active)")
+    s = sub.add_parser("approve", help="승인 사건 기록 (approved_at·active). base_sha 는 적지 않는다 — 승인 커밋은 이력에서 찾는다")
     s.add_argument("unit")
     s.add_argument("--by", required=True)
+    s.add_argument("--reapprove", action="store_true",
+                   help="이미 승인된 spec 을 다시 승인한다(검증 계획·확인란 변경). 이전 승인은 approval_history 에 남는다")
+    s.add_argument("--reason", help="(--reapprove) 무엇이 바뀌어 다시 승인하는지")
     s.add_argument("--root")
     s.set_defaults(fn=cmd_approve)
 
@@ -401,7 +417,7 @@ def build_parser():
     v_b.add_argument("--unit", required=True)
     v_b.add_argument("--role", required=True, choices=["implementer", "reviewer"])
     v_b.add_argument("--base-sha", dest="base_sha",
-                     help="승인된 spec.md 가 들어 있는 커밋. 생략하면 spec 의 base_sha 를 쓴다(D-a)")
+                     help="승인된 spec.md 가 들어 있는 커밋. 생략하면 이력에서 승인 커밋(현재 승인이 처음 커밋된 자리)을 찾는다(D-a)")
     v_b.add_argument("--run", help="파일 이름 앞에 붙일 run 이름 — evidence·결과 계약과 같은 값을 쓴다")
     v_b.add_argument("--root")
     v_b.add_argument("--json", action="store_true")
@@ -415,6 +431,15 @@ def build_parser():
     v_c.add_argument("--root")
     v_c.add_argument("--json", action="store_true")
     v_c.set_defaults(fn=cmd_envelope)
+
+    s = sub.add_parser("review", help="검토자 출력을 봉투로 기록한다 — review/<run>-reviewer.json 을 쓰고 그 sha256 을 같은 run 의 증거에 봉인")
+    rs = s.add_subparsers(dest="action", required=True)
+    r_rec = rs.add_parser("record", help="romeo review record --unit ID --run RUN <검토자 출력 JSON 파일>")
+    r_rec.add_argument("source", help="검토자가 낸 결과 계약 JSON 파일(워크트리 밖 -o 출력 등)")
+    r_rec.add_argument("--unit", required=True)
+    r_rec.add_argument("--run", required=True, help="검토 run id — 봉투 이름과 증거 파일이 이 값으로 묶인다")
+    r_rec.add_argument("--root")
+    r_rec.set_defaults(fn=cmd_review)
 
     s = sub.add_parser("close", help="/plan-close 검사 → status done")
     s.add_argument("--unit", required=True)

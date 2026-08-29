@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "romeo/result-envelope",
   "title": "Romeo 결과 계약(ResultEnvelope)",
-  "description": "실행 런타임의 출력을 정규화한 결과 계약. 동등성 판정이 비교하는 대상이고 증거를 복제하지 않는다(C-C3·D-12·K-63). 구현자가 gate_verdict PASS 를 낼 때는 checks 가 1건 이상이고 evidence_ref 가 채워져 있어야 한다 — 실행하지 않은 것을 완료로 선언할 수 없다(K-51). 검토자는 검사를 실행하지 않으므로 그쪽 증거 규칙은 역할 계약이 소유하고 동등성 판정이 강제한다(K-63).",
+  "description": "실행 런타임의 출력을 정규화한 결과 계약. 동등성 판정이 비교하는 대상이고 증거를 복제하지 않는다(C-C3·D-12·K-63). 구현자가 gate_verdict PASS 를 낼 때는 checks 가 1건 이상이고 evidence_ref 가 채워져 있어야 한다 — 실행하지 않은 것을 완료로 선언할 수 없다(K-51). 검토자는 검사를 실행하지 않으므로 그쪽 증거 규칙은 역할 계약이 소유하고 동등성 판정이 강제한다(K-63). notes 는 실행자가 판정의 맥락(예: 이 FAIL 이 자기 변경과 무관하다는 근거)을 계약 안에 남기는 자유 서술 자리이고 판정에 쓰이지 않는다 — 종료 검사·동등성 판정·역할 계약 검사는 이 필드를 읽지 않으며, 판정은 gate_verdict·checks·findings 로만 낸다.",
   "type": "object",
   "required": [
     "schema",
@@ -123,6 +123,9 @@
         "string",
         "null"
       ]
+    },
+    "notes": {
+      "type": "string"
     }
   },
   "anyOf": [
@@ -143,6 +146,7 @@
         },
         "blocked_reason": {},
         "findings": {},
+        "notes": {},
         "evidence_ref": {
           "type": "string",
           "minLength": 1
@@ -162,6 +166,7 @@
         "gate_verdict": {},
         "blocked_reason": {},
         "findings": {},
+        "notes": {},
         "evidence_ref": {}
       }
     },
@@ -181,6 +186,7 @@
         },
         "blocked_reason": {},
         "findings": {},
+        "notes": {},
         "evidence_ref": {}
       }
     }

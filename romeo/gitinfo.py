@@ -47,8 +47,9 @@ def changed_files(cwd, base_sha=None):
     files = set()
     if base_sha:
         try:
-            out = _git(["diff", "--name-only", base_sha, "HEAD"], cwd).stdout
-            files.update(p for p in out.splitlines() if p)
+            # -z: 비ASCII 경로가 8진수 이스케이프("\\355\\225…")로 인쇄되지 않게 한다(core.quotePath 기본값).
+            out = _git(["diff", "--name-only", "-z", base_sha, "HEAD"], cwd).stdout
+            files.update(p for p in out.split("\0") if p)
         except subprocess.CalledProcessError:
             pass
     out = _git(["status", "--porcelain", "-z", "--untracked-files=all"], cwd).stdout

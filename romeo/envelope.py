@@ -12,7 +12,7 @@ from pathlib import Path
 
 from . import HARNESS_ROOT, frontmatter
 from .close import ENVELOPE_CHECKS, UNREADABLE, UNVERIFIED, envelope_checks, required_checks
-from .docs import find_unit_dir
+from .docs import approval_commit, approval_key, approval_keys_known, find_unit_dir
 from .gitinfo import head_sha, is_repo
 from .parity import load_role_contracts
 from .policy import classification_from_frontmatter, load_policy, load_project_state, route
@@ -59,6 +59,13 @@ def _head_hint(project_root, spec_rel, sha):
     if fm and _approved(fm):
         return f" HEAD({head[:12]}) 에는 승인된 spec.md 가 있다 — --base-sha {head} 로 다시 실행한다."
     return ""
+
+
+def _approval_hint(project_root, unit_id):
+    try:
+        return approval_commit(project_root, unit_id)[:12]
+    except ValueError:
+        return "(아직 커밋되지 않았다)"
 
 
 CHANGE_SCOPE_HEADING = "## 변경 범위"
@@ -120,11 +127,17 @@ def _allowed_paths(harness_root, role, unit_id, body=None):
     raise ValueError(f"{role} 역할 계약의 allowed_paths.scope 를 모른다: {scope!r}")
 
 
-def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None):
+def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, allow_superseded=False):
     """승인된 spec 에서 작업 계약을 계산한다(파일을 쓰지 않는다).
 
-    base_sha 를 생략하면 spec frontmatter 의 base_sha 를 쓴다. 그 커밋에 승인된 spec.md 가 없으면
-    계약을 만들지 않고 거부한다 — 워커가 볼 수 없는 승인은 승인이 아니다."""
+    base_sha 를 생략하면 **이력에서 승인 커밋을 찾는다**(`docs.approval_commit`) — spec frontmatter 의 base_sha 는 읽지 않는다.
+    그 값은 승인 시점의 HEAD 라 승인을 담지 않는 커밋(승인 커밋의 부모)을 가리켰다(체크리스트 38).
+    지목된 커밋에 승인된 spec.md 가 없으면 계약을 만들지 않고 거부한다 — 워커가 볼 수 없는 승인은 승인이 아니다.
+
+    명시한 base_sha 도 검사한다: 그 커밋의 spec 이 담은 승인이 **지금의 승인**과 같아야 한다. 재승인 전 커밋을 주면
+    이전 승인본의 검증 계획으로 계약이 만들어지므로(이 결함이 실제로 5건 대 6건으로 났다) 거부한다 —
+    `allow_superseded=True` 는 종료 검사의 재계산 대조에서만 쓴다: 이전 승인으로 만든 봉투도 봉투로 **식별**은 돼야 하고,
+    그것을 지금의 판정에 세지 않는 것은 그쪽의 일이다."""
     if role not in ROLES:
         raise ValueError(f"역할을 모른다: {role!r} (허용: {' · '.join(ROLES)})")
     project_root = Path(project_root).resolve()
@@ -134,10 +147,7 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     udir = find_unit_dir(project_root, unit_id)
     spec = udir / "spec.md"
     spec_rel = rel(spec, project_root)
-    work_fm, _ = frontmatter.read(spec)
-    ref = base_sha or work_fm.get("base_sha")
-    if not ref:
-        raise ValueError(f"{unit_id}: base_sha 가 없다 — 승인 기록이 없다(romeo approve 로 승인을 기록한다)")
+    ref = base_sha or approval_commit(project_root, unit_id)
     sha = _rev_parse(project_root, ref)
     raw = _committed_bytes(project_root, sha, spec_rel)
     if raw is None:
@@ -153,6 +163,21 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
                          f"(status={fm.get('status')} approved_at={fm.get('approved_at')}) — "
                          f"승인 없이 구현하지 않는다(D-27). 승인된 spec.md 를 커밋한 뒤 "
                          f"--base-sha <커밋 SHA> 로 다시 만든다(D-a)." + _head_hint(project_root, spec_rel, sha))
+    # 새 계약은 **지금의 승인**에서만 만든다. 재계산 대조(allow_superseded)는 식별만 하므로 이 검사를 건너뛴다 —
+    # 이전 승인으로 낸 봉투를 지금의 판정에 세지 않는 것은 종료 검사의 일이다(`close._check_review`).
+    if not allow_superseded:
+        work_fm, _ = frontmatter.read(spec)
+        blob_key, known = approval_key(fm), approval_keys_known(work_fm)
+        if blob_key != known[-1]:
+            if blob_key in known:
+                raise ValueError(
+                    f"{sha[:12]} 시점의 {spec_rel} 는 재승인 **전**의 승인(approved_at {fm.get('approved_at')})을 담고 있다 — "
+                    f"지금의 승인은 approved_at {work_fm.get('approved_at')} 이고 그 계약은 이전 검증 계획으로 만들어진다. "
+                    f"현재 승인이 처음 커밋된 커밋은 {_approval_hint(project_root, unit_id)} 이다(D-a)")
+            raise ValueError(
+                f"{sha[:12]} 시점의 {spec_rel} 가 담은 승인(approved_at {fm.get('approved_at')})은 이 작업 트리의 spec 이 겪은 "
+                f"어느 승인과도 맞지 않는다(현재 approved_at {work_fm.get('approved_at')}) — 다른 브랜치의 승인이거나 "
+                f"손으로 고친 spec 이거나 재승인 전 승인이다. 같은 승인을 보고 있지 않으면 계약을 만들지 않는다(D-a)")
 
     pol = load_policy(harness_root)
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
@@ -231,6 +256,10 @@ def format_result_check(res):
 def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, run_name=None):
     """계약을 작업 단위 폴더 안(`docs/work/<id>/task/`)에 쓴다 — 등록되지 않은 산출물은 종료 검사가 인정하지 않는다(K-62)."""
     project_root = Path(project_root).resolve()
+    if role == "reviewer" and not run_name:
+        # 검토 봉투는 계약 경로의 <run> 으로 자기 run 의 증거(방어 검사)에 묶인다 — run 없는 자리(task/reviewer.json)의 계약으로 낸
+        # 판정은 종료 검사가 세지 않는다. 만들 수 있는 자리를 두면 함정이므로 여기서 거부한다.
+        raise ValueError("검토자 계약에는 --run 이 필요하다 — 검토 판정은 task/<run>-reviewer.json 의 <run> 으로 그 run 의 증거에 묶인다")
     env = build_envelope(unit_id, role, project_root=project_root, harness_root=harness_root, base_sha=base_sha)
     tdir = find_unit_dir(project_root, unit_id) / "task"
     tdir.mkdir(exist_ok=True)

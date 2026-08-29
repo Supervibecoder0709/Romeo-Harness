@@ -45,8 +45,15 @@ orca worktree current --json
 `core/schemas/result-envelope.json` 의 `anyOf` 절은 역할별 제약을 표현하려고 `"schema": {}` 같은 **빈 하위 스키마**를 쓰는데,
 그 런타임이 요구하는 형식은 모든 property 에 `type` 키를 요구한다. JSON Schema 로는 완전히 유효하므로
 스키마 검사기로는 잡히지 않고 **그 CLI 를 실제로 호출해야만** 드러난다.
-형식을 강제할 자리는 여기가 아니다 — §3.8 의 `envelope check` 가 같은 원본 스키마로 검증하고 앵커 검사 4개를 더 건다.
+형식을 강제할 자리는 여기가 아니다 — §3.8 의 `envelope check` 가 같은 원본 스키마로 검증하고(검사 5개 = 스키마 1 + 앵커 4) 더 강하게 건다.
 그래서 이 문서는 `--output-schema` 를 넘기지 않고, 출력 **형식**은 워커 프롬프트가 지시하고 **검증**은 종료 경로가 한다.
+
+**교체 실행의 검토자(claude)도 같은 자리에서 막힌다(2026-08-29 실측 2회, 체크리스트 40).**
+`claude -p --json-schema "$(cat core/schemas/result-envelope.json)" …` 은 즉시 종료 코드 1 로 끝난다(출력 121바이트):
+`Error: --json-schema is not a valid JSON Schema: no schema with key or ref "https://json-schema.org/draft/2020-12/schema"`.
+스키마가 선언한 `$schema` 메타스키마를 그 CLI 가 풀지 못한다. codex 의 `--output-schema` 와 정확히 같은 성질이다 —
+JSON Schema 로는 유효해서 검사기로는 잡히지 않고 그 CLI 를 호출해야만 드러난다. 그래서 **두 런타임 모두 스키마 플래그를 넘기지 않는다** —
+형식은 절차 파일(`adapters/orca/prompts/reviewer-brief.md`)이 지시하고 검증은 `envelope check` 가 한다. 두 런타임이 대칭이다.
 
 `--model` 과 `--effort` 는 **넘기지 않는다** — 계정 기본값을 쓴다(K-12). `--effort` 는 `--model` 을 요구하고, 둘 다 `--terminal` 과 결합할 수 없다(실측).
 
@@ -83,8 +90,23 @@ orca worktree current --json
 bin/romeo approve <작업 단위 id> --by <승인자>
 ```
 
-성공 신호: 종료 코드 0 과 `approved <id> at <시각> by <승인자> base_sha=<SHA>`.
+성공 신호: 종료 코드 0 과 `approved <id> at <시각> by <승인자>`.
 이 명령은 승인 **사건**을 `spec.md` 에 기록할 뿐 커밋하지 않는다(D-61). 이어서 명령 자신이 다음 단계를 인쇄한다.
+**`base_sha` 는 적지 않는다**(체크리스트 38) — 승인 시점의 HEAD 는 승인을 담지 않는 커밋(승인 커밋의 부모)이라, 그 값으로 계약을 만들면
+이전 승인본의 검증 계획이 나온다(2026-08-29 재관통 직전에 실제로 5건 대 6건으로 어긋났다). 승인 커밋은 파일의 주장이 아니라
+이력의 사실이다: `bin/romeo envelope build` 는 `--base-sha` 를 생략하면 `git log -- docs/work/<id>/spec.md` 를 걸어 **현재 승인이 처음
+커밋된 커밋**을 스스로 찾는다. 이 문서의 `<base-sha>` 는 그 값이고, 명시하려면 `--base-sha` 로 준다.
+이미 승인된 spec 의 검증 계획·확인란이 바뀌었으면 `bin/romeo approve <id> --by <승인자> --reapprove --reason "<무엇이 바뀌었나>"` 로
+다시 승인한다(체크리스트 37) — 이전 승인은 frontmatter `approval_history` 에 남고, `status` 를 손으로 내리지 않는다.
+재승인을 커밋하면 그 커밋이 새 승인 커밋이다.
+
+**`<base-sha>` 는 승인 커밋일 수도, 그 뒤의 커밋일 수도 있다 — 둘의 관계를 안다.** 아래 확인 1 은 승인 커밋이 만족하지만 확인 2·3 은
+승인 뒤에 하네스 커밋이 쌓였으면 승인 커밋이 만족하지 못한다(이 단위가 그 경우였다 — 승인 커밋 `f4c8d10`, 실제 `<base-sha>` 는 34 적용 커밋 `c237ea9`).
+그래서 `<base-sha>` 는 **승인 커밋이거나 그 후손**이어야 하고, 그 커밋의 spec 이 담은 승인이 **지금의 승인과 같아야** 한다 —
+승인 동일성은 `envelope build` 가 검사해 재승인 전 승인을 담은 커밋(옛 `<base-sha>`)을 거부하고, 조상 관계는 §3.8 의 `BASE_SHA` 앵커
+(`envelope check`·`close`)가 검사한다. `--base-sha` 를 생략하면 승인 커밋 자체를 쓴다.
+승인 커밋과 `<base-sha>` 사이에 계약 입력(정책표·`core/roles/`·`core/schemas/`·`.harness/romeo.project.yaml`)이 바뀌었으면 §3.8 의 재계산 대조가
+**지금 하네스**로 다시 계산하므로 `<base-sha>` 를 그 변경 뒤로 잡는다.
 
 그 다음 **사람이** 승인된 `spec.md` **와 워커가 실행할 하네스 상태**를 커밋한다. 하네스는 커밋하지 않는다 —
 무엇을 언제 커밋하는지는 사람의 판단이다. 이 커밋의 SHA 가 이후 모든 명령의 `<base-sha>` 이고,
@@ -169,9 +191,11 @@ bin/romeo envelope build --unit <작업 단위 id> --role reviewer    --base-sha
 
 | 메시지 | 무엇을 안 했나 |
 | --- | --- |
-| `base_sha 가 없다 — 승인 기록이 없다` | §3.1 의 `bin/romeo approve` 를 하지 않았다 |
+| `승인 기록이 없다 (status=draft …) — romeo approve 로 승인을 기록한다(D-27)` | §3.1 의 `bin/romeo approve` 를 하지 않았다 |
+| `승인(approved_at …)이 아직 커밋되지 않았다 — 승인된 spec.md 를 커밋한 뒤 다시 실행한다` | `--base-sha` 를 생략했는데 승인 커밋이 없다 — 승인 커밋을 하지 않았다(체크리스트 38: 승인 커밋은 이력에서 찾는다) |
 | `<sha> 에 docs/work/<id>/spec.md 가 없다 — 승인된 spec.md 를 커밋한 뒤 --base-sha <커밋 SHA> 로 다시 만든다(D-a)` | 승인 커밋을 하지 않았다. HEAD 에 승인된 spec 이 있으면 메시지가 쓸 SHA 를 알려준다 |
 | `<sha> 시점의 ... 는 승인 상태가 아니다` | 승인 이전 커밋을 지목했다 |
+| `<sha> 시점의 … 는 재승인 **전**의 승인(approved_at …)을 담고 있다 — … 현재 승인이 처음 커밋된 커밋은 <sha>` | `--reapprove` 뒤에 옛 `<base-sha>` 를 그대로 썼다 — 이전 검증 계획의 계약이 나오므로 거부된다(체크리스트 38). 재승인 커밋 이후의 커밋을 지목한다 |
 
 두 계약의 `base_sha` 는 같은 값이어야 한다. 다르면 두 역할이 같은 것을 보고 있지 않다(`review/SKILL.md` 1번이 그때 `BLOCKED_CAPABILITY` 로 끝낸다).
 
@@ -206,6 +230,10 @@ orca orchestration task-create --run <run-id> \
 그 출력의 **형식**(`core/schemas/result-envelope.json`), 그리고 봉투에 적을 `evidence_ref`
 (`docs/work/<id>/evidence/<run-id>.yaml`). 여기에 검사를 증거 기록 명령으로 돌리라는 조건과 §5 의 식별자 플래그,
 그리고 절차 문서(`core/workflows/{implement,review}/SKILL.md`)를 함께 넣는다 — 이것도 **자기 작업 루트 기준 상대 경로**다.
+구현자 `--spec` 에는 「수용 기준 체크박스는 뒷받침 증거를 지목할 수 있을 때 구현자가 `[x]` 로 채운다 — 자기 검토 선언이 아니라 완료 주장이다」
+를 넣는다(`core/workflows/implement/SKILL.md` 7번). 2026-08-29 재관통의 구현자가 이것을 C-D3 금지로 읽어 비워 두었고 close 가 `AC_ALL_CHECKED` 로 막혔다(체크리스트 31).
+**검토자 `--spec` 은 손으로 쓰지 않는다** — `adapters/orca/prompts/reviewer-brief.md` 의 자리표시자를 채운 것이 정본이고, §3.7 의 `P` 파일과 같은 내용이다.
+「명령을 실행하지 않는다」 를 조건 없이 옮겨 적으면 codex 검토자가 파일을 하나도 읽지 못한다 — 그 런타임에서 읽기·검색은 셸 명령이기 때문이다(체크리스트 42).
 
 **이 시점에 아는 식별자는 둘뿐이다 — `<run-id>` 와 `<task-id>`.** `<dispatch-id>` 는 §3.5 의 `worker-start` 가
 돌아오면서 발급하므로 지금 `--spec` 에 넣을 값이 없다. 없는 값을 자리표로 적어 넘기면 워커가 그 문자열을 그대로
@@ -394,11 +422,19 @@ W=<구현자 워크트리 절대경로>
 T=$W/docs/work/<id>/task/<run-id>-reviewer.json      # §3.5.1 이 이 워크트리 안에 실재시킨 검토자 계약
 
 # 검토자에게 갈 프롬프트 = 절차 지시 + 계약 JSON. 두 파일을 이어 붙여 한 프롬프트로 넘긴다.
-# 절차 파일은 검토 대상 워크트리 **밖**에 둔다 — 안에 두면 §4 방어 검사가 그 파일 때문에 무효가 된다.
-P=<절차 지시 파일의 절대경로>                                # §3.4 의 검토자 --spec 과 같은 내용
+# 절차 파일은 검토 대상 워크트리 안이라도 **제외 경로(.harness/) 밖에는 두지 않는다** — 방어 검사가 그 파일을 변경으로 본다.
+# 절차 파일은 손으로 새로 쓰지 않는다 — 채움 스크립트가 정본(adapters/orca/prompts/reviewer-brief.md)의 자리표시자를 채우고
+# 이 런타임의 읽기 수단 한 줄을 붙인 뒤 스스로 검증한다(남은 자리표시자 0 · HTML 주석 0 · 읽기 수단 문장 1개, 체크리스트 42).
+# 출력은 검토 대상 워크트리의 **제외 경로 안**(.harness/runs/<id>/<run-id>/)에 둔다 — 신선도·방어 검사가 그 경로를 빼므로 검토를 깨지 않는다.
+P=$W/.harness/runs/<id>/<run-id>/reviewer-brief.md
+python3 adapters/orca/prompts/fill_brief.py --unit <id> --run <run-id> \
+  --base-sha "$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['base_sha'])" "$T")" \
+  --task-sha256 "$(shasum -a 256 "$T" | cut -d' ' -f1)" \
+  --runtime <codex|claude — 이 실행의 검토자 런타임> --mode base --out "$P"
+# 검토자가 받은 입력을 그 run 의 증거에 남긴다(재현 가능성 · K-51). .harness 는 트리 해시에서 빠지므로 방어 검사와 어긋나지 않는다.
+bin/romeo evidence run --unit <id> --run <run-id> --root "$W" --label reviewer-brief -- shasum -a 256 "$P"
 
-# 그 절차 파일에는 계약의 sha256 을 **위임한 쪽이 계산해** 적어 둔다(아래 상자 참조).
-shasum -a 256 "$T" | cut -d' ' -f1
+# 계약의 sha256 은 fill_brief 가 --task-sha256 으로 받아 적는다(위) — 손으로 적지 않는다. 아래 상자가 그 이유다.
 
 CMD="codex -s read-only -C '$W' \"\$(cat '$P'; cat '$T')\""
 
@@ -409,10 +445,10 @@ orca terminal create \
   --json
 ```
 
-`CMD` 의 앞부분은 `.harness/bindings.yaml` 의 `roles.reviewer.enforcement` 값(`codex exec -s read-only`)을 그대로 옮긴 것이다.
-이 문서는 그 값을 옮겨 적을 뿐이다 — 두 값이 다르면 bindings 가 맞다. 역할 교체 실행(§6)이면 같은 자리에
+`CMD` 의 샌드박스 플래그(`-s read-only`)는 `.harness/bindings.yaml` 의 `roles.reviewer.enforcement` 값(`codex exec -s read-only`)에서 옮긴 것이다 —
+형태는 위 표의 실측대로 TUI(`codex`, `exec` 없음)다. 강제 수단(플래그)은 bindings 가 정본이고, 기동 형태(TUI/비대화형)는 이 절이 정한다. 역할 교체 실행(§6)이면 같은 자리에
 `parity_swap.reviewer.enforcement` 를 넣는다: `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config`
-(그 런타임의 스키마 전달 형태는 §4 의 두 번째 블록 그대로 — `--json-schema` 에는 파일 경로가 아니라 내용을 넣는다).
+(그쪽도 스키마 플래그는 넘기지 않는다 — `--json-schema` 는 이 저장소의 스키마를 거부한다. §2 의 경고 문단과 §4 의 두 번째 블록).
 
 경로를 작은따옴표로 감싸는 것은 공백이 든 절대 경로가 터미널 쪽 셸에서 쪼개지지 않게 하기 위해서다.
 `\$(cat '$T')` 의 `\$` 는 바깥 셸의 확장을 막는 것이다. 계약 JSON 을 여기서 펼치지 않고 **문자열 그대로** 넘겨,
@@ -517,7 +553,11 @@ ls "$W/docs/work/<id>/result/<run-id>-implementer.json"
   `-s` 는 **모델이 만든 셸 명령**에만 걸리고 CLI 자신이 여는 출력 파일에는 걸리지 않기 때문이다.
   그래서 `-o` 대상은 검토 대상 워크트리 **밖**에 둔다 — 안에 두면 §4 의 방어 검사가 그 파일 때문에 무효가 된다.
 
-어느 자리에서 받았든 `review/` 경로에 쓰는 것은 위임한 쪽이다. 검토자가 그 파일을 쓰지 않는다.
+어느 자리에서 받았든 `review/` 경로에 쓰는 것은 위임한 쪽이다. 검토자가 그 파일을 쓰지 않는다. **손으로 복사하지 않는다** —
+`"$W/bin/romeo" review record --unit <id> --run <run-id> --root "$W" <검토자 출력 JSON>` 이 봉투를 `review/<run-id>-reviewer.json` 에 쓰고
+같은 run 의 증거에 그 파일의 sha256 을 `review-record` 명령으로 봉인한다. 종료 검사는 봉투의 현재 해시가 그 기록과 같을 때만 판정으로 센다 —
+판정 문자열(`gate_verdict`)은 다른 어떤 앵커에도 묶이지 않기 때문이다(정직한 FAIL 봉투에서 한 단어만 바꾸면 통과하던 것을 설계 검토가 재현했다).
+이것도 로컬 파일이다: 봉투·증거·로그·해시를 전부 앞뒤 맞게 고치면 뚫린다. 검토자 면에는 재실행 대조 같은 종점이 없다.
 
 ```bash
 orca orchestration worker-read --dispatch <검토자 dispatch-id> --source auto --limit 400 --json
@@ -545,8 +585,26 @@ orca orchestration worker-read --dispatch <검토자 dispatch-id> --source auto 
 `result/` 쪽은 close 가 보지 않으므로 이 명령이 구현자 결과 계약의 유일한 검증이다.
 
 종료 검사가 이 파일들을 읽는다. `review/*.json` 이 없으면 `HAS_REVIEW` 가 FAIL 이고, 스키마·`unit_id`·`role` 이 맞지 않으면
-`REVIEW_ENVELOPE_VALID` 가 FAIL 이며, **`gate_verdict` 가 `PASS` 가 아닌 판정이 하나라도 남아 있으면 `REVIEW_VERDICT` 가 FAIL 이다**(D-c).
-빈 파일 하나로 통과하던 예전 동작이 아니다. 검토자가 FAIL 을 냈으면 고친 뒤 다시 검토받는다 — 낡은 FAIL 봉투를 남겨 두면 close 는 계속 거부한다.
+`REVIEW_ENVELOPE_VALID` 가 FAIL 이며, **현재 산출물·현재 승인에 대한 판정 중 `gate_verdict` 가 `PASS` 가 아닌 것이 하나라도 있으면
+`REVIEW_VERDICT` 가 FAIL 이다**(D-75 — D-c 를 '현재 산출물·현재 승인' 으로 좁힌 것). 다른 산출물·재승인 전 승인의 판정은 `REVIEW_SUPERSEDED` 로 인쇄만 한다.
+빈 파일 하나로 통과하던 예전 동작이 아니다. 검토자가 FAIL 을 냈으면 고친 뒤 다시 검토받는다.
+**판정은 산출물에 묶인다(D-73 의 close 적용, 체크리스트 41).** close 는 각 검토자 봉투가 본 산출물(`head_sha`+`dirty_tree_hash`)을
+검토 run 자신의 증거(방어 검사 기록)에서 읽고 — 봉투의 `evidence_ref` 가 가리킨 산출물은 그것과 같아야 한다, 아래 — 지금 닫으려는 산출물
+(검사 기록 run 의 것)과 비교한다. 같은 산출물을 본 판정만 `REVIEW_VERDICT` 에 세고,
+다른 산출물을 본 판정은 PASS 든 FAIL 이든 `REVIEW_SUPERSEDED`(WARN, 비차단)로 인쇄한다. 그래서 고친 뒤 새 검토를 받으면 옛 산출물의 FAIL 봉투는
+**지우지 않아도** 막지 않는다(그 봉투들은 §6 의 관측 표본이라 지워서도 안 된다). 반대로 옛 산출물의 PASS 로 새 산출물이 닫히지도 않고,
+검사만 다시 기록해도 산출물이 같으면 같은 FAIL 이 그대로 선다. 앵커 검사 5개는 낡은 봉투에도 걸린다 — 낡아도 봉투는 봉투다.
+**검사 기록도 내용으로 고른다.** close 는 마지막 evidence 파일이 아니라 지금 트리와 같은 산출물을 기록한 run 중 검증 계획의 검사를
+**전부** 실행한 run(여럿이면 최신)을 읽고 `EVIDENCE_SELECTED` 로 어느 run 을 골랐고 어느 run 을 제외했는지 인쇄한다 — §4·§6.6 이 남기는
+방어 검사 전용 run 이 마지막 파일이어도, §6.3 모으기로 다른 산출물의 완전한 run 이 같은 폴더에 있어도, 더는 `REQUIRED_CHECK` 가 '명령 없음' 으로
+떨어지지 않는다. 검사는 한 산출물 위에서 전부 돌아야 한다 — run 의 산출물은 마지막 명령의 것이므로 중간에 트리가 바뀐 뒤 다시 돌지 않은 검사는
+`다른 트리에서 돌았다` 로 미검증이다(명령별 `head_sha`·`dirty_tree_hash` 는 원시 로그의 `--- head/tree ---` 줄이 봉인한다).
+**검토자가 본 산출물은 봉투의 `evidence_ref` 가 아니라 검토 run 자신의 증거에서 읽는다.** §4 의 방어 검사(`review-tree-before/after`)가
+`evidence/<run-id>.yaml` 에 남긴 `head_sha`·`dirty_tree_hash` 가 그 판정의 산출물이고, `evidence_ref` 의 산출물은 그것과 같아야 한다 —
+다르면 그 봉투는 어느 산출물을 본 판정인지 말할 수 없어 **미검증**이다(포인터 문자열 하나로 FAIL 을 낡은 것으로 보내는 위조를 설계 검토가 재현했다).
+그래서 §4 의 방어 검사는 선택이 아니다 — 그 run 의 증거가 없으면 그 검토는 판정으로 세이지 않는다. 계약의 `base_sha` 가 담은 승인이 지금의 승인과
+다른 봉투(재승인 전)도 대상이 아니다. 현재 산출물에 PASS 가 1건뿐이면 `REVIEW_SAMPLE` 이 WARN 으로 드러낸다 — 같은 산출물에서도 판정은 흔들리고(D-74),
+close 에 표본 2건을 요구할지는 D-75 다.
 
 **위임 식별자가 실제로 워커에 닿았는지 여기서 판정한다(§3.5.2 의 게이트).** §3.5.2 의 `send` 가 종료 코드 0 을 냈다는 것은
 보냈다는 뜻일 뿐이다. 워커가 받아 반영했는지는 그 워커가 남긴 증거에만 나타난다.
@@ -592,9 +650,10 @@ evidence 에 적힌 종료 코드를 읽는 것으로 끝내지 않고, 같은 �
 - **재실행이 작업 트리를 바꾸면 안 된다.** 바뀌면 `REQUIRED_CHECK_RERUN` 이
   `재실행이 작업 트리를 바꿨다` 로 **미검증**이 된다 — 재실행 전에 계산한 신선도 판정이 더 이상 그 트리를 말하지 않기 때문이다.
   (`docs/work/<id>/` 와 `.harness/` 는 신선도 계산에서 빠지지만, 그 밖의 산출물은 빠지지 않는다.)
-- **검증 계획이 그 체크아웃의 HEAD 에 커밋돼 있어야 한다**(`CHECK_PLAN_COMMITTED`). 지금 읽는 `required_checks` 와
-  HEAD 에 커밋된 `spec.md` 의 것이 다르면 FAIL 이다 — 실행할 검사를 바꾸는 것은 증거가 아니라 **주장**을 바꾸는 것이다.
-  구현자가 수용 기준 체크박스를 채우는 것은 문제가 없지만(대조는 `id`·`command`·`expect` 만 본다) 검증 계획 자체는 건드리지 않는다.
+- **검증 계획이 승인 커밋의 것과 같아야 한다**(`CHECK_PLAN_COMMITTED`). 지금 읽는 `required_checks` 와 승인 커밋(이력에서 찾은,
+  현재 승인이 처음 커밋된 자리)의 `spec.md` 의 것이 다르면 FAIL 이다 — 고치고 커밋해도 재승인(`approve --reapprove`) 없이는 FAIL 이다.
+  실행할 검사를 바꾸는 것은 증거가 아니라 **주장**을 바꾸는 것이다. 짝이 되는 검사가 `AC_TEXT_UNCHANGED` 다 — 확인란의 문장이 승인 커밋과
+  같아야 한다(체크 표시만 다를 수 있다). 구현자가 수용 기준 체크박스를 채우는 것은 문제가 없지만 검증 계획·확인란 문장은 건드리지 않는다.
 - **재실행할 수 없는 명령은 막지 않고 드러낸다.** 부작용이 있어 두 번 돌릴 수 없거나 돌릴 때마다 결론이 달라지는 검사는
   검증 계획에서 `rerun: false` 로 선언하고 `rerun_reason` 에 이유를 적는다. 그러면 `재실행으로 확인되지 않았다 (rerun: false — <이유>)` 로
   **미검증** 인쇄되고 통과로 세지 않는다 — close 는 done 을 선언하지 않는다. 대조하지 못했다는 사실을 PASS 로 인쇄하는 것보다 낫다.
@@ -668,27 +727,29 @@ orca orchestration worker-release --dispatch <dispatch-id> --json
 ```bash
 T=<§3.5.1 이 구현자 워크트리 안에 실재시킨 검토자 계약의 절대경로>   # $W/docs/work/<id>/task/<run-id>-reviewer.json
 
+P=$W/.harness/runs/<id>/<run-id>/reviewer-brief.md   # fill_brief.py 가 채운 것(§3.7) — 제외 경로 안이라 방어 검사를 깨지 않는다
+
 codex exec -s read-only -C <검토 대상 워크트리 절대경로> \
-  --output-schema $W/core/schemas/result-envelope.json \
   -o <위임한 쪽이 지정한 파일> \
-  "$(cat "$T")"
+  "$(cat "$P"; cat "$T")"
 ```
 
-`-s` 는 **모델이 만든 셸 명령**에 적용되는 샌드박스 정책이고(`codex exec --help` 문구 그대로), 허용값은 `read-only`·`workspace-write`·`danger-full-access` 다. `-C/--cd` 는 작업 루트, `--output-schema <FILE>` 은 최종 응답 형태를 강제하는 JSON Schema 파일, `-o/--output-last-message <FILE>` 은 마지막 메시지를 떨어뜨릴 파일이다. `-o` 의 대상 경로는 검토자가 고르는 것이 아니라 위임한 쪽이 고른다.
+`-s` 는 **모델이 만든 셸 명령**에 적용되는 샌드박스 정책이고(`codex exec --help` 문구 그대로), 허용값은 `read-only`·`workspace-write`·`danger-full-access` 다. `-C/--cd` 는 작업 루트, `-o/--output-last-message <FILE>` 은 마지막 메시지를 떨어뜨릴 파일이다. `-o` 의 대상 경로는 검토자가 고르는 것이 아니라 위임한 쪽이 고른다.
+`--output-schema` 는 넘기지 않는다 — 이 저장소의 스키마로는 HTTP 400 이다(§2 의 경고 문단).
 
 역할을 교체하면 검토자가 다른 런타임이 된다(§6). 그쪽의 형태는 다음이다.
 
 ```bash
 claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config \
-  --json-schema "$(cat "$W/core/schemas/result-envelope.json")" \
-  --output-format json "$(cat "$T")"
+  --output-format json "$(cat "$P"; cat "$T")"
 ```
 
 플래그 **셋을 다 준다.** 프로브 3회 결과다(`.harness/bindings.yaml` 의 `parity_swap.reviewer.enforcement_note`):
 `--allowedTools` 만 주면 쓰기 도구가 목록에 남아 비대화형이라 승인을 못 받아 실패할 뿐이고(약한 보장),
 `--tools` 를 더하면 내장 쓰기 도구는 사라지지만 외부 연결 도구가 남는다. 셋을 다 준 실행에서만
 사용 가능한 도구가 `Read`·`Grep`·`Glob` 3개로 관찰됐고 파일은 생성되지 않았다.
-`--json-schema` 는 도움말 예시가 인라인 JSON 이므로 파일 경로 대신 내용을 넣어 전달한다.
+`--json-schema` 는 넘기지 않는다 — 이 저장소의 스키마를 넣으면 `no schema with key or ref "https://json-schema.org/draft/2020-12/schema"` 로
+즉시 종료한다(2026-08-29 실측 2회 · EXIT=1 · 121바이트, §2 의 경고 문단). 두 런타임 모두 형식은 절차 파일이 지시하고 검증은 §3.8 의 `envelope check` 가 한다.
 
 **방어 검사 — 강제가 실패했을 때 그것을 아는 방법.** 강제 수단이 아니라 사후 확인이다(리뷰 F-03).
 **이 검사를 돌리는 것은 검토자를 띄운 쪽이다 — 검토자가 아니다.** 검토자의 역할 계약에는 명령 실행 능력이 없고
@@ -738,6 +799,9 @@ PY
 
 성공 신호: 종료 코드 0 과 `유효`. 두 실행 중 하나라도 없으면 종료 코드 1 이다 — 안 돌린 것을 통과로 세지 않는다.
 `무효` 면 그 판정은 무효다. 결과 계약을 `review/` 에 기록하지 않고, 무엇이 바뀌었는지와 함께 사람에게 보고한다.
+**이 두 기록은 이제 종료 검사가 읽는다(체크리스트 45).** close 는 검토 봉투가 본 산출물을 `evidence_ref` 가 아니라 **그 검토 run 의
+`review-tree-before`/`after` 기록**(명령별 `head_sha`·`dirty_tree_hash`, 원시 로그가 봉인)에서 읽고, 둘이 같고 로그와 맞을 때만 인정한다 —
+없거나 다르거나 로그가 없으면 그 판정은 미검증이다. 그래서 방어 검사는 선택이 아니고, close 는 로그가 있는 그 워크트리에서 돌린다.
 검토자가 만든 변경을 임의로 되돌리지 않는다 — 되돌리기는 삭제이고 삭제는 승인 대상이다(K-66).
 
 ## 5. evidence 에 남길 식별자
@@ -772,6 +836,7 @@ bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --no
    구현자는 §3.5 의 `--agent` 값이, 검토자는 §3.7 (1) 의 `--command` 안 강제 수단 문자열이 바뀌는 자리다.
    검토자를 `--agent` 로 띄우는 경로는 교체 실행에서도 쓰지 않는다(§2 표 · §3.7 · §10).
    승인 커밋(§3.1)은 다시 하지 않는다 — 같은 커밋을 가리켜야 두 실행이 같은 것을 본다.
+   두 실행 사이에 `--reapprove` 가 끼면 승인 커밋이 옮겨져 두 면의 계약이 달라진다 — 그때는 둘 다 새 `<base-sha>` 로 다시 돈다.
    작업 계약은 `--run` 이 달라 파일 이름이 다르지만, `--base-sha` 가 같으므로 **내용은 바이트까지 같다**. 다르면 그 비교는 성립하지 않는다.
 3. **결과 계약 4개(기준 2 + 교체 2)를 한 체크아웃으로 모은다.** 이 단계를 빼면 뒤가 전부 실행 불가다 —
    4개는 서로 다른 두 자식 워크트리에 흩어져 있는데, 동등성 검사기는 **한 `project_root` 아래에서만** 파일을 찾는다
@@ -923,12 +988,17 @@ source:
 3. `bin/romeo evidence run --unit <id> --run <새 run> --root "$W1" --task-id <검토자 task> --label review-tree-before -- git status …` —
    **새 run 의 evidence** 에 기록한다. 기준 실행의 evidence 에 덧붙이지 않는다(그 파일의 `task_id`·`dispatch_id` 는 구현자의 것이라
    다른 값을 거부하고, 덧붙이면 모아 둔 사본과 갈린다). `dispatch_id` 는 없다 — 비대화형 경로는 워커를 채택하지 않는다.
-4. 검토자 프롬프트는 §3.7 과 같되 세 줄이 다르다 — "검토자만 다시 띄운 것", 읽을 증거·구현자 결과 계약은 **기준 실행의 것**
-   (`evidence/<기준 run>.yaml` · `result/<기준 run>-implementer.json`), `task_envelope_ref.path` 는 **새 run** 의 계약. `evidence_ref` 도 기준 실행의
-   evidence 를 지목한다 — 검토자가 읽은 증거가 그것이고, 산출물 식별(`head_sha`·`dirty_tree_hash`)은 거기서 읽힌다(D-73).
+4. 검토자 프롬프트는 §3.7 과 같은 채움 스크립트로 만들되 `--mode rerun --evidence-run <기준 run>` 을 준다 — 「검토자만 다시 띄운 것」 문단이 들어가고,
+   읽을 증거·구현자 결과 계약이 기준 실행의 것(`evidence/<기준 run>.yaml` · `result/<기준 run>-implementer.json`)이 되며,
+   `<run-id>` 는 **새 run** 이라 `task_envelope_ref.path` 가 새 run 의 계약을 가리킨다. `evidence_ref` 도 기준 실행의
+   evidence 를 지목한다 — 검토자가 읽은 증거가 그것이고, 산출물 식별(`head_sha`·`dirty_tree_hash`)은 3번이 새 run 의 증거에 남긴 방어 검사에서 읽혀
+   `evidence_ref` 의 것과 같아야 한다(D-73 · 종료 검사의 자기-run 결박). 채운 파일은 `$W1/.harness/runs/<id>/<새 run>/reviewer-brief.md` 에 두고
+   그 sha256 을 3번과 같은 run 의 증거에 남긴다.
 5. `orca terminal create --worktree "path:$W1" --command "claude -p <3플래그> --verbose --output-format json \"\$(cat '<프롬프트>'; cat '<계약>')\" > <워크트리 밖 파일>"`.
    워커로 채택하지 않았으므로 완료는 출력 파일의 표식으로 기다리고, Task 는 `task-update --status completed --result <json>` 으로 사람이 정리한다.
-6. 종료 직후 `review-tree-after` → `유효` 판정 → 출력의 마지막 `result` 를 봉투로 꺼내 `$W1/docs/work/<id>/review/<새 run>-reviewer.json` 에 쓴다 →
+6. 종료 직후 `review-tree-after` → `유효` 판정 → 출력의 마지막 `result` 를 JSON 파일로 꺼내(워크트리 밖 또는 `.harness/` 안)
+   `"$W1/bin/romeo" review record --unit <id> --run <새 run> --root "$W1" <그 파일>` 로 `$W1/docs/work/<id>/review/<새 run>-reviewer.json` 에 기록한다
+   (같은 run 의 증거에 봉투 sha256 이 봉인된다 — 손으로 복사하지 않는다) →
    `"$W1/bin/romeo" envelope check` 5개 PASS → §6.3 모으기(봉투·evidence 복사, 계약은 재생성) → 검토자 면만 있는 관측 케이스 등록 → §6.5.
    관측 케이스의 두 면은 `results.reviewer` 만 갖는다(구현은 한 번뿐이었다). 두 봉투가 같은 evidence 를 지목하므로 산출물 식별은 같다.
 7. **각 런타임마다 1~6 을 두 번 이상 반복한다(D-74).** 한 번의 판정은 그 런타임의 판정이 아니라 그 실행의 판정이다 —
@@ -972,6 +1042,10 @@ M2 에서는 대화 승인을 증거로 기록한다.
 ```bash
 bin/romeo evidence approve --unit <작업 단위 id> --guard <가드 id> --by <승인자> --note "<영향 범위·복구 방법>" --run <run-id>
 ```
+
+이 명령은 승인 항목을 evidence 의 `approvals` 에 적으면서 **원시 로그(`.harness/runs/<id>/<run>/approve-NN-<가드>.log`)와 그 sha256** 도 남긴다(체크리스트 45).
+종료 검사의 `GUARD_APPROVED` 는 그 로그와 대조해 맞을 때만 승인으로 세고, 로그가 없으면 미검증이다 — yaml 배열에 항목을 손으로 써 넣는 것으로는
+가드가 열리지 않는다. 그래서 가드 승인도 close 가 도는 그 워크트리에서 기록한다.
 
 승인 전 상태 변경 0건이다. **선행 실행이 없어도 이 명령은 동작한다** — 그 `--run` 의 레코드가 없으면
 `commands: []` 인 승인 전용 레코드를 만든다. 승인 시점에 실행한 명령이 0건이라는 사실 자체가 '승인 전 상태 변경 0건' 의 증거다.
@@ -1055,6 +1129,7 @@ orca orchestration gate-list --json
 | **종료 검사의 재실행 대조** | **성립한다.** `REQUIRED_CHECK_RERUN` 5건이 자식 워크트리에서 전부 재실행돼 기록과 일치했고, 재실행이 트리를 바꾸지 않았다. `EVIDENCE_LOG` 는 `.harness/runs/` 원시 로그와 14건을 대조해 PASS — 로그가 남아 있는 그 워크트리에서 돌렸기 때문이다 |
 | **§3.1 의 (a)·(b) 가 실제 위임 실행에서 걸리는가** | **걸린다.** 두 체크아웃이 갈라진 상태에서 `REVIEW_TASK_ANCHORED`·`REVIEW_BASE_SHA`·`REVIEW_EVIDENCE_ANCHORED`·`REVIEW_ROLE_CONTRACT` 가 전부 PASS 로 인쇄됐다 — 실물 검토자 봉투로 이 앵커들이 작동한 첫 관측이다 |
 | **`--output-schema` 로 이 저장소의 스키마를 넘길 수 있는가** | **없다.** HTTP 400 — `anyOf` 의 빈 하위 스키마 때문이다. §2 의 경고 문단 참조 |
+| **교체 검토자(claude)의 `--json-schema` 로 이 저장소의 스키마를 넘길 수 있는가** (2026-08-29 · 체크리스트 40) | **없다.** `--json-schema is not a valid JSON Schema: no schema with key or ref "https://json-schema.org/draft/2020-12/schema"` 로 즉시 종료 코드 1(출력 121바이트). 실측 2회. codex 의 `--output-schema` 와 같은 성질이라 두 런타임이 **대칭**이다 — 어느 쪽도 스키마 플래그로 형식을 강제하지 못하고, 형식은 절차 파일이 지시하고 검증은 `envelope check` 가 한다. 재관통 7봉투 전부 그 경로로 PASS 였다 |
 | **`-o` 가 read-only 아래에서 파일을 쓰는가** | **쓴다.** 검토 대상 워크트리 **밖** 경로(`/private/tmp/...`)에 855바이트를 썼다. 샌드박스는 모델이 만든 셸 명령에만 걸리고 CLI 자신의 출력 파일에는 걸리지 않는다 |
 | **§6.6 검토자-only 재실행이 성립하는가** (2026-08-29 · Run `run_5fc794f15236` · Task `task_4c65f8e08cf9`) | **성립한다.** 기준 실행의 구현자 워크트리(트리 `7b035490df84…`, 기준 evidence 와 같은 값)에서 검토자 계약을 다시 만들어 `cmp` identical, `review-tree-before/after` 의 `log_sha256` 이 **기준 실행의 값과 같은** `2bc7dad48f31…`(트리가 그때와 지금 사이에 한 번도 바뀌지 않았다), 새 봉투는 두 체크아웃의 `envelope check` 5개 전부 PASS. 교체 검토자(claude 3플래그)는 32턴 · 6분 20초 · tool_use `Read` 24·`Glob` 4·`Grep` 3 · `permission_denials` 0 · 모델 `claude-fable-5`. **판정: `FAIL`(findings 6)** — 같은 산출물에 기준 검토자(codex)는 `PASS`(findings 0)였다. 두 봉투를 검토자 면만 있는 관측 케이스로 등록하자 게이트가 `VERDICT_DIFFERS reviewer PASS≠FAIL` 로 **FAIL** 을 냈다. claude 가 잡은 것은 기준 검토자의 자기 스냅샷(`13-review-tree-before.log`)에도 보이던 **작업 루트의 미추적 파일 11개**(`archive/obra-superpowers/` 사본 — `check-3` 의 첫 실행이 `bash -c` 인용 오류로 `$t` 가 비어 루트에 복사한 것)다 |
 | **비대화형 검토자의 Task 정리** | `task-update --id <task> --run <run> --status completed --result <json>` 이 `.ok == true` · `status: completed` 를 돌려준다. 워커를 채택하지 않았으므로 `worker_done` 은 없고 이 명령이 유일한 정리 경로다 |
@@ -1071,6 +1146,9 @@ orca orchestration gate-list --json
 - `--agent` 가 받는 id 의 전체 목록, `--effort` 가 받는 값의 전체 목록.
 - `--worktree` selector 형식 중 `path:` 만 썼다. `id:<repoId>::<path>`·`name:`·`branch:` 는 도움말이 나열한 것을 옮긴 것이다.
 - `dispatch-show` 반환 JSON 의 어느 필드가 dispatch id 인지. 두 실행 모두 §3.5.2 의 `send` 가 닿아 이 폴백 경로를 쓰지 않았다.
+- **체크리스트 41~45 의 새 장치는 실물 위임 실행으로 관측되지 않았다** — 검토 run 자기-증거 결박, `review record` 의 봉투 봉인, 방어 검사 기록의
+  명령별 봉인, 가드 승인 로그, 승인 되돌리기·사슬 검사, 채움 스크립트(`fill_brief.py`). 전부 격리 저장소 테스트와 impl3 의 dry-run 으로만 확인했다.
+  옛 관통의 기록에는 명령별 봉인·봉투 기록이 없으므로 그 봉투들은 close 에서 전부 미검증이다 — 3차 관통이 이 장치들의 첫 실전이다.
 - **구현자 쪽 권한 상한은 두 실행 모두 미관측이다.** §4 표의 구현자 두 칸(`.claude/settings.json` 의 승인 게이트 · `-s workspace-write`)이
   실제로 무엇을 막는지 이번 관통은 시험하지 않았다 — 두 구현자 모두 승인 대상 명령을 시도하지 않았기 때문이다.
   강제가 있었는지 없었는지 이 실행으로는 구분되지 않는다. **그 두 칸은 여전히 `enforcement_observed: false` 다.**

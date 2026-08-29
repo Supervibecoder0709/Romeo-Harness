@@ -17,6 +17,7 @@ REPO = project_root(Path(__file__).parent)
 DOC_GLOBS = [
     "core/workflows/*/SKILL.md",
     "adapters/*/workflows/*.md",
+    "adapters/orca/prompts/*.md",
     "core/templates/*.md",
 ]
 RUNTIME_SKILL_GLOBS = [".claude/skills/plan/SKILL.md", ".claude/skills/plan-close/SKILL.md",

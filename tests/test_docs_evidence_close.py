@@ -14,7 +14,8 @@ from romeo.cli import main
 from romeo.close import close_unit, format_close
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
-from romeo.evidence import add_approval, parse_log_exit_code, run_command, run_required_checks
+from romeo.evidence import (add_approval, parse_log_exit_code, record_review_envelope, run_command,
+                            run_required_checks)
 from romeo.policy import route
 from romeo.util import dump_yaml, load_yaml, sha256_file
 from romeo.validate import validate_doc
@@ -75,7 +76,8 @@ class TestVerticalSlice(unittest.TestCase):
         self._fill_spec(tick_ac=False)
         fm = approve_unit(self.unit, "tester", project_root=self.root)
         self.assertEqual(fm["status"], "active")
-        self.assertEqual(fm["base_sha"], git("rev-parse", "HEAD", cwd=self.root))
+        # 승인 시점의 HEAD 는 승인을 담지 않는 커밋이다 — base_sha 를 적지 않는다(체크리스트 38). 승인 커밋은 이력에서 찾는다.
+        self.assertIsNone(fm["base_sha"])
         self.assertIsNotNone(fm["approved_at"])
 
     def test_close_rejects_unchecked_ac_and_passes_after_tick(self):
@@ -180,6 +182,47 @@ class TestVerticalSlice(unittest.TestCase):
         self.assertEqual(len(rec["approvals"]), 1)
 
     # ── 위임 식별자 ─────────────────────────────────────────────────────────────
+    def test_a_hand_written_guard_approval_does_not_open_the_guard(self):
+        """가드 승인은 yaml 배열이었다 — 항목 하나를 손으로 써 넣으면 승인으로 보였다. 이제 승인 사건도 원시 로그로 봉인된다."""
+        out = route({"unit": "T0", "mode": "delivery", "intent": "delete", "facets": ["docs"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "삭제 T0", "guard-t0", "가드 승인", project_root=self.root, date="20260829")
+        unit, spec = res["id"], Path(res["files"][0])
+        fm, body = frontmatter.read(spec)
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"')
+        frontmatter.write(spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
+        approve_unit(unit, "tester", project_root=self.root)
+        (self.root / "gone.txt").write_text("x\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "approve+impl", cwd=self.root)
+        run_command(unit, "true", run_name="run-g", project_root=self.root)
+        r = close_unit(unit, project_root=self.root, dry_run=True)
+        self.assertIn("GUARD_APPROVED", [c["id"] for c in r["checks"] if not c["ok"] and c["level"] == "error"])
+        # 손으로 써 넣은 승인 항목
+        path = spec.parent / "evidence" / "run-g.yaml"
+        rec = load_yaml(path)
+        rec["approvals"] = [{"guard": "deletion", "approved_at": "2026-08-29T00:00:00+09:00", "approved_by": "forger", "note": None}]
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        r = close_unit(self.unit if False else unit, project_root=self.root, dry_run=True)
+        row = next(c for c in r["checks"] if c["id"] == "GUARD_APPROVED")
+        self.assertEqual(row["level"], "unverified", row)
+        self.assertEqual(r["verdict"], "FAIL")
+        # 정식 기록은 로그와 함께 남고 통과한다
+        rec["approvals"] = []
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        add_approval(unit, "deletion", "tester", note="gone.txt 를 지운다", run_name="run-g", project_root=self.root)
+        rec = load_yaml(path)
+        self.assertTrue(rec["approvals"][0]["log"].startswith(".harness/runs/"))
+        self.assertTrue((self.root / rec["approvals"][0]["log"]).is_file())
+        r = close_unit(unit, project_root=self.root, dry_run=True)
+        self.assertTrue(next(c for c in r["checks"] if c["id"] == "GUARD_APPROVED")["ok"], r["checks"])
+        # 기록 뒤 로그를 고치면 잡힌다
+        log = self.root / rec["approvals"][0]["log"]
+        log.write_text(log.read_text(encoding="utf-8").replace("by=tester", "by=forger"), encoding="utf-8")
+        r = close_unit(unit, project_root=self.root, dry_run=True)
+        row = next(c for c in r["checks"] if c["id"] == "GUARD_APPROVED")
+        self.assertFalse(row["ok"]); self.assertEqual(row["level"], "error")
+
     def test_delegation_ids_are_recorded_once_per_run(self):
         self._fill_spec(tick_ac=False)
         approve_unit(self.unit, "tester", project_root=self.root)
@@ -245,6 +288,164 @@ class TestVerticalSlice(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("required_checks", err.getvalue())
         self.assertNotIn("Traceback", out.getvalue() + err.getvalue())
+
+    # ── 검사 기록은 내용으로 고른다(체크리스트 41) ───────────────────────────────
+    def _defensive_run(self, run_name):
+        """검토자를 띄운 쪽이 남기는 방어 검사 전용 run(RUNBOOK §4·§6.6) — 계획의 검사를 하나도 담지 않는다."""
+        for label in ("review-tree-before", "review-tree-after"):
+            run_command(self.unit, "git status --porcelain", run_name=run_name, label=label, project_root=self.root)
+
+    def _selected(self, r):
+        return next(c for c in r["checks"] if c["id"] == "EVIDENCE_SELECTED")
+
+    def test_close_reads_the_run_that_executed_the_check_plan_not_the_latest_file(self):
+        """§6.6 뒤에 close 가 구조적으로 깨지던 자리(체크리스트 41). 마지막 evidence 파일은 검토자를 띄우며 남긴
+        방어 검사 전용 run 이고, 거기에는 required_checks 가 없다 — 그것을 읽으면 6건 전부 '명령 없음' 이었다."""
+        self._fill_spec(tick_ac=True)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_required_checks(self.unit, run_name="run-impl", project_root=self.root)
+        self._defensive_run("run-review-1")
+        self._defensive_run("run-review-2")
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        sel = self._selected(r)
+        self.assertTrue(sel["ok"])
+        self.assertIn("run-impl", sel["detail"])
+        self.assertIn("run-review-1", sel["detail"])
+        self.assertIn("run-review-2", sel["detail"])
+        # 실제 close 는 판정을 **검사 기록** run 에 적는다 — 마지막 파일이 아니라.
+        r = close_unit(self.unit, project_root=self.root)
+        self.assertEqual(r["verdict"], "PASS")
+        impl = load_yaml(self.spec.parent / "evidence" / "run-impl.yaml")
+        self.assertEqual(impl["verdict"], "PASS")
+        self.assertIn("close", impl)
+        self.assertNotIn("close", load_yaml(self.spec.parent / "evidence" / "run-review-2.yaml"))
+        fm, body = frontmatter.read(self.spec)
+        self.assertEqual(fm["status"], "done")
+        self.assertIn("evidence/run-impl.yaml", fm["evidence"])   # 방어 검사 run 도 이 단위의 증거로 남는다
+        self.assertIn("evidence/run-review-1.yaml", fm["evidence"])
+
+    def test_close_prefers_the_latest_complete_check_record_and_names_the_others(self):
+        self._fill_spec(tick_ac=True)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        run_required_checks(self.unit, run_name="run-b", project_root=self.root)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        sel = self._selected(r)
+        self.assertRegex(sel["detail"], r"검사 기록 = run-b")
+        self.assertIn("run-a", sel["detail"])
+
+    def test_close_falls_back_to_the_most_covering_run_and_says_so(self):
+        """계획을 전부 실행한 run 이 없으면 통과가 아니다 — 가장 많이 실행한 run 을 읽되 그 사실을 WARN 으로 인쇄하고,
+        빠진 검사는 REQUIRED_CHECK 가 잡는다. 조용히 마지막 파일을 읽는 것과 구분돼야 한다."""
+        self._fill_spec(tick_ac=True)
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace('    command: "true"\n    expect: exit 0\n',
+                            '    command: "true"\n    expect: exit 0\n  - id: check-2\n    command: "echo two"\n    expect: exit 0\n')
+        frontmatter.write(self.spec, fm, body)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_command(self.unit, "true", run_name="run-partial", label="check-1", project_root=self.root)
+        self._defensive_run("run-review-1")
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "FAIL")
+        sel = self._selected(r)
+        self.assertFalse(sel["ok"])
+        self.assertEqual(sel["level"], "warning")
+        self.assertIn("run-partial", sel["detail"])
+        self.assertIn("1/2", sel["detail"])
+        missing = [c for c in r["checks"] if c["id"] == "REQUIRED_CHECK" and not c["ok"]]
+        self.assertEqual(len(missing), 1)
+        self.assertIn("echo two", missing[0]["detail"])
+
+
+    def test_close_prefers_a_run_of_the_current_tree_over_a_newer_run_of_another_tree(self):
+        """동등성 관측을 모으는 절차(RUNBOOK §6.3)는 다른 산출물의 완전한 run 을 같은 evidence/ 에 둔다 —
+        최신 규칙만으로는 그쪽이 뽑혀 기준 산출물의 검토 판정이 전부 낡은 것이 된다. 지금 트리와 같은 run 이 먼저다."""
+        self._fill_spec(tick_ac=True)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_required_checks(self.unit, run_name="run-here", project_root=self.root)
+        here = load_yaml(self.spec.parent / "evidence" / "run-here.yaml")
+        # 다른 산출물에서 만든 완전한 run 을 모아 온 것처럼 — 그 파일의 head/tree 만 다르다.
+        other = dict(here)
+        other["run_id"] = "run-other"
+        other["head_sha"] = "f" * 40
+        other["dirty_tree_hash"] = "e" * 64
+        other["finished_at"] = "2099-01-01T00:00:00+09:00"
+        (self.spec.parent / "evidence" / "run-other.yaml").write_text(dump_yaml(other), encoding="utf-8")
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        sel = self._selected(r)
+        self.assertRegex(sel["detail"], r"검사 기록 = run-here")
+        self.assertIn("지금 트리와 같은 산출물의 run 1건/2건", sel["detail"])
+        self.assertTrue(next(c for c in r["checks"] if c["id"] == "FRESH_TREE")["ok"])
+
+    def test_a_check_that_ran_on_another_tree_is_unverified(self):
+        """한 run 의 검사는 한 산출물 위에서 전부 돌아야 한다 — run 의 산출물은 마지막 명령의 것이므로,
+        중간에 트리가 바뀌었으면 그 전에 돈 검사의 결과는 이 산출물의 결과가 아니다."""
+        self._fill_spec(tick_ac=True)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        (self.root / "z.txt").write_text("late\n", encoding="utf-8")      # 검사 뒤에 트리가 바뀐다
+        run_command(self.unit, "git status --porcelain", run_name="run-a", label="review-tree-before", project_root=self.root)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        row = next(c for c in r["checks"] if c["id"] == "REQUIRED_CHECK")
+        self.assertEqual(row["level"], "unverified", row)
+        self.assertIn("다른 트리에서 돌았다", row["detail"])
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_changing_the_user_check_text_after_approval_is_rejected(self):
+        """구현자는 체크박스를 채울 수 있다 — 그러나 확인란의 문장은 사용자가 승인한 것이다(D-27·D-60).
+        체크 표시 외의 변경은 재승인 대상이다."""
+        self._fill_spec(tick_ac=False)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        fm, body = frontmatter.read(self.spec)
+        frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        self.assertTrue(next(c for c in r["checks"] if c["id"] == "AC_TEXT_UNCHANGED")["ok"])
+        fm, body = frontmatter.read(self.spec)
+        frontmatter.write(self.spec, fm, body.replace("- [x] AC-1", "- [x] AC-1 (완화된 기준)"))
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "FAIL")
+        row = next(c for c in r["checks"] if c["id"] == "AC_TEXT_UNCHANGED")
+        self.assertFalse(row["ok"])
+        self.assertIn("reapprove", row["detail"])
+
+    def test_committing_an_edited_check_plan_without_reapproval_is_rejected(self):
+        """종전의 '절반의 앵커': 실패하는 검사를 계획에서 지우고 **커밋**하면 HEAD 와 같아져 통과했다.
+        원본은 승인 커밋의 계획이다 — 계획을 바꾸려면 재승인해야 하고 재승인은 승인 커밋을 옮긴다."""
+        self._fill_spec(tick_ac=True)
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace('    command: "true"\n    expect: exit 0\n',
+                            '    command: "true"\n    expect: exit 0\n  - id: check-2\n    command: "false"\n    expect: exit 0\n')
+        frontmatter.write(self.spec, fm, body)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._implement_and_commit()
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace('  - id: check-2\n    command: "false"\n    expect: exit 0\n', "")
+        frontmatter.write(self.spec, fm, body)
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "drop the failing check", cwd=self.root)
+        run_required_checks(self.unit, run_name="run-a", project_root=self.root)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        row = next(c for c in r["checks"] if c["id"] == "CHECK_PLAN_COMMITTED")
+        self.assertFalse(row["ok"], row)
+        self.assertIn("승인 커밋", row["detail"])
+        self.assertEqual(r["verdict"], "FAIL")
+        # 재승인하고 커밋하면 원본이 옮겨져 통과한다.
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="check-2 제거")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "reapprove", cwd=self.root)
+        run_required_checks(self.unit, run_name="run-b", project_root=self.root)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
 
 
 class TestEvidenceIsReExecuted(unittest.TestCase):
@@ -389,6 +590,25 @@ class TestEvidenceIsReExecuted(unittest.TestCase):
         for cid in ("REQUIRED_CHECK", "EVIDENCE_LOG", "REQUIRED_CHECK_RERUN", "CHECK_PLAN_COMMITTED"):
             self.assertIn(f"[PASS] {cid}", text)
 
+    def test_the_raw_log_seals_the_product_identity(self):
+        """evidence yaml 의 head_sha·dirty_tree_hash 만 손으로 고치면 로그의 봉인 줄과 어긋난다(4차 리뷰 구멍 B 의 한 겹)."""
+        self._prepare("true")
+        path = self.spec.parent / "evidence" / "run-a.yaml"
+        rec = load_yaml(path)
+        cmd = rec["commands"][0]
+        self.assertEqual(cmd["head_sha"], rec["head_sha"])
+        self.assertEqual(cmd["dirty_tree_hash"], rec["dirty_tree_hash"])
+        log = (self.root / cmd["log"]).read_text(encoding="utf-8")
+        self.assertIn(f"--- head {rec['head_sha']} ---", log)
+        self.assertIn(f"--- tree {rec['dirty_tree_hash']} ---", log)
+        r, failed, _u = self._close()
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        rec["commands"][0]["dirty_tree_hash"] = "0" * 64
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        r, failed, _u = self._close()
+        self.assertIn("EVIDENCE_LOG", failed, r["checks"])
+        self.assertIn("산출물 식별이 손으로 고쳐졌다", format_close(r))
+
     def test_editing_the_approved_check_plan_is_rejected(self):
         """재실행 대조를 붙이자 위조가 한 겹 옆으로 갔다 — 실패하는 검사를 지우고 통과하는 검사로 바꾼 뒤
         그것을 진짜로 실행하면 기록·로그·재실행이 전부 맞는다. 고쳐진 것은 증거가 아니라 주장이다.
@@ -400,7 +620,8 @@ class TestEvidenceIsReExecuted(unittest.TestCase):
         r, failed, _u = self._close()
         self.assertIn("CHECK_PLAN_COMMITTED", failed, r["checks"])
         self.assertEqual(r["verdict"], "FAIL")
-        self.assertIn("HEAD 에 커밋된 것과 다르다", format_close(r))
+        self.assertIn("승인 커밋", format_close(r))
+        self.assertIn("의 것과 다르다", format_close(r))
 
 
 class TestCloseReviewVerdict(unittest.TestCase):
@@ -443,31 +664,51 @@ class TestCloseReviewVerdict(unittest.TestCase):
         git("add", ".", cwd=self.root)
         git("commit", "-q", "-m", "impl", cwd=self.root)
         run_command(self.unit, "true", run_name="run-test", project_root=self.root)
+        self._defensive("run-test")
         self.review = self.spec.parent / "review"
         self.review.mkdir()
+
+    def _defensive(self, run):
+        """검토자를 띄운 쪽이 검토 전후에 남기는 방어 검사(RUNBOOK §4) — 이 두 기록이 검토 시점의 산출물이다."""
+        for label in ("review-tree-before", "review-tree-after"):
+            run_command(self.unit, "git status --porcelain", run_name=run, label=label, project_root=self.root)
 
     def tearDown(self):
         self.tmp.cleanup()
 
-    def _envelope(self, verdict="PASS", **over):
+    def _envelope(self, verdict="PASS", run="run-test", **over):
         """실제 계약 산출물을 가리키는 봉투. sha256 은 손으로 쓰지 않고 그 파일에서 읽는다 —
         테스트가 손으로 쓴 값을 표준으로 박아 두면 느슨한 계약이 고정된다.
-        검토자는 명령을 실행하지 않으므로 checks 는 비어 있다(core/roles/reviewer.yaml)."""
+        검토자는 명령을 실행하지 않으므로 checks 는 비어 있다(core/roles/reviewer.yaml).
+        `run` 은 이 봉투가 속한 검토 run — 그 run 의 계약(`task/<run>-reviewer.json`)과 증거(`evidence/<run>.yaml`)를 가리킨다."""
+        task_rel = f"docs/work/{self.unit}/task/{run}-reviewer.json"
+        task_path = self.root / task_rel
+        task_sha = sha256_file(task_path) if task_path.is_file() else self.task_sha
         env = {
             "schema": "romeo/result-envelope@0.1.0",
             "unit_id": self.unit,
             "role": "reviewer",
-            "task_envelope_ref": {"path": self.task_rel, "sha256": self.task_sha},
+            "task_envelope_ref": {"path": task_rel, "sha256": task_sha},
             "checks": [],
             "gate_verdict": verdict,
             "blocked_reason": None,
             "findings": [],
-            "evidence_ref": f"docs/work/{self.unit}/evidence/run-test.yaml",
+            "evidence_ref": f"docs/work/{self.unit}/evidence/{run}.yaml",
         }
         env.update(over)
         return env
 
-    def _write_review(self, name, data):
+    def _write_review(self, name, data, record=True):
+        """검토 봉투를 남긴다. 기본은 하네스 명령(`review record`)으로 — 봉투를 쓰고 그 sha256 을 검토 run 의 증거에 봉인한다.
+        손으로 쓴 봉투(기록 없음)가 필요한 테스트만 record=False 다."""
+        if record and name.endswith("-reviewer.json"):
+            run = name[:-len("-reviewer.json")]
+            # 원본은 제외 경로(.harness/) 안에 둔다 — 저장소 루트에 두면 미추적 파일이 생겨 검사 기록의 트리가 바뀐다(그 검사가 실제로 잡았다).
+            src = self.root / ".harness" / "review-src" / f"{name}.src"
+            src.parent.mkdir(parents=True, exist_ok=True)
+            src.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+            record_review_envelope(self.unit, run, src, project_root=self.root)
+            return
         (self.review / name).write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
     def _failed(self):
@@ -509,10 +750,15 @@ class TestCloseReviewVerdict(unittest.TestCase):
         self.assertEqual(r["verdict"], "PASS")
 
     def test_any_standing_fail_blocks_close(self):
-        self._write_review("run-a-reviewer.json", self._envelope("PASS"))
-        self._write_review("run-b-reviewer.json", self._envelope("BLOCKED", blocked_reason="BLOCKED_CAPABILITY"))
-        ids, _ = self._failed()
-        self.assertIn("REVIEW_VERDICT", ids)
+        """같은 산출물에 PASS 와 FAIL 이 함께 있으면 FAIL 이 이긴다 — 두 번째 검토 run(방어 검사·계약·기록 전부 정식)."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        self._defensive("run-r2")
+        write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=self.approval_sha, run_name="run-r2")
+        self._write_review("run-r2-reviewer.json", self._envelope(
+            "FAIL", run="run-r2", evidence_ref=f"docs/work/{self.unit}/evidence/run-test.yaml"))
+        ids, r = self._failed()
+        self.assertIn("REVIEW_VERDICT", ids, r["checks"])
+        self.assertIn("run-r2-reviewer.json", self._row(r, "REVIEW_VERDICT")["detail"])
 
     # ── 앵커 반례: 스키마를 통과한 PASS 봉투가 무엇에도 매여 있지 않을 때 ──────────────
     def test_task_envelope_ref_to_missing_file_is_rejected(self):
@@ -632,7 +878,8 @@ class TestCloseReviewVerdict(unittest.TestCase):
         """지목한 증거가 없으면 '증거가 이 단위 안에 있는가' 를 대조할 수 없다 — PASS 가 아니다."""
         self._write_review("run-test-reviewer.json", self._envelope("FAIL", evidence_ref=None))
         ids, r = self._failed()
-        self.assertIn("REVIEW_VERDICT", ids)
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")     # 어느 산출물을 본 판정인지 모른다 — FAIL 도 PASS 도 아닌 미검증
         self._assert_unverified(r, "REVIEW_EVIDENCE_ANCHORED")
 
     def test_a_valid_envelope_still_prints_pass(self):
@@ -765,6 +1012,236 @@ class TestCloseReviewVerdict(unittest.TestCase):
         self.assertTrue({"REVIEW_TASK_ANCHORED", "REVIEW_EVIDENCE_ANCHORED", "REVIEW_ROLE_CONTRACT"} <= ids, ids)
         fm, _ = frontmatter.read(self.spec)
         self.assertNotEqual(fm["status"], "done")
+
+    # ── 검토 판정은 현재 산출물에 대한 것만 센다(체크리스트 41 · D-73 의 close 적용) ────────
+    def _new_product(self, run_name, filename="y.txt"):
+        """산출물을 바꾸고(새 파일 커밋) 그 위에서 검사를 다시 기록한다 — 새 evidence 의 head_sha 가 달라진다.
+        새 run 의 검토자 계약도 만든다(RUNBOOK §6.6 2번) — 검토 봉투는 자기 run 의 계약과 증거에 묶인다."""
+        (self.root / filename).write_text("more\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", f"impl {filename}", cwd=self.root)
+        run_command(self.unit, "true", run_name=run_name, project_root=self.root)
+        self._defensive(run_name)
+        write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=self.approval_sha, run_name=run_name)
+        return f"docs/work/{self.unit}/evidence/{run_name}.yaml"
+
+    def _row(self, r, cid):
+        return next(c for c in r["checks"] if c["id"] == cid)
+
+    def test_a_fail_on_a_superseded_product_does_not_block_when_the_current_product_has_a_pass(self):
+        """검토자의 판정은 자기가 본 산출물의 함수다(D-73). 고친 뒤 새 산출물이 PASS 를 받았으면 옛 산출물의 FAIL 은
+        이 close 의 대상이 아니다 — 그 봉투는 지우지 않는다(동등성 게이트의 관측 표본이다)."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL", findings=[{"summary": "옛 산출물의 결함"}]))
+        self._new_product("run-two")
+        self._write_review("run-two-reviewer.json", self._envelope("PASS", run="run-two"))
+        ids, r = self._failed()
+        self.assertNotIn("REVIEW_VERDICT", ids, r["checks"])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        sup = self._row(r, "REVIEW_SUPERSEDED")
+        self.assertEqual(sup["level"], "warning")
+        self.assertIn("run-test-reviewer.json", sup["detail"])
+        self.assertIn("FAIL", sup["detail"])
+        self.assertIn("옛 산출물의 결함", sup["detail"], "뺀 판정의 findings 가 사람에게 보여야 한다")
+        self.assertNotIn("run-test-reviewer.json", self._row(r, "REVIEW_VERDICT")["detail"])
+        # PASS 가 1건뿐이면 D-74 의 표본 요구에 못 미친다 — 막지 않고 WARN 으로 드러낸다(D-75 미확정).
+        sample = self._row(r, "REVIEW_SAMPLE")
+        self.assertEqual(sample["level"], "warning")
+        self.assertIn("D-75", sample["detail"])
+
+    def test_a_pass_on_a_superseded_product_does_not_close_the_current_one(self):
+        """이전에는 통과하던 구멍이다 — 옛 산출물의 PASS 하나로 새 산출물이 닫혔다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        self._new_product("run-two")
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("검토가 아직 없다", self._row(r, "REVIEW_VERDICT")["detail"])
+        self.assertIn("run-test-reviewer.json", self._row(r, "REVIEW_SUPERSEDED")["detail"])
+
+    def test_rerunning_the_checks_without_changing_the_product_keeps_the_standing_fail(self):
+        """검사만 다시 기록하는 것으로는 FAIL 을 벗어날 수 없다 — 산출물(head_sha·dirty_tree_hash)이 같으면 같은 판정 대상이다."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL"))
+        run_command(self.unit, "true", run_name="run-two", project_root=self.root)
+        ids, r = self._failed()
+        self.assertIn("REVIEW_VERDICT", ids)
+        self.assertNotIn("REVIEW_SUPERSEDED", [c["id"] for c in r["checks"]])
+
+    def test_an_envelope_whose_product_cannot_be_read_is_unverified_not_passed_over(self):
+        """산출물을 식별하지 못하는 판정은 지나간 것으로도 현재 것으로도 접지 않는다 — 미검증이고 done 을 막는다(K-51).
+        동등성 판정이 같은 봉투를 구조 오류로 빼는 것과 같은 강도다(K-63)."""
+        self._write_review("blocked-reviewer.json", self._envelope(
+            "BLOCKED", blocked_reason="BLOCKED_CAPABILITY", evidence_ref=None))
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("blocked-reviewer.json", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    def test_retargeting_evidence_ref_cannot_move_a_verdict_to_another_product(self):
+        """설계 검토가 재현한 가장 싼 위조: 증거는 건드리지 않고 검토 봉투의 evidence_ref 문자열만 옛 run 으로 돌리면
+        FAIL 이 낡은 것으로 빠지고, 옛 PASS 를 현재 run 으로 돌리면 현재 PASS 가 된다. 판정이 본 산출물은 봉투의 포인터가
+        아니라 **검토 run 자신의 증거**(방어 검사 기록)에서 읽고, 포인터의 산출물은 그것과 같아야 한다."""
+        old_ref = f"docs/work/{self.unit}/evidence/run-test.yaml"
+        self._new_product("run-two")
+        # FAIL 은 run-two 의 검토인데 evidence_ref 만 옛 run 을 가리킨다 → 낡은 것이 아니라 미검증이다.
+        self._write_review("run-two-reviewer.json", self._envelope("FAIL", run="run-two", evidence_ref=old_ref))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("검토 run run-two 이 기록한 산출물", self._row(r, "REVIEW_VERDICT")["detail"])
+        self.assertNotIn("REVIEW_SUPERSEDED", [c["id"] for c in r["checks"]])
+        # 반대 방향: 옛 run 의 PASS 가 evidence_ref 만 현재 run 으로 돌린다 → 현재 PASS 가 되지 않는다.
+        (self.review / "run-two-reviewer.json").unlink()
+        self._write_review("run-test-reviewer.json", self._envelope(
+            "PASS", evidence_ref=f"docs/work/{self.unit}/evidence/run-two.yaml"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+
+    def test_a_verdict_under_a_superseded_approval_does_not_count_even_on_the_same_product(self):
+        """산출물 식별에는 spec 이 없다(docs/work/<id>/ 는 트리 해시에서 빠진다). 재승인으로 수용 기준이 바뀌어도 산출물은 그대로라,
+        이전 승인의 계약으로 낸 PASS 가 현재 판정으로 세이면 새 수용 기준이 검토되지 않은 채 닫힌다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="수용 기준 변경")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "reapprove", cwd=self.root)
+        run_command(self.unit, "true", run_name="run-two", project_root=self.root)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertTrue(self._row(r, "REVIEW_TASK_ANCHORED")["ok"], "이전 승인의 계약도 봉투로 식별은 된다")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("재승인 전 승인", self._row(r, "REVIEW_SUPERSEDED")["detail"])
+
+    def test_a_pass_whose_own_run_has_no_evidence_is_unverified(self):
+        """검토 run 의 증거(방어 검사 기록)가 없으면 검토 시점의 산출물을 하네스가 기록하지 않은 것이다 — PASS 로 세지 않는다."""
+        write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=self.approval_sha, run_name="run-nolog")
+        self._write_review("run-nolog-reviewer.json", self._envelope(
+            "PASS", run="run-nolog", evidence_ref=f"docs/work/{self.unit}/evidence/run-test.yaml"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("run-nolog", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    # ── 구현 diff 반박 검토(2026-08-29)가 잡은 위조 경로 — 회귀 고정 ───────────────
+    def test_editing_the_verdict_word_after_recording_is_caught(self):
+        """가장 싼 위조: 정직한 FAIL 봉투에서 gate_verdict 한 단어만 PASS 로 바꾼다. 판정 문자열은 어떤 앵커에도 묶이지 않으므로
+        기록 명령이 남긴 sha256 봉인이 유일한 결박이다 — 기록 뒤 바뀐 봉투는 미검증이다."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL", findings=[{"summary": "결함"}]))
+        ids, r = self._failed()
+        self.assertIn("REVIEW_VERDICT", ids)
+        path = self.review / "run-test-reviewer.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["gate_verdict"], data["findings"] = "PASS", []
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("기록 시점의 값과 다르다", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    def test_a_hand_written_envelope_without_a_record_is_unverified(self):
+        """record 명령을 거치지 않은 봉투(손으로 쓴 PASS)는 현재 산출물이어도 판정으로 세지 않는다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"), record=False)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("review-record", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    def test_copying_the_contract_under_the_implementer_run_name_does_not_borrow_its_evidence(self):
+        """'검토 run 자신의 증거' 규칙 우회: 검토자 계약을 구현 run 이름으로 복사하면 구현자의 진짜 증거가 '검토 run 의 증거' 가 됐다.
+        검토 run 의 증거에는 방어 검사 두 기록이 실재하고 로그와 맞아야 한다 — 구현 run(run-impl)에는 그것이 없다."""
+        (self.root / "y.txt").write_text("more\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "impl y", cwd=self.root)
+        run_command(self.unit, "true", run_name="run-impl", project_root=self.root)     # 방어 검사 없는 구현 run
+        import shutil
+        shutil.copy(self.task_path, self.task_path.parent / "run-impl-reviewer.json")
+        self._write_review("run-impl-reviewer.json", self._envelope("PASS", run="run-impl"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("방어 검사", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    def test_editing_the_top_level_product_of_the_review_run_is_caught(self):
+        """봉인은 명령별 값을 덮는데 판정은 최상위 값을 읽었다 — 최상위 두 줄만 고치면 판정이 다른 산출물로 옮겨졌다.
+        최상위 값은 마지막 명령 기록(봉인된 자리)과 같아야 한다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        path = self.spec.parent / "evidence" / "run-test.yaml"
+        rec = load_yaml(path)
+        rec["dirty_tree_hash"] = "e" * 64
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertIn("EVIDENCE_LOG", ids)
+        self.assertIn("봉인되지 않은 자리만 고쳐졌다", self._row(r, "EVIDENCE_LOG")["detail"])
+
+    def test_deleting_the_review_run_log_is_unverified_not_passed(self):
+        """봉인 회피: 로그를 지우면 '없는 것은 어긴 것이 아니다' 로 통과하던 자리 — 검토 run 의 방어 검사는 로그로 확인될 때만 인정한다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        import shutil
+        shutil.rmtree(self.root / ".harness" / "runs" / self.unit / "run-test")
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+
+    def test_stripping_the_seal_lines_from_the_log_is_caught(self):
+        """옛 형식 흉내: 기록에는 head/tree 가 있는데 로그에서 봉인 줄만 지우고 log_sha256 을 다시 계산한다 — 어긴 것이다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        path = self.spec.parent / "evidence" / "run-test.yaml"
+        rec = load_yaml(path)
+        last = rec["commands"][-1]
+        log = self.root / last["log"]
+        text = "\n".join(ln for ln in log.read_text(encoding="utf-8").splitlines()
+                         if not ln.startswith("--- head ") and not ln.startswith("--- tree ")) + "\n"
+        log.write_text(text, encoding="utf-8")
+        from romeo.util import sha256_bytes
+        last["log_sha256"] = sha256_bytes(text.encode("utf-8"))
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertIn("봉인 줄", format_close(r))
+
+    def test_rolling_the_approval_back_in_the_working_tree_is_rejected(self):
+        """승인 되돌리기: 재승인이 커밋된 뒤 작업 트리 frontmatter 만 옛 승인으로 되돌리면 옛 승인 커밋이 '승인 커밋' 이 됐다.
+        작업 트리의 승인 기록은 HEAD 에 커밋된 것을 포함해야 한다 — 승인은 앞으로만 간다."""
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="검사 추가")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "reapprove", cwd=self.root)
+        fm, body = frontmatter.read(self.spec)
+        old_at = fm["approval_history"][0]["approved_at"]
+        fm["approved_at"], fm["approval_history"] = old_at, []
+        frontmatter.write(self.spec, fm, body)
+        from romeo.docs import approval_commit
+        with self.assertRaises(ValueError) as cm:
+            approval_commit(self.root, self.unit)
+        self.assertIn("어긋난다", str(cm.exception))
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "CHECK_PLAN_COMMITTED")
+
+    def test_a_forged_reapproval_breaks_the_approval_chain_and_is_printed(self):
+        """가짜 재승인: approve 명령 없이 approved_at 만 새 값으로 바꿔 커밋하면 그 커밋이 승인 커밋이 된다 — 사슬이 끊긴 것을 경고로 드러낸다.
+        (차단은 아니다 — 옛 방식의 재승인도 같은 모양이고, 승인 사건을 기계가 확인할 형태는 사용자 결정이다.)"""
+        fm, body = frontmatter.read(self.spec)
+        fm["approved_at"] = "2030-01-01T00:00:00+09:00"
+        frontmatter.write(self.spec, fm, body)
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "forged reapprove", cwd=self.root)
+        run_command(self.unit, "true", run_name="run-two", project_root=self.root)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        chain = [c for c in r["checks"] if c["id"] == "APPROVAL_CHAIN"]
+        self.assertEqual(len(chain), 1, r["checks"])
+        self.assertEqual(chain[0]["level"], "warning")
+        self.assertIn("거치지 않은 승인", chain[0]["detail"])
+
+    def test_superseded_envelopes_must_still_be_valid_envelopes(self):
+        """낡은 봉투도 봉투다 — 앵커 검사는 산출물과 무관하게 모든 봉투에 걸린다."""
+        self._write_review("run-test-reviewer.json", self._envelope(
+            "FAIL", task_envelope_ref={"path": f"docs/work/{self.unit}/task/없는계약.json", "sha256": "0" * 64}))
+        self._new_product("run-two")
+        self._write_review("run-two-reviewer.json", self._envelope("PASS", run="run-two"))
+        ids, r = self._failed()
+        self.assertIn("REVIEW_TASK_ANCHORED", ids)
+        self.assertEqual(r["verdict"], "FAIL")
 
 
 if __name__ == "__main__":

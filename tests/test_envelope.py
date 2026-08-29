@@ -148,8 +148,8 @@ class TestEnvelope(unittest.TestCase):
     def test_written_path_is_inside_the_unit_folder(self):
         sha = self._approve_and_commit()
         task_dir = (self.spec.parent / "task").resolve()
-        res = write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=sha)
-        self.assertEqual(Path(res["path"]).resolve(), task_dir / "reviewer.json")
+        res = write_envelope(self.unit, "implementer", project_root=self.root, base_sha=sha)
+        self.assertEqual(Path(res["path"]).resolve(), task_dir / "implementer.json")
         res = write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=sha, run_name="run_7865ac")
         self.assertEqual(Path(res["path"]).resolve(), task_dir / "run_7865ac-reviewer.json")
         self.assertEqual(load_json(res["path"])["role"], "reviewer")
@@ -349,3 +349,240 @@ class TestResultEnvelopeCheck(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class _ApprovalRepo(unittest.TestCase):
+    """승인 커밋 테스트의 공통 저장소 — T0 단위 하나가 승인 전 상태로 준비된다."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "승인 커밋", "approval-t0", "승인 커밋 파생", project_root=self.root, date="20260829")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+        self._set_command("true")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _set_command(self, command):
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
+        body = body.replace('command: "채움"', f'command: "{command}"').replace('command: "true"', f'command: "{command}"')
+        frontmatter.write(self.spec, fm, body)
+
+    def _commit(self, msg):
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", msg, cwd=self.root)
+        return git("rev-parse", "HEAD", cwd=self.root)
+
+
+class TestApprovalCommit(_ApprovalRepo):
+    """승인 커밋은 파일의 주장이 아니라 이력의 사실이다(체크리스트 38·37).
+
+    `approve` 가 승인 시점의 HEAD 를 base_sha 로 적으면 그 커밋의 spec 에는 승인이 없다 — 승인 표시는 그 다음 커밋에 들어가므로
+    base_sha 는 언제나 승인 커밋의 **부모**를 가리켰다. 실제 단위에서 그 값으로 계약을 만들면 이전 승인본의 검증 계획(5건)이 나왔다.
+    그래서 approve 는 base_sha 를 적지 않고, 계약 생성은 이력에서 승인 커밋을 스스로 찾는다."""
+
+    def test_approve_does_not_record_a_base_sha(self):
+        fm = approve_unit(self.unit, "tester", project_root=self.root)
+        self.assertIsNone(fm["base_sha"], "승인 시점의 HEAD 는 승인을 담지 않는 커밋이다 — 적지 않는다")
+        self.assertEqual(fm["status"], "active")
+
+    def test_contract_without_base_sha_uses_the_approval_commit_not_its_parent(self):
+        from romeo.docs import approval_commit
+        parent = git("rev-parse", "HEAD", cwd=self.root)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        approval = self._commit("approve")
+        self.assertEqual(approval_commit(self.root, self.unit), approval)
+        env = build_envelope(self.unit, "implementer", project_root=self.root)
+        self.assertEqual(env["base_sha"], approval)
+        self.assertNotEqual(env["base_sha"], parent)
+        # 승인 뒤 커밋이 더 쌓여도 승인 커밋은 그대로다 — 최신 커밋이 아니라 승인이 처음 커밋된 자리다.
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        self._commit("impl")
+        self.assertEqual(approval_commit(self.root, self.unit), approval)
+        self.assertEqual(build_envelope(self.unit, "implementer", project_root=self.root)["base_sha"], approval)
+
+    def test_contract_without_base_sha_is_refused_until_the_approval_is_committed(self):
+        from romeo.docs import approval_commit
+        approve_unit(self.unit, "tester", project_root=self.root)   # 커밋하지 않는다
+        with self.assertRaises(ValueError) as cm:
+            approval_commit(self.root, self.unit)
+        self.assertIn("커밋", str(cm.exception))
+        with self.assertRaises(ValueError) as cm:
+            build_envelope(self.unit, "implementer", project_root=self.root)
+        self.assertIn("--base-sha", str(cm.exception))
+
+    def test_unapproved_spec_has_no_approval_commit(self):
+        from romeo.docs import approval_commit
+        self._commit("draft")
+        with self.assertRaises(ValueError) as cm:
+            approval_commit(self.root, self.unit)
+        self.assertIn("승인", str(cm.exception))
+
+    def test_reapproval_needs_the_flag_and_a_reason_and_moves_the_approval_commit(self):
+        from romeo.docs import approval_commit
+        approve_unit(self.unit, "tester", project_root=self.root)
+        first = self._commit("approve")
+        first_fm, _ = frontmatter.read(self.spec)
+        # 검증 계획이 바뀌었다 — 재승인 대상이다(D-27). status 를 손으로 내리는 경로 대신 명령이 있어야 한다.
+        self._set_command("echo changed")
+        with self.assertRaises(ValueError) as cm:
+            approve_unit(self.unit, "tester", project_root=self.root)
+        self.assertIn("--reapprove", str(cm.exception))
+        with self.assertRaises(ValueError) as cm:
+            approve_unit(self.unit, "tester", project_root=self.root, reapprove=True)
+        self.assertIn("--reason", str(cm.exception))
+        fm = approve_unit(self.unit, "tester2", project_root=self.root, reapprove=True, reason="검증 계획 변경")
+        self.assertEqual(fm["status"], "active")
+        self.assertEqual(fm["approved_by"], "tester2")
+        self.assertIsNone(fm["base_sha"])
+        self.assertEqual(len(fm["approval_history"]), 1)
+        self.assertEqual(fm["approval_history"][0]["approved_at"], first_fm["approved_at"])
+        self.assertEqual(fm["approval_history"][0]["approved_by"], "tester")
+        self.assertEqual(fm["approval_history"][0]["reason"], "검증 계획 변경")
+        # 재승인이 커밋되기 전에는 승인 커밋이 없다 — 이전 승인 커밋으로 조용히 되돌아가지 않는다.
+        with self.assertRaises(ValueError):
+            approval_commit(self.root, self.unit)
+        second = self._commit("reapprove")
+        self.assertEqual(approval_commit(self.root, self.unit), second)
+        self.assertNotEqual(second, first)
+        env = build_envelope(self.unit, "implementer", project_root=self.root)
+        self.assertEqual(env["base_sha"], second)
+        self.assertEqual([c["command"] for c in env["required_checks"]], ["echo changed"],
+                         "재승인 커밋의 계약은 새 검증 계획을 담는다 — 38 의 결함은 정확히 여기서 이전 계획이 나오던 것이다")
+        # 문서 스키마가 재승인 이력을 받는다.
+        from romeo.validate import validate_doc
+        self.assertEqual(validate_doc(self.spec)["errors"], [])
+
+    def test_reapprove_cli_flags(self):
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._commit("approve")
+        self._set_command("echo changed")
+        buf = io.StringIO()
+        with redirect_stdout(buf), redirect_stderr(buf):
+            rc = main(["approve", self.unit, "--by", "tester", "--root", str(self.root)])
+        self.assertEqual(rc, 1, buf.getvalue())
+        buf = io.StringIO()
+        with redirect_stdout(buf), redirect_stderr(buf):
+            rc = main(["approve", self.unit, "--by", "tester", "--root", str(self.root),
+                       "--reapprove", "--reason", "검증 계획 변경"])
+        self.assertEqual(rc, 0, buf.getvalue())
+        self.assertNotIn("base_sha=", buf.getvalue(), "승인 메시지가 더는 base_sha 를 인쇄하지 않는다")
+        self.assertIn("커밋", buf.getvalue())
+
+    def test_evidence_change_base_is_the_commit_before_the_approval(self):
+        """증거의 변경 기준은 승인 직전 커밋이다 — 승인과 구현을 한 커밋에 넣는 T0 흐름에서도 구현이 변경으로 잡혀야 한다.
+        approve 가 예전에 적던 값(승인 시점 HEAD)과 같은 의미이고, 계약의 base_sha(승인 커밋)와는 다른 것이다."""
+        before = git("rev-parse", "HEAD", cwd=self.root)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        approval = self._commit("approve+impl")
+        res = run_command(self.unit, "true", run_name="run-test", project_root=self.root)
+        from romeo.util import load_yaml
+        rec = load_yaml(res["evidence"])
+        self.assertEqual(rec["base_sha"], before)
+        self.assertNotEqual(rec["base_sha"], approval)
+        self.assertEqual(rec["changed_files"], ["x.txt"])
+        # 계약은 승인 커밋을 base 로 쓴다 — 두 값은 다른 것이다.
+        self.assertEqual(build_envelope(self.unit, "implementer", project_root=self.root)["base_sha"], approval)
+
+
+class TestApprovalIdentity(_ApprovalRepo):
+    """명시한 --base-sha 도 지금의 승인을 담고 있어야 한다 — 재승인 전 커밋을 주면 이전 검증 계획의 계약이 만들어진다(체크리스트 38 의 본체).
+    종료 검사의 재계산 대조는 식별만 하므로 이전 승인의 봉투도 봉투로는 인정한다(지우지 않는다 — 동등성 관측의 표본이다)."""
+
+    def test_explicit_base_sha_of_a_superseded_approval_is_refused(self):
+        approve_unit(self.unit, "tester", project_root=self.root)
+        first = self._commit("approve")
+        self._set_command("echo changed")
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="검증 계획 변경")
+        second = self._commit("reapprove")
+        with self.assertRaises(ValueError) as cm:
+            build_envelope(self.unit, "implementer", project_root=self.root, base_sha=first)
+        self.assertIn("재승인", str(cm.exception))
+        self.assertIn(second[:12], str(cm.exception))
+        env = build_envelope(self.unit, "implementer", project_root=self.root, base_sha=second)
+        self.assertEqual([c["command"] for c in env["required_checks"]], ["echo changed"])
+        # 재계산 대조(allow_superseded)는 이전 승인의 계약도 그대로 다시 계산한다 — 식별이지 판정이 아니다.
+        old = build_envelope(self.unit, "implementer", project_root=self.root, base_sha=first, allow_superseded=True)
+        self.assertEqual([c["command"] for c in old["required_checks"]], ["true"])
+
+    def test_a_commit_holding_an_unknown_approval_is_refused(self):
+        """다른 브랜치의 승인이거나 손으로 고친 spec — 이 작업 트리가 겪은 어느 승인과도 맞지 않으면 계약을 만들지 않는다."""
+        approve_unit(self.unit, "tester", project_root=self.root)
+        sha = self._commit("approve")
+        fm, body = frontmatter.read(self.spec)
+        fm["approved_at"] = "2020-01-01T00:00:00+09:00"     # 작업 트리의 승인을 손으로 바꿨다
+        frontmatter.write(self.spec, fm, body)
+        with self.assertRaises(ValueError) as cm:
+            build_envelope(self.unit, "implementer", project_root=self.root, base_sha=sha)
+        self.assertIn("어느 승인과도 맞지 않는다", str(cm.exception))
+
+
+class TestSmallDefectsFromTheDiffReview(_ApprovalRepo):
+    """구현 diff 반박 검토가 잡은 작은 결함들 — 각각 한 번씩 고정한다."""
+
+    def test_reviewer_contract_requires_a_run(self):
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._commit("approve")
+        with self.assertRaises(ValueError) as cm:
+            write_envelope(self.unit, "reviewer", project_root=self.root)
+        self.assertIn("--run", str(cm.exception))
+        write_envelope(self.unit, "reviewer", project_root=self.root, run_name="run-r")   # --run 이 있으면 된다
+        write_envelope(self.unit, "implementer", project_root=self.root)                  # 구현자 계약은 종전대로
+
+    def test_unquoted_approved_at_still_identifies_the_approval(self):
+        """따옴표 없이 적힌 approved_at 은 YAML 이 datetime 으로 읽는다 — 문자열과 같은 승인으로 식별돼야 한다."""
+        from romeo.docs import approval_commit
+        approve_unit(self.unit, "tester", project_root=self.root)
+        sha = self._commit("approve")
+        text = self.spec.read_text(encoding="utf-8")
+        fm, _ = frontmatter.read(self.spec)
+        quoted = f"approved_at: '{fm['approved_at']}'"
+        self.assertIn(quoted, text)
+        self.spec.write_text(text.replace(quoted, f"approved_at: {fm['approved_at']}"), encoding="utf-8")
+        self.assertEqual(approval_commit(self.root, self.unit), sha)
+
+    def test_non_ascii_paths_are_recorded_verbatim_in_changed_files(self):
+        from romeo.gitinfo import changed_files
+        base = git("rev-parse", "HEAD", cwd=self.root)
+        (self.root / "한글파일.txt").write_text("x\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "korean", cwd=self.root)
+        files = changed_files(self.root, base)
+        self.assertIn("한글파일.txt", files)
+        self.assertFalse(any(f.startswith('"') for f in files), files)
+
+    def test_t0_with_a_contract_still_counts_the_implementation_as_change(self):
+        """T0 는 승인과 구현을 한 커밋에 넣고도 계약을 만든다(implement 절차 2번) — 그 계약의 base(승인 커밋)를 변경 기준으로 쓰면
+        구현이 변경으로 잡히지 않아 HAS_CHANGE 가 떨어졌다. 현재 작업 공간 계약은 첫 승인 직전 규칙을 쓴다."""
+        from romeo.util import load_yaml
+        before = git("rev-parse", "HEAD", cwd=self.root)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        self._commit("approve+impl")
+        env = write_envelope(self.unit, "implementer", project_root=self.root, run_name="run-t0")
+        self.assertEqual(env["envelope"]["workspace"], "current")
+        res = run_command(self.unit, "true", run_name="run-t0", project_root=self.root)
+        rec = load_yaml(res["evidence"])
+        self.assertEqual(rec["base_sha"], before)
+        self.assertEqual(rec["changed_files"], ["x.txt"])
+
+    def test_runs_that_finish_in_the_same_second_are_ordered_by_recording_time(self):
+        from romeo.evidence import list_runs
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self._commit("approve")
+        run_command(self.unit, "true", run_name="run-z-first", project_root=self.root)
+        run_command(self.unit, "true", run_name="run-a-second", project_root=self.root)
+        names = [r["run_id"] for r in list_runs(self.root, self.unit)]
+        self.assertEqual(names[-1], "run-a-second", names)

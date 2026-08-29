@@ -79,6 +79,10 @@ def validate_doc(path, harness_root=None):
         warnings.append(f"OPEN_LOOP NEEDS_INPUT {info['needs_input']}곳")
     if info["unchecked_ac"]:
         warnings.append(f"UNCHECKED_AC {info['unchecked_ac']}개")
+    # base_sha 는 더 이상 승인이 기록하지 않는다(체크리스트 38) — 남아 있는 값은 승인 커밋의 부모를 가리키는 낡은 사실이다.
+    if fm.get("base_sha") and fm.get("status") not in ("done", "dropped", "superseded"):
+        warnings.append(f"STALE_BASE_SHA frontmatter 의 base_sha {str(fm['base_sha'])[:12]} 는 승인 커밋이 아니다 — "
+                        f"계약 생성은 이력에서 승인 커밋을 찾는다. 재승인하면 지워진다")
     # 링크
     for target in LINK_RE.findall(body):
         if target.startswith(("http://", "https://", "mailto:", "#")):

@@ -239,3 +239,35 @@ reviewer_verdict_reproducibility:
     표본이 모자라면 `VERDICT_UNSAMPLED`, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로 판정에서 빼되 '비교 불가' 로 인쇄한다 —
     D-73 의 `PRODUCT_DIFFERS` 와 같은 형태다. 관측 케이스 `pr-license-field-t1-reviewer-observed` 는 이제 다섯 봉투를
     모두 담고 `VERDICT_UNSTABLE` 로 빠진다. `expect` 는 고치지 않았다(D-b) — 케이스가 담는 표본을 늘렸을 뿐이다.
+
+
+# 두 런타임의 결과 계약 스키마 CLI 플래그가 이 저장소의 스키마를 받는가 — 2026-08-29 (체크리스트 29①·40).
+# doctor 는 이 블록을 읽지 않는다. 사람이 읽는 기록이다.
+#
+# 왜 적나: 두 실패 모두 JSON Schema 검사기로는 잡히지 않고 그 CLI 를 호출해야만 드러난다. 문서(RUNBOOK §4)가
+# 한동안 claude 쪽을 실행 가능한 것처럼 적고 있었다 — 관측을 여기 두어 다음에 같은 플래그를 다시 넣지 않게 한다.
+result_schema_cli_flags:
+  observed_at: 2026-08-29
+  schema: core/schemas/result-envelope.json
+  codex:
+    flag: --output-schema <파일>
+    result: >-
+      HTTP 400 — "Invalid schema for response_format 'codex_output_schema': In context=('anyOf','0','properties','schema'),
+      schema must have a 'type' key."
+    cause: >-
+      anyOf 의 역할별 제약이 `"schema": {}` 같은 빈 하위 스키마를 쓴다. 그 런타임은 모든 property 에 type 을 요구한다
+    observed: 2026-08-29 관통(체크리스트 29①)
+  claude:
+    flag: --json-schema <내용>
+    result: >-
+      EXIT=1 · 출력 121바이트 · Error: --json-schema is not a valid JSON Schema: no schema with key or ref
+      "https://json-schema.org/draft/2020-12/schema"
+    cause: 스키마가 선언한 `$schema` 메타스키마를 그 CLI 가 풀지 못한다
+    observed: 2026-08-29 재관통(체크리스트 40) · 같은 날 재현 1회(`claude -p --json-schema "$(cat core/schemas/result-envelope.json)" --output-format json --max-turns 1 "hi"`)
+  conclusion: >-
+    두 런타임 모두 스키마 플래그로 결과 계약 형식을 강제하지 못한다 — 대칭이다. 형식은 절차 파일
+    (adapters/orca/prompts/reviewer-brief.md)이 지시하고 검증은 `romeo envelope check` 가 원본 스키마로 한다(앵커 검사 5개).
+    2026-08-29 재관통의 봉투 7개가 전부 그 경로로 PASS 였다. RUNBOOK §2·§4·§11 에서 두 플래그를 걷어냈다.
+  what_this_does_not_say: >-
+    스키마를 두 CLI 가 받는 형태로 고치면 강제가 성립하는지는 시험하지 않았다 — anyOf 를 풀고 `$schema` 를 빼면 될 수도 있으나,
+    그러면 역할별 제약(구현자 PASS 에 checks·evidence_ref 필수)이 스키마에서 사라진다. 그 제약은 envelope check 가 이미 강제하므로 시급하지 않다.

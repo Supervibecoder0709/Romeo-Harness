@@ -7,15 +7,16 @@ from pathlib import Path
 import yaml
 
 from . import HARNESS_ROOT, frontmatter
-from .docs import find_unit_dir
-from .evidence import (RERUN_TIMEOUT, command_log_state, dirty_tree_hash_excluding, exclusions,
-                       list_runs, replay)
+from .docs import approval_chain_warnings, approval_commit, approval_key, approval_key_at, find_unit_dir
+from .evidence import (RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
+                       list_runs, replay, review_record_state, sealed_product)
 from .gitinfo import head_sha
-from .parity import _envelope_defects, evidence_ref_error, load_role_contracts, task_ref_error
+from .parity import (_envelope_defects, _evidence_product, _product_of, _product_text, evidence_ref_error,
+                     load_role_contracts, task_ref_error)
 from .policy import classification_from_frontmatter, load_policy, load_project_state, route
 from .schema import validate as validate_schema
 from .util import dump_yaml, load_json, load_yaml, now_iso, rel, sha256_bytes, sha256_file, today
-from .validate import UNCHECKED_RE, validate_doc
+from .validate import UNCHECKED_RE, section_lines, validate_doc
 
 CHECKS_BLOCK_RE = re.compile(r"```yaml\s*\n(required_checks:.*?)\n```", re.S)
 RESULT_SCHEMA = "core/schemas/result-envelope.json"
@@ -43,35 +44,76 @@ def _plan_key(plan):
             for rc in plan]
 
 
-def _check_plan_committed(check, project_root, spec, plan):
-    """지금 읽고 있는 검증 계획이 **커밋된 계획**과 같은지 본다.
+def _approved_body(project_root, spec, unit_id):
+    """승인 커밋의 spec 본문. (본문, 승인 커밋 SHA, 실패 이유) — 승인이 커밋되지 않았으면 본문이 None 이다."""
+    try:
+        sha = approval_commit(project_root, unit_id)
+    except ValueError as e:
+        return None, None, str(e)
+    relpath = rel(spec, project_root)
+    proc = subprocess.run(["git", "show", f"{sha}:{relpath}"], cwd=str(project_root), capture_output=True)
+    if proc.returncode != 0:
+        return None, sha, f"승인 커밋 {sha[:12]} 에 {relpath} 가 없다"
+    _fm, body = frontmatter.split(proc.stdout.decode("utf-8", "replace"))
+    return body, sha, None
+
+
+def _check_plan_committed(check, project_root, spec, plan, unit_id):
+    """지금 읽고 있는 검증 계획이 **승인 시점의 계획**과 같은지 본다.
 
     재실행 대조를 붙이자 위조가 한 겹 옆으로 갔다: 실패하는 검사(`false`)를 지우고 `true` 로 바꾼 뒤
     그것을 진짜로 실행하면 기록도 로그도 재실행도 전부 맞는다. 고쳐진 것은 증거가 아니라 **주장 자체**다.
     `docs/work/<unit>/` 는 신선도 계산에서 제외돼 있어(기록 행위가 트리를 바꾸므로) 이 편집은 어디에도 걸리지 않았다.
 
-    그래서 계획만은 커밋된 것과 대조한다 — 커밋되지 않은 계획은 어느 이력에도 없고 되짚을 수 없다.
-    **이것은 절반의 앵커다**: 계획을 고치고 커밋한 경우는 여전히 통과한다. 계획이 *승인 시점의* 계획인지까지
-    묶으려면 승인 기록이 그때의 계획을 남겨야 하고, 그것은 승인을 기록하는 쪽의 일이다."""
-    relpath = rel(spec, project_root)
-    proc = subprocess.run(["git", "show", f"HEAD:{relpath}"], cwd=str(project_root), capture_output=True)
-    if proc.returncode != 0:
+    종전에는 HEAD 의 계획과 대조했다 — 그것은 절반의 앵커였다: 계획을 고치고 **커밋**하면 통과했다. 이제 원본은
+    승인 커밋(`docs.approval_commit` — 현재 승인이 처음 커밋된 자리)의 계획이다. 계획을 바꾸려면 재승인해야 하고,
+    재승인은 승인 커밋을 옮긴다(체크리스트 37·38). 승인이 커밋되지 않았으면 대조할 원본이 없다 — 미검증이다."""
+    committed_body, sha, why = _approved_body(project_root, spec, unit_id)
+    if committed_body is None:
         check("CHECK_PLAN_COMMITTED", UNVERIFIED,
-              f"HEAD 에 {relpath} 가 없다 — 커밋되지 않은 검증 계획은 대조할 원본이 없다. "
-              f"승인된 spec.md 를 커밋한 뒤 다시 실행한다(D-a)")
+              f"승인 시점의 검증 계획을 읽을 수 없다 — {why}. 승인된 spec.md 를 커밋한 뒤 다시 실행한다(D-a)")
         return
-    _fm, committed_body = frontmatter.split(proc.stdout.decode("utf-8", "replace"))
     try:
         committed = required_checks(committed_body)
     except Exception as e:
-        check("CHECK_PLAN_COMMITTED", UNVERIFIED, f"HEAD 의 {relpath} 에서 검증 계획을 읽을 수 없다 ({e})")
+        check("CHECK_PLAN_COMMITTED", UNVERIFIED, f"승인 커밋 {sha[:12]} 의 spec.md 에서 검증 계획을 읽을 수 없다 ({e})")
         return
     if _plan_key(committed) != _plan_key(plan):
         check("CHECK_PLAN_COMMITTED", False,
-              f"검증 계획이 HEAD 에 커밋된 것과 다르다 — 커밋 {_plan_key(committed)} vs 지금 {_plan_key(plan)}. "
-              f"실행할 검사를 바꾸는 것은 증거가 아니라 주장을 바꾸는 것이다: 승인을 다시 받고 커밋한다")
+              f"검증 계획이 승인 커밋 {sha[:12]} 의 것과 다르다 — 승인 {_plan_key(committed)} vs 지금 {_plan_key(plan)}. "
+              f"실행할 검사를 바꾸는 것은 증거가 아니라 주장을 바꾸는 것이다: 다시 승인한다(romeo approve --reapprove, D-27)")
         return
-    check("CHECK_PLAN_COMMITTED", True, f"검사 {len(plan)}건이 HEAD 의 spec.md 와 같다")
+    check("CHECK_PLAN_COMMITTED", True, f"검사 {len(plan)}건이 승인 커밋 {sha[:12]} 의 spec.md 와 같다")
+
+
+def _normalized_user_check(body):
+    """확인란 절을 체크 표시만 지운 형태로 — 사용자가 승인한 문장 자체를 대조하기 위해서다."""
+    lines = section_lines(body or "", "확인란")
+    if lines is None:
+        return None
+    return "\n".join(re.sub(r"^(\s*- )\[[xX]\]", r"\1[ ]", ln) for ln in lines).strip()
+
+
+def _check_ac_text(check, project_root, spec, body, unit_id):
+    """확인란의 **문장**이 승인 시점과 같은지 본다 — 체크 표시(`[x]`)만 다를 수 있다.
+
+    구현자는 수용 기준 체크박스를 채운다(implement 절차 7번). 그 편집을 허용하면서 확인란 본문이 승인본과 같은지 보지 않으면,
+    `[x]` 를 채우며 수용 기준 문구를 바꿔도 걸리지 않는다 — 확인란은 사용자가 승인하는 유일한 면이다(D-27·D-60).
+    체크 표시를 지운 뒤 승인 커밋의 절과 바이트로 대조한다. 승인이 커밋되지 않았으면 미검증이다."""
+    committed_body, sha, why = _approved_body(project_root, spec, unit_id)
+    if committed_body is None:
+        check("AC_TEXT_UNCHANGED", UNVERIFIED, f"승인 시점의 확인란을 읽을 수 없다 — {why}")
+        return
+    now, then = _normalized_user_check(body), _normalized_user_check(committed_body)
+    if now is None or then is None:
+        check("AC_TEXT_UNCHANGED", UNVERIFIED, "확인란 절이 없다 — 승인된 문장을 대조할 수 없다")
+        return
+    if now != then:
+        check("AC_TEXT_UNCHANGED", False,
+              f"확인란의 문장이 승인 커밋 {sha[:12]} 의 것과 다르다(체크 표시 외) — 확인란은 사용자가 승인한 면이므로 "
+              f"고쳤으면 다시 승인한다(romeo approve --reapprove, D-27). 체크박스만 채우는 것은 여기 걸리지 않는다")
+        return
+    check("AC_TEXT_UNCHANGED", True, f"확인란의 문장이 승인 커밋 {sha[:12]} 과 같다(체크 표시 제외)")
 
 
 def _check_evidence_logs(check, project_root, ev):
@@ -93,13 +135,17 @@ def _check_evidence_logs(check, project_root, ev):
         states.append(state)
         if why:
             details.append(why)
+    _sealed, mismatch = sealed_product(ev)
+    if mismatch:
+        states.append(False)
+        details.append(mismatch)
     detail = "; ".join(details)
     if False in states:
         check("EVIDENCE_LOG", False, detail)
     elif None in states:
         check("EVIDENCE_LOG", UNVERIFIED, detail)
     else:
-        check("EVIDENCE_LOG", True, f"{len(cmds)}건이 원시 로그·log_sha256 과 일치")
+        check("EVIDENCE_LOG", True, f"{len(cmds)}건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다")
 
 
 def _skip_rerun(check, plan, why):
@@ -156,6 +202,61 @@ def _check_rerun(check, project_root, unit_id, plan, cmds, rerun, timeout):
               "더는 성립하지 않는다. 그 검사는 검증 계획에서 rerun: false 로 선언하고 이유를 적는다")
 
 
+def _run_name(r):
+    return str(r.get("run_id") or Path(str(r.get("_path", ""))).stem or "?")
+
+
+def select_check_record(runs, plan, cur_head=None, cur_dirty=None):
+    """이 작업 단위의 **검사 기록**을 고른다 — `(run, 완전한가, 설명)`.
+
+    종전에는 마지막 evidence 파일(`runs[-1]`)을 읽었다. 그런데 정규 절차가 evidence 를 하나만 남기지 않는다:
+    검토자를 띄운 쪽은 실행마다 새 run 에 방어 검사(review-tree-before/after) 2건만 든 evidence 를 남기고(RUNBOOK §4·§6.6),
+    그 파일이 마지막이 되면 close 는 구현자의 검사 기록 대신 그것을 읽어 `REQUIRED_CHECK` 전부가 '명령 없음' 이 됐다 —
+    두 정규 절차가 서로를 깨뜨렸다(체크리스트 41).
+
+    그래서 파일의 위치가 아니라 **내용**으로 고른다: 검증 계획(`required_checks`)의 명령을 **전부** 실행한 run 이 검사 기록이고,
+    여럿이면 최신이다. run 들을 합치지 않는다 — 검사는 한 산출물(한 run 의 `head_sha`·`dirty_tree_hash`) 위에서 전부 돌아야
+    무엇을 검사했는지 말할 수 있다. 전부 실행한 run 이 없으면 가장 많이 실행한 run 을 읽되 그 사실을 인쇄한다(통과가 아니다 —
+    빠진 검사는 `REQUIRED_CHECK` 가 잡는다). 계획이 비어 있으면 종전처럼 마지막 run 이다.
+
+    후보는 먼저 **지금 트리와 같은 산출물**(`head_sha`·`dirty_tree_hash`)을 기록한 run 으로 좁힌다 — 동등성 관측을 모으는
+    절차(RUNBOOK §6.3)는 다른 산출물의 완전한 run 을 같은 evidence/ 에 두고, 최신 규칙만으로는 그쪽이 뽑혀 기준 산출물의
+    검토 판정을 전부 낡은 것으로 보낸다. 같은 산출물의 run 이 없으면 전체에서 고르고 신선도 검사가 그 사실을 드러낸다."""
+    pool, scope = runs, ""
+    if cur_head and cur_dirty:
+        same = [r for r in runs if r.get("head_sha") == cur_head and r.get("dirty_tree_hash") == cur_dirty]
+        if same:
+            pool = same
+            scope = f" · 지금 트리와 같은 산출물의 run {len(same)}건/{len(runs)}건 중"
+        else:
+            scope = f" · 지금 트리와 같은 산출물의 run 이 없다({len(runs)}건 전체에서 골랐다 — 신선도 검사가 이것을 잡는다)"
+    if not plan:
+        ev = pool[-1]
+        return ev, True, f"검사 기록 = {_run_name(ev)} — 검증 계획이 없어 마지막 run 을 읽는다{scope}"
+    wanted = [str((rc or {}).get("command", "")) for rc in plan]
+
+    def coverage(r):
+        have = {c.get("command") for c in (r.get("commands") or []) if isinstance(c, dict)}
+        return sum(1 for cmd in wanted if cmd in have)
+
+    scored = [(coverage(r), r) for r in pool]
+    full = [r for n, r in scored if n == len(wanted)]
+    empty = [_run_name(r) for n, r in scored if n == 0]
+    if full:
+        ev = full[-1]
+        detail = f"검사 기록 = {_run_name(ev)} — 검증 계획 {len(wanted)}건을 전부 실행한 run"
+        others = [_run_name(r) for r in full if r is not ev]
+        detail += f" {len(full)}건 중 최신(다른 완전한 기록: {others})" if others else ""
+        if empty:
+            detail += f" · 계획의 검사를 하나도 담지 않은 run {len(empty)}건은 검사 기록이 아니다(방어 검사 등): {empty}"
+        return ev, True, detail + scope
+    best = max(n for n, _ in scored)
+    ev = [r for n, r in scored if n == best][-1]
+    return ev, False, (f"검증 계획 {len(wanted)}건을 전부 실행한 run 이 없다 — 가장 많이 실행한 {_run_name(ev)}"
+                       f"({best}/{len(wanted)})을 읽는다. 빠진 검사는 아래 REQUIRED_CHECK 가 잡는다: "
+                       f"romeo evidence checks 로 한 run 에 전부 기록한다{scope}")
+
+
 def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
                rerun=True, rerun_timeout=RERUN_TIMEOUT):
     project_root = Path(project_root).resolve()
@@ -183,14 +284,15 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     check("APPROVED", fm.get("status") == "active" and fm.get("approved_at"), f"status={fm.get('status')} approved_at={fm.get('approved_at')}")
     runs = list_runs(project_root, unit_id)
     if not check("HAS_EVIDENCE", bool(runs), "" if runs else "evidence/*.yaml 없음 — romeo evidence run 으로 만든다"):
-        return _finish(checks, fm, body, spec, runs, dry_run, project_root)
-    ev = runs[-1]
+        return _finish(checks, fm, body, spec, runs, dry_run, project_root, None)
+    plan = required_checks(body)
     cur_head = head_sha(project_root)
     cur_dirty = dirty_tree_hash_excluding(project_root, exclusions(unit_id))
+    ev, complete, why = select_check_record(runs, plan, cur_head, cur_dirty)
+    check("EVIDENCE_SELECTED", complete, why, level="error" if complete else "warning")
     check("FRESH_HEAD", ev.get("head_sha") == cur_head, f"evidence {str(ev.get('head_sha'))[:12]} vs 현재 {cur_head[:12]}")
     check("FRESH_TREE", ev.get("dirty_tree_hash") == cur_dirty, f"evidence {str(ev.get('dirty_tree_hash'))[:12]} vs 현재 {cur_dirty[:12]} (tracked 수정·staged·untracked 포함)")
     cmds = {c["command"]: c for c in ev.get("commands", [])}
-    plan = required_checks(body)
     if not plan:
         # 실행 대조의 앵커(검증 계획)가 없다. 검사할 것이 0건인 것을 조용히 지나가지 않는다 — 인쇄한다(K-51).
         check("REQUIRED_CHECK", UNVERIFIED,
@@ -200,6 +302,13 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
         rec = cmds.get(cmd)
         if rec is None:
             check("REQUIRED_CHECK", False, f"{rc.get('id')}: evidence 에 명령 없음 — {cmd}")
+        elif isinstance(rec.get("dirty_tree_hash"), str) and rec["dirty_tree_hash"] != ev.get("dirty_tree_hash"):
+            # 한 run 의 검사는 한 산출물 위에서 전부 돌아야 한다 — run 의 산출물은 마지막 명령의 것이므로,
+            # 그 전에 다른 트리에서 돈 검사의 결과는 이 산출물에 대한 결과가 아니다(명령별 값이 없는 옛 기록은 대조하지 않는다).
+            check("REQUIRED_CHECK", UNVERIFIED,
+                  f"{rc.get('id')}: exit {rec['exit_code']} 이지만 다른 트리에서 돌았다 "
+                  f"(그때 {rec['dirty_tree_hash'][:12]} vs 이 run 의 산출물 {str(ev.get('dirty_tree_hash'))[:12]}) — "
+                  f"이 산출물에서 다시 실행해 기록한다: {cmd}")
         else:
             check("REQUIRED_CHECK", rec["exit_code"] == 0, f"{rc.get('id')}: exit {rec['exit_code']} — {cmd}")
     _check_evidence_logs(check, project_root, ev)
@@ -209,12 +318,24 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
     unapproved = []
     for g in out["guards"]:
-        approved = any(a.get("guard") == g["id"] for r in runs for a in r.get("approvals", []))
-        check("GUARD_APPROVED", approved, f"{g['id']} ({g['name']}) 승인 기록 없음")
-        if not approved:
+        entries = [a for r in runs for a in (r.get("approvals") or []) if isinstance(a, dict) and a.get("guard") == g["id"]]
+        if not entries:
+            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}) 승인 기록 없음")
             unapproved.append(g["id"])
+            continue
+        # 승인 항목은 yaml 배열이라 손으로 써 넣을 수 있다 — 기록 명령이 남긴 원시 로그와 봉인이 맞을 때만 승인으로 센다.
+        states = [approval_log_state(project_root, a) for a in entries]
+        if any(s is False for s, _ in states):
+            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}): " + "; ".join(w for s, w in states if s is False))
+            unapproved.append(g["id"])
+        elif all(s is None for s, _ in states):
+            check("GUARD_APPROVED", UNVERIFIED, f"{g['id']} ({g['name']}): " + "; ".join(w for s, w in states if w)
+                  + " — 승인 기록을 로그로 확인하지 못했다(K-51)")
+            unapproved.append(g["id"])
+        else:
+            check("GUARD_APPROVED", True, f"{g['id']} ({g['name']}) 승인 기록 {len(entries)}건 — 원시 로그와 일치")
     if plan:
-        _check_plan_committed(check, project_root, spec, plan)
+        _check_plan_committed(check, project_root, spec, plan, unit_id)
         if unapproved:
             _skip_rerun(check, plan,
                         "승인되지 않은 실행 가드가 있어 재실행하지 않았다 — 승인 없이 실행하지 않는다(K-66): "
@@ -222,14 +343,19 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
         else:
             _check_rerun(check, project_root, unit_id, plan, cmds, rerun, rerun_timeout)
     check("AC_ALL_CHECKED", not UNCHECKED_RE.search(body), f"미체크 {len(UNCHECKED_RE.findall(body))}개")
+    _check_ac_text(check, project_root, spec, body, unit_id)
+    for w in approval_chain_warnings(project_root, unit_id):
+        # 차단이 아니라 경고다 — 옛 방식의 재승인도 같은 모양이고, 승인 사건을 기계가 확인할 형태는 사용자 결정이다(체크리스트 45).
+        check("APPROVAL_CHAIN", False, w, level="warning")
     check("NO_OPEN_LOOP", "NEEDS_INPUT" not in body, f"NEEDS_INPUT {body.count('NEEDS_INPUT')}곳")
     check("HAS_CHANGE", bool(ev.get("changed_files")), f"changed_files {ev.get('changed_files')}" if ev.get("changed_files") else "changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다")
     spec_sha = sha256_file(spec)
     spec_same = (ev.get("spec_ref") or {}).get("sha256") == spec_sha
     check("SPEC_UNCHANGED_SINCE_EVIDENCE", spec_same, "" if spec_same else "spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.", level="warning")
     if out["reviewer"] != "none":
-        _check_review(check, udir, fm.get("id") or unit_id, harness_root, project_root)
-    return _finish(checks, fm, body, spec, runs, dry_run, project_root)
+        _check_review(check, udir, fm.get("id") or unit_id, harness_root, project_root,
+                      product=_product_of(ev))
+    return _finish(checks, fm, body, spec, runs, dry_run, project_root, ev)
 
 
 def _inside(project_root, raw):
@@ -290,7 +416,7 @@ def _task_anchor(project_root, unit_id, env, harness_root):
         return None, f"{raw} 의 role 이 {task.get('role')!r} 다 — 이 판정의 역할({env.get('role')!r})이 아니다"
     try:
         rebuilt = build_envelope(unit_id, task["role"], project_root=project_root,
-                                 harness_root=harness_root, base_sha=task["base_sha"])
+                                 harness_root=harness_root, base_sha=task["base_sha"], allow_superseded=True)
     except Exception as e:
         return task, (f"{raw} 를 커밋된 원본에서 다시 계산할 수 없다 ({e}) — "
                       f"계약은 손으로 쓰지 않고 계약 생성 명령이 만든다")
@@ -459,12 +585,20 @@ def envelope_checks(env, unit_id, role, project_root, udir, roles, schema, side=
     return rows
 
 
-def _check_review(check, udir, unit_id, harness_root, project_root):
+def _check_review(check, udir, unit_id, harness_root, project_root, product=None):
     """검토자가 낸 게이트 판정을 읽어 완료 판정에 연결한다.
 
     디렉터리가 비어 있지 않다는 것은 검토가 아니다 — 결과 계약을 스키마로 검증하고 `gate_verdict` 를 읽는다.
-    PASS 가 아닌 판정이 하나라도 남아 있으면 close 는 done 을 선언하지 않는다(D-c).
+    **현재 산출물에 대한** 판정 중 PASS 가 아닌 것이 하나라도 남아 있으면 close 는 done 을 선언하지 않는다(D-c).
     판정을 읽을 수 없는 형식이면 통과가 아니라 거부다 — 모르는 것을 통과로 세지 않는다(K-51).
+
+    검토자의 판정은 자기가 본 산출물의 함수다(D-73) — 산출물은 봉투가 지목한 증거의 `head_sha`·`dirty_tree_hash` 로 식별한다.
+    `product` 는 지금 닫으려는 산출물(검사 기록 run 의 것)이고, 다른 산출물을 본 판정은 PASS 든 FAIL 이든 이 close 의 대상이
+    아니다 — 낡은 PASS 로 새 산출물이 닫히지 않고, 낡은 FAIL 이 새 산출물을 막지 않는다(체크리스트 41). 그런 봉투는 지우지
+    않고 `REVIEW_SUPERSEDED` 로 인쇄한다(동등성 게이트의 관측 표본이다). 산출물을 식별하지 못하는 봉투는 미검증이다 — PASS 로도
+    지나간 것으로도 세지 않는다. 검사만 다시 기록해도 산출물이 같으면 같은 판정 대상이다. 앵커 검사 5개는 산출물과 무관하게 모든 봉투에 걸린다.
+    현재 산출물의 봉투는 그 run 의 증거에 **기록된 그대로**여야 한다(`romeo review record` 가 남긴 sha256 봉인) — 판정 문자열은
+    다른 어떤 앵커에도 묶이지 않는다.
 
     스키마를 통과했다는 것도 검토가 아니다. 봉투는 손으로 쓸 수 있으므로, 그 안의 주장을 **실재하는 것**에 묶는다 —
     가리킨 작업 계약이 실재하고 해시가 맞는가, 그 계약의 base_sha 가 이 이력 안인가, 가리킨 증거가 실재하는가,
@@ -504,25 +638,177 @@ def _check_review(check, udir, unit_id, harness_root, project_root):
         check("REVIEW_" + cid,
               False if False in states else (UNVERIFIED if UNVERIFIED in states else True), detail)
 
-    bad = [(n, e) for n, e in verdicts if e.get("gate_verdict") != "PASS"]
+    current, stale, unknown = [], [], []
+    now_key = _current_approval_key(udir)
+    for n, e in verdicts:
+        seen, own_rec, why = _reviewed_product(project_root, udir, unit_id, e)
+        if seen is None:
+            unknown.append((n, e, why))
+            continue
+        approval = _envelope_approval_key(project_root, unit_id, e)
+        reasons = []
+        if now_key is not None and approval is not None and approval != now_key:
+            reasons.append(f"재승인 전 승인(approved_at {approval[0]})으로 낸 판정")
+        if product is not None and seen != product:
+            reasons.append(f"다른 산출물({_product_text(seen)})을 본 판정")
+        if reasons:
+            stale.append((n, e, " · ".join(reasons)))
+            continue
+        recorded, why = review_record_state(project_root, own_rec, Path(udir) / "review" / n, product=seen)
+        if recorded is not True:
+            # 판정 문자열 자체는 어떤 앵커에도 묶이지 않는다 — 기록 명령이 남긴 sha256 봉인이 유일한 결박이다.
+            unknown.append((n, e, why or "봉투 기록을 대조할 수 없다"))
+            continue
+        current.append((n, e))
+    if stale:
+        check("REVIEW_SUPERSEDED", False,
+              "; ".join(f"{n}: {e['gate_verdict']}{_findings_gist(e)} — {why}이라 이 close 의 대상이 아니다"
+                        for n, e, why in stale)
+              + f". 현재 산출물은 {_product_text(product) if product else '?'} 이다"
+              f"(검사 기록 run 의 head_sha+dirty_tree_hash, D-73)",
+              level="warning")
+    bad = [(n, e) for n, e in current if e.get("gate_verdict") != "PASS"]
+    passes = [n for n, e in current if e.get("gate_verdict") == "PASS"]
     if not verdicts:
-        detail = "review/ 에서 읽을 수 있는 검토자 판정이 없다 — 통과로 세지 않는다"
+        check("REVIEW_VERDICT", False, "review/ 에서 읽을 수 있는 검토자 판정이 없다 — 통과로 세지 않는다")
     elif bad:
-        detail = "; ".join(f"{n}: {e['gate_verdict']} (blocked_reason={e.get('blocked_reason')}, "
-                           f"findings {len(e.get('findings') or [])}건)" for n, e in bad)
+        check("REVIEW_VERDICT", False,
+              "; ".join(f"{n}: {e['gate_verdict']} (blocked_reason={e.get('blocked_reason')}, "
+                        f"findings {len(e.get('findings') or [])}건)" for n, e in bad))
+    elif unknown:
+        # 어느 산출물을 본 판정인지 하네스가 확인하지 못했다 — PASS 로 세지 않고, 지나간 것으로도 접지 않는다(K-51).
+        check("REVIEW_VERDICT", UNVERIFIED,
+              "판정이 본 산출물을 확인할 수 없는 봉투가 있다 — " + "; ".join(f"{n}: {why}" for n, _e, why in unknown))
+    elif not current:
+        check("REVIEW_VERDICT", UNVERIFIED,
+              f"현재 산출물({_product_text(product) if product else '?'})에 대한 검토가 아직 없다 — 낡은 판정 {len(stale)}건은 "
+              f"다른 산출물·다른 승인의 것이다. 이 산출물을 검토받는다")
     else:
-        detail = "; ".join(f"{n}: PASS" for n, _ in verdicts)
-    check("REVIEW_VERDICT", bool(verdicts) and not bad, detail)
+        check("REVIEW_VERDICT", True, "; ".join(f"{n}: PASS" for n in passes))
+        if len(passes) < REVIEW_PASS_SAMPLES:
+            # D-74 는 판정 역할의 면에 표본 2건 이상을 요구한다(한 번의 판정은 그 실행의 판정이다). close 에 같은 요구를
+            # 넣을지는 사용자 결정 사항(D-75)이라 지금은 막지 않고 드러낸다 — 산출물을 사소하게 바꿔 PASS 가 나올 때까지
+            # 검토를 반복하는 길이 이 줄에 보인다.
+            check("REVIEW_SAMPLE", False,
+                  f"현재 산출물에 PASS {len(passes)}건뿐이다 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). "
+                  f"close 에 표본 {REVIEW_PASS_SAMPLES}건 이상을 요구할지는 D-75 미확정", level="warning")
 
 
-def _finish(checks, fm, body, spec, runs, dry_run, project_root):
+# close 의 검토자 면이 요구할 PASS 표본 수. D-74 는 동등성 게이트에 2 를 요구한다 — close 에 같은 요구를 넣을지는 D-75 다.
+REVIEW_PASS_SAMPLES = 2
+# 검토자를 띄운 쪽이 검토 전후에 남기는 방어 검사의 라벨(RUNBOOK §4). 이 두 기록이 검토 시점의 산출물이다.
+DEFENSIVE_LABELS = ("review-tree-before", "review-tree-after")
+
+
+def _run_of_envelope(env):
+    """봉투가 가리킨 작업 계약 경로 `docs/work/<id>/task/<run>-<role>.json` 의 `<run>`. 규약 밖이면 None."""
+    raw = ((env.get("task_envelope_ref") or {}).get("path") or "").replace("\\", "/")
+    name = raw.rsplit("/", 1)[-1]
+    role = env.get("role") or ""
+    suffix = f"-{role}.json"
+    if not name.endswith(suffix) or len(name) <= len(suffix):
+        return None
+    return name[:-len(suffix)]
+
+
+def _reviewed_product(project_root, udir, unit_id, env):
+    """검토자가 실제로 본 산출물 — **검토 run 자신의 증거**에서 읽는다. (식별자, 못 읽은 이유)
+
+    `evidence_ref` 는 봉투 작성자가 고르는 포인터라 판정을 다른 산출물로 옮기는 데 쓸 수 있다(문자열 하나로 FAIL 을 낡은 것으로,
+    옛 PASS 를 현재 것으로 만든다 — 설계 검토가 재현했다). 검토 시점의 산출물은 검토자를 띄운 쪽이 그 run 의 증거에
+    방어 검사로 기록한다(RUNBOOK §4·§6.6: `evidence/<run>.yaml` 의 review-tree-before/after). 그래서 산출물 식별은
+    그 증거에서 읽고, `evidence_ref` 의 산출물은 그것과 **같아야** 한다 — 다르면 그 봉투는 어느 산출물을 본 판정인지 말할 수 없다.
+    원시 로그가 그 체크아웃에 있으면 마지막 명령의 봉인(head/tree 줄)까지 대조한다."""
+    run = _run_of_envelope(env)
+    if run is None:
+        return None, None, "작업 계약 경로가 <run>-<role>.json 규약이 아니라 검토 run 의 증거를 찾을 수 없다"
+    own_rel = f"docs/work/{unit_id}/evidence/{run}.yaml"
+    own_path = Path(udir) / "evidence" / f"{run}.yaml"
+    if not own_path.is_file():
+        return None, None, (f"검토 run {run} 의 증거({own_rel})가 없다 — 검토 시점의 산출물을 하네스가 기록하지 않았다"
+                            f"(RUNBOOK §4 방어 검사를 그 run 에 남긴다)")
+    try:
+        own_rec = load_yaml(own_path)
+    except Exception as e:
+        return None, None, f"검토 run {run} 의 증거를 읽을 수 없다 ({e})"
+    if not isinstance(own_rec, dict):
+        return None, None, f"검토 run {run} 의 증거가 증거 기록(YAML 매핑)이 아니다"
+    # 검토 시점의 산출물은 방어 검사(review-tree-before/after)가 기록한다 — 그 두 기록이 실재하고 원시 로그와 맞아야
+    # '검토 run 의 증거' 다. 계약 파일을 다른 run 이름으로 복사해 아무 증거나 자기 것으로 삼는 길을 여기서 막는다.
+    cmds = [c for c in (own_rec.get("commands") or []) if isinstance(c, dict)]
+    guards = {label: [c for c in cmds if c.get("id") == label] for label in DEFENSIVE_LABELS}
+    missing = [label for label, recs in guards.items() if not recs]
+    if missing:
+        return None, None, (f"검토 run {run} 의 증거에 방어 검사 {missing} 기록이 없다 — 검토자를 띄운 쪽이 그 run 에 "
+                            f"review-tree-before/after 를 남겨야 검토 시점의 산출물이 기록된다(RUNBOOK §4)")
+    products = {}
+    for label, recs in guards.items():
+        state, why = command_log_state(project_root, recs[-1])
+        if state is not True:
+            # None(로그 없음)도 통과가 아니다 — 검사 기록 면의 EVIDENCE_LOG 와 같은 기준이다(K-63).
+            return None, None, f"검토 run {run} 의 {label} 기록을 원시 로그로 확인하지 못했다 — {why}"
+        products[label] = _product_of(recs[-1])
+        if products[label] is None:
+            return None, None, (f"검토 run {run} 의 {label} 기록에 산출물 식별이 없다 — 명령별 봉인이 없던 시절의 기록이라 "
+                                f"검토 시점의 산출물을 확인할 수 없다")
+    # 검토 시점의 산출물은 **방어 검사 기록**의 것이다 — run 최상위나 마지막 명령이 아니다. 최상위·마지막 명령은 그 run 에 나중에
+    # 명령을 하나 더 기록하는 것으로 '지금' 으로 바뀐다(옛 run 에 새 봉투를 기록하면 옛 판정이 현재 산출물로 옮겨지던 자리).
+    before, after = products["review-tree-before"], products["review-tree-after"]
+    if before != after:
+        return None, None, (f"검토 run {run} 의 방어 검사가 무효다 — 검토 전({_product_text(before)})과 후({_product_text(after)})의 "
+                            f"산출물이 다르다. 검토 중 작업 트리가 바뀌었다(RUNBOOK §4)")
+    own = after
+    ref = _evidence_ref(env)
+    if ref is None:
+        return None, None, "봉투가 evidence_ref 를 비워 두어 읽은 산출물을 지목하지 않았다"
+    seen, err = _evidence_product(Path(project_root), ref)
+    if seen is None:
+        return None, None, f"evidence_ref 의 산출물을 읽을 수 없다 — {err}"
+    if seen != own:
+        return None, None, (f"evidence_ref 가 지목한 산출물({_product_text(seen)})이 검토 run {run} 이 기록한 산출물"
+                            f"({_product_text(own)})과 다르다 — 판정이 본 것과 다른 증거를 가리킨다")
+    return own, own_rec, None
+
+
+def _current_approval_key(udir):
+    try:
+        fm, _ = frontmatter.read(Path(udir) / "spec.md")
+        return approval_key(fm) if fm.get("approved_at") else None
+    except Exception:
+        return None
+
+
+def _envelope_approval_key(project_root, unit_id, env):
+    """봉투가 가리킨 작업 계약의 base_sha 커밋이 담은 승인. 재승인 뒤에는 이전 승인으로 낸 판정을 가려내는 데 쓴다."""
+    raw = (env.get("task_envelope_ref") or {}).get("path") or ""
+    path = _inside(project_root, raw)
+    if path is None or not path.is_file():
+        return None
+    try:
+        sha = (json.loads(path.read_text(encoding="utf-8")) or {}).get("base_sha")
+        return approval_key_at(project_root, sha, unit_id) if sha else None
+    except Exception:
+        return None
+
+
+def _findings_gist(env):
+    findings = env.get("findings") or []
+    if not findings:
+        return ""
+    first = str((findings[0] or {}).get("summary", ""))[:60]
+    return f"(findings {len(findings)}건 — 첫째: {first})"
+
+
+def _finish(checks, fm, body, spec, runs, dry_run, project_root, ev):
     """PASS 는 '어긴 것이 없다' 가 아니라 '전부 대조했고 어긴 것이 없다' 다.
-    성립하지 않은 검사(UNVERIFIED)가 하나라도 있으면 done 을 선언하지 않는다 — 미검증은 완료가 아니다(K-51)."""
+    성립하지 않은 검사(UNVERIFIED)가 하나라도 있으면 done 을 선언하지 않는다 — 미검증은 완료가 아니다(K-51).
+    판정은 **검사 기록** run(`ev`)에 적는다 — 마지막 파일이 아니라(체크리스트 41). evidence 링크는 모든 run 을 남긴다:
+    방어 검사 run 도 이 단위의 증거다."""
     failed = [c for c in checks if c["level"] == "error" and not c["ok"]]
     unverified = [c for c in checks if c["level"] == UNVERIFIED]
     verdict = "PASS" if not failed and not unverified else "FAIL"
     result = {"unit_id": fm.get("id"), "verdict": verdict, "checks": checks, "dry_run": dry_run, "updated": []}
-    if verdict == "PASS" and not dry_run:
+    if verdict == "PASS" and not dry_run and ev is not None:
         ev_links = [rel(r["_path"], spec.parent) for r in runs]
         fm["status"] = "done"
         fm["closed_at"] = now_iso()
@@ -534,18 +820,19 @@ def _finish(checks, fm, body, spec, runs, dry_run, project_root):
             j = i + 1
             while j < len(lines) and not lines[j].startswith("## "):
                 j += 1
-            block = ["", f"close PASS · {fm['closed_at']} · HEAD {runs[-1].get('head_sha', '')[:12]}", ""] + [f"- [{p}]({p}) — exit codes {[c['exit_code'] for c in r.get('commands', [])]}" for p, r in zip(ev_links, runs)] + [""]
+            block = (["", f"close PASS · {fm['closed_at']} · HEAD {str(ev.get('head_sha', ''))[:12]} · 검사 기록 {_run_name(ev)}", ""]
+                     + [f"- [{p}]({p}) — exit codes {[c['exit_code'] for c in r.get('commands', [])]}"
+                        + (" (검사 기록)" if r is ev else "") for p, r in zip(ev_links, runs)] + [""])
             lines[i + 1:j] = block
             body = "\n".join(lines)
         except StopIteration:
             pass
         frontmatter.write(spec, fm, body)
         result["updated"].append(str(spec))
-        last = runs[-1]
-        path = last.pop("_path")
-        last["verdict"] = "PASS"
-        last["close"] = {"at": fm["closed_at"], "checks": [{"id": c["id"], "ok": c["ok"], "level": c["level"], "detail": c["detail"]} for c in checks]}
-        Path(path).write_text(dump_yaml(last), encoding="utf-8")
+        path = ev.pop("_path")
+        ev["verdict"] = "PASS"
+        ev["close"] = {"at": fm["closed_at"], "checks": [{"id": c["id"], "ok": c["ok"], "level": c["level"], "detail": c["detail"]} for c in checks]}
+        Path(path).write_text(dump_yaml(ev), encoding="utf-8")
         result["updated"].append(path)
     return result
 

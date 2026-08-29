@@ -298,6 +298,41 @@ class TestResultEnvelope(unittest.TestCase):
     def test_evidence_ref_is_nullable(self):
         self.assertEqual(self.schema["properties"]["evidence_ref"]["type"], ["string", "null"])
 
+    # ── notes — 판정에 쓰이지 않는 자유 서술 자리(체크리스트 39) ────────────────────
+    def test_notes_is_an_optional_free_text_field_for_both_roles(self):
+        """구현자는 findings 를 낼 수 없고(역할 계약 findings: none) 스키마에 서술 자리가 없어
+        "이 FAIL 은 내 변경 때문이 아니다" 같은 판정의 맥락을 계약 밖 .md 로 뺐다 — 봉투만 읽는 검사기는 그것을 못 본다."""
+        for role in ("implementer", "reviewer"):
+            sample = result_sample(role)
+            sample["notes"] = "check-5 의 실패 3건은 변경 없이 돌려도 같다 — 회귀가 아니다"
+            self.assertEqual(validate(sample, self.schema), [], f"{role} 의 notes 가 거부됐다")
+        blocked = result_sample()
+        blocked.update({"checks": [], "gate_verdict": "BLOCKED", "blocked_reason": "BLOCKED_CAPABILITY",
+                        "evidence_ref": None, "notes": "계약이 그 자리에 없다"})
+        self.assertEqual(validate(blocked, self.schema), [])
+        self.assertNotIn("notes", self.schema["required"], "notes 는 선택이다 — 없는 봉투도 유효하다")
+
+    def test_notes_must_be_text(self):
+        for bad in (12, ["a"], {"k": "v"}, None):
+            sample = result_sample()
+            sample["notes"] = bad
+            self.assertTrue(validate(sample, self.schema), f"notes={bad!r} 가 통과한다")
+
+    def test_notes_do_not_enter_any_verdict(self):
+        """스키마 설명이 '판정에 쓰이지 않는다' 고 말하는 것을 코드로 고정한다 — 대조 로직이 이 필드를 읽으면
+        서술 한 줄로 판정을 흔들 수 있다. 동등성 판정의 대표값과 역할 계약 검사가 notes 에 무관해야 한다."""
+        from romeo.parity import _envelope_defects, _verdict_key
+        roles = {r: load_yaml(p) for r, p in ROLE_FILES.items()}
+        for role in ("implementer", "reviewer"):
+            plain = result_sample(role)
+            noted = dict(plain, notes="판정과 무관한 서술")
+            self.assertEqual(_verdict_key(plain), _verdict_key(noted))
+            self.assertEqual(_envelope_defects("baseline", role, plain, roles),
+                             _envelope_defects("baseline", role, noted, roles))
+        # description 은 파일당 하나다(위 관례 테스트) — 그래서 이 사실은 최상위 설명이 말한다.
+        self.assertIn("notes", self.schema["description"])
+        self.assertIn("판정에 쓰이지 않는다", self.schema["description"])
+
 
 if __name__ == "__main__":
     unittest.main()

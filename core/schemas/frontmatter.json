@@ -215,6 +215,37 @@
         "string",
         "null"
       ]
+    },
+    "approval_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "approved_at",
+          "approved_by",
+          "superseded_at",
+          "reason"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "approved_at": {
+            "type": "string"
+          },
+          "approved_by": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "superseded_at": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
     }
   }
 }
