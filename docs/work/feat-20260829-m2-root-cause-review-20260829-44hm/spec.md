@@ -11,7 +11,7 @@ profile: deep
 blast_radius: medium
 uncertainty: high
 status: active
-approved_at: '2026-08-29T18:23:27+09:00'
+approved_at: '2026-08-29T18:38:07+09:00'
 approved_by: julliettelee
 base_sha: null
 closed_at: null
@@ -26,6 +26,9 @@ routing:
   history: []
 created: '2026-08-29'
 updated: '2026-08-29'
+approval_history:
+- {approved_at: '2026-08-29T18:23:27+09:00', approved_by: julliettelee, superseded_at: '2026-08-29T18:38:07+09:00',
+  reason: 승인된 산출물 경로를 계약 파서가 읽는 백틱 경로 두 개로 정정해 docs/reviews 보고서 쓰기 범위를 명시함}
 ---
 
 # M2 마일스톤 지연 근본 원인 리뷰
@@ -52,7 +55,7 @@ updated: '2026-08-29'
 
 ## 변경 범위
 
-- 바뀌는 파일·모듈: 이 작업 단위의 `brief.md`·`spec.md`, `docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md`, 그리고 이 작업 단위의 검토 결과 봉투. 실행 중 생성되는 run 로그는 `.harness/runs/`에만 둔다.
+- 바뀌는 파일·모듈: `docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/` · `docs/reviews/2026-08-29-m2-root-cause-review/`
 - 영향을 받는 부분: M2 종료·재관통·후속 M3 착수의 의사결정. 제품 코드나 외부 운영 상태에는 영향이 없다.
 - 바꾸지 않는 것(비범위): `core/`, `romeo/`, `adapters/`, `fixtures/`, `tests/`, 기존 `docs/planning/`·`docs/decisions/`·`docs/work/feat-20260829-license-field-46an/` 파일, git history, 원격 저장소와 기존 worktree.
 
