@@ -17,17 +17,17 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `5297470` · 2026-08-29)
+## 지금 상태 (기준 `b53f08c` · 2026-08-29)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline 5297470..HEAD` 가 비어 있지 않으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline b53f08c..HEAD` 가 비어 있지 않으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
 - **마일스톤:** M2 진행 중 — **동등성 게이트가 구현자 면과 검토자 면을 둘 다 판정했다**(관측 2건 · 판정에서 뺀 면 1 · EXIT=0).
   **검토자 면이 실제로 비교된 것은 이번이 처음이다** — 앞 라운드까지 그 면은 `PRODUCT_DIFFERS` 나 `VERDICT_UNSTABLE` 로
   한 번도 판정된 적이 없었다. 남은 비교 불가 1개는 구조적으로 정상이다(두 구현자의 산출물이 다르므로
   그 케이스의 검토자 면은 D-73 이 애초에 비교하지 않는다). M3~M7 미착수.
-- **CI:** 재관통 커밋(`5297470`) 푸시 후의 실행이 이 블록의 기준이다. 직전 초록불은 run `33234498547`(`fb4cceb`).
+- **CI:** ✅ run `33237273401`(`b53f08c`) **success** — `gate_verdict=PASS · checker_verdict=PASS · 관측 2건 · 합성 9건 · 판정에서 뺀 면 1`. 뺀 면이 2개에서 1개로 줄었고, 그 1개는 구조적으로 정상이다.
 - **로컬 검사 (2026-08-29 재관통 뒤):** unittest **349 OK** · `fixtures parity --report` **EXIT=0**
   (`gate_verdict=PASS · checker_verdict=PASS · 관측 2 · 합성 9 · 판정에서 뺀 면 1`) ·
   `compile --check`·`notices --check`·`vendor check`·`doctor`·`validate` 전부 EXIT=0.
