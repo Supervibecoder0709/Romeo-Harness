@@ -39,19 +39,30 @@ baseline:
       findings: []
       evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
     reviewer:
-      schema: romeo/result-envelope@0.1.0
-      unit_id: feat-20260828-license-field-a1b2
-      role: reviewer
-      task_envelope_ref:
-        path: .harness/runs/feat-20260828-license-field-a1b2/run-a/task-reviewer.json
-        sha256: "2222222222222222222222222222222222222222222222222222222222222222"
-      checks: []
-      gate_verdict: PASS
-      blocked_reason: null
-      findings:
-        - {summary: 인덱스 열 순서가 _source.md 의 필드 순서와 다르다 — 읽는 사람이 대조하기 어렵다, file: archive/README.md, line: 12}
-      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
-
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-a/task-reviewer.json
+          sha256: "2222222222222222222222222222222222222222222222222222222222222222"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings:
+          - {summary: 인덱스 열 순서가 _source.md 의 필드 순서와 다르다 — 읽는 사람이 대조하기 어렵다, file: archive/README.md, line: 12}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-a/task-reviewer.json
+          sha256: "2222222222222222222222222222222222222222222222222222222222222222"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings:
+          - {summary: 인덱스 열 순서가 _source.md 의 필드 순서와 다르다 — 읽는 사람이 대조하기 어렵다, file: archive/README.md, line: 12}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-a.yaml
 swapped:
   runtimes: {implementer: codex, reviewer: claude}
   product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
@@ -72,19 +83,30 @@ swapped:
       findings: []
       evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
     reviewer:
-      schema: romeo/result-envelope@0.1.0
-      unit_id: feat-20260828-license-field-a1b2
-      role: reviewer
-      task_envelope_ref:
-        path: .harness/runs/feat-20260828-license-field-a1b2/run-b/task-reviewer.json
-        sha256: "4444444444444444444444444444444444444444444444444444444444444444"
-      checks: []
-      gate_verdict: PASS
-      blocked_reason: null
-      findings:
-        - {summary: 라이선스 열의 빈칸 처리 규칙이 문서에 없다, file: archive/README.md, line: 14}
-      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
-
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-b/task-reviewer.json
+          sha256: "4444444444444444444444444444444444444444444444444444444444444444"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings:
+          - {summary: 라이선스 열의 빈칸 처리 규칙이 문서에 없다, file: archive/README.md, line: 14}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-b/task-reviewer.json
+          sha256: "4444444444444444444444444444444444444444444444444444444444444444"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings:
+          - {summary: 라이선스 열의 빈칸 처리 규칙이 문서에 없다, file: archive/README.md, line: 14}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-b.yaml
 note: findings 문장은 면마다 달라도 된다. 판정이 같으면 동등하다 — 프롬프트 동일성은 요구하지 않는다(C-C2).
   evidence_ref 경로가 면마다 다른 것도 같다 — 실행이 다르면 증거 파일도 다르다. 비교하는 것은 checks 와 gate 판정이다.
 source:

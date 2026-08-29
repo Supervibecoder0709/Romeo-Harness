@@ -38,18 +38,28 @@ baseline:
       findings: []
       evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-e.yaml
     reviewer:
-      schema: romeo/result-envelope@0.1.0
-      unit_id: feat-20260828-license-field-a1b2
-      role: reviewer
-      task_envelope_ref:
-        path: .harness/runs/feat-20260828-license-field-a1b2/run-e/task-reviewer.json
-        sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-      checks: []
-      gate_verdict: PASS
-      blocked_reason: null
-      findings: []
-      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-e.yaml
-
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-e/task-reviewer.json
+          sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings: []
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-e.yaml
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-e/task-reviewer.json
+          sha256: "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings: []
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-e.yaml
 swapped:
   runtimes: {implementer: codex, reviewer: claude}
   product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "2222222222222222222222222222222222222222222222222222222222222222"}
@@ -69,19 +79,30 @@ swapped:
       findings: []
       evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-f.yaml
     reviewer:
-      schema: romeo/result-envelope@0.1.0
-      unit_id: feat-20260828-license-field-a1b2
-      role: reviewer
-      task_envelope_ref:
-        path: .harness/runs/feat-20260828-license-field-a1b2/run-f/task-reviewer.json
-        sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
-      checks: []
-      gate_verdict: FAIL
-      blocked_reason: null
-      findings:
-        - {summary: 목록 표 헤더는 6열인데 구분선은 5셀 — 마크다운 표 구조가 깨진다, file: archive/README.md, line: 17}
-      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-f.yaml
-
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-f/task-reviewer.json
+          sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        checks: []
+        gate_verdict: FAIL
+        blocked_reason: null
+        findings:
+          - {summary: 목록 표 헤더는 6열인데 구분선은 5셀 — 마크다운 표 구조가 깨진다, file: archive/README.md, line: 17}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-f.yaml
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-f/task-reviewer.json
+          sha256: "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        checks: []
+        gate_verdict: FAIL
+        blocked_reason: null
+        findings:
+          - {summary: 목록 표 헤더는 6열인데 구분선은 5셀 — 마크다운 표 구조가 깨진다, file: archive/README.md, line: 17}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-f.yaml
 source:
   kind: authored
   ref: docs/planning/progress.md §10 체크리스트 30 (2026-08-29 관통이 드러낸 모양)

@@ -46,6 +46,13 @@
 산출물 식별은 관측 케이스에서는 봉투가 지목한 증거의 `head_sha`·`dirty_tree_hash` 에서 읽고(손으로 적지 않는다 — D-b),
 합성 케이스에서는 면마다 `product:` 로 선언하며 `expect_incomparable:` 로 검사기가 그것을 잡는지 검증한다.
 관측 케이스의 모든 면이 비교 불가이면 게이트는 PASS 도 FAIL 도 아니라 미판정이다 — 비교하지 않은 것을 통과로 세지 않는다.
+
+**판정 역할의 면에는 전제가 하나 더 있다 — 그 면이 자기 안에서 일관한가(D-74).** 2026-08-29 재현성 측정에서
+같은 산출물·같은 계약에 codex 검토자를 세 번 돌려 PASS 1 · FAIL 2 가, claude 검토자를 두 번 돌려 FAIL 1 · PASS 1 이 나왔다.
+**두 런타임 다 자기 안에서 흔들린다.** 그러면 각 면 1건씩을 비교해 얻은 `VERDICT_DIFFERS` 는 런타임의 차이가 아니라
+실행 간 분산일 수 있다. 그래서 판정 역할의 면은 각 면 `JUDGE_MIN_SAMPLES` 건 이상을 요구하고(`{files: [...]}`),
+표본이 모자라면 `VERDICT_UNSAMPLED`, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로 판정에서 빼되 '비교 불가' 로 인쇄한다.
+구현자 면에는 이 요구가 없다 — 그 면이 묻는 것은 재현성이 아니라 같은 계약에서 같은 검사를 돌려 같은 결론을 냈는가다.
 """
 import re
 from collections import Counter
@@ -85,8 +92,14 @@ PRODUCT_KEYS = ("head_sha", "dirty_tree_hash")
 # 비교 불가 — 불일치도 판정 불가도 아니다. 그 면을 게이트 판정에서 빼고 뺐다는 사실을 인쇄한다.
 PRODUCT_DIFFERS = "PRODUCT_DIFFERS"
 PRODUCT_UNKNOWN = "PRODUCT_UNKNOWN"
-INCOMPARABLE_CODES = (PRODUCT_DIFFERS, PRODUCT_UNKNOWN)
+# 판정 역할의 표본이 자기 안에서 흔들린다 — 그 면의 한 판정은 그 런타임을 대표하지 못한다(D-74).
+VERDICT_UNSTABLE = "VERDICT_UNSTABLE"
+# 판정 역할의 표본이 재현성을 말할 만큼 있지 않다(1건).
+VERDICT_UNSAMPLED = "VERDICT_UNSAMPLED"
+INCOMPARABLE_CODES = (PRODUCT_DIFFERS, PRODUCT_UNKNOWN, VERDICT_UNSTABLE, VERDICT_UNSAMPLED)
 INCOMPARABLE_TEXT = "비교 불가"
+# 판정 역할의 면에 요구하는 최소 표본 수(D-74). 1건은 그 런타임의 판정이 아니라 그 실행의 판정이다.
+JUDGE_MIN_SAMPLES = 2
 
 # 관측 케이스의 앵커가 실재해야 하는 자리.
 WORK_DIR = "docs/work"
@@ -197,25 +210,42 @@ def task_ref_error(unit_id, ref):
     return None
 
 
-def _result_ref(unit, role, ref):
-    """관측 케이스가 지목한 결과 계약 파일의 상대 경로. (경로, 오류)
+def _result_refs(unit, role, ref):
+    """관측 케이스가 지목한 결과 계약 파일들의 상대 경로. (경로 목록, 오류)
+
+    `{file: <경로>}` 는 표본 1건, `{files: [<경로>, …]}` 는 n건이다. 판정 역할은 n≥2 를 요구한다(D-74) —
+    같은 산출물에 같은 런타임을 두 번 돌려 판정이 갈리는 것이 관측됐으므로(2026-08-29 Q-08),
+    1건의 판정은 그 런타임의 판정이 아니라 그 실행의 판정이다.
 
     인라인 봉투를 여기서 거부한다 — 게이트가 비교하는 값을 케이스 작성자가 그대로 타이핑할 수 있으면
     게이트는 아무것도 지키지 않는다(D-b)."""
     place = "|".join(RESULT_DIRS)
-    if not isinstance(ref, dict) or list(ref) != ["file"]:
+    shape = (f"{{file: {WORK_DIR}/{unit}/<{place}>/<run>-{role}{RESULT_SUFFIX}}} 또는 "
+             f"{{files: [<같은 모양의 경로>, …]}}")
+    if not isinstance(ref, dict) or list(ref) not in (["file"], ["files"]):
         return None, (f"results.{role} 이 봉투를 인라인으로 담고 있다 — 관측 케이스는 봉투를 파일로만 받는다"
-                      f"({{file: {WORK_DIR}/{unit}/<{place}>/<run>-{role}{RESULT_SUFFIX}}}). "
-                      f"인라인 봉투는 종료 검사의 앵커 검사를 받지 않는다(K-63)")
-    raw = ref.get("file")
-    if not isinstance(raw, str) or not raw.strip():
-        return None, f"results.{role}.file 이 비어 있다 — 결과 계약 파일을 상대 경로로 지목한다"
-    text = raw.strip()
+                      f"({shape}). 인라인 봉투는 종료 검사의 앵커 검사를 받지 않는다(K-63)")
+    if "files" in ref:
+        raws = ref.get("files")
+        if not isinstance(raws, list) or not raws:
+            return None, f"results.{role}.files 가 비어 있거나 목록이 아니다 — 결과 계약 파일들을 상대 경로로 지목한다"
+    else:
+        raws = [ref.get("file")]
+    out = []
     allowed = tuple(f"{WORK_DIR}/{unit}/{d}/" for d in RESULT_DIRS)
-    if not text.startswith(allowed) or not text.endswith(RESULT_SUFFIX):
-        return None, (f"results.{role}.file {text!r} 가 {WORK_DIR}/{unit}/<{place}>/*{RESULT_SUFFIX} 밖이다 — "
-                      f"결과 계약도 그 작업 단위 안에 있다(K-62)")
-    return text, None
+    for raw in raws:
+        key = "files" if "files" in ref else "file"
+        if not isinstance(raw, str) or not raw.strip():
+            return None, f"results.{role}.{key} 에 빈 값이 있다 — 결과 계약 파일을 상대 경로로 지목한다"
+        text = raw.strip()
+        if not text.startswith(allowed) or not text.endswith(RESULT_SUFFIX):
+            return None, (f"results.{role}.{key} {text!r} 가 {WORK_DIR}/{unit}/<{place}>/*{RESULT_SUFFIX} 밖이다 — "
+                          f"결과 계약도 그 작업 단위 안에 있다(K-62)")
+        if text in out:
+            return None, (f"results.{role}.{key} 에 같은 경로가 두 번 있다({text}) — "
+                          f"같은 파일을 두 번 세는 것은 표본이 둘이라는 뜻이 아니다")
+        out.append(text)
+    return out, None
 
 
 def _judges_product(role, roles):
@@ -243,13 +273,34 @@ def _product_text(product):
     return f"{product[0][:7]}+{product[1][:12]}"
 
 
+def _as_envelopes(value):
+    """면의 한 역할이 담은 것을 **표본 목록**으로 정규화한다.
+
+    봉투 하나(dict)면 표본 1건, 목록이면 그대로다. 판정 역할은 n≥2 를 요구하므로(D-74) 비교는
+    항상 목록 위에서 돈다 — 단일 형태는 그 목록의 길이가 1 인 경우일 뿐이다."""
+    return list(value) if isinstance(value, list) else [value]
+
+
+def _verdict_key(env):
+    """한 실행의 판정을 대표하는 값 — 이것이 같아야 그 면의 표본이 자기 안에서 일관한다(D-74)."""
+    if not isinstance(env, dict):
+        return (None, None, ())
+    return (env.get("gate_verdict"), env.get("blocked_reason"), tuple(_check_key(env)))
+
+
 def _inline_products(case):
-    """합성 케이스의 면별 산출물 선언(`<면>.product`)을 그 면의 모든 역할에 붙인다. 없으면 None 이다."""
+    """합성 케이스의 면별 산출물 선언(`<면>.product`)을 그 면의 모든 역할에 붙인다. 없으면 None 이다.
+
+    표본이 n건이면 같은 선언을 n번 붙인다 — 합성 케이스의 `product:` 는 그 면 전체가 본 산출물이다."""
     out = {}
     for side in ("baseline", "swapped"):
         face = case.get(side) if isinstance(case.get(side), dict) else {}
         product = _product_of(face.get("product"))
-        out[side] = {role: product for role in _results(case, side)}
+        results = _results(case, side)
+        out[side] = {}
+        for role in results:
+            n = len(_as_envelopes(results[role])) if isinstance(results, dict) else 1
+            out[side][role] = ([product] * n) if product is not None else None
     return out
 
 
@@ -283,35 +334,48 @@ def _resolve_face(case, side, project_root, harness_root, unit_dir, schema, role
     if not isinstance(results, dict):
         return out, products, errs
     for role, ref in sorted(results.items()):
-        rel_path, why = _result_ref(unit, role, ref)
+        rel_paths, why = _result_refs(unit, role, ref)
         if why is not None:
             errs.append(f"{side}.{why}")
             continue
-        path = _repo_path(project_root, rel_path)
-        if not _is_file(path):
-            errs.append(f"{side}.results.{role}.file {rel_path!r} 가 실재하지 않는다 — "
-                        f"관측 케이스의 봉투는 실행이 남긴 파일이다")
+        envs, prods, dropped = [], [], False
+        for rel_path in rel_paths:
+            path = _repo_path(project_root, rel_path)
+            if not _is_file(path):
+                errs.append(f"{side}.results.{role} {rel_path!r} 가 실재하지 않는다 — "
+                            f"관측 케이스의 봉투는 실행이 남긴 파일이다")
+                dropped = True
+                break
+            try:
+                env = load_json(path)
+            except (OSError, ValueError) as e:
+                errs.append(f"{side}.results.{role} {rel_path} 를 JSON 으로 읽을 수 없다 ({e})")
+                dropped = True
+                break
+            rows = envelope_checks(env, unit, role, project_root, unit_dir, roles, schema,
+                                   side=side, harness_root=harness_root)
+            bad = [f"{cid} {'FAIL' if state is False else 'UNVERIFIED'}"
+                   + (f": {reason}" if reason else "") for cid, state, reason in rows if state is not True]
+            if bad:
+                errs.append(f"{side}.results.{role} {rel_path} 가 종료 검사와 같은 앵커 검사를 "
+                            f"통과하지 못한다 — " + "; ".join(bad))
+                dropped = True
+                break
+            if _judges_product(role, roles):
+                product, why = _evidence_product(project_root, env.get("evidence_ref"))
+                if why is not None:
+                    errs.append(f"{side}.results.{role} {rel_path} — {why}")
+                    dropped = True
+                    break
+                prods.append(product)
+            envs.append(env)
+        # 표본 하나라도 앵커를 통과하지 못하면 그 면 전체를 비교에서 뺀다 — 통과한 것만 골라
+        # 세면 표본을 고른 것이 된다(D-b).
+        if dropped:
             continue
-        try:
-            env = load_json(path)
-        except (OSError, ValueError) as e:
-            errs.append(f"{side}.results.{role}.file {rel_path} 를 JSON 으로 읽을 수 없다 ({e})")
-            continue
-        rows = envelope_checks(env, unit, role, project_root, unit_dir, roles, schema,
-                               side=side, harness_root=harness_root)
-        bad = [f"{cid} {'FAIL' if state is False else 'UNVERIFIED'}"
-               + (f": {reason}" if reason else "") for cid, state, reason in rows if state is not True]
-        if bad:
-            errs.append(f"{side}.results.{role}.file {rel_path} 가 종료 검사와 같은 앵커 검사를 "
-                        f"통과하지 못한다 — " + "; ".join(bad))
-            continue
-        if _judges_product(role, roles):
-            product, why = _evidence_product(project_root, env.get("evidence_ref"))
-            if why is not None:
-                errs.append(f"{side}.results.{role}.file {rel_path} — {why}")
-                continue
-            products[role] = product
-        out[role] = env
+        out[role] = envs
+        if prods:
+            products[role] = prods
     return out, products, errs
 
 
@@ -478,15 +542,23 @@ def check_parity_cases(cases, harness_root=None, project_root=None):
             for role, env in sorted(results.items()):
                 if role not in ROLES:
                     errs.append(f"{side}.results 의 역할 {role!r} 은 {list(ROLES)} 밖")
+                envs = _as_envelopes(env)
+                # 표본을 여러 건 받는 것은 판정 역할뿐이다(D-74). 구현자 면이 묻는 것은 재현성이 아니라
+                # 같은 계약에서 같은 검사를 돌려 같은 결론을 냈는가이고, 두 구현자가 다른 바이트를
+                # 만드는 것은 정상이다 — 같은 구현자를 두 번 돌린 결과를 나란히 둘 자리가 없다.
+                if len(envs) > 1 and not _judges_product(role, contracts):
+                    errs.append(f"{side}.results.{role} 이 표본 {len(envs)}건이다 — "
+                                f"표본을 여러 건 받는 것은 판정 역할뿐이다(D-74)")
                 if observed:
                     continue      # 봉투는 파일에서 읽어 앵커 검사가 본다(resolve_case)
-                if not isinstance(env, dict):
-                    errs.append(f"{side}.results.{role} 이 매핑이 아님")
-                    continue
-                if env.get("role") != role:
-                    errs.append(f"{side}.results.{role} 의 role 이 {env.get('role')!r}")
-                if env.get("unit_id") != case.get("unit_id"):
-                    errs.append(f"{side}.results.{role} 의 unit_id 가 케이스와 다름")
+                for env_one in envs:
+                    if not isinstance(env_one, dict):
+                        errs.append(f"{side}.results.{role} 이 매핑도 매핑 목록도 아님")
+                        continue
+                    if env_one.get("role") != role:
+                        errs.append(f"{side}.results.{role} 의 role 이 {env_one.get('role')!r}")
+                    if env_one.get("unit_id") != case.get("unit_id"):
+                        errs.append(f"{side}.results.{role} 의 unit_id 가 케이스와 다름")
         if errs:
             errors[_where(case)] = errs
     return errors
@@ -541,6 +613,49 @@ def _envelope_defects(side, role, env, roles):
     return out
 
 
+def _judge_face_error(role, base_envs, swap_envs, base_products, swap_products):
+    """판정 역할의 두 면을 비교할 수 있는가. 비교 불가면 `incomparable` 행, 가능하면 None.
+
+    판정 역할의 결론에는 전제가 둘 있다.
+      (1) **같은 산출물을 봤는가**(D-73) — 판정은 자기가 본 산출물의 함수다.
+      (2) **그 면의 표본이 자기 안에서 일관한가**(D-74) — 2026-08-29 Q-08 측정에서 같은 산출물에
+          같은 런타임을 세 번 돌려 PASS 1 · FAIL 2 가 나왔다. 한 실행의 판정을 그 런타임의 판정으로
+          읽으면, 두 면의 차이가 런타임의 차이인지 실행 간 분산인지 구분되지 않는다.
+    둘 중 하나라도 깨지면 그 면을 게이트 판정에서 빼고 '비교 불가' 로 인쇄한다 — 뺐다는 사실을 숨기지 않는다(K-51)."""
+    # 순서가 진단의 정확도다 — 산출물이 다르면 표본을 아무리 늘려도 비교할 수 없으므로 그것을 먼저 본다.
+    if not base_products or not swap_products:
+        return {"role": role, "code": PRODUCT_UNKNOWN,
+                "detail": f"{PRODUCT_UNKNOWN} {role} 산출물을 식별하지 못했다 — {INCOMPARABLE_TEXT}"}
+    for side, prods in (("baseline", base_products), ("swapped", swap_products)):
+        if len(set(prods)) > 1:
+            seen = " · ".join(sorted({_product_text(p) for p in prods}))
+            return {"role": role, "code": PRODUCT_DIFFERS,
+                    "detail": f"{PRODUCT_DIFFERS} {role} {side} 면의 표본들이 서로 다른 산출물을 봤다({seen}) — "
+                              f"{INCOMPARABLE_TEXT}: 그것은 같은 것을 두 번 본 것이 아니다"}
+    if base_products[0] != swap_products[0]:
+        return {"role": role, "code": PRODUCT_DIFFERS,
+                "detail": f"{PRODUCT_DIFFERS} {role} 산출물 {_product_text(base_products[0])}≠"
+                          f"{_product_text(swap_products[0])} — {INCOMPARABLE_TEXT}: 다른 산출물에 "
+                          f"대한 판정 차이는 런타임의 차이를 말하지 않는다"}
+    n_base, n_swap = len(base_envs), len(swap_envs)
+    if n_base < JUDGE_MIN_SAMPLES or n_swap < JUDGE_MIN_SAMPLES:
+        return {"role": role, "code": VERDICT_UNSAMPLED,
+                "detail": f"{VERDICT_UNSAMPLED} {role} 표본 {n_base}·{n_swap} 건 "
+                          f"(각 면 {JUDGE_MIN_SAMPLES} 건 이상 필요) — {INCOMPARABLE_TEXT}: "
+                          f"1건의 판정은 그 런타임의 판정이 아니라 그 실행의 판정이다"}
+    unstable = []
+    for side, envs in (("baseline", base_envs), ("swapped", swap_envs)):
+        seen = {_verdict_key(e) for e in envs}
+        if len(seen) > 1:
+            unstable.append(f"{side} {' ≠ '.join(sorted(str(k[0]) for k in seen))}")
+    if unstable:
+        return {"role": role, "code": VERDICT_UNSTABLE,
+                "detail": f"{VERDICT_UNSTABLE} {role} {' · '.join(unstable)} — {INCOMPARABLE_TEXT}: "
+                          f"같은 산출물에 같은 런타임을 다시 돌려 판정이 갈렸다. "
+                          f"그 면의 한 판정은 그 런타임을 대표하지 못한다"}
+    return None
+
+
 def compare_case(case, schema, roles=None, results=None, products=None):
     """한 케이스의 두 면을 역할별로 짝지어 판정한다. 미실행 케이스는 비교하지 않는다.
 
@@ -561,40 +676,36 @@ def compare_case(case, schema, roles=None, results=None, products=None):
         results = {side: _results(case, side) for side in ("baseline", "swapped")}
     if products is None:
         products = _inline_products(case)
-    base = results.get("baseline") or {}
-    swap = results.get("swapped") or {}
+    base = {r: _as_envelopes(v) for r, v in (results.get("baseline") or {}).items()}
+    swap = {r: _as_envelopes(v) for r, v in (results.get("swapped") or {}).items()}
     row["roles"] = sorted(set(base) | set(swap))
+    row["samples"] = {side: {r: len(v) for r, v in face.items()}
+                      for side, face in (("baseline", base), ("swapped", swap))}
     codes, detail = [], []
     compared, incomparable = [], []
     for side, face in (("baseline", base), ("swapped", swap)):
         for role in sorted(face):
-            env = face[role]
-            for err in _validate(env, schema):
-                codes.append("SCHEMA_INVALID")
-                detail.append(f"SCHEMA_INVALID {side}.{role} {err}")
-            if isinstance(env, dict):
-                for code, msg in _envelope_defects(side, role, env, roles):
-                    codes.append(code)
-                    detail.append(msg)
+            for env in face[role]:
+                for err in _validate(env, schema):
+                    codes.append("SCHEMA_INVALID")
+                    detail.append(f"SCHEMA_INVALID {side}.{role} {err}")
+                if isinstance(env, dict):
+                    for code, msg in _envelope_defects(side, role, env, roles):
+                        codes.append(code)
+                        detail.append(msg)
     if sorted(base) != sorted(swap):
         codes.append("ROLE_SET_DIFFERS")
         detail.append(f"ROLE_SET_DIFFERS {sorted(base)}≠{sorted(swap)}")
     for role in sorted(set(base) & set(swap)):
-        base_env, swap_env = base[role], swap[role]
+        base_envs, swap_envs = base[role], swap[role]
         if _judges_product(role, roles):
-            # 판정 역할의 결론은 자기가 본 산출물의 함수다 — 같은 산출물을 봤을 때만 비교가 성립한다(D-73).
-            base_product = (products.get("baseline") or {}).get(role)
-            swap_product = (products.get("swapped") or {}).get(role)
-            if base_product is None or swap_product is None:
-                incomparable.append({"role": role, "code": PRODUCT_UNKNOWN,
-                                     "detail": f"{PRODUCT_UNKNOWN} {role} 산출물을 식별하지 못했다 — {INCOMPARABLE_TEXT}"})
+            bad = _judge_face_error(role, base_envs, swap_envs,
+                                    (products.get("baseline") or {}).get(role),
+                                    (products.get("swapped") or {}).get(role))
+            if bad is not None:
+                incomparable.append(bad)
                 continue
-            if base_product != swap_product:
-                incomparable.append({"role": role, "code": PRODUCT_DIFFERS,
-                                     "detail": f"{PRODUCT_DIFFERS} {role} 산출물 {_product_text(base_product)}≠"
-                                               f"{_product_text(swap_product)} — {INCOMPARABLE_TEXT}: 다른 산출물에 "
-                                               f"대한 판정 차이는 런타임의 차이를 말하지 않는다"})
-                continue
+        base_env, swap_env = base_envs[0], swap_envs[0]
         compared.append(role)
         base_checks, swap_checks = _check_key(base_env), _check_key(swap_env)
         if base_checks != swap_checks:
@@ -677,7 +788,7 @@ def run_parity(cases, harness_root=None, project_root=None):
     else:
         checker = "PASS" if all(r["ok"] for r in synthetic) else "FAIL"
     # 게이트 판정 — 실제 교차 실행 관측만 본다. 관측이 없으면 통과도 실패도 선언하지 않는다(D-b).
-    # 비교 불가 면은 판정에서 뺀다(D-73) — 남은 면이 하나도 없으면 미판정이다.
+    # 비교 불가 면은 판정에서 뺀다(D-73·D-74) — 남은 면이 하나도 없으면 미판정이다.
     if not decided:
         gate = "UNDETERMINED"
     elif all(r["actual"] == "same" and r["ok"] for r in decided):
@@ -754,12 +865,12 @@ def format_parity(rep):
         lines.append(f"핵심 동등성 게이트: 미판정 — 관측 {rep['observed']}건이 전부 {INCOMPARABLE_TEXT}다. "
                      f"두 면이 다른 산출물을 봤고 비교할 다른 면이 없다: "
                      + "; ".join(f"{cid}: {i['detail']}" for cid, i in excluded_faces) + ". "
-                     f"같은 산출물을 두 판정 역할에게 보인 관측이 있어야 판정한다(D-73·K-51).")
+                     f"같은 산출물을 두 판정 역할에게 보인 관측이 각 면 {JUDGE_MIN_SAMPLES} 건 이상 있어야 판정한다(D-73·D-74·K-51).")
     else:
         lines.append(f"핵심 동등성 게이트: {GATE_TEXT[rep['gate_verdict']]} — 관측 {rep['observed']}건으로 판정했다.")
         if excluded_faces:
             # 뺀 면을 숨기지 않는다. 이 판정은 비교한 면 위에만 서 있다(K-51).
-            lines.append(f"{INCOMPARABLE_TEXT} — 관측 케이스의 {len(excluded_faces)}개 면을 판정에서 뺐다(D-73): "
+            lines.append(f"{INCOMPARABLE_TEXT} — 관측 케이스의 {len(excluded_faces)}개 면을 판정에서 뺐다(D-73·D-74): "
                          + "; ".join(f"{cid}: {i['detail']}" for cid, i in excluded_faces) + ". "
                          f"**이 판정은 비교한 면으로만 섰다** — 뺀 역할의 동등성은 이 관측으로 증명되지 않았고, "
                          f"같은 산출물을 그 역할의 두 런타임에게 보인 관측이 있어야 판정된다.")

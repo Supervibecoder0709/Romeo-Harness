@@ -790,6 +790,13 @@ bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --no
 '비교 불가' 로 인쇄한다.** 2026-08-29 관통이 정확히 이 경우였다. 이때 게이트는 구현자 면으로만 서고 리포트가 그 사실을 적는다 —
 검토자 동등성을 판정하려면 **같은 산출물을 두 검토자에게 보인 관측**이 따로 필요하다(§6.6).
 
+**그리고 전제가 하나 더 있다 — 그 면이 자기 안에서 일관한가(D-74).** 2026-08-29 재현성 측정에서 같은 산출물·같은 계약에
+codex 검토자를 세 번 돌려 `PASS`(0) · `FAIL`(1) · `FAIL`(4) 가, claude 검토자를 두 번 돌려 `FAIL`(6) · `PASS`(8) 이 나왔다.
+**두 런타임 다 흔들린다.** 그래서 검사기는 판정 역할의 면에 **각 면 2건 이상의 표본**을 요구하고
+(관측 케이스의 `results.<역할>.files`), 표본이 모자라면 `VERDICT_UNSAMPLED`, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로
+판정에서 빼되 '비교 불가' 로 인쇄한다. 진단 순서는 산출물 전제가 먼저다 — 산출물이 다르면 표본을 늘려도 비교할 수 없다.
+**즉 §6.6 은 한 번이 아니라 각 런타임마다 두 번 이상 돌려야 검토자 면이 판정된다.**
+
 **여기서 비교하는 `required_checks` 는 두 실행의 주장이다.** 그 주장이 실제 실행과 맞는지는 §3.8 의 종료 검사가 재실행으로 대조한다 —
 동등성 게이트와 종료 검사는 서로를 대신하지 않는다. 같은 거짓을 두 번 적으면 양면이 같아지므로, 동등성만으로는 참이 되지 않는다.
 
@@ -923,7 +930,11 @@ source:
    워커로 채택하지 않았으므로 완료는 출력 파일의 표식으로 기다리고, Task 는 `task-update --status completed --result <json>` 으로 사람이 정리한다.
 6. 종료 직후 `review-tree-after` → `유효` 판정 → 출력의 마지막 `result` 를 봉투로 꺼내 `$W1/docs/work/<id>/review/<새 run>-reviewer.json` 에 쓴다 →
    `"$W1/bin/romeo" envelope check` 5개 PASS → §6.3 모으기(봉투·evidence 복사, 계약은 재생성) → 검토자 면만 있는 관측 케이스 등록 → §6.5.
-   관측 케이스의 두 면은 `results.reviewer` 만 갖는다(구현은 한 번뿐이었다). 두 봉투가 같은 evidence 를 지목하므로 산출물 식별은 같고, 검토자 면이 **비교된다**.
+   관측 케이스의 두 면은 `results.reviewer` 만 갖는다(구현은 한 번뿐이었다). 두 봉투가 같은 evidence 를 지목하므로 산출물 식별은 같다.
+7. **각 런타임마다 1~6 을 두 번 이상 반복한다(D-74).** 한 번의 판정은 그 런타임의 판정이 아니라 그 실행의 판정이다 —
+   검사기는 각 면 2건 미만이면 `VERDICT_UNSAMPLED` 로 빼고, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로 뺀다.
+   관측 케이스는 표본을 `results.reviewer.files: [<봉투1>, <봉투2>, …]` 로 담는다(같은 경로를 두 번 적으면 구조 오류다).
+   표본을 늘리는 것은 케이스가 담는 관측을 늘리는 것이지 `expect` 를 고치는 것이 아니다(D-b).
 
 `--root` 는 스키마와 앵커를 찾는 루트이고, 케이스 목록은 호출된 `bin/romeo` 의 저장소에서 읽는다 —
 그래서 위 명령은 `$P/bin/romeo` 로 부른다. 두 값이 갈리면 "케이스는 여기 있는데 관측물은 저기 있다" 가 된다.
@@ -1050,7 +1061,7 @@ orca orchestration gate-list --json
 | **`worker-start --terminal` 이 비대화형 실행을 워커로 채택하는가** | **못 한다.** `codex exec` → `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled`. TUI(`codex -s read-only`) → `state: ready` · `stage: input_accepted`. §3.7 의 표 참조 |
 | **§3.7 로 기동한 검토자에 read-only 강제가 걸리는가** | **걸린다.** §4 의 방어 검사가 `유효` 를 냈다 — `review-tree-before` 와 `review-tree-after` 의 `log_sha256` 이 같은 값이었다. 검토자가 실행되는 동안 작업 트리가 바뀌지 않았다 |
 | 자식 워크트리에서 close 를 돌릴 수 있는가 | **있다.** `--root "$W"` 로 돌렸고 신선도·재실행·로그 대조가 모두 그 체크아웃 기준으로 성립했다 |
-| **같은 산출물에 같은 검토자 런타임을 다시 띄우면 판정이 재현되는가** (2026-08-29 · Q-08 (a) · Run `run_241a35112ca3`·`run_5dd1b2c232c7`) | **재현되지 않는다.** §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번 더 띄웠다 — 계약 네 개가 `cmp` identical(`f79f4bc1…`), 방어 검사 스냅샷 여덟 개가 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 11:49 까지 트리 불변), 두 봉투 모두 `envelope check` 5개 PASS. 판정은 **`FAIL`(findings 1) · `FAIL`(findings 4)** 로, 같은 산출물의 기준 실행(`PASS` findings 0)과 다르다. `run_5dd1b2c232c7` 의 4건은 claude 검토자의 6건과 실질적으로 겹친다(루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함). **두 FAIL 끼리도 findings 가 1건과 4건으로 다르다** — 판정은 런타임을 고정해도 흔들린다. 기동 경로가 교란 변수로 남는다(PASS 만 TUI 였다). 해석과 게이트 함의는 `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility` 와 Q-09 |
+| **같은 산출물에 같은 검토자 런타임을 다시 띄우면 판정이 재현되는가** (2026-08-29 · Q-08 (a) · Run `run_241a35112ca3`·`run_5dd1b2c232c7`·`run_222f508b5541`) | **재현되지 않는다 — 두 런타임 다.** §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번, claude 검토자를 한 번 더 띄웠다. 산출물 고정의 근거: 검토자 계약 다섯 개가 `cmp` identical(`f79f4bc1…`), 방어 검사 스냅샷 열 개가 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 12:17 까지 트리 불변), 봉투마다 두 체크아웃에서 `envelope check` 5개 PASS. **판정: codex `PASS`(0) · `FAIL`(1) · `FAIL`(4) · claude `FAIL`(6) · `PASS`(8).** codex 의 `run_5dd1b2c232c7` 이 낸 4건은 claude 의 6건과 실질적으로 겹친다(루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함) — 보는 능력의 차이가 아니다. claude 의 두 번째 실행은 findings 를 **더 많이**(8건) 내고도 게이트 판정은 `PASS` 였다 — findings 수와 판정이 같은 방향으로 움직이지도 않는다. 기동 경로가 교란 변수로 남는다(PASS 가 나온 codex 실행만 TUI). 이 관측이 **D-74**(재현성 요구)의 근거다. 해석은 `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility` |
 | **coordinator 터미널과 Run 의 바인딩** (2026-08-29) | **한 번에 한 Run 에만 바인딩된다.** `run-create` 는 그 터미널을 새 Run 에 바인딩하므로, Run 을 둘 만들면 뒤에 만든 것이 바인딩되고 앞의 Run 에 대한 `task-create`·`task-update` 는 `consumer_fenced: This coordinator terminal is bound to <다른 run>` 으로 거부된다(종료 코드 0 · `.ok == false`). 전환은 `orca orchestration run-use --id <run-id>` 다 — **`--run` 이 아니라 `--id`** 를 받는다(`--run` 은 `invalid_argument`). `run-current --json` 이 지금 바인딩된 Run 을 보여준다 |
 | **`terminal wait --for exit` 이 비대화형 실행의 종료를 알려주는가** (2026-08-29) | **못 한다.** `terminal create --command` 로 만든 터미널은 그 명령이 끝나도 셸이 살아 있어 `--for exit` 이 만료된다 — 900초를 줬는데 4~5분에 끝난 두 실행 모두 `ok:false · code:timeout` 이었다(그런데 CLI 자신의 종료 코드는 0 이다 — `.ok` 를 읽지 않으면 성공으로 오독한다). 실제 완료 신호는 `-o` 가 만드는 **출력 파일의 존재**다. §6.6 5 가 "완료는 출력 파일의 표식으로 기다린다" 고 한 이유가 이것이다 |
 

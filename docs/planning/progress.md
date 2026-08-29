@@ -97,6 +97,7 @@ authority: derived
 | 33 | #11 | 검토자 면 동등성 관측 — 검토자-only 재실행(RUNBOOK §6.6) | **완료 — 게이트 FAIL** | Run `run_5fc794f15236` · Task `task_4c65f8e08cf9` · 기준 구현자 워크트리(트리 `7b035490df84…` = baseline 증거)에서 검토자 계약 재생성(`cmp` identical, sha `f79f4bc1…`) · `review-tree-before/after` 를 새 run 의 증거로 기록(`log_sha256` 이 기준 실행의 `2bc7dad48f31…` 과 동일 → 트리가 그때부터 지금까지 불변) · claude 검토자(3플래그, `orca terminal create` 경로) 32턴·6분 20초·tool_use `Read` 24·`Glob` 4·`Grep` 3·거부 0 · 봉투 `envelope check` 두 체크아웃 모두 5/5 PASS · **판정 `FAIL` findings 6**(F2 루트 미추적 파일 11개 — `check-3` 첫 실행의 `bash -c` 인용 오류가 원인 · F3 증거가 오염 트리에 묶임 · F4 `check-3` 의 빈 변수 실패 모드 · F5 `Varies by skill` 자유 서술 · F6 `allowed_paths` 에 `.`) · 같은 산출물의 codex 는 `PASS` findings 0 · `fixtures/parity/pr-license-field-t1-reviewer-observed.yaml` 등록 → `핵심 동등성 게이트: FAIL — 관측 2건 · VERDICT_DIFFERS reviewer PASS≠FAIL` EXIT=1. `expect` 는 고치지 않았다(D-b). RUNBOOK §4 표(교체 검토자 §3 기동 경로 → 예)·§6.6·§11 반영, `.harness/observations.yaml` 의 `swapped_reviewer_launch_path`. Orca Task 는 `task-update --status completed` 로 정리(비대화형 경로) |
 | 34 | — | 작업 계약 `allowed_paths` 상한 — spec 변경 범위로 좁힌다 | **미착수 (영향 실측 완료)** | claude 검토자 F6 · codex 재현 B 도 같은 자리를 지적했다: 구현자 계약의 `allowed_paths` 가 `["docs/work/<id>/", "."]` 라 쓰기 상한이 저장소 전체다 — 그래서 루트 오염이 「allowed_paths 밖 변경」으로 걸리지 않았고 검토 항목 4 가 이 단위에서 아무것도 걸러내지 못했다. 역할 계약의 `must_include` 만이 아니라 spec 의 「변경 범위」(spec.md:51 — 백틱 경로로 적혀 있어 추출 가능하다)를 상한으로 내보내야 한다(`romeo/envelope.py` 의 `_allowed_paths`). **2026-08-29 영향 실측**(임시 probe 로 `_allowed_paths` 를 바꿔 돌린 뒤 되돌렸다): `envelope check` 가 `TASK_ANCHORED FAIL — 다시 계산한 계약과 바이트로 다르다 · 다른 필드 ['allowed_paths']` 를 내고, `fixtures parity` 가 `pr-license-field-t1-observed` 를 **`PARITY_INVALID`(구조 오류)** 로 뺀다. **깨지는 것은 관측 2건 전부가 아니라 1건이다** — 검토자 계약은 `allowed_paths: []`(scope `none`)라 바뀌지 않아 `pr-license-field-t1-reviewer-observed` 는 살아남는다. 즉 34 를 넣으면 **구현자 면의 관측을 잃고** 재관통으로 다시 만들어야 한다 — 그래서 31 과 한 묶음이다 |
 | 35 | — | Q-08 재현성 측정 — 같은 산출물에 같은 검토자 런타임 2회 추가 | **완료 — codex 의 PASS 는 재현되지 않았다** | 사용자 결정으로 선택지 (a) 를 실행했다. RUNBOOK §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번 더 띄웠다(Run `run_241a35112ca3`·`run_5dd1b2c232c7` · Task `task_07183f883449`·`task_596c7ac5df3e`). **산출물 고정의 근거**: 계약 네 개가 `cmp` identical(`f79f4bc1…`) · `head 6e5290012dd8 tree 7b035490df84` 가 기준 evidence 와 같음 · 방어 검사 `log_sha256` 여덟 스냅샷 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 11:49 까지 트리 불변) · 두 봉투 모두 두 체크아웃에서 `envelope check` 5개 PASS. **결과**: `FAIL`(findings 1 — AC-1 의 표 일치를 required_checks 가 검사하지 못함) · `FAIL`(findings 4 — 루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함). 같은 산출물의 기준 실행은 `PASS`(findings 0)였다. **Q-08 의 (c) 기본 바인딩 재검토는 근거를 잃었다** — 그 PASS 는 런타임의 성질이 아니라 한 번의 누락이다. `run_5dd1b2c232c7` 의 4건은 claude 의 6건과 실질적으로 겹쳐 **루트 오염을 보는 능력의 차이가 아니다.** **그러나 두 FAIL 끼리도 findings 가 1건과 4건으로 다르다** — 판정은 런타임을 고정해도 흔들린다(→ Q-09). 기동 경로는 교란 변수로 남는다(PASS 만 TUI, FAIL 둘은 비대화형). 이번 측정으로 `fixtures/parity/` 와 `expect` 는 고치지 않았다(D-b) |
+| 36 | #11 | 동등성 게이트에 재현성 요구 (D-74) | **완료 — 게이트 PASS(관측 2건 · 비교 불가 면 2)** | Q-09 의 사용자 결정으로 선택지 (a) 를 구현했다. **먼저 표본을 보강했다** — claude 검토자를 §6.6 으로 한 번 더 띄웠고(Run `run_222f508b5541` · 25턴 · 304초 · tool_use `Read` 18·`Grep` 4·`Glob` 2 · `permission_denials` 0), 판정이 **`PASS`(findings 8)** 였다. 같은 런타임의 앞 실행은 `FAIL`(findings 6) 이다 — **claude 도 흔들린다.** 다섯 실행이 같은 것을 봤다는 근거: 계약 다섯 개 `cmp` identical(`f79f4bc1…`) · 방어 검사 스냅샷 열 개 전부 `2bc7dad48f31…` · 봉투마다 `envelope check` 5개 PASS. **구현**: `romeo/parity.py` 에 `VERDICT_UNSAMPLED`·`VERDICT_UNSTABLE` 과 `JUDGE_MIN_SAMPLES=2` 를 넣고, 관측 케이스가 `results.<역할>.files` 로 표본 목록을 받게 했다. 판정 역할의 면은 (1) 산출물 전제(D-73) (2) 표본 수 (3) 면 내부 일관성 순으로 보고, 깨지면 판정에서 빼되 '비교 불가' 로 인쇄한다. 진단 순서는 산출물이 먼저다 — 산출물이 다르면 표본을 늘려도 비교할 수 없다. 구현자 면에는 이 요구가 없고, 구조 검사가 구현자 면의 표본 목록을 거부한다. **실측**: `fixtures parity --report` → `pr-license-field-t1-observed` 는 `PRODUCT_DIFFERS`(D-73), `pr-license-field-t1-reviewer-observed` 는 다섯 봉투를 담고 `VERDICT_UNSTABLE reviewer baseline FAIL ≠ PASS · swapped FAIL ≠ PASS` → **`핵심 동등성 게이트: PASS — 관측 2건으로 판정했다` · `비교 불가 — 2개 면을 판정에서 뺐다(D-73·D-74)` · EXIT=0.** 합성 케이스 2건 신설(`pr-reviewer-unstable`·`pr-reviewer-unsampled`)로 검사기가 두 코드를 잡는지 검증 — 자기 검증 `PASS`(합성 9건). 기존 합성 3건은 검토자 면을 표본 2건으로 늘렸다. 테스트 `tests.test_parity` 108 → **115 OK**. `expect` 는 고치지 않았다(D-b) |
 
 ## 세션 기록
 
@@ -118,12 +119,15 @@ authority: derived
 
 ### 2026-08-29 게이트 정의 보완(D-73)·검토자-only 재실행(§6.6) 이후 남은 것
 
-- **검토자 판정은 런타임을 고정해도 흔들린다 — 2026-08-29 재현성 측정(체크리스트 35).** 같은 산출물에 codex 3회 = `PASS`(0) · `FAIL`(1) · `FAIL`(4),
-  claude 1회 = `FAIL`(6). **Q-08 은 답변됐다** — codex 의 PASS 는 재현되지 않았고 기본 바인딩 재검토의 근거는 사라졌다.
-  **대신 더 큰 것이 드러났다(Q-09)**: 같은 런타임·같은 기동 경로·같은 입력의 두 실행이 findings 1건과 4건으로 갈렸다.
-  게이트의 검토자 면은 각 런타임 **1회** 판정을 비교하므로 `VERDICT_DIFFERS reviewer` 는 런타임 차이의 증거가 아니다 —
-  실행 간 분산일 수 있다. D-73 이 `PRODUCT_DIFFERS` 로 걸러낸 것과 같은 층위이고, 아직 걸러내는 장치가 없다.
-  **기동 경로가 교란 변수로 남는다** — PASS 가 나온 실행만 TUI(`worker-start --terminal`)였고 FAIL 둘은 비대화형이다. 이 측정은 둘을 분리하지 않았다.
+- **검토자 판정은 런타임을 고정해도 흔들린다 — 두 런타임 다.** 같은 산출물에 codex 3회 = `PASS`(0) · `FAIL`(1) · `FAIL`(4),
+  claude 2회 = `FAIL`(6) · `PASS`(8). **Q-08·Q-09 는 답변됐다**(체크리스트 35·36) — codex 의 PASS 는 재현되지 않았고,
+  게이트는 이제 판정 역할의 면에 각 면 2건 이상의 표본과 면 내부 일관성을 요구한다(D-74).
+  **그러나 D-74 는 흔들림을 드러내고 판정에서 빼는 장치이지 흔들림을 줄이는 장치가 아니다.**
+  claude 의 두 번째 실행은 findings 를 **더 많이**(8건) 내고도 판정은 `PASS` 였다 — findings 수와 게이트 판정이 같은 방향으로 움직이지도 않는다.
+  왜 흔들리는지는 이 다섯 실행으로 가려지지 않았다: 판정 기준의 모호함(`core/workflows/review/SKILL.md` 는 무엇이 FAIL 사유인지 열거하지 않는다) ·
+  검토 절차의 빈자리(미추적 파일 대조 지시가 없다 — Q-08 의 선택지 (b), 미실행) · 모델의 비결정성 · 기동 경로(TUI vs 비대화형) → **Q-10**.
+- **검토자 면의 동등성은 아직 판정된 적이 없다.** 게이트가 PASS 인 것은 **구현자 면으로만** 선 결과다.
+  검토자 면이 판정되려면 같은 산출물에 각 런타임 2회 이상을 돌려 **그 표본들이 자기 안에서 일관해야** 하는데, 지금은 양쪽 다 일관하지 않는다.
 - **§6.6 은 비대화형 경로로만 돌렸다.** `worker-start --terminal` 채택(lifecycle 있는 형태)으로는 미관측이다(RUNBOOK §11.2).
 - **검토자 절차 문서는 "작업 트리 스냅샷의 미추적 파일을 대조하라" 고 말하지 않는다.** codex 가 놓친 자리가 정확히 거기다 —
   `core/workflows/review/SKILL.md` 3번의 판정 대상에 그것이 없다. 보강 여부는 Q-08 의 선택지 (b) 다.

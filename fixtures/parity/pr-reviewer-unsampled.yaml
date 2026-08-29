@@ -1,0 +1,81 @@
+# 검사기가 **표본 부족**을 잡는지 확인하는 합성 케이스(D-74).
+#
+# 두 면의 산출물이 같고 판정도 갈렸다(PASS≠FAIL). 예전 정의라면 VERDICT_DIFFERS 다.
+# 그런데 각 면의 표본이 1건뿐이다 — 그 판정이 그 런타임의 판정인지 그 실행의 판정인지 모른다.
+# 2026-08-29 Q-08 측정에서 같은 산출물에 같은 런타임을 세 번 돌려 PASS 1 · FAIL 2 가 나왔으므로,
+# 1건짜리 표본 두 개의 차이를 런타임의 차이로 읽을 근거가 없다.
+# 검사기는 VERDICT_DIFFERS 로 세지 않고 VERDICT_UNSAMPLED 로 분리해 판정에서 빼되 '비교 불가' 로 인쇄해야 한다.
+#
+# 이 케이스는 손으로 쓴 합성 데이터다(source.kind: authored). 검사기가 도는지만 증명하고
+# 핵심 동등성 게이트를 통과시키지 못한다(D-b).
+---
+id: pr-reviewer-unsampled
+title: 표본이 각 1건뿐이다 — 판정이 갈려도 비교 불가, 구현자 면만 비교한다
+unit_id: feat-20260828-license-field-a1b2
+status: executed
+expect: same
+expect_incomparable: {reviewer: VERDICT_UNSAMPLED}
+
+baseline:
+  runtimes: {implementer: claude, reviewer: codex}
+  product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "4444444444444444444444444444444444444444444444444444444444444444"}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-i/task-implementer.json
+        sha256: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-i.yaml
+    reviewer:
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-i/task-reviewer.json
+          sha256: "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        checks: []
+        gate_verdict: PASS
+        blocked_reason: null
+        findings: []
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-i.yaml
+swapped:
+  runtimes: {implementer: codex, reviewer: claude}
+  product: {head_sha: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", dirty_tree_hash: "4444444444444444444444444444444444444444444444444444444444444444"}
+  results:
+    implementer:
+      schema: romeo/result-envelope@0.1.0
+      unit_id: feat-20260828-license-field-a1b2
+      role: implementer
+      task_envelope_ref:
+        path: .harness/runs/feat-20260828-license-field-a1b2/run-j/task-implementer.json
+        sha256: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      checks:
+        - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
+      gate_verdict: PASS
+      blocked_reason: null
+      findings: []
+      evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-j.yaml
+    reviewer:
+      - schema: romeo/result-envelope@0.1.0
+        unit_id: feat-20260828-license-field-a1b2
+        role: reviewer
+        task_envelope_ref:
+          path: .harness/runs/feat-20260828-license-field-a1b2/run-j/task-reviewer.json
+          sha256: "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        checks: []
+        gate_verdict: FAIL
+        blocked_reason: null
+        findings:
+          - {summary: 루트에 등록되지 않은 미추적 파일이 남아 있다, file: archive/README.md, line: 16}
+        evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-j.yaml
+source:
+  kind: authored
+  ref: .harness/observations.yaml 의 reviewer_verdict_reproducibility (2026-08-29 관측을 본떠 만들었다)
+  date: '2026-08-29'

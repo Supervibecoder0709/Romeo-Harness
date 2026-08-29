@@ -208,15 +208,34 @@ reviewer_verdict_reproducibility:
       launch: 비대화형 (claude -p 3플래그)
       verdict: FAIL
       findings: 6
+    - run_id: run_222f508b5541
+      runtime: claude
+      launch: 비대화형 (claude -p 3플래그)   # run_5fc794f15236 과 같은 프롬프트·같은 계약·같은 강제 수단
+      task_id: task_e065a9086f11
+      duration_s: 304          # 세션 리포트의 duration_ms 303556
+      turns: 25
+      tool_use_counts: {Read: 18, Grep: 4, Glob: 2}
+      permission_denials: 0
+      verdict: PASS
+      findings: 8
+      findings_summary: >-
+        AC-1 검증 공백 · nextlevelbuilder 값이 계획의 단서를 잃음 · `Varies by skill` · 증거에 폐기된 초기 기록 ·
+        루트 미추적 12개 · allowed_paths 의 `.` · check-3 이 실패 사유를 확인하지 않음 · spec 의 "넷" 이 실제로는 다섯.
+        **findings 가 더 많은데 판정은 PASS 다** — 같은 런타임의 앞 실행(run_5fc794f15236)은 findings 6 으로 FAIL 이었다
   conclusion: >-
-    **codex 의 PASS 는 재현되지 않았다.** 같은 산출물·같은 계약·같은 역할에 codex 를 세 번 돌려 PASS 1 · FAIL 2 다.
-    Q-08 의 (c)(이 관측을 근거로 기본 바인딩을 재검토)는 근거를 잃었다 — 기준 실행의 PASS 는 그 런타임의 성질이 아니라
-    한 번의 누락이다. 그리고 FAIL 두 건 중 하나(run_5dd1b2c232c7)는 claude 가 잡은 것을 실질적으로 같이 잡았다 —
-    루트 오염을 '보는 능력' 의 차이가 아니다.
+    **두 런타임 다 자기 안에서 흔들린다.** 같은 산출물·같은 계약·같은 역할에 codex 를 세 번 돌려 PASS 1 · FAIL 2,
+    claude 를 두 번 돌려 FAIL 1 · PASS 1 이다. Q-08 의 (c)(이 관측을 근거로 기본 바인딩을 재검토)는 근거를 잃었다 —
+    기준 실행의 PASS 는 그 런타임의 성질이 아니라 한 번의 누락이다. 그리고 codex 의 FAIL 한 건(run_5dd1b2c232c7)은
+    claude 가 잡은 것을 실질적으로 같이 잡았다 — 루트 오염을 '보는 능력' 의 차이가 아니다.
+    claude 의 두 번째 실행은 findings 를 **더 많이**(8건) 내고도 게이트 판정은 PASS 였다 —
+    findings 의 수와 게이트 판정이 같은 방향으로 움직이지도 않는다.
   what_this_does_not_say: >-
-    **판정이 안정적이라는 뜻이 아니다.** 같은 런타임·같은 기동 경로·같은 입력의 두 실행이 findings 1건과 4건으로 갈렸다.
-    기동 경로(TUI vs 비대화형)도 교란 변수로 남아 있다 — PASS 가 나온 실행만 TUI 였다. 이 측정은 그 둘을 분리하지 않았다.
+    **어느 런타임이 더 낫다는 뜻이 아니다.** 표본은 codex 3 · claude 2 이고 어느 쪽도 자기 안에서 일관하지 않았다.
+    기동 경로(TUI vs 비대화형)는 교란 변수로 남아 있다 — codex 의 PASS 만 TUI 였고 claude 는 두 번 다 비대화형이었다.
+    이 측정은 그 변수를 분리하지 않았다. **왜 흔들리는지도 말하지 않는다** — 판정 기준의 모호함인지, 검토 절차 문서의
+    빈자리인지, 모델의 비결정성인지는 이 다섯 실행으로 가려지지 않는다.
   implication_for_gate: >-
-    동등성 게이트의 검토자 면은 각 런타임 1회 판정을 비교한다. 같은 런타임의 1회 판정끼리도 갈리는 것이 관측됐으므로,
-    `VERDICT_DIFFERS reviewer` 는 런타임 차이의 증거가 아니다 — 실행 간 분산일 수 있다. 게이트 정의를 어떻게 할지는 Q-09.
-    이번 관측으로 `fixtures/parity/` 의 케이스나 `expect` 를 고치지 않았다(D-b).
+    **게이트 정의를 바꿨다(D-74, 사용자 결정 2026-08-29).** 판정 역할의 면은 각 면 2건 이상의 표본을 요구하고,
+    표본이 모자라면 `VERDICT_UNSAMPLED`, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로 판정에서 빼되 '비교 불가' 로 인쇄한다 —
+    D-73 의 `PRODUCT_DIFFERS` 와 같은 형태다. 관측 케이스 `pr-license-field-t1-reviewer-observed` 는 이제 다섯 봉투를
+    모두 담고 `VERDICT_UNSTABLE` 로 빠진다. `expect` 는 고치지 않았다(D-b) — 케이스가 담는 표본을 늘렸을 뿐이다.
