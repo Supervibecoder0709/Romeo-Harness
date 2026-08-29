@@ -6,6 +6,7 @@
 같은 (unit_id · role · base_sha · 정책표)에는 항상 바이트 단위로 같은 계약이 나온다 —
 시각·난수 같은 비결정 값을 담지 않는다."""
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -60,8 +61,45 @@ def _head_hint(project_root, spec_rel, sha):
     return ""
 
 
-def _allowed_paths(harness_root, role, unit_id):
-    """역할 계약(core/roles/<role>.yaml)이 정한 범위를 그대로 옮긴다. 계약이 정하지 않은 경로를 계약서에 적지 않는다(K-66)."""
+CHANGE_SCOPE_HEADING = "## 변경 범위"
+CHANGE_SCOPE_LABEL = "바뀌는 파일·모듈:"
+# 항목 구분자. 라벨 자체에도 `·` 가 있으므로 라벨 뒤부터 나눈다.
+CHANGE_SCOPE_SEP = "·"
+
+
+def change_scope_paths(body):
+    """승인된 spec 의 「변경 범위」가 **바뀌는 파일·모듈** 로 선언한 경로들. 백틱 안의 값만 읽는다.
+
+    쓰기 상한을 역할 계약의 `must_include` 만으로 두면 작업 공간 전체(`.`)가 열린다 — 그러면
+    검토 항목 '변경이 allowed_paths 안인가' 가 아무것도 걸러내지 못한다(2026-08-29 검토자 3명이 같은 자리를 지적했다).
+    상한의 출처는 사람이 승인한 문장이어야 하므로, 승인된 spec 이 스스로 선언한 범위를 그대로 옮긴다.
+    저장소 밖을 가리키는 값은 버린다 — 계약은 작업 공간 안에서만 유효하다(K-66)."""
+    inside = False
+    for line in (body or "").split("\n"):
+        if line.startswith("## "):
+            inside = line.strip() == CHANGE_SCOPE_HEADING
+            continue
+        if inside and CHANGE_SCOPE_LABEL in line:
+            out = []
+            # 항목은 `·` 로 나뉘고 **각 항목의 첫 백틱이 그 항목의 경로**다. 뒤따르는 백틱은 설명이다
+            # (예: `scripts/generate-archive-index.py`(`collect` 에 …) — collect 는 함수 이름이지 경로가 아니다).
+            for chunk in line.split(CHANGE_SCOPE_LABEL, 1)[1].split(CHANGE_SCOPE_SEP):
+                found = re.search(r"`([^`]+)`", chunk)
+                if not found:
+                    continue
+                text = found.group(1).strip().replace("\\", "/")
+                if not text or text.startswith("/") or text.startswith("~") or ".." in text.split("/"):
+                    continue
+                if text not in out:
+                    out.append(text)
+            return out
+    return []
+
+
+def _allowed_paths(harness_root, role, unit_id, body=None):
+    """역할 계약(core/roles/<role>.yaml)이 정한 범위와 **spec 이 선언한 변경 범위**의 교집합을 계약서에 적는다.
+
+    계약이 정하지 않은 경로를 적지 않고(K-66), 승인이 정하지 않은 경로도 적지 않는다."""
     contract = load_yaml(Path(harness_root) / "core/roles" / f"{role}.yaml") or {}
     ap = contract.get("allowed_paths") or {}
     scope = ap.get("scope")
@@ -69,8 +107,15 @@ def _allowed_paths(harness_root, role, unit_id):
     if scope == "none":
         return []
     if scope == "workspace":
-        if "." not in paths:
-            paths.append(".")
+        scoped = change_scope_paths(body)
+        if not scoped:
+            raise ValueError(
+                f"{unit_id}: spec 의 「{CHANGE_SCOPE_HEADING[3:]}」 절에서 '{CHANGE_SCOPE_LABEL}' 줄의 "
+                f"백틱 경로를 읽지 못했다 — 쓰기 상한을 승인된 문장에서 가져오지 못하면 계약을 만들지 않는다(K-66). "
+                f"그 줄에 바뀌는 파일·모듈을 백틱으로 적고 다시 승인·커밋한다(D-27).")
+        for path in scoped:
+            if path not in paths:
+                paths.append(path)
         return paths
     raise ValueError(f"{role} 역할 계약의 allowed_paths.scope 를 모른다: {scope!r}")
 
@@ -125,7 +170,7 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
         "role": role,
         "spec_ref": {"path": spec_rel, "sha256": sha256_bytes(raw)},
         "base_sha": sha,
-        "allowed_paths": _allowed_paths(harness_root, role, unit_id),
+        "allowed_paths": _allowed_paths(harness_root, role, unit_id, body),
         "guards": [{"id": g["id"], "name": g["name"]} for g in out["guards"]],
         "required_checks": checks,
         "output_schema": OUTPUT_SCHEMA,

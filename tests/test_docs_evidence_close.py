@@ -19,6 +19,12 @@ from romeo.policy import route
 from romeo.util import dump_yaml, load_yaml, sha256_file
 from romeo.validate import validate_doc
 
+# 작업 계약의 쓰기 상한은 spec 의 「변경 범위」에서 온다(체크리스트 34) — 각 `·` 항목의 첫 백틱이 그 항목의 경로다.
+# 템플릿의 NEEDS_INPUT 자리에 실제 경로가 없으면 계약을 만들지 않는다(K-66).
+SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
+SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
+
+
 
 def git(*args, cwd):
     return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
@@ -44,7 +50,7 @@ class TestVerticalSlice(unittest.TestCase):
 
     def _fill_spec(self, tick_ac=True, command="true"):
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움")
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
         body = body.replace('command: "채움"', f'command: "{command}"')
         if tick_ac:
             body = body.replace("- [ ] AC-1", "- [x] AC-1")
@@ -276,7 +282,7 @@ class TestEvidenceIsReExecuted(unittest.TestCase):
     def _prepare(self, command="false"):
         """검증 계획의 명령이 `command` 인 승인된 단위를 만들고 그 명령을 실제로 실행해 증거를 남긴다."""
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', f'command: "{command}"')
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', f'command: "{command}"')
         frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
         approve_unit(self.unit, "tester", project_root=self.root)
         git("add", ".", cwd=self.root)
@@ -420,7 +426,7 @@ class TestCloseReviewVerdict(unittest.TestCase):
         self.unit = res["id"]
         self.spec = Path(res["files"][0])
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', 'command: "true"')
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"')
         body = body.replace("- [ ] AC-1", "- [x] AC-1")
         frontmatter.write(self.spec, fm, body)
         approve_unit(self.unit, "tester", project_root=self.root)

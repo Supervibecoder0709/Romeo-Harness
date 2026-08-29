@@ -66,6 +66,12 @@ from romeo.policy import route
 from romeo.schema import validate
 from romeo.util import dump_yaml, load_json, load_yaml, project_root
 
+# 작업 계약의 쓰기 상한은 spec 의 「변경 범위」에서 온다(체크리스트 34) — 각 `·` 항목의 첫 백틱이 그 항목의 경로다.
+# 템플릿의 NEEDS_INPUT 자리에 실제 경로가 없으면 계약을 만들지 않는다(K-66).
+SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
+SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
+
+
 REPO = project_root(Path(__file__).parent)
 CASE_DIR = REPO / "fixtures/parity"
 RESULT_SCHEMA = load_json(REPO / "core/schemas/result-envelope.json")
@@ -117,7 +123,7 @@ class ObservedRun:
         self.unit = res["id"]
         self.spec = Path(res["files"][0])
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', 'command: "true"')
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"')
         frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
         approve_unit(self.unit, "tester", project_root=self.root)
         git("add", ".", cwd=self.root)

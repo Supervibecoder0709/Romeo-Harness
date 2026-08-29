@@ -20,6 +20,12 @@ from romeo.policy import route
 from romeo.schema import validate
 from romeo.util import load_json, sha256_file
 
+# 작업 계약의 쓰기 상한은 spec 의 「변경 범위」에서 온다(체크리스트 34) — 각 `·` 항목의 첫 백틱이 그 항목의 경로다.
+# 템플릿의 NEEDS_INPUT 자리에 실제 경로가 없으면 계약을 만들지 않는다(K-66).
+SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
+SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
+
+
 
 def git(*args, cwd):
     return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
@@ -42,7 +48,7 @@ class TestEnvelope(unittest.TestCase):
         self.unit = res["id"]
         self.spec = Path(res["files"][0])
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', 'command: "python3 -m unittest tests.test_envelope"')
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "python3 -m unittest tests.test_envelope"')
         frontmatter.write(self.spec, fm, body)
 
     def tearDown(self):
@@ -111,7 +117,7 @@ class TestEnvelope(unittest.TestCase):
         unit = res["id"]
         spec = Path(res["files"][0])
         fm, body = frontmatter.read(spec)
-        frontmatter.write(spec, fm, body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', 'command: "true"'))
+        frontmatter.write(spec, fm, body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"'))
         approve_unit(unit, "tester", project_root=self.root)
         git("add", ".", cwd=self.root)
         git("commit", "-q", "-m", "approve-del", cwd=self.root)
@@ -183,7 +189,7 @@ class TestResultEnvelopeCheck(unittest.TestCase):
         self.unit = res["id"]
         self.spec = Path(res["files"][0])
         fm, body = frontmatter.read(self.spec)
-        body = body.replace("NEEDS_INPUT", "채움").replace('command: "채움"', 'command: "true"')
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"')
         frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
         approve_unit(self.unit, "tester", project_root=self.root)
         git("add", ".", cwd=self.root)
