@@ -2,7 +2,7 @@
 id: open-questions
 type: planning
 status: active
-updated: 2026-08-27
+updated: 2026-08-29
 authority: canonical
 ---
 
@@ -63,7 +63,8 @@ authority: canonical
 | Q-05 | `rulesync`, `cc-switch` 같은 후발 조사 대상을 어댑터 구현에 반영하는가 | `archive/` (분석만 완료) |
 | Q-06 | BMAD 본체는 아직 아카이브되지 않았다(CIS만 있음). 기획 자산 판정을 위해 필요한가 — **G-M3 선행 조건으로 승격** | `archive/README.md` 목록, D-55 |
 | Q-07 | 사용자가 "실제로 써보고 정말 좋았던" 워크플로우의 구체 목록 | **답변됨(2026-08-27, D-64)**: CIS 4종 최우선, BMAD PRD 흐름 후순위, Superpowers 개발 체계·OpenWiki 자동 문서 관리·impeccable/taste anti-slop·UI UX Pro Max 실사용. 상상 흐름 CIS → Romeo 문서 → Superpowers → OpenWiki |
-| Q-08 | **같은 산출물에서 두 검토자의 판정이 갈렸다(2026-08-29 §6.6 관측, 게이트 FAIL) — codex 검토자의 `PASS` 는 우연인가 체계적인가.** codex 는 자기 스냅샷에 보이던 루트 미추적 파일 11개를 지적하지 않고 PASS, claude 는 그것을 FAIL 사유로 잡았다. 표본이 각 1건이라 재현성을 모른다. 선택지: (a) 같은 산출물에 codex 검토자를 1~2회 더 띄워 재현성 측정 (b) 검토 절차 문서에 '작업 트리 스냅샷의 미추적 파일을 반드시 대조' 를 명시하고 두 런타임 재실행 (c) 이 관측을 근거로 기본 바인딩(reviewer=codex)을 재검토. 어느 쪽이든 게이트 FAIL 은 관측이지 검사기 버그가 아니므로 `expect` 를 고치지 않는다(D-b) | `fixtures/parity/pr-license-field-t1-reviewer-observed.yaml`, `docs/work/feat-20260829-license-field-46an/review/run_5fc794f15236-reviewer.json`, RUNBOOK §11.1 |
+| Q-08 | ~~같은 산출물에서 두 검토자의 판정이 갈렸다 — codex 의 `PASS` 는 우연인가 체계적인가.~~ **답변됨(2026-08-29, 재현성 측정 · 사용자 결정으로 선택지 (a) 실행)**: codex 의 PASS 는 **재현되지 않았다.** 산출물을 고정한 채(트리 `7b035490df84…` · 계약 sha256 `f79f4bc1…` 네 개 `cmp` identical · 방어 검사 `log_sha256` 여덟 스냅샷 전부 `2bc7dad48f31…`) codex 를 세 번 돌려 **PASS 1 · FAIL 2** 다 — 기준 `run_31e175742892`(TUI 경로) PASS findings 0, `run_241a35112ca3` FAIL findings 1, `run_5dd1b2c232c7` FAIL findings 4. 따라서 **(c) 기본 바인딩 재검토는 근거를 잃었다** — 그 PASS 는 런타임의 성질이 아니라 한 번의 누락이다. 그리고 FAIL 두 건 중 `run_5dd1b2c232c7` 의 findings 4건은 claude 검토자(`run_5fc794f15236`)의 6건과 실질적으로 겹친다(루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함) — 루트 오염을 **보는 능력의 차이가 아니다.** 남은 것은 (b) 검토 절차 보강 여부와, 이 측정이 새로 드러낸 **Q-09** 다. `expect` 는 고치지 않았다(D-b) | `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility`, `docs/work/feat-20260829-license-field-46an/review/run_{241a35112ca3,5dd1b2c232c7}-reviewer.json`, RUNBOOK §11.1 |
+| Q-09 | **검토자 판정이 같은 런타임 안에서도 흔들린다 — 동등성 게이트의 검토자 면을 1회 표본으로 판정할 수 있는가.** Q-08 측정에서 같은 런타임·같은 기동 경로·같은 입력의 두 실행이 findings 1건과 4건으로 갈렸다. 게이트의 검토자 면은 각 런타임 **1회** 판정을 비교하므로, `VERDICT_DIFFERS reviewer` 는 런타임 차이의 증거가 아니라 실행 간 분산일 수 있다 — D-73 이 `PRODUCT_DIFFERS` 로 걸러낸 것과 같은 층위의 문제다. 선택지: (a) 게이트에 재현성 요구를 넣는다 — 검토자 면은 각 런타임의 n≥2 회 판정이 **자기 안에서 일관할 때만** 비교하고, 흔들리면 `VERDICT_UNSTABLE` 로 판정에서 빼고 '비교 불가' 로 인쇄한다(D-73 과 같은 형태) (b) 검토자 면을 게이트에서 영구히 빼고 구현자 면으로만 판정한다 — 검토 판정은 본래 재현 대상이 아니라고 선언하는 것 (c) 아무것도 바꾸지 않는다 — 게이트는 계속 FAIL 이고, 그 FAIL 이 무엇의 증거인지는 리포트를 읽는 사람이 판단한다. 어느 쪽이든 관측된 케이스의 `expect` 는 고치지 않는다(D-b) | `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility.implication_for_gate`, `romeo/parity.py`, `fixtures/parity/pr-license-field-t1-reviewer-observed.yaml` |
 
 ---
 

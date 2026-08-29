@@ -159,3 +159,64 @@ swapped_reviewer_launch_path:
     §4 표의 교체 검토자 행은 이제 '§3 기동 경로' 칸도 관측이다 — 도구 목록이 셋뿐이었고 그 밖의 도구 호출·거부가 0건이다.
     강제가 작동했다는 사후 확인이지 쓰기 시도가 막힌 것을 본 것은 아니다(단독 프로브 쪽이 그것을 봤다).
 
+
+# 같은 산출물에 같은 검토자 런타임(codex)을 두 번 더 띄웠을 때 판정이 재현되는가 — 2026-08-29 Q-08 (a) 재현성 측정.
+# doctor 는 이 블록을 읽지 않는다(runtime_load 만 읽는다). 사람이 읽는 기록이다.
+#
+# 왜 이 측정을 했나: §6.6 재실행이 같은 산출물에서 codex PASS ≠ claude FAIL 을 냈고, 표본이 각 1건이라
+# 그 차이가 런타임의 성질인지 한 번의 누락인지 구분할 수 없었다(Q-08). 런타임을 바꾸지 않고 같은 런타임을
+# 두 번 더 돌려 먼저 그것부터 갈랐다.
+reviewer_verdict_reproducibility:
+  observed_at: 2026-08-29
+  unit_id: feat-20260829-license-field-46an
+  # 네 실행이 본 것이 같다는 근거 — 손으로 맞춘 값이 아니라 명령이 남긴 값이다
+  fixed_product:
+    worktree: <기준 실행의 구현자 워크트리>
+    head_sha: 6e5290012dd8f088d3ede4b78f4c9e7c31877609
+    dirty_tree_hash: 7b035490df840dce0acb7b070ecae1a61b7566e65d8e93f31843e84dc4744d21
+    task_envelope_sha256: f79f4bc1283a7e027b8ff088fdcd86c08416f57c6dea9d382c59180ec1bdfefd  # 네 계약이 cmp identical
+    defensive_check_log_sha256: 2bc7dad48f31a5a25d79447a115707ae30aa0169503e2e5e443b5ec21d111401
+    defensive_check_note: >-
+      review-tree-before/after 여덟 스냅샷(기준 실행 4 · §6.6 재실행 2 · 이번 재현 4 중 각 2)이 전부 같은 해시다 —
+      2026-08-29 01:24 의 구현 종료부터 11:49 까지 작업 트리가 한 번도 바뀌지 않았다.
+  runs:
+    - run_id: run_31e175742892
+      runtime: codex
+      launch: TUI (codex -s read-only) + worker-start --terminal   # RUNBOOK §3.7 (2)
+      verdict: PASS
+      findings: 0
+    - run_id: run_241a35112ca3
+      runtime: codex
+      launch: 비대화형 (codex exec -s read-only -o <워크트리 밖 파일>)  # RUNBOOK §6.6 5
+      task_id: task_07183f883449
+      duration_s: 232          # review-tree-before 종료 11:44:02 → after 시작 11:47:54
+      verdict: FAIL
+      findings: 1
+      findings_summary: AC-1 이 요구한 '18개 값이 계획 §1.3 표와 일치' 를 required_checks 가 검사하지 못한다
+    - run_id: run_5dd1b2c232c7
+      runtime: codex
+      launch: 비대화형 (codex exec -s read-only -o <워크트리 밖 파일>)
+      task_id: task_596c7ac5df3e
+      duration_s: 271          # 11:44:42 → 11:49:13
+      verdict: FAIL
+      findings: 4
+      findings_summary: >-
+        루트 미추적 아카이브 사본 · 증거가 오염 트리에 묶임 · `Varies by skill` 이 계획 표의 확정 값이 아님 ·
+        check-3 첫 기록의 `bash -c` 인용 결함. 네 건 모두 claude 검토자(run_5fc794f15236)의 findings 와 겹친다
+    - run_id: run_5fc794f15236
+      runtime: claude
+      launch: 비대화형 (claude -p 3플래그)
+      verdict: FAIL
+      findings: 6
+  conclusion: >-
+    **codex 의 PASS 는 재현되지 않았다.** 같은 산출물·같은 계약·같은 역할에 codex 를 세 번 돌려 PASS 1 · FAIL 2 다.
+    Q-08 의 (c)(이 관측을 근거로 기본 바인딩을 재검토)는 근거를 잃었다 — 기준 실행의 PASS 는 그 런타임의 성질이 아니라
+    한 번의 누락이다. 그리고 FAIL 두 건 중 하나(run_5dd1b2c232c7)는 claude 가 잡은 것을 실질적으로 같이 잡았다 —
+    루트 오염을 '보는 능력' 의 차이가 아니다.
+  what_this_does_not_say: >-
+    **판정이 안정적이라는 뜻이 아니다.** 같은 런타임·같은 기동 경로·같은 입력의 두 실행이 findings 1건과 4건으로 갈렸다.
+    기동 경로(TUI vs 비대화형)도 교란 변수로 남아 있다 — PASS 가 나온 실행만 TUI 였다. 이 측정은 그 둘을 분리하지 않았다.
+  implication_for_gate: >-
+    동등성 게이트의 검토자 면은 각 런타임 1회 판정을 비교한다. 같은 런타임의 1회 판정끼리도 갈리는 것이 관측됐으므로,
+    `VERDICT_DIFFERS reviewer` 는 런타임 차이의 증거가 아니다 — 실행 간 분산일 수 있다. 게이트 정의를 어떻게 할지는 Q-09.
+    이번 관측으로 `fixtures/parity/` 의 케이스나 `expect` 를 고치지 않았다(D-b).

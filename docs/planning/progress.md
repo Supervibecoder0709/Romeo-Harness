@@ -88,6 +88,7 @@ authority: derived
 | 32 | — | `AGENTS.md` 서문 비대칭 해소 | **미착수** | `CLAUDE.md` 는 마커 밖에 프로젝트 정체성·충돌 해소 순서·문서 인덱스를 두는데 `AGENTS.md` 는 managed block 으로 바로 시작한다 — **같은 안내를 Codex 세션은 보지 못한다.** 코어 규칙("공통 규칙을 특정 실행기에 종속시키지 않는다")과 어긋나고 동등성의 전제도 약해진다. 지금 고치지 않는 이유는 순서다 — Codex 런타임의 지침이 바뀌면 그 조건 위에서 관측한 `fixtures/parity/pr-license-field-t1-observed.yaml` 의 의미가 흐려진다. 체크리스트 30 을 정리한 뒤 같이 처리한다. 후보 방식 2가지: (a) 두 파일의 마커 밖에 같은 서문을 손으로 유지 — 어긋나도 검사하는 게이트가 없다, (b) 인덱스를 `core/` 아래 한 파일에 두고 compile 이 두 지침 파일에 함께 투영 — 원본이 하나가 되지만 컴파일 대상이 는다 |
 | 33 | #11 | 검토자 면 동등성 관측 — 검토자-only 재실행(RUNBOOK §6.6) | **완료 — 게이트 FAIL** | Run `run_5fc794f15236` · Task `task_4c65f8e08cf9` · 기준 구현자 워크트리(트리 `7b035490df84…` = baseline 증거)에서 검토자 계약 재생성(`cmp` identical, sha `f79f4bc1…`) · `review-tree-before/after` 를 새 run 의 증거로 기록(`log_sha256` 이 기준 실행의 `2bc7dad48f31…` 과 동일 → 트리가 그때부터 지금까지 불변) · claude 검토자(3플래그, `orca terminal create` 경로) 32턴·6분 20초·tool_use `Read` 24·`Glob` 4·`Grep` 3·거부 0 · 봉투 `envelope check` 두 체크아웃 모두 5/5 PASS · **판정 `FAIL` findings 6**(F2 루트 미추적 파일 11개 — `check-3` 첫 실행의 `bash -c` 인용 오류가 원인 · F3 증거가 오염 트리에 묶임 · F4 `check-3` 의 빈 변수 실패 모드 · F5 `Varies by skill` 자유 서술 · F6 `allowed_paths` 에 `.`) · 같은 산출물의 codex 는 `PASS` findings 0 · `fixtures/parity/pr-license-field-t1-reviewer-observed.yaml` 등록 → `핵심 동등성 게이트: FAIL — 관측 2건 · VERDICT_DIFFERS reviewer PASS≠FAIL` EXIT=1. `expect` 는 고치지 않았다(D-b). RUNBOOK §4 표(교체 검토자 §3 기동 경로 → 예)·§6.6·§11 반영, `.harness/observations.yaml` 의 `swapped_reviewer_launch_path`. Orca Task 는 `task-update --status completed` 로 정리(비대화형 경로) |
 | 34 | — | 작업 계약 `allowed_paths` 상한 — spec 변경 범위로 좁힌다 | **미착수** | claude 검토자 F6: 구현자 계약의 `allowed_paths` 가 `["docs/work/<id>/", "."]` 라 쓰기 상한이 저장소 전체다 — 그래서 루트 오염(F2)이 "allowed_paths 밖 변경" 으로 걸리지 않았고 검토 항목 4 가 이 단위에서 아무것도 걸러내지 못했다. 역할 계약의 `must_include` 만이 아니라 spec 의 변경 범위를 상한으로 내보내야 한다(`romeo/envelope.py`). 계약 바이트가 바뀌므로 기존 관측 케이스의 `TASK_ANCHORED` 재계산에 영향이 있는지 먼저 본다 |
+| 35 | — | Q-08 재현성 측정 — 같은 산출물에 같은 검토자 런타임 2회 추가 | **완료 — codex 의 PASS 는 재현되지 않았다** | 사용자 결정으로 선택지 (a) 를 실행했다. RUNBOOK §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번 더 띄웠다(Run `run_241a35112ca3`·`run_5dd1b2c232c7` · Task `task_07183f883449`·`task_596c7ac5df3e`). **산출물 고정의 근거**: 계약 네 개가 `cmp` identical(`f79f4bc1…`) · `head 6e5290012dd8 tree 7b035490df84` 가 기준 evidence 와 같음 · 방어 검사 `log_sha256` 여덟 스냅샷 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 11:49 까지 트리 불변) · 두 봉투 모두 두 체크아웃에서 `envelope check` 5개 PASS. **결과**: `FAIL`(findings 1 — AC-1 의 표 일치를 required_checks 가 검사하지 못함) · `FAIL`(findings 4 — 루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함). 같은 산출물의 기준 실행은 `PASS`(findings 0)였다. **Q-08 의 (c) 기본 바인딩 재검토는 근거를 잃었다** — 그 PASS 는 런타임의 성질이 아니라 한 번의 누락이다. `run_5dd1b2c232c7` 의 4건은 claude 의 6건과 실질적으로 겹쳐 **루트 오염을 보는 능력의 차이가 아니다.** **그러나 두 FAIL 끼리도 findings 가 1건과 4건으로 다르다** — 판정은 런타임을 고정해도 흔들린다(→ Q-09). 기동 경로는 교란 변수로 남는다(PASS 만 TUI, FAIL 둘은 비대화형). 이번 측정으로 `fixtures/parity/` 와 `expect` 는 고치지 않았다(D-b) |
 
 ## 세션 기록
 
@@ -109,9 +110,12 @@ authority: derived
 
 ### 2026-08-29 게이트 정의 보완(D-73)·검토자-only 재실행(§6.6) 이후 남은 것
 
-- **검토자 면은 관측됐고 동등하지 않았다 — 표본은 각 1건이다.** 같은 산출물에 codex `PASS`(findings 0) · claude `FAIL`(findings 6).
-  codex 의 PASS 가 그 런타임의 체계적 경향인지 한 번의 누락인지는 재실행 없이는 모른다(Q-08). 게이트 FAIL 은 관측 2건 위의 판정이지
-  재현성의 증거가 아니다. 반대로 claude 의 findings 는 전부 파일·줄 근거가 있고 F2(루트 미추적 11개)는 `changed_files` 로 독립 확인된다.
+- **검토자 판정은 런타임을 고정해도 흔들린다 — 2026-08-29 재현성 측정(체크리스트 35).** 같은 산출물에 codex 3회 = `PASS`(0) · `FAIL`(1) · `FAIL`(4),
+  claude 1회 = `FAIL`(6). **Q-08 은 답변됐다** — codex 의 PASS 는 재현되지 않았고 기본 바인딩 재검토의 근거는 사라졌다.
+  **대신 더 큰 것이 드러났다(Q-09)**: 같은 런타임·같은 기동 경로·같은 입력의 두 실행이 findings 1건과 4건으로 갈렸다.
+  게이트의 검토자 면은 각 런타임 **1회** 판정을 비교하므로 `VERDICT_DIFFERS reviewer` 는 런타임 차이의 증거가 아니다 —
+  실행 간 분산일 수 있다. D-73 이 `PRODUCT_DIFFERS` 로 걸러낸 것과 같은 층위이고, 아직 걸러내는 장치가 없다.
+  **기동 경로가 교란 변수로 남는다** — PASS 가 나온 실행만 TUI(`worker-start --terminal`)였고 FAIL 둘은 비대화형이다. 이 측정은 둘을 분리하지 않았다.
 - **§6.6 은 비대화형 경로로만 돌렸다.** `worker-start --terminal` 채택(lifecycle 있는 형태)으로는 미관측이다(RUNBOOK §11.2).
 - **검토자 절차 문서는 "작업 트리 스냅샷의 미추적 파일을 대조하라" 고 말하지 않는다.** codex 가 놓친 자리가 정확히 거기다 —
   `core/workflows/review/SKILL.md` 3번의 판정 대상에 그것이 없다. 보강 여부는 Q-08 의 선택지 (b) 다.
