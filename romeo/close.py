@@ -643,6 +643,13 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
     for n, e in verdicts:
         seen, own_rec, why = _reviewed_product(project_root, udir, unit_id, e)
         if seen is None:
+            head = _legacy_head(project_root, udir, unit_id, e)
+            if head is not None and product is not None and head != product[0]:
+                # 봉인 이전 형식의 봉투 — 판정이 본 산출물을 증명할 수 없지만, 그 증거의 head_sha 가 지금 HEAD 가 아니므로
+                # 현재 산출물에 대한 판정일 수 없다(산출물 식별에는 head 가 들어 있다). 낡은 것으로 분류하되 그 근거가
+                # 미봉인 값임을 인쇄한다. 지금 HEAD 를 가리키는 미봉인 봉투는 그대로 미검증이다(위조 방향을 막는다).
+                stale.append((n, e, f"봉인 이전 형식의 기록이라 산출물을 증명하지 못했지만 증거의 head_sha {head[:7]} 가 지금 HEAD 가 아니다 — {why}"))
+                continue
             unknown.append((n, e, why))
             continue
         approval = _envelope_approval_key(project_root, unit_id, e)
@@ -768,6 +775,37 @@ def _reviewed_product(project_root, udir, unit_id, env):
         return None, None, (f"evidence_ref 가 지목한 산출물({_product_text(seen)})이 검토 run {run} 이 기록한 산출물"
                             f"({_product_text(own)})과 다르다 — 판정이 본 것과 다른 증거를 가리킨다")
     return own, own_rec, None
+
+
+def _legacy_head(project_root, udir, unit_id, env):
+    """봉인 이전 형식(방어 검사 기록에 명령별 head/tree 가 없는) 검토 run 의 봉투가 지목한 증거의 **미봉인** head_sha. 아니면 None.
+
+    봉인 형식의 기록(명령별 값이 있는데 로그가 없거나 어긋나는 경우)은 여기 오지 않는다 — 그것은 미검증으로 남아 막는다.
+    옛 형식이라는 판정은 방어 검사 기록에 `head_sha` 키가 하나도 없다는 사실로 한다."""
+    run = _run_of_envelope(env)
+    if run is None:
+        return None
+    own_path = Path(udir) / "evidence" / f"{run}.yaml"
+    if not own_path.is_file():
+        return None
+    try:
+        own = load_yaml(own_path)
+    except Exception:
+        return None
+    cmds = [c for c in ((own or {}).get("commands") or []) if isinstance(c, dict)]
+    defensive = [c for c in cmds if c.get("id") in DEFENSIVE_LABELS]
+    if not defensive or any(isinstance(c.get("head_sha"), str) and c.get("head_sha") for c in defensive):
+        return None
+    # 기록만 지워 옛 형식으로 위장한 경우는 로그가 잡는다(로그에 봉인 줄이 남아 있다) — 그것은 옛 형식이 아니라 위반이다.
+    for c in defensive:
+        state, _why = command_log_state(project_root, c)
+        if state is False:
+            return None
+    ref = _evidence_ref(env)
+    if ref is None:
+        return None
+    seen, _err = _evidence_product(Path(project_root), ref)
+    return seen[0] if seen else None
 
 
 def _current_approval_key(udir):

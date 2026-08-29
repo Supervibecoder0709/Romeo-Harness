@@ -1233,6 +1233,45 @@ class TestCloseReviewVerdict(unittest.TestCase):
         self.assertEqual(chain[0]["level"], "warning")
         self.assertIn("거치지 않은 승인", chain[0]["detail"])
 
+    def test_a_legacy_envelope_on_an_older_head_is_superseded_with_a_caveat(self):
+        """봉인 이전 형식(방어 검사 기록에 명령별 head/tree 없음)의 봉투는 산출물을 증명하지 못한다 — 그러나 증거의 head_sha 가
+        지금 HEAD 가 아니면 현재 산출물의 판정일 수 없으므로 낡은 것으로 분류한다(그 근거가 미봉인 값임을 인쇄). 옛 관통의 봉투가
+        영원히 close 를 막지 않게 하는 규칙이다."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL"))
+        path = self.spec.parent / "evidence" / "run-test.yaml"
+        rec = load_yaml(path)
+        for c in rec["commands"]:
+            c.pop("head_sha", None); c.pop("dirty_tree_hash", None)          # 옛 형식 흉내
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        import shutil
+        shutil.rmtree(self.root / ".harness" / "runs" / self.unit / "run-test")   # 로그도 없다(다른 체크아웃에서 모아 온 봉투)
+        # 같은 HEAD 를 가리키는 동안은 미검증이다 — 위조 방향(현재 FAIL 을 옛 형식으로 위장)을 막는다.
+        ids, r = self._failed()
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        # 산출물이 새 커밋으로 바뀌면(HEAD 이동) 낡은 것으로 분류된다.
+        self._new_product("run-two")
+        self._write_review("run-two-reviewer.json", self._envelope("PASS", run="run-two"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        sup = self._row(r, "REVIEW_SUPERSEDED")
+        self.assertIn("run-test-reviewer.json", sup["detail"])
+        self.assertIn("봉인 이전 형식", sup["detail"])
+
+    def test_stripping_seal_values_from_a_sealed_record_is_caught(self):
+        """봉인 형식의 기록에서 명령별 값만 지워 옛 형식으로 위장한다 — 로그에 봉인 줄이 남아 있으므로 잡힌다."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL"))
+        path = self.spec.parent / "evidence" / "run-test.yaml"
+        rec = load_yaml(path)
+        for c in rec["commands"]:
+            c.pop("head_sha", None); c.pop("dirty_tree_hash", None)
+        path.write_text(dump_yaml(rec), encoding="utf-8")
+        self._new_product("run-two")
+        self._write_review("run-two-reviewer.json", self._envelope("PASS", run="run-two"))
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("봉인 값이 지워졌다", self._row(r, "REVIEW_VERDICT")["detail"])
+
     def test_superseded_envelopes_must_still_be_valid_envelopes(self):
         """낡은 봉투도 봉투다 — 앵커 검사는 산출물과 무관하게 모든 봉투에 걸린다."""
         self._write_review("run-test-reviewer.json", self._envelope(

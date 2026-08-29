@@ -398,9 +398,13 @@ def command_log_state(project_root, cmd_rec):
     # 산출물 식별 줄 — 기록과 로그 양쪽에 있을 때만 대조한다(이 줄이 없던 시절의 기록은 그 줄로 판정하지 않는다).
     for key, regex, what in (("head_sha", HEAD_LINE_RE, "head_sha"), ("dirty_tree_hash", TREE_LINE_RE, "dirty_tree_hash")):
         recorded = cmd_rec.get(key)
-        if not (isinstance(recorded, str) and recorded):
-            continue                       # 봉인 줄이 없던 시절의 기록 — 그 줄로 판정하지 않는다
         in_log = _last_match(regex, lines)
+        if not (isinstance(recorded, str) and recorded):
+            if in_log is not None:
+                # 로그에는 봉인 줄이 있는데 기록에서 그 값이 사라졌다 — 옛 형식을 흉내내려고 기록만 지운 흔적이다.
+                return False, (f"{cmd_rec.get('id')}: 원시 로그에는 {what} 봉인 줄이 있는데 기록에 그 값이 없다 — "
+                               f"기록에서 봉인 값이 지워졌다")
+            continue                       # 봉인 줄이 없던 시절의 기록 — 그 줄로 판정하지 않는다
         if in_log is None:
             return False, (f"{cmd_rec.get('id')}: 기록에는 {what} 가 있는데 원시 로그에 봉인 줄(--- {what.split('_')[0] if what == 'head_sha' else 'tree'} … ---)이 없다 — "
                            f"봉인 줄이 지워졌거나 옛 형식을 흉내낸 로그다")
