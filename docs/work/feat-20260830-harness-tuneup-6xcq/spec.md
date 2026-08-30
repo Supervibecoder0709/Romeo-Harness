@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-08-30T13:13:42+09:00'
+approved_at: '2026-08-30T13:17:58+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -25,6 +25,10 @@ routing:
   history: []
 created: '2026-08-30'
 updated: '2026-08-30'
+approval_history:
+- {approved_at: '2026-08-30T13:13:42+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T13:17:58+09:00',
+  reason: check-9 의 expect 문구에 있던 콜론이 required_checks YAML 파싱을 깨뜨려 가운데점으로 교체했다. 명령·기대 종료 코드·수용 기준·확인란은
+    불변}
 ---
 # M3 진입 전 하네스 정비 — run-unit 자동화·코어 규칙 승격·문서 다이어트
 
@@ -124,7 +128,7 @@ required_checks:
     expect: exit 0 (다이어트 뒤 progress.md 의 상대 링크가 전부 실재하는지)
   - id: check-9
     command: "python3 -m unittest tests.test_run_unit"
-    expect: exit 0 (AC-8 을 대조하는 유일한 검사 — 반례 4건: 연속 2회 실패 뒤 3회차 거부 · --after-review 해제 · 성공 시 카운터 0 · base_sha 변경으로는 리셋되지 않음)
+    expect: exit 0 (AC-8 을 대조하는 유일한 검사 — 반례 4건 · 연속 2회 실패 뒤 3회차 거부 · --after-review 해제 · 성공 시 카운터 0 · base_sha 변경으로는 리셋되지 않음)
 ```
 
 ## 위험·백업·복구
