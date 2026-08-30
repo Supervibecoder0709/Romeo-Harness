@@ -260,8 +260,25 @@ def cmd_id(args):
 
 
 def cmd_compile(args):
-    from .compile import check_compiled, compile_all
+    from .compile import check_compiled, compile_all, list_outputs
     root = _root(args)
+    if args.list_outputs:
+        # 제거 대상(이전 컴파일에만 있던 경로)도 함께 인쇄한다 — 쓰기가 아니라 삭제지만
+        # 작업 트리를 바꾸는 것은 같으므로 쓰기 상한에서 빠뜨리면 안 된다. staging 은 완료 뒤에는
+        # 남지 않지만 실패하면 남고 이름이 매번 다르므로, 이름이 아니라 패턴으로 따로 인쇄한다.
+        outputs, pruned, transient = list_outputs(root)
+        if args.json:
+            print(json.dumps({"outputs": outputs, "pruned": pruned, "transient": transient},
+                             ensure_ascii=False, indent=1))
+        else:
+            removed = set(pruned)
+            for rel in outputs:
+                print(f"  {rel}" + ("  (제거 대상 — 이전 컴파일 산출물)" if rel in removed else ""))
+            for pattern in transient:
+                print(f"  {pattern}  (컴파일 중에만 존재 — 이름이 매번 달라 패턴이다. 실패하면 남는다)")
+            print(f"완료 뒤 남는 산출물 {len(outputs)}개 (그 중 제거 대상 {len(pruned)}개, 쓰지 않았다)"
+                  f" + 컴파일 중 임시 패턴 {len(transient)}개")
+        return 0
     if args.check:
         findings = check_compiled(root)
         for code, path, _, why in findings:
@@ -494,8 +511,11 @@ def build_parser():
     s.add_argument("--slug", required=True)
     s.set_defaults(fn=cmd_id)
 
-    s = sub.add_parser("compile", help="코어 → 런타임 산출물 컴파일 (--check 로 대조)")
+    s = sub.add_parser("compile", help="코어 → 런타임 산출물 컴파일 (--check 로 대조, --list-outputs 로 대상만 나열)")
     s.add_argument("--check", action="store_true", help="쓰지 않고 최신인지만 검사")
+    s.add_argument("--list-outputs", action="store_true",
+                   help="쓰지 않고 컴파일이 건드릴 경로를 나열한다 — 완료 뒤 남는 산출물과 "
+                        "컴파일 중에만 있는 staging 패턴 (읽기 전용)")
     s.add_argument("--root")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_compile)

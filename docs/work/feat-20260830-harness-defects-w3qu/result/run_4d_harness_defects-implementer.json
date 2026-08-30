@@ -1,0 +1,25 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_4d_harness_defects-implementer.json",
+    "sha256": "db60dfd2b79de5a5efe6a95ace7e13422ffb9e230cc4c0dbb85c65a61857f240"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest discover -s tests -t . -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo compile --check", "exit_code": 0},
+    {"id": "check-3", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo doctor", "exit_code": 0},
+    {"id": "check-5", "command": "bin/romeo fixtures parity --report", "exit_code": 0},
+    {"id": "check-6", "command": "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v", "exit_code": 0},
+    {"id": "check-7", "command": "! grep -q '6건' adapters/orca/prompts/implementer-brief.md", "exit_code": 0},
+    {"id": "check-8", "command": "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v", "exit_code": 0},
+    {"id": "check-9", "command": "grep -c '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_4d_harness_defects.yaml",
+  "notes": "4회차 — 3차 검토자 FAIL findings 1건(compile 이 저장소 루트에 .compile-* staging 을 만드는데 list_outputs 가 인쇄하지 않는다) 반영. 재승인 커밋 ae7b67a 가 AC-4 를 '완료 뒤 남기는 산출물은 이름 전부, 컴파일 중에만 있는 staging 은 패턴 한 줄' 로 한정했고, 이번 변경은 그 한정에 맞춘 것이다. 코드: romeo/compile.py 에 STAGE_PREFIX('.compile-')·STAGE_GLOB('.compile-*/') 상수를 두고 _stage_compile 의 mkdtemp prefix 가 그 상수를 쓰게 해, 인쇄되는 패턴과 실제로 만들어지는 이름이 한 곳에서 나오게 했다. list_outputs 는 (산출물, 제거 대상, 임시 패턴) 3-튜플을 돌려주고 CLI 는 임시 패턴을 별도 줄로 인쇄한다 — 완료 뒤 남는 것과 중간에만 있는 것을 같은 줄에 섞지 않는다. 검사: check-6 의 테스트 클래스에 test_prints_the_staging_directory_as_one_pattern 을 더했다. 문자열을 보는 검사가 아니라 _prepare_compile→_stage_compile 로 **실제 staging 디렉터리를 만들어** 그 경로 전부가 인쇄된 패턴에 덮이는지 대조하고, 먼저 산출물 목록만으로는 덮이지 않는 것(uncovered 가 비지 않는 것)을 확인해 패턴 줄이 실제로 검사되게 했다. 음성 대조는 evidence 의 check6-negative-control-retry — 메모리 안에서 STAGE_GLOB 만 '.staging-*/' 로 어긋나게 하면 check-6 이 FAILED(failures=1) 이고, 그때만 그 명령이 exit 0 이다(작업 트리는 건드리지 않았다; 앞선 check6-negative-control 은 PYTHONPATH 누락으로 ModuleNotFoundError exit 1 이라 재실행했다 — 그 실패 기록도 evidence 에 그대로 남아 있다). AC-4 의 CLI 절반은 evidence 의 ac4-cli-pattern 이 겨눈다 — bin/romeo compile --list-outputs 출력에 '.compile-*/' 줄이 있고, 실행 전후 git status --porcelain 해시가 같다(읽기 전용). 1~3회차가 만든 나머지 변경(romeo/close.py 의 ①, core/templates/tech-spec.md 의 ②, implementer-brief.md 의 ③, RUNBOOK.md 의 ⑤, tests/test_envelope.py·tests/test_docs.py)은 그대로 남아 있고 이번에 고치지 않았다. 검사 9건 전부 evidence run_4d_harness_defects 에 check-1~check-9 로 기록됐고 모두 exit 0 이다(check-1 은 unittest 455건 OK, 84.7s — 3회차보다 1건 늘었고 그 1건이 위 staging 패턴 테스트다). head ae7b67af6a0f, tree 58c63bc249e4 로 12개 기록의 앵커가 모두 같다. 수용 기준 체크박스 6개를 채웠고 확인란 문장·검증 계획은 무변경이다."
+}

@@ -1,7 +1,11 @@
 """어댑터 컴파일 — 코어(벤더 중립) → 런타임별 산출물.
 
-원본은 `core/` 와 `vendor/` 이고, 산출물(`CLAUDE.md`·`AGENTS.md`·`.claude/skills/**`·`.agents/skills/**`)은
-언제든 다시 만들 수 있어야 한다. 두 가지 규칙이 이걸 보장한다.
+원본은 `core/` 와 `vendor/` 이고, 산출물(지침 파일 `CLAUDE.md`·`AGENTS.md`, 스킬 트리 `.claude/skills/**`·`.agents/skills/**`,
+역할 투영 `.claude/agents/*.md`, 권한 상한 `.claude/settings.json`, 컴파일 상태 `.harness/compiled.yaml`)은
+언제든 다시 만들 수 있어야 한다. 실제로 **건드릴** 경로 전부는 `list_outputs()`(CLI 로는 `romeo compile --list-outputs`)가
+답한다 — 손으로 기억하지 않는다. 거기에는 이전 컴파일에만 있던 **제거 대상**도 들어가고(삭제도 작업 트리를 바꾼다),
+컴파일 **중에만** 존재하는 staging(`.compile-*`, 저장소 루트, 실패 시 보존)은 이름이 매번 달라 패턴 한 줄로 붙는다.
+두 가지 규칙이 이걸 보장한다.
 
 - **지침 파일**(`CLAUDE.md`·`AGENTS.md`)은 managed 마커 안쪽만 하네스가 소유한다. 마커 밖 텍스트는 보존된다.
 - **스킬 파일**은 전체가 산출물이다. 손으로 고치면 다음 컴파일에서 사라진다 — 고칠 것은 `core/` 나 어댑터 정의다.
@@ -31,6 +35,11 @@ FENCE_RE = re.compile(r"^\s*(```|~~~)")
 class CompileError(RuntimeError):
     """산출물을 쓰기 전에 멈춘다. 반쯤 쓴 상태를 만들지 않는다."""
 STATE_PATH = ".harness/compiled.yaml"
+# staging 디렉터리는 저장소와 같은 파일시스템이어야 원자 교체가 되므로 저장소 루트에 만든다.
+# 이름은 mkdtemp 가 정해 매번 다르다 — 그래서 쓰기 상한에 적을 수 있는 것은 이름이 아니라 패턴이다.
+# 두 값이 한 곳에서 나오게 묶어 둔다: 인쇄되는 패턴과 실제로 만들어지는 이름이 어긋나면 상한이 헛돈다.
+STAGE_PREFIX = ".compile-"
+STAGE_GLOB = STAGE_PREFIX + "*/"
 ADAPTERS_DIR = "adapters"
 ROLES_DIR = "core/roles"
 GENERATED_NOTE = "<!-- 이 파일은 `romeo compile` 산출물이다. 직접 고치지 않는다 — 고칠 곳은 core/ 와 adapters/ 다. -->"
@@ -468,6 +477,53 @@ def _previous_outputs(root):
     return set(outputs)
 
 
+def compile_targets(root: Path, prune: bool = True):
+    """compile 이 건드리는 경로를 계산한다. 쓰지 않는다 — 계획과 인쇄가 같은 것을 보게 하는 하나의 원본이다.
+
+    돌려주는 것은 `(files, trees, planned, pruned)` 다. `planned` 는 이번 컴파일이 쓸 산출물이고,
+    `pruned` 는 이전 상태(STATE_PATH)에만 남아 이번에 **지워질** 경로다 — 쓰기가 아니라 삭제지만
+    작업 트리를 바꾸는 것은 같으므로 쓰기 상한을 정할 때 빠뜨리면 안 된다."""
+    files, trees = plan_outputs(root)
+    tree_rels = [str(dst.relative_to(root)) for _src, dst in trees]
+    if len(tree_rels) != len(set(tree_rels)):
+        raise CompileError("같은 skill destination 이 두 번 계획됐다")
+    if set(files) & set(tree_rels):
+        raise CompileError("파일 산출물과 tree 산출물 경로가 충돌한다")
+    planned = set(files) | set(tree_rels)
+    previous = _previous_outputs(root)
+    pruned = sorted((previous or set()) - planned) if prune else []
+    return files, trees, planned, pruned
+
+
+def list_outputs(root=None, prune=True):
+    """`romeo compile` 이 건드릴 경로 — 파일을 쓰지 않고 계산만 한다(읽기 전용).
+
+    구현자가 spec 의 「변경 범위」를 쓸 때 컴파일 산출물을 손으로 기억하다 빠뜨리는 것(결함 ④,
+    `.agents/`·`.harness/compiled.yaml` 누락)을 막는다. `compile_all()` 이 건드리는 대상과 같은
+    집합이어야 한다 — 계획된 산출물·제거될 이전 산출물·컴파일 상태 파일(STATE_PATH) 셋 다다.
+
+    **디렉터리 산출물은 끝에 `/` 를 붙여 인쇄한다.** 스킬 트리는 통째로 하나의 산출물이라 그 안의 파일
+    이름은 vendor 내용에 따라 바뀐다 — 파일을 낱개로 세면 목록이 그때그때 달라지고, 그 목록을 옮겨 적은
+    쓰기 상한은 다음 vendor 갱신에서 곧바로 모자란다. 그래서 이 목록의 디렉터리 항목은 **그 아래 전부**를
+    뜻하고, 이것이 `allowed_paths` 를 읽는 방식과도 같다.
+
+    `(산출물, 제거 대상, 임시 패턴)` 을 돌려준다. 앞의 둘은 **완료 뒤 작업 트리에 남는(또는 남지 않게 되는)**
+    경로라 이름을 그대로 적을 수 있다. 세 번째는 **컴파일 중에만 존재하는** staging 이다 — `mkdtemp` 가
+    이름을 정하므로 미리 적을 수 있는 것은 이름이 아니라 패턴(`STAGE_GLOB`)뿐이고, 성공하면 지워지지만
+    반영과 rollback 이 모두 실패하면 저장소 루트에 남는다. 목록의 목적은 쓰기 상한을 정하는 것이고
+    상한은 패턴으로 세울 수 있으므로, 이름을 못 적는다는 것이 빠뜨려도 된다는 뜻은 아니다."""
+    root = Path(root) if root else _project_root()
+    _files, trees, planned, pruned = compile_targets(root, prune)
+    dirs = {str(dst.relative_to(root)) for _src, dst in trees}
+
+    def mark(rel):
+        # 계획 단계에서 트리로 잡힌 것, 또는 이전 산출물이 디스크에 디렉터리로 남아 있는 것.
+        return f"{rel}/" if rel in dirs or (root / rel).is_dir() else rel
+
+    outputs = sorted({mark(rel) for rel in planned | set(pruned) | {STATE_PATH}})
+    return outputs, [mark(rel) for rel in pruned], [STAGE_GLOB]
+
+
 def _exists(path: Path) -> bool:
     return path.exists() or path.is_symlink()
 
@@ -533,16 +589,7 @@ def _state_bytes(written):
 
 def _prepare_compile(root: Path, prune: bool):
     """모든 입력·경로를 읽고 검증해 메모리 계획으로 만든다. 출력은 쓰지 않는다."""
-    files, trees = plan_outputs(root)
-    tree_rels = [str(dst.relative_to(root)) for _src, dst in trees]
-    if len(tree_rels) != len(set(tree_rels)):
-        raise CompileError("같은 skill destination 이 두 번 계획됐다")
-    if set(files) & set(tree_rels):
-        raise CompileError("파일 산출물과 tree 산출물 경로가 충돌한다")
-
-    planned = set(files) | set(tree_rels)
-    previous = _previous_outputs(root)
-    pruned = sorted((previous or set()) - planned) if prune else []
+    files, trees, planned, pruned = compile_targets(root, prune)
     for rel in sorted(planned | set(pruned) | {STATE_PATH}):
         target = _inside(root, rel, "compile output")
         _validate_parent_chain(root, target, rel)
@@ -583,7 +630,7 @@ def _prepare_compile(root: Path, prune: bool):
 
 def _stage_compile(root: Path, plan):
     """완성본과 파일 rollback 사본을 저장소와 같은 파일시스템에 만든다."""
-    stage = Path(tempfile.mkdtemp(prefix=".compile-", dir=str(root)))
+    stage = Path(tempfile.mkdtemp(prefix=STAGE_PREFIX, dir=str(root)))
     try:
         new = stage / "new"
         for rel, data in {**plan["files"], STATE_PATH: plan["state"]}.items():

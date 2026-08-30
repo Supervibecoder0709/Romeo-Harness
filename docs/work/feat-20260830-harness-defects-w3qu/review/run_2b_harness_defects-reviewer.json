@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_2b_harness_defects-reviewer.json",
+    "sha256": "c816be12d8537899df3ce7c585aa35dfe4b8b7461482a5ff2734da487a693b81"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "check-7은 `grep -c '6건' ... || true`이므로 '6건'이 다시 생기거나 grep 자체가 실패해도 종료 코드가 항상 0이다. 재실행 대조가 AC-3의 충족과 위반을 구별하지 못하므로 이 required_check는 수용 기준을 실제로 게이트하지 못한다.",
+      "file": "docs/work/feat-20260830-harness-defects-w3qu/task/run_2b_harness_defects-reviewer.json",
+      "line": 45
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_2b_harness_defects.yaml",
+  "notes": "두 역할 계약의 base_sha는 일치한다. 승인 리비전 이후 spec 변경은 수용 기준 체크 표시뿐이고 검증 계획은 바뀌지 않았다. 현재 구현 변경은 증거의 changed_files와 구현자 allowed_paths 안에 있으며 guards는 비어 있다. 다만 check-7의 재실행 결과가 AC-3 위반을 판별할 수 없어 PASS 근거가 성립하지 않는다."
+}

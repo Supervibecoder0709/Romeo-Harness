@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_3c_harness_defects-reviewer.json",
+    "sha256": "de95fb120def01b77e3a603031a104a2432c07ac17794540c24d964b02bdca16"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "AC-4의 출력 목록은 planned·pruned·상태 파일만 포함하지만, 실제 compile은 저장소 루트에 `.compile-*` staging 디렉터리를 만들고 그 아래에 파일을 쓴다. 이 경로는 목록에서 빠지며, check-6의 실행 전후 스냅샷은 완료 전에 삭제되는 transient staging 쓰기를 관찰하지 못한다. 따라서 `compile`이 실제로 쓰는 경로를 전부 인쇄한다는 수용 기준과 그 검사의 주장이 성립하지 않는다.",
+      "file": "romeo/compile.py",
+      "line": 622
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_3c_harness_defects.yaml",
+  "notes": "두 역할 계약의 base_sha는 일치한다. 승인 리비전 이후 spec 변경은 수용 기준 체크 표시뿐이고 required_checks는 바뀌지 않았다. 증거의 changed_files는 구현자 allowed_paths 안에 있고 guards는 비어 있으며, 기록된 검사들은 모두 exit 0이다. 검사는 재실행하지 않았다."
+}

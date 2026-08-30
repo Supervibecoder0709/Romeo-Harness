@@ -586,3 +586,53 @@ class TestSmallDefectsFromTheDiffReview(_ApprovalRepo):
         run_command(self.unit, "true", run_name="run-a-second", project_root=self.root)
         names = [r["run_id"] for r in list_runs(self.root, self.unit)]
         self.assertEqual(names[-1], "run-a-second", names)
+
+    def test_a_colon_in_expect_gives_a_pointed_korean_error_not_a_traceback(self):
+        """결함 ① 회귀 — `expect` 문구에 따옴표 없는 콜론이 들어가면 검증 계획 YAML 이 깨진다.
+        `envelope build` 는 파이썬 traceback 대신 어느 검사·어느 줄·열이 깨졌는지 지목하는
+        한국어 오류(ValueError)를 내야 하고, CLI 는 그것을 종료 코드가 0 이 아닌 것으로 끝내야 한다."""
+        fm, body = frontmatter.read(self.spec)
+        self.assertIn("expect: exit 0", body)
+        body = body.replace("expect: exit 0", "expect: exit 0: 이유")
+        frontmatter.write(self.spec, fm, body)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        sha = self._commit("approve")
+
+        with self.assertRaises(ValueError) as cm:
+            build_envelope(self.unit, "implementer", project_root=self.root, base_sha=sha)
+        msg = str(cm.exception)
+        self.assertIn("check-1", msg)
+        self.assertIn("행", msg)
+        self.assertIn("열", msg)
+        self.assertIn("콜론", msg)
+        self.assertNotIn("Traceback", msg)
+        self.assertNotIn("expect: exit 0: 이유", msg, "명령·값 문자열 전체를 싣지 않는다")
+
+        buf = io.StringIO()
+        with redirect_stdout(buf), redirect_stderr(buf):
+            rc = main(["envelope", "build", "--unit", self.unit, "--role", "implementer",
+                       "--base-sha", sha, "--root", str(self.root)])
+        self.assertNotEqual(rc, 0)
+        self.assertNotIn("Traceback", buf.getvalue())
+        self.assertIn("check-1", buf.getvalue())
+
+    def test_the_pointed_error_names_the_right_check_not_a_colon_inside_a_command(self):
+        """결함 ① 의 오류 메시지가 **어느 검사인지**를 틀리게 지목하지 않는가.
+
+        검사 id 는 YAML 시퀀스 항목(`- id: ...`)에서만 온다. `id:` 를 아무 데서나 찾으면 바로 위
+        command·expect 값에 든 `id:` 를 검사 이름으로 읽어, 사람을 엉뚱한 줄로 보낸다."""
+        from romeo.close import required_checks
+        body = ("```yaml\n"
+                "required_checks:\n"
+                "  - id: check-1\n"
+                '    command: "true"\n'
+                "    expect: exit 0\n"
+                "  - id: check-2\n"
+                "    command: \"grep 'id: 미끼' README.md\"\n"
+                "    expect: exit 0: 이유\n"
+                "```\n")
+        with self.assertRaises(ValueError) as cm:
+            required_checks(body)
+        msg = str(cm.exception)
+        self.assertIn("check-2", msg, "깨진 줄이 속한 검사를 지목하지 못했다")
+        self.assertNotIn("미끼", msg, "command 값 안의 `id:` 를 검사 이름으로 오인했다")

@@ -1,0 +1,84 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_4d_review2
+task_id: task_f64e722ad172
+dispatch_id: null
+unit_id: feat-20260830-harness-defects-w3qu
+spec_ref:
+  path: docs/work/feat-20260830-harness-defects-w3qu/spec.md
+  sha256: 6796bef2af29d8111aab0b97edd4f50782659ac3516617efb873e429a7e31dae
+base_sha: 53519c8df7c76d6ec2c0ad257bf68cca864c56a4
+head_sha: ae7b67af6a0fbc4fc836a5f5b25ea8c784b637a6
+dirty_tree_hash: 58c63bc249e44f2cb3ad1f48173a39c2be8d6bd260ca70699967c312aa196d4a
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-harness-defects-w3qu
+started_at: '2026-08-30T21:17:44+09:00'
+finished_at: '2026-08-30T21:22:36+09:00'
+commands:
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-defects-w3qu'
+  exit_code: 0
+  started_at: '2026-08-30T21:17:44+09:00'
+  finished_at: '2026-08-30T21:17:44+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_4d_review2/01-review-tree-before.log
+  log_sha256: 491761e2368cf16c727a07555ebe5895619d088b924b47b0c89354b59d9935fe
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M adapters/orca/prompts/implementer-brief.md\n M core/templates/tech-spec.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/compile.py\n M tests/test_compile.py\n M tests/test_envelope.py\n\
+    ?? tests/test_docs.py"
+  head_sha: ae7b67af6a0fbc4fc836a5f5b25ea8c784b637a6
+  dirty_tree_hash: 58c63bc249e44f2cb3ad1f48173a39c2be8d6bd260ca70699967c312aa196d4a
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-defects-w3qu'
+  exit_code: 0
+  started_at: '2026-08-30T21:21:47+09:00'
+  finished_at: '2026-08-30T21:21:47+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_4d_review2/02-review-tree-after.log
+  log_sha256: 491761e2368cf16c727a07555ebe5895619d088b924b47b0c89354b59d9935fe
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M adapters/orca/prompts/implementer-brief.md\n M core/templates/tech-spec.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/compile.py\n M tests/test_compile.py\n M tests/test_envelope.py\n\
+    ?? tests/test_docs.py"
+  head_sha: ae7b67af6a0fbc4fc836a5f5b25ea8c784b637a6
+  dirty_tree_hash: 58c63bc249e44f2cb3ad1f48173a39c2be8d6bd260ca70699967c312aa196d4a
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260830-harness-defects-w3qu/review/run_4d_review2-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-30T21:22:36+09:00'
+  finished_at: '2026-08-30T21:22:36+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_4d_review2/03-review-record.log
+  log_sha256: 77e220d96455c814d26826a39ccaf1e198507ef0f00e6b57b59bb46fecdcbe90
+  stdout_tail: ae24a913bd6834e467277ee49417d54423bf646c719a480bbeed2d0401f9e9c5  docs/work/feat-20260830-harness-defects-w3qu/review/run_4d_review2-reviewer.json
+  head_sha: ae7b67af6a0fbc4fc836a5f5b25ea8c784b637a6
+  dirty_tree_hash: 58c63bc249e44f2cb3ad1f48173a39c2be8d6bd260ca70699967c312aa196d4a
+changed_files:
+- adapters/orca/RUNBOOK.md
+- adapters/orca/prompts/implementer-brief.md
+- archive/README.md
+- archive/bmad-code-org-BMAD-METHOD/00-exploration.md
+- archive/bmad-code-org-BMAD-METHOD/01-docs/README.ko.md
+- archive/bmad-code-org-BMAD-METHOD/01-docs/docs-reference-agents.ko.md
+- archive/bmad-code-org-BMAD-METHOD/01-docs/docs-reference-workflow-map.ko.md
+- archive/bmad-code-org-BMAD-METHOD/02-workflow-summary.md
+- archive/bmad-code-org-BMAD-METHOD/03-components/bmm-agents.ko.md
+- archive/bmad-code-org-BMAD-METHOD/03-components/core-and-workflows.ko.md
+- archive/bmad-code-org-BMAD-METHOD/04-components-table.md
+- archive/bmad-code-org-BMAD-METHOD/05-pm-harness-notes.md
+- archive/bmad-code-org-BMAD-METHOD/06-source-evidence.md
+- archive/bmad-code-org-BMAD-METHOD/_source.md
+- core/templates/tech-spec.md
+- docs/planning/implementation-plan.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/compile.py
+- tests/test_compile.py
+- tests/test_docs.py
+- tests/test_envelope.py
+artifact_hash: c39bb4a66ffd33372bc97e54b93cf9dc4abf800660a29d913a9cba2b9ae64ac8
+reviewer: null
+verdict: null
+approvals: []

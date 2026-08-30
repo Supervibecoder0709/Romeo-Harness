@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/spec.md",
+    "sha256": "8d00b2933edcf7ecc40cd07ffcc58c64ac46c2de6b02e827658fe2100d5ed499"
+  },
+  "base_sha": "c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests -t . -v",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo compile --check",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo doctor",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo fixtures parity --report",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --list-outputs",
+      "expect": "exit 0 이고 출력에 .agents/ 와 .harness/compiled.yaml 이 모두 있다"
+    },
+    {
+      "id": "check-7",
+      "command": "grep -c '6건' adapters/orca/prompts/implementer-brief.md || true",
+      "expect": "출력이 0 이다 (검사 개수를 고정한 표현이 남아 있지 않다)"
+    },
+    {
+      "id": "check-8",
+      "command": "grep -n '한 줄' core/templates/tech-spec.md",
+      "expect": "exit 0 이고 변경 범위 절의 형식 제약을 인쇄한 줄이 나온다"
+    },
+    {
+      "id": "check-9",
+      "command": "grep -n 'agent_prompt_stalled' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0 이고 늦은 채택 실패를 적은 줄이 함께 나온다"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

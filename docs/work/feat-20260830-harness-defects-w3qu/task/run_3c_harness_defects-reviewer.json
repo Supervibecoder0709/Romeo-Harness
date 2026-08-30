@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/spec.md",
+    "sha256": "801185417fa32ebc795792e8700826cb76160a15c726930d7fbe5bc38cbab721"
+  },
+  "base_sha": "5aa0c6802e689332799bbd88e2831ffe2cf8bad8",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests -t . -v",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo compile --check",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo doctor",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo fixtures parity --report",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v",
+      "expect": "exit 0 — list_outputs 가 compile 이 실제로 건드리는 집합(planned·pruned·상태 파일)을 모두 담는지 검사한다"
+    },
+    {
+      "id": "check-7",
+      "command": "! grep -q '6건' adapters/orca/prompts/implementer-brief.md",
+      "expect": "exit 0 — 매치가 있으면 ! 가 1 로 뒤집어 검사가 실패한다. 종료 코드 자체가 조건이다"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v",
+      "expect": "exit 0 — romeo new 가 만든 spec 에 템플릿의 한 줄·백틱 제약이 그대로 나타나는지 검사한다"
+    },
+    {
+      "id": "check-9",
+      "command": "grep -c '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md",
+      "expect": "출력이 1 이상이다 — agent_prompt_stalled 토큰은 승인 리비전에 이미 3번 있어 검사가 되지 않는다"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

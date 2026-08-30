@@ -483,6 +483,16 @@ orca terminal wait --terminal "$HANDLE" --for tui-idle --timeout-ms 90000 --json
 
 성공 신호: `.result.wait.satisfied == true` 이고 `.result.wait.status == "running"`(실측).
 
+**표본 1건 — `tui-idle` 을 기다린 뒤에 채택해도 `agent_prompt_stalled` 로 실패했다.** 이 정비 직전 관통(`feat-20260830-harness-defects-w3qu`
+의 선행 관통)에서 `orca terminal wait --for tui-idle` 이 `.result.wait.satisfied == true` 를 반환한 뒤에 `worker-start --terminal` 을
+불렀는데도 위 표와 같은 실패(`state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled`)가 났다. 위 문단은
+"너무 일찍 채택하면 경쟁한다" 만 적고 있지만, 이 표본은 **준비를 기다려도 실패할 수 있다**는 것을 보여준다 — `tui-idle` 만족이
+채택 성공을 보장하지 않는다는 뜻이다. 표본이 1건이라 원인을 재현해 확정하지 못했으므로 규칙으로 단정하지 않고 관측으로만 남긴다.
+'너무 일찍'과 '너무 늦게'는 서로 다른 실패이고, 둘 다 같은 증상(`agent_prompt_stalled`)으로 나타난다.
+그때 쓴 우회는 위 "비대화형 형태를 굳이 쓸 이유가 있다면" 문단과 같다 — 워커로 채택하지 않고 비대화형(`codex exec -s read-only`)으로
+터미널만 만들어 `-o <파일>` 출력으로 결과를 회수했다. 그 경로에는 lifecycle(`worker_done`·heartbeat)이 없으므로
+그 Task 는 orchestration 이 완료로 표시하지 못하고 `task-update` 로 사람이 정리해야 한다 — 위 문단과 같은 대가를 다시 치른다.
+
 **절차 파일에 계약 해시를 적어 준다 — 적지 않으면 두 런타임의 판정이 갈린다(2026-08-29 관통에서 확정).**
 
 결과 계약 스키마는 검토자에게 `task_envelope_ref.sha256` 을 요구한다. 그런데 검토자의 역할 계약

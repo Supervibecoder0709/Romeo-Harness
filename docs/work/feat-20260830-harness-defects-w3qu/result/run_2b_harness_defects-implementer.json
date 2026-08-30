@@ -1,0 +1,25 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_2b_harness_defects-implementer.json",
+    "sha256": "8a24b79607ffb858f332ac1bc125caad6008f3f2ddb4a51dba7b9be58d98bdd7"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest discover -s tests -t . -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo compile --check", "exit_code": 0},
+    {"id": "check-3", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo doctor", "exit_code": 0},
+    {"id": "check-5", "command": "bin/romeo fixtures parity --report", "exit_code": 0},
+    {"id": "check-6", "command": "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v", "exit_code": 0},
+    {"id": "check-7", "command": "grep -c '6건' adapters/orca/prompts/implementer-brief.md || true", "exit_code": 0},
+    {"id": "check-8", "command": "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v", "exit_code": 0},
+    {"id": "check-9", "command": "grep -c '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_2b_harness_defects.yaml",
+  "notes": "2회차 — 1차 검토자 FAIL findings 5건 반영. ① spec.md 확인란(finding 1): 재승인 커밋 99e9031 에서 이미 해소돼 있었고, 이번에는 승인 문장을 건드리지 않고 체크 표시만 채웠다(승인 리비전과 diff 대조: 체크 표시 외 무변경). ② compile.py list_outputs(finding 2): planned 만 인쇄하던 것을 compile_targets() 하나로 합쳐 pruned 와 STATE_PATH 까지 담게 고쳤고, 디렉터리 산출물은 끝에 '/' 를 붙여 그 아래 전부를 뜻한다는 것을 드러낸다. ③ close.py 검사 id 정규식(finding 5): '^\\s*-\\s+id:' 로 앵커해 command·expect 값 안의 'id:' 를 검사 이름으로 오인하지 않게 했다. ④ check-8(finding 3)·check-6(finding 2)·check-9(finding 4) 는 재승인된 검증 계획이 이미 실검사로 바꿔 놓은 것이고, 그것이 겨누는 테스트 tests/test_docs.py::TestNewSpecCarriesChangeScopeConstraint(4건)·tests/test_compile.py::TestListOutputsCoversEverythingCompileWrites(4건)를 새로 썼다. 세 검사 모두 음성 대조를 거쳤다 — 승인 리비전 99e9031 의 구현(list_outputs 1차형·앵커 없는 정규식·tech-spec.md 원본)으로 되돌리면 각각 실패한다(check-6 2건 실패, check-8 3건 실패, 앵커 회귀 테스트는 검사 id 를 '미끼' 로 오인해 실패). check-9 는 승인 리비전의 RUNBOOK 에서 grep -c 가 0 이고 현재 1 이다. 9건 전부 evidence run_2b_harness_defects 에서 exit 0 로 기록됐고, check-1 은 unittest 454건 OK 다."
+}

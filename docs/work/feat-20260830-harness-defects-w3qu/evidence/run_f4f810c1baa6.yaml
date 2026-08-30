@@ -1,0 +1,198 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_f4f810c1baa6
+task_id: task_8389b0182379
+dispatch_id: ctx_7e86a3a17c03
+unit_id: feat-20260830-harness-defects-w3qu
+spec_ref:
+  path: docs/work/feat-20260830-harness-defects-w3qu/spec.md
+  sha256: 10642fb0908a216961a7655b085f7f15ea0b1235d02b4b639639616cb1602182
+base_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-harness-defects-w3qu
+started_at: '2026-08-30T14:41:03+09:00'
+finished_at: '2026-08-30T19:53:24+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest discover -s tests -t . -v
+  exit_code: 0
+  started_at: '2026-08-30T14:41:03+09:00'
+  finished_at: '2026-08-30T14:42:25+09:00'
+  seconds: 81.918
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/01-check-1.log
+  log_sha256: 4814fcca38af9691ebe3ba8be110396c33036e660d9a05a80682234403376488
+  stdout_tail: ''
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-2
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-30T14:42:25+09:00'
+  finished_at: '2026-08-30T14:42:25+09:00'
+  seconds: 0.142
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/02-check-2.log
+  log_sha256: 03ac847be66e7721b591621191505bb230f8900d1a52ffab575e220c61975de8
+  stdout_tail: compile 검사 PASS
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-3
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-30T14:42:25+09:00'
+  finished_at: '2026-08-30T14:42:25+09:00'
+  seconds: 0.082
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/03-check-3.log
+  log_sha256: b4d61b8d46d64bd7e91f746c866ac4725d3e162195221d97473bc200a0441ddf
+  stdout_tail: "s/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-harness-defects-w3qu/docs/work/feat-20260830-harness-tuneup-6xcq/brief.md\
+    \ lines=71 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-harness-defects-w3qu/docs/work/feat-20260830-harness-tuneup-6xcq/spec.md\
+    \ lines=154 needs_input=0 unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 154 > 150"
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-4
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-30T14:42:25+09:00'
+  finished_at: '2026-08-30T14:42:26+09:00'
+  seconds: 0.349
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/04-check-4.log
+  log_sha256: 95adbc2321f054722118e7c16e6fb765b0488eb169d8e4c6c983d523efecc99f
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-5
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-30T14:42:26+09:00'
+  finished_at: '2026-08-30T14:42:27+09:00'
+  seconds: 0.891
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/05-check-5.log
+  log_sha256: 1bb14d2bdfc3889555cb6f3b399dab320b17f9eb1c0119a0733db8383cd5f2d3
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-6
+  command: bin/romeo compile --list-outputs
+  exit_code: 0
+  started_at: '2026-08-30T14:42:27+09:00'
+  finished_at: '2026-08-30T14:42:27+09:00'
+  seconds: 0.131
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/06-check-6.log
+  log_sha256: c6c7c792df8b1fa8188be88a5e3b0fe895694fb95863b2e242e8438d34eddf46
+  stdout_tail: "lls/plan-close/SKILL.md\n  .claude/skills/plan/SKILL.md\n  .claude/skills/receiving-code-review\n\
+    \  .claude/skills/requesting-code-review\n  .claude/skills/review/SKILL.md\n  .claude/skills/systematic-debugging\n\
+    \  .claude/skills/test-driven-development\n  .claude/skills/using-git-worktrees\n  .claude/skills/verification-before-completion\n\
+    \  .harness/compiled.yaml\n  AGENTS.md\n  CLAUDE.md\n컴파일 대상 29개 (쓰지 않았다)"
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-7
+  command: grep -c '6건' adapters/orca/prompts/implementer-brief.md || true
+  exit_code: 0
+  started_at: '2026-08-30T14:42:27+09:00'
+  finished_at: '2026-08-30T14:42:27+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/07-check-7.log
+  log_sha256: fd4bf4f062fc51596fb556c0ddd42e6d3fa3dac9c94c9eb2764253b1f37db3e7
+  stdout_tail: '0'
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-8
+  command: grep -n '한 줄' core/templates/tech-spec.md
+  exit_code: 0
+  started_at: '2026-08-30T14:42:27+09:00'
+  finished_at: '2026-08-30T14:42:27+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/08-check-8.log
+  log_sha256: 9665ac650ea5a04779bca60ac418f33584ca80e2758d753d1e363202a1be6c8c
+  stdout_tail: 48:**'바뀌는 파일·모듈' 은 한 줄이어야 하고, 각 항목의 경로는 백틱으로 감싼다.** 이 줄이 작업 계약의 `allowed_paths` 가 된다 —
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: check-9
+  command: grep -n 'agent_prompt_stalled' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T14:42:27+09:00'
+  finished_at: '2026-08-30T14:42:27+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/09-check-9.log
+  log_sha256: 15fbfabba2b22cf36960c6a5ec897c3331135436691024173dd515d10dceeee7
+  stdout_tail: '''는 서로 다른 실패이고, 둘 다 같은 증상(`agent_prompt_stalled`)으로 나타난다.
+
+    1169:| **`worker-start --terminal` 이 비대화형 실행을 워커로 채택하는가** | **못 한다.** `codex exec` → `state: failed`
+    · `stage: dispatch_input` · `last_failure: agent_prompt_stalled`. TUI(`codex -s read-only`) → `state:
+    ready` · `stage: input_accepted`. §3.7 의 표 참조 |
+
+    1196:- 이 문서가 지시하는 실패·복구 경로(§7) 중 실제로 밟은 것은 `worker-start` 실패 1건(`agent_prompt_stalled`)뿐이다.'
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-defects-w3qu'
+  exit_code: 0
+  started_at: '2026-08-30T14:47:55+09:00'
+  finished_at: '2026-08-30T14:47:55+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/10-review-tree-before.log
+  log_sha256: 58ff7b49f13e9e483781a78194b7ad375df10840a8a2dd0897d90c397384a030
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M adapters/orca/prompts/implementer-brief.md\n M core/templates/tech-spec.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/compile.py\n M tests/test_envelope.py"
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-defects-w3qu'
+  exit_code: 0
+  started_at: '2026-08-30T19:39:39+09:00'
+  finished_at: '2026-08-30T19:39:39+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/11-review-tree-after.log
+  log_sha256: 58ff7b49f13e9e483781a78194b7ad375df10840a8a2dd0897d90c397384a030
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M adapters/orca/prompts/implementer-brief.md\n M core/templates/tech-spec.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/compile.py\n M tests/test_envelope.py"
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-defects-w3qu'
+  exit_code: 0
+  started_at: '2026-08-30T19:46:01+09:00'
+  finished_at: '2026-08-30T19:46:01+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/12-review-tree-after.log
+  log_sha256: 58ff7b49f13e9e483781a78194b7ad375df10840a8a2dd0897d90c397384a030
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M adapters/orca/prompts/implementer-brief.md\n M core/templates/tech-spec.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/compile.py\n M tests/test_envelope.py"
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260830-harness-defects-w3qu/review/run_f4f810c1baa6-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-30T19:53:24+09:00'
+  finished_at: '2026-08-30T19:53:24+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260830-harness-defects-w3qu/run_f4f810c1baa6/13-review-record.log
+  log_sha256: af7d3da1847e8ad8f8c1269dc27874b738ff1ccf8f731bea2608e161fa148ab6
+  stdout_tail: 34b2fa6e79c7336f8620f67fab0bebf2b8a7e0a118adee47eeb08ff920559ca1  docs/work/feat-20260830-harness-defects-w3qu/review/run_f4f810c1baa6-reviewer.json
+  head_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  dirty_tree_hash: fbada6cb9d5dc0e8518f2aed75082f76de5dff3bc115e35fece7602c1223eee9
+changed_files:
+- adapters/orca/RUNBOOK.md
+- adapters/orca/prompts/implementer-brief.md
+- core/templates/tech-spec.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/compile.py
+- tests/test_envelope.py
+artifact_hash: 4feaa982dd1a79c5337e4f4c5a01e61999dcb470990a96e8158a62d3e33528da
+reviewer: null
+verdict: null
+approvals: []

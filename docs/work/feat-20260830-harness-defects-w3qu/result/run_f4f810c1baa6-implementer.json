@@ -1,0 +1,25 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_f4f810c1baa6-implementer.json",
+    "sha256": "4a5250e6442cc96c60c614a1333cee5cdcbc97f52c6320bab88305caa70c370a"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest discover -s tests -t . -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo compile --check", "exit_code": 0},
+    {"id": "check-3", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo doctor", "exit_code": 0},
+    {"id": "check-5", "command": "bin/romeo fixtures parity --report", "exit_code": 0},
+    {"id": "check-6", "command": "bin/romeo compile --list-outputs", "exit_code": 0},
+    {"id": "check-7", "command": "grep -c '6건' adapters/orca/prompts/implementer-brief.md || true", "exit_code": 0},
+    {"id": "check-8", "command": "grep -n '한 줄' core/templates/tech-spec.md", "exit_code": 0},
+    {"id": "check-9", "command": "grep -n 'agent_prompt_stalled' adapters/orca/RUNBOOK.md", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_f4f810c1baa6.yaml",
+  "notes": "9건 전부 evidence run_f4f810c1baa6 에서 exit 0 로 재실행 확인됨. AC-1~AC-6 을 뒷받침하는 근거는 spec.md 확인란의 각 체크박스에 파일 경로·줄과 evidence run_f4f810c1baa6 의 check id 로 적었다. check-1 은 unittest 445건(회귀 테스트 tests/test_envelope.py::TestSmallDefectsFromTheDiffReview::test_a_colon_in_expect_gives_a_pointed_korean_error_not_a_traceback 포함) 전부 OK."
+}

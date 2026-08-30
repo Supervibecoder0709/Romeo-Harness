@@ -30,12 +30,39 @@ ENVELOPE_CHECKS = ("ENVELOPE_VALID", "TASK_ANCHORED", "BASE_SHA", "EVIDENCE_ANCH
 UNREADABLE = "봉투를 읽을 수 없어 대조가 성립하지 않는다"
 
 
+# 검사 id 는 YAML 시퀀스 항목(`  - id: check-1`)의 형태로만 인정한다. `id:` 를 어디서나 찾으면
+# 바로 위 command·expect 값에 든 `id:` 를 검사 이름으로 오인해 엉뚱한 검사를 지목한다.
+CHECK_ID_RE = re.compile(r"^\s*-\s+id:\s*(\S+)\s*$")
+
+
 def required_checks(body):
     m = CHECKS_BLOCK_RE.search(body)
     if not m:
         return []
-    data = yaml.safe_load(m.group(1)) or {}
+    block = m.group(1)
+    try:
+        data = yaml.safe_load(block) or {}
+    except yaml.YAMLError as e:
+        raise ValueError(_checks_yaml_error(block, e)) from e
     return data.get("required_checks") or []
+
+
+def _checks_yaml_error(block, exc):
+    """파서 예외를 어느 검사의 어느 줄·열이 깨졌는지 지목하는 한국어 메시지로 바꾼다.
+    명령 문자열 전체는 싣지 않는다 — 원인 파악에 위치만 있으면 충분하고, 명령이 길면 메시지가 그것에 묻힌다."""
+    mark = getattr(exc, "problem_mark", None)
+    if mark is None:
+        return "검증 계획의 required_checks YAML 을 읽을 수 없다 — 형식이 깨졌다"
+    lines = block.splitlines()
+    check_id = None
+    for i in range(min(mark.line, len(lines) - 1), -1, -1):
+        found = CHECK_ID_RE.match(lines[i])
+        if found:
+            check_id = found.group(1).strip("\"'")
+            break
+    where = f"{check_id}" if check_id else "알 수 없는 검사"
+    return (f"검증 계획의 required_checks YAML 이 {where} 근처 {mark.line + 1}행 {mark.column + 1}열에서 깨졌다 — "
+            "값에 따옴표 없는 콜론(:)이 들어 있을 수 있다. 그 값을 큰따옴표로 감싼다.")
 
 
 # 하네스 자신을 대상으로 하는 검사. 페이로드(하네스를 부착한 프로젝트) 작업 단위의 검증 계획에는 넣지 않는다 —

@@ -1,0 +1,25 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_3c_harness_defects-implementer.json",
+    "sha256": "a5ac235b5e801a4323c763b301587fc4bd3c145910597c848a6de381e919fdb9"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest discover -s tests -t . -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo compile --check", "exit_code": 0},
+    {"id": "check-3", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo doctor", "exit_code": 0},
+    {"id": "check-5", "command": "bin/romeo fixtures parity --report", "exit_code": 0},
+    {"id": "check-6", "command": "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v", "exit_code": 0},
+    {"id": "check-7", "command": "! grep -q '6건' adapters/orca/prompts/implementer-brief.md", "exit_code": 0},
+    {"id": "check-8", "command": "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v", "exit_code": 0},
+    {"id": "check-9", "command": "grep -c '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_3c_harness_defects.yaml",
+  "notes": "3회차 — 2차 검토자 FAIL findings 1건(check-7 의 '|| true' 가 종료 코드를 항상 0 으로 만들어 AC-3 위반을 통과시킨다) 반영. 그 결함은 검증 계획 안에 있었으므로 구현자가 고칠 수 없었고(§7 '검증 계획 자체는 실행 중에 바꾸지 않는다'), 재승인 커밋 5aa0c68 이 check-7 을 '! grep -q ...' 로 바꿨다. 이번 실행의 산출물 변경은 spec.md 수용 기준 체크박스 6개뿐이다 — git diff 로 대조했고 확인란 문장·검증 계획은 무변경이다(문장 diff 0줄). 소스 변경(romeo/close.py·compile.py·cli.py·core/templates/tech-spec.md·adapters/orca/prompts/implementer-brief.md·adapters/orca/RUNBOOK.md·tests/) 은 2회차가 만든 것이 그대로 남아 있고 커밋되지 않았다 — head 5aa0c6802e68, tree 346127755f28. check-7 음성 대조: 현재 브리프 파일을 복사해 '`required_checks` 6건은 문자열 그대로 실행한다' 를 되돌린 사본에 같은 명령을 걸면 exit 1 이고, 현재 파일에는 exit 0 이다(scratchpad 에서 sh -c 로 실측). 즉 이 검사는 이제 AC-3 의 충족과 위반을 종료 코드로 구별한다. AC-4 는 명령을 직접 돌려 .agents/ 12건·.claude/ 14건·.harness/compiled.yaml·AGENTS.md·CLAUDE.md 총 29개가 인쇄되는 것과, 실행 전후 git status --porcelain 과 HEAD 가 동일한 것(읽기 전용)을 확인했다. AC-5 는 §3.7(RUNBOOK 394행에서 시작, 그 뒤 500행까지 다른 절 없음)의 483행 뒤 문단이다. 9건 전부 evidence run_3c_harness_defects 에 cmd-1~cmd-9 로 기록됐고, evidence checks 가 같은 9건을 재실행해 전부 exit 0 로 대조했다 — check-1 은 unittest 454건 OK, 82.57s."
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-defects-w3qu",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-defects-w3qu/task/run_4d_harness_defects-reviewer.json",
+    "sha256": "b4a88f273da4941e1172ce5842e837fc9e8833dbcc61dce8996835e7b348e5ac"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "구현자 증거의 spec_ref.sha256(6796bef2...)이 reviewer·implementer 작업 계약의 승인된 spec_ref.sha256(d848729d...)과 다르다. 따라서 기록된 녹색 검사와 체크된 수용 기준이 승인 원본에 묶였다고 볼 수 없어 PASS의 근거가 되지 않는다.",
+      "file": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_4d_harness_defects.yaml",
+      "line": 10
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260830-harness-defects-w3qu/evidence/run_4d_harness_defects.yaml",
+  "notes": "두 작업 계약의 base_sha는 일치한다. changed_files는 구현자 allowed_paths 안에 있고 guards는 비어 있으며, required_checks 9건은 승인된 계획과 대응하고 모두 exit 0으로 기록됐다. 그러나 spec 증거 앵커 불일치로 수용 기준 충족을 승인 원본에 귀속할 수 없다."
+}

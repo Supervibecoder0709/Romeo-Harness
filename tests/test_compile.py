@@ -7,14 +7,17 @@
 4. vendor 투영본은 원문과 blob SHA 가 같다 (수정 0 이 투영 후에도 유지된다).
 5. `--check` 가 stale(코어를 고치고 컴파일하지 않은 상태)과 managed block 손댐을 잡는다.
 """
+import fnmatch
 import os
 import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-from romeo.compile import (MANAGED_END, MANAGED_START, _strip_frontmatter, check_compiled,
-                           compile_all, replace_managed_block)
+from romeo.compile import (MANAGED_END, MANAGED_START, STAGE_GLOB, STATE_PATH,
+                           _prepare_compile, _previous_outputs, _stage_compile,
+                           _state_bytes, _strip_frontmatter, check_compiled, compile_all,
+                           list_outputs, replace_managed_block)
 from romeo.provenance import blob_sha
 from romeo.util import project_root
 
@@ -49,6 +52,34 @@ def snapshot_outputs(root: Path):
             else:
                 entries[key] = ("missing",)
     return entries
+
+
+def uncovered(touched, outputs):
+    """`outputs` 가 담지 못한 경로. 끝에 `/` 가 붙은 항목은 그 아래 전부를 덮고, `*` 가 든 항목은
+    이름이 매번 달라 미리 적을 수 없는 경로를 패턴으로 덮는다 — `allowed_paths` 를 읽는 방식과 같은 규칙이다."""
+    entries = set(outputs)
+    dirs = tuple(rel for rel in entries if rel.endswith("/") and "*" not in rel)
+    globs = [rel.rstrip("/") for rel in entries if "*" in rel]
+
+    def covered(rel):
+        if rel in entries or (dirs and rel.startswith(dirs)):
+            return True
+        parts = rel.split("/")
+        return any(fnmatch.fnmatch("/".join(parts[:i + 1]), pattern)
+                   for i in range(len(parts)) for pattern in globs)
+
+    return sorted(rel for rel in touched if not covered(rel))
+
+
+def files_snapshot(root: Path):
+    """작업 트리의 모든 일반 파일을 바이트로 찍는다. 어떤 경로가 바뀌었는지 실측으로 판정하기 위한 것이다."""
+    out = {}
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            out[str(path.relative_to(root))] = ("symlink", os.readlink(path))
+        elif path.is_file():
+            out[str(path.relative_to(root))] = ("file", path.read_bytes())
+    return out
 
 
 class TestManagedBlock(unittest.TestCase):
@@ -593,6 +624,112 @@ class TestCompile(unittest.TestCase):
                 self.assertEqual(meta.get("name"), name, f"{p} 의 name 이 폴더명과 다르다")
                 self.assertTrue((meta.get("description") or "").strip(),
                                 f"{p} 에 description 이 없다")
+
+
+class TestListOutputsCoversEverythingCompileWrites(unittest.TestCase):
+    """`--list-outputs` 가 컴파일이 실제로 건드리는 집합을 전부 담는가 (AC-4).
+
+    이름만 세는 검사가 아니다 — 컴파일 전후로 작업 트리를 실측해 **바뀐 경로 전부**가 목록 안에 있는지 본다.
+    구현자가 이 목록을 보고 spec 의 「변경 범위」를 쓰기 때문에, 목록이 하나라도 빠뜨리면 그 다음 위임이
+    쓰기 상한 밖을 건드리고 폐기된다(결함 ④ 가 바로 그것이었다). 계획 산출물만 인쇄하고 **제거 대상**
+    (이전 컴파일에만 있던 경로)을 빠뜨리는 것도 같은 누락이다 — 삭제도 작업 트리를 바꾼다.
+
+    집합은 두 가지다. **완료 뒤 남는 산출물**은 이름을 그대로 인쇄하고, **컴파일 중에만 존재하는 staging**
+    은 `mkdtemp` 라 이름이 매번 달라 미리 인쇄할 수 없으므로 패턴 한 줄로 세운다(AC-4). 성공한 컴파일은
+    staging 을 지우므로 전후 스냅샷으로는 관찰되지 않는다 — 그래서 그 줄은 실제로 만들어지는 디렉터리와
+    대조한다."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = make_tree(Path(self.tmp.name))
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _mark_as_previous_output(self, rel):
+        """이전 컴파일이 그 경로를 만들었던 것처럼 상태 파일을 고친다 — 다음 컴파일의 제거 대상이 된다."""
+        previous = _previous_outputs(self.root) or set()
+        (self.root / STATE_PATH).write_bytes(_state_bytes(previous | {rel}))
+
+    def test_lists_the_paths_the_acceptance_criterion_names(self):
+        compile_all(self.root)
+        outputs, _pruned, _transient = list_outputs(self.root)
+        self.assertIn(STATE_PATH, outputs, "컴파일 상태 파일이 목록에 없다")
+        self.assertTrue([rel for rel in outputs if rel.startswith(".agents/")],
+                        f".agents/ 산출물이 목록에 없다: {outputs}")
+        self.assertIn(".agents/skills/plan/SKILL.md", outputs)
+        self.assertIn(".claude/agents/implementer.md", outputs)
+        self.assertTrue([rel for rel in outputs if rel.startswith(".claude/")], outputs)
+        self.assertIn("CLAUDE.md", outputs)
+        self.assertIn("AGENTS.md", outputs)
+
+    def test_listing_does_not_write(self):
+        compile_all(self.root)
+        before = files_snapshot(self.root)
+        list_outputs(self.root)
+        self.assertEqual(before, files_snapshot(self.root), "--list-outputs 가 작업 트리를 바꿨다")
+
+    def test_prints_the_staging_directory_as_one_pattern(self):
+        """컴파일 중에만 있는 staging 을 패턴 한 줄로 세우고, 그 패턴이 실제 디렉터리를 덮는가 (AC-4).
+
+        `_stage_compile` 은 저장소 루트에 `mkdtemp` 로 디렉터리를 만들고, 반영과 rollback 이 모두 실패하면
+        그것을 **지우지 않고 남긴다**. 이름이 매번 다르므로 목록에 적을 수 있는 것은 패턴뿐이다 — 여기서
+        확인하는 것은 그 패턴이 실제로 만들어지는 이름을 덮는가이지 문자열이 그럴듯한가가 아니다.
+        패턴이 어긋나면 쓰기 상한이 그 자리를 비워 두고, 실패한 컴파일 뒤의 다음 위임이 거기서 막힌다."""
+        compile_all(self.root)
+        outputs, _pruned, transient = list_outputs(self.root)
+        self.assertEqual(len(transient), 1, f"staging 은 패턴 한 줄이어야 한다: {transient}")
+        self.assertIn("*", transient[0], f"패턴이 아니라 고정된 이름이 인쇄됐다: {transient[0]}")
+        self.assertEqual(transient, [STAGE_GLOB])
+        self.assertNotIn(transient[0], outputs,
+                         "완료 뒤 남는 산출물과 컴파일 중에만 있는 경로가 같은 목록에 섞였다")
+
+        plan = _prepare_compile(self.root, True)
+        stage = _stage_compile(self.root, plan)
+        try:
+            rel = str(stage.relative_to(self.root))
+            self.assertTrue(rel.startswith("."), f"staging 이 저장소 루트에 만들어지지 않았다: {rel}")
+            touched = {rel} | {str(path.relative_to(self.root)) for path in stage.rglob("*")}
+            self.assertGreater(len(touched), 1, "staging 이 비어 있다 — 검사가 성립하지 않는다")
+            self.assertTrue(uncovered(touched, outputs),
+                            "완료 뒤 남는 산출물 목록이 staging 을 이미 덮는다 — 패턴 줄이 검사되지 않는다")
+            missing = uncovered(touched, list(outputs) + list(transient))
+            self.assertFalse(missing, f"실제 staging 경로를 패턴이 덮지 못한다: {missing[:5]}")
+        finally:
+            shutil.rmtree(stage, ignore_errors=True)
+
+    def test_covers_every_path_a_real_compile_changes(self):
+        compile_all(self.root)
+        stray = ".claude/skills/gone-in-a-previous-compile/SKILL.md"
+        (self.root / stray).parent.mkdir(parents=True, exist_ok=True)
+        (self.root / stray).write_text("이전 컴파일이 남긴 산출물\n", encoding="utf-8")
+        self._mark_as_previous_output(stray)
+
+        outputs, pruned, _transient = list_outputs(self.root)
+        self.assertIn(stray, pruned, "이전 상태에만 있는 경로를 제거 대상으로 잡지 못했다")
+        self.assertIn(stray, outputs, "제거 대상이 전체 목록에서 빠졌다")
+
+        before = files_snapshot(self.root)
+        compile_all(self.root)
+        after = files_snapshot(self.root)
+        touched = {rel for rel in set(before) | set(after) if before.get(rel) != after.get(rel)}
+
+        self.assertIn(stray, touched,
+                      "이 테스트가 제거를 재현하지 못했다 — 검사가 성립하지 않는다")
+        missing = uncovered(touched, outputs)
+        self.assertFalse(missing, f"컴파일이 바꿨는데 --list-outputs 가 인쇄하지 않은 경로: {missing}")
+
+    def test_a_fresh_tree_compile_changes_nothing_outside_the_list(self):
+        """상태 파일이 없는 최초 컴파일 — 산출물이 통째로 생기는 경우에도 목록이 그것을 전부 담는가."""
+        outputs, pruned, _transient = list_outputs(self.root)
+        self.assertEqual(pruned, [], "상태 파일이 없으면 제거 대상은 없다")
+        before = files_snapshot(self.root)
+        compile_all(self.root)
+        after = files_snapshot(self.root)
+        touched = {rel for rel in set(before) | set(after) if before.get(rel) != after.get(rel)}
+        self.assertTrue(touched, "최초 컴파일이 아무것도 만들지 않았다 — 검사가 성립하지 않는다")
+        missing = uncovered(touched, outputs)
+        self.assertFalse(missing, f"컴파일이 만들었는데 --list-outputs 가 인쇄하지 않은 경로: {missing}")
 
 
 if __name__ == "__main__":

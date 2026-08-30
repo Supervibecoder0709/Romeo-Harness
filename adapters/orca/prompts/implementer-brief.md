@@ -9,7 +9,7 @@
 
 입력 — 작업 계약: `docs/work/<id>/task/<run-id>-implementer.json` (자기 작업 루트 기준 상대 경로).
 그 자리에 아직 없으면 자기 작업 루트에서 `bin/romeo envelope build --unit <id> --role implementer --base-sha <base-sha> --run <run-id>` 로 만든다 —
-같은 입력이면 바이트까지 같은 계약이 나온다. 계약의 `allowed_paths` 밖에는 쓰지 않는다. `required_checks` 6건은 문자열 그대로 실행한다.
+같은 입력이면 바이트까지 같은 계약이 나온다. 계약의 `allowed_paths` 밖에는 쓰지 않는다. 개수는 그 계약이 정한다 — `required_checks` 를 문자열 그대로 전부 실행한다.
 
 위임 식별자 — Run `<run-id>`. `<task-id>` 와 `<dispatch-id>` 는 기동 뒤에 메시지로 전달된다(orca orchestration 수신함 — 제목 「위임 식별자」). 수신함을 못 읽으면(샌드박스가 IPC 를 막으면) 기동 지시문에 적힌 값을 쓴다.
 **받기 전에는 `bin/romeo evidence run`·`evidence checks` 를 시작하지 않는다.** 전달이 늦으면 `orca orchestration check --run <run-id> --peek --json` 으로 수신함을 본다.
