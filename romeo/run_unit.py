@@ -70,16 +70,27 @@ def _reviewed_through(data):
     return max(ns) if ns else 0
 
 
+def _settled_through(data):
+    """판정이 난 마지막 시도의 회차 번호.
+
+    진행 중(`started`)인 시도는 세지 않는다 — 아직 실패하지 않은 시도를 재검토가 덮었는지 묻는 것은 뜻이 없고,
+    그렇게 물으면 재검토로 막 해제한 그 회차가 **자기 계약을 다시 만들지 못한다**(계약 생성이 게이트를 다시 지난다)."""
+    ns = [int(a.get("n") or 0) for a in (data.get("attempts") or [])
+          if a.get("result") in ("pass", "fail")]
+    return max(ns) if ns else 0
+
+
 def consecutive_failures(data):
-    """마지막 재검토 **이후**의 연속 실패 수.
+    """마지막 성공(`pass`) **이후**의 연속 실패 수.
 
     성공(`pass`)이 나오면 거기서 끊긴다 — 카운터가 0 으로 돌아간다. 아직 판정이 없는 시도(`started`)는 세지 않는다.
-    `base_sha` 는 보지 않는다: 새 base 로 다시 겨눈 시도도 **같은 완료 정의**를 겨눈 시도이므로 리셋 사유가 아니다."""
-    floor = _reviewed_through(data)
+    `base_sha` 는 보지 않는다: 새 base 로 다시 겨눈 시도도 **같은 완료 정의**를 겨눈 시도이므로 리셋 사유가 아니다.
+
+    **재검토는 이 수를 줄이지 않는다.** 재검토는 그 시점까지를 한 번 통과시키는 것이지 실패를 없애는 것이 아니다 —
+    줄이면 실패 1·2 → 재검토 → 실패 3 이 다시 1 이 되어 4회차가 재검토 없이 돈다(2026-08-31 실측).
+    카운터를 되돌리는 것은 성공뿐이다(AGENTS.core §10). 해제 판정은 `gate()` 가 따로 한다."""
     count = 0
     for att in reversed(data.get("attempts") or []):
-        if int(att.get("n") or 0) <= floor:
-            break
         result = att.get("result")
         if result == "fail":
             count += 1
@@ -89,14 +100,22 @@ def consecutive_failures(data):
 
 
 def gate(data):
-    """기동해도 되는가. (허용 여부, 연속 실패 수, 사람이 읽을 이유)"""
+    """기동해도 되는가. (허용 여부, 연속 실패 수, 사람이 읽을 이유)
+
+    한도에 이르러도 **마지막 재검토가 판정 난 마지막 시도를 덮으면** 통과시킨다. 그 뒤에 실패가 하나 더 쌓이면
+    다시 막힌다 — 한 번의 재검토는 그 시점까지의 면제이지 영구 면제가 아니다."""
     n = consecutive_failures(data)
     if n < CONSECUTIVE_FAILURE_LIMIT:
         return True, n, ""
+    if _reviewed_through(data) >= _settled_through(data):
+        return True, n, ""
+    unit = data.get("unit_id") or "<단위>"
     return False, n, (
         f"같은 작업 단위에서 관통이 연속 {n}회 실패했다 — {n + 1}회차를 돌기 전에 완료 정의가 달성 가능한지 "
-        f"사람이 재검토한다(AGENTS.core §10). 재검토 결론을 --after-review \"<결론>\" 으로 주면 "
-        f"그 결론을 기록하고 진행한다. 실패 원인 분류는 기록만 하고 이 판정에 쓰지 않는다.")
+        f"사람이 재검토한다(AGENTS.core §10). 재검토 결론을 "
+        f"bin/romeo run-unit --unit {unit} --run <run> --base-sha <승인 커밋> "
+        f"--after-review \"<결론>\" --by <사람> 으로 주면 그 결론을 기록하고 진행한다 — "
+        f"기록 창구는 이 하나다. 실패 원인 분류는 기록만 하고 이 판정에 쓰지 않는다.")
 
 
 def add_review(data, conclusion, by=None):
@@ -334,6 +353,9 @@ def run_unit(unit_id, project_root=".", harness_root=None, run=None, base_sha=No
                     "consecutive_failures": failures, "blocked_reason": why,
                     "attempts_path": str(attempts_path(project_root, unit_id)), "stages": []}
         add_review(data, after_review, by=by)
+        # 재검토를 **먼저** 디스크에 남긴다. 아래 1단계의 계약 생성이 같은 게이트를 다시 지나므로
+        # (`envelope.write_envelope`), 메모리에만 있는 해제는 그 자리에서 보이지 않는다.
+        save_attempts(project_root, unit_id, data)
         released = True
 
     # 계약을 만들기 전에 base_sha 를 확정한다 — 시도 기록에 남는 값과 계약의 값이 같아야 한다.

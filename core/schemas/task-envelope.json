@@ -100,9 +100,6 @@
           "command": {
             "type": "string",
             "minLength": 1
-          },
-          "expect": {
-            "type": "string"
           }
         }
       }

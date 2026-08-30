@@ -183,12 +183,10 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
     if out["isolation"] not in WORKSPACES:
         raise ValueError(f"{unit_id}: 격리가 {out['isolation']!r} 다 — 문서 패키지가 없는 분류에는 작업 계약을 만들지 않는다")
-    checks = []
-    for rc in required_checks(body):
-        item = {"id": str(rc.get("id") or ""), "command": str(rc.get("command") or "")}
-        if rc.get("expect") is not None:
-            item["expect"] = str(rc["expect"])
-        checks.append(item)
+    # 검사는 id 와 명령뿐이다. 종료 코드 자체가 조건이므로 기대를 따로 적는 자리를 두지 않는다 —
+    # 사람이 조건으로 쓰는데 기계가 판정에 쓰지 않는 필드는 함정이었다(2026-08-31, 이 단위).
+    checks = [{"id": str(rc.get("id") or ""), "command": str(rc.get("command") or "")}
+              for rc in required_checks(body)]
     env = {
         "schema": SCHEMA_ID,
         "unit_id": unit_id,
@@ -253,9 +251,32 @@ def format_result_check(res):
     return "\n".join(lines)
 
 
+def repeat_gate(project_root, unit_id):
+    """반복 중단 게이트(`AGENTS.core.md` §10). 차단이면 예외를 던져 계약을 만들지 못하게 한다.
+
+    이 자리에 두는 이유: **계약 생성은 모든 관통의 첫 동작**이다. 게이트를 `run-unit` 안에만 두면
+    RUNBOOK §3 을 손으로 밟는 관통에서는 한 번도 평가되지 않는다 — 직전 관통이 실제로 그랬다(2026-08-31 실측).
+    어느 경로로 돌리든 이 자리를 지나므로, 여기서 막으면 3회차가 시작되지 않는다.
+
+    시도 기록(`attempts.yaml`)이 없으면 실패 0 으로 본다. 지금 대부분의 단위가 그 상태이고,
+    입구에 선 게이트가 기록 없는 단위까지 막으면 어떤 관통도 시작하지 못한다.
+
+    `run_unit` 을 함수 안에서 부르는 것은 순환 import 때문이다 — 그쪽이 이 모듈의 `write_envelope` 를 쓴다."""
+    from .run_unit import gate, load_attempts  # 순환 import 를 피해 여기서 부른다
+    allowed, n, why = gate(load_attempts(project_root, unit_id))
+    if not allowed:
+        raise ValueError(f"{unit_id}: 반복 중단 — 작업 계약을 만들지 않는다. {why}")
+    return n
+
+
 def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, run_name=None):
-    """계약을 작업 단위 폴더 안(`docs/work/<id>/task/`)에 쓴다 — 등록되지 않은 산출물은 종료 검사가 인정하지 않는다(K-62)."""
+    """계약을 작업 단위 폴더 안(`docs/work/<id>/task/`)에 쓴다 — 등록되지 않은 산출물은 종료 검사가 인정하지 않는다(K-62).
+
+    **반복 중단 게이트가 여기서 걸린다**(`repeat_gate`). 계약을 계산하는 `build_envelope` 가 아니라 **쓰는** 자리에
+    두는 이유는, 종료 검사가 봉투를 대조할 때 그 계산을 다시 부르기 때문이다(`close._check_review`) —
+    거기서 막으면 차단된 단위는 지난 관통의 판정조차 대조하지 못한다. 막아야 할 것은 **새 관통의 시작**이다."""
     project_root = Path(project_root).resolve()
+    repeat_gate(project_root, unit_id)
     if role == "reviewer" and not run_name:
         # 검토 봉투는 계약 경로의 <run> 으로 자기 run 의 증거(방어 검사)에 묶인다 — run 없는 자리(task/reviewer.json)의 계약으로 낸
         # 판정은 종료 검사가 세지 않는다. 만들 수 있는 자리를 두면 함정이므로 여기서 거부한다.

@@ -60,9 +60,10 @@ def harness_own_checks(plan):
 
 
 def _plan_key(plan):
-    """검증 계획을 대조용 형태로 줄인다 — 무엇을 어떤 기대로 실행하기로 했는가."""
-    return [(str((rc or {}).get("id")), str((rc or {}).get("command")), str((rc or {}).get("expect")))
-            for rc in plan]
+    """검증 계획을 대조용 형태로 줄인다 — 무엇을 실행하기로 했는가.
+
+    종료 코드 자체가 조건이므로 기대를 따로 적는 자리는 없다. 대조는 id 와 명령 문자열로만 성립한다."""
+    return [(str((rc or {}).get("id")), str((rc or {}).get("command"))) for rc in plan]
 
 
 def _approved_body(project_root, spec, unit_id):

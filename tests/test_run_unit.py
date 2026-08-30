@@ -22,7 +22,7 @@ from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
 from romeo.policy import route
 from romeo.run_unit import (CONSECUTIVE_FAILURE_LIMIT, STAGES, consecutive_failures, gate,
-                            load_attempts, record_result, run_unit)
+                            load_attempts, record_result, run_unit, save_attempts, start_attempt)
 from romeo.util import load_yaml
 
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
@@ -78,7 +78,8 @@ class TestStopRule(unittest.TestCase):
     def test_review_record_releases_the_gate(self):
         data = _attempts("fail", "fail")
         data["reviews"] = [{"after_attempt": 2, "conclusion": "완료 정의를 좁혔다", "by": "사람"}]
-        self.assertEqual(consecutive_failures(data), 0)
+        # 재검토는 카운터를 **되돌리지 않는다** — 해제는 gate() 가 따로 판정한다(RepeatGate 참고)
+        self.assertEqual(consecutive_failures(data), 2)
         self.assertTrue(gate(data)[0])
         # 해제 뒤에도 다시 2연속 실패가 쌓이면 또 막는다 — 한 번의 재검토가 영구 면제가 아니다
         data["attempts"] += [{"n": 3, "run": "run_3", "base_sha": "c" * 40, "result": "fail"},
@@ -90,8 +91,8 @@ class TestStopRule(unittest.TestCase):
         self.assertEqual(consecutive_failures(data), 2)
 
 
-class TestRunUnit(unittest.TestCase):
-    """실제 저장소 위에서 5단계와 중단 기준을 함께 본다."""
+class _UnitRepo:
+    """승인된 작업 단위 하나가 커밋돼 있는 임시 저장소. 계약 생성이 도는 최소 조건이다."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
@@ -128,6 +129,10 @@ class TestRunUnit(unittest.TestCase):
         with redirect_stdout(buf), redirect_stderr(err):
             code = main(list(argv))
         return code, buf.getvalue() + err.getvalue()
+
+
+class TestRunUnit(_UnitRepo, unittest.TestCase):
+    """실제 저장소 위에서 5단계와 중단 기준을 함께 본다."""
 
     # ── 5단계 ────────────────────────────────────────────────────────────────
     def test_dry_run_walks_five_stages_in_order(self):
@@ -253,6 +258,105 @@ class TestRunUnit(unittest.TestCase):
         with self.assertRaises(SystemExit) as cm:
             self._cli("run-unit", "--help")
         self.assertEqual(cm.exception.code, 0)
+
+
+class RepeatGate(_UnitRepo, unittest.TestCase):
+    """브레이크가 실제로 걸리는가 — 재검토가 카운터를 리셋하지 않고, 게이트가 **모든 관통의 입구**에 선다.
+
+    두 결함이 이 클래스의 이유다(2026-08-31 실측).
+
+      ③ 실패 1·2 → 재검토 → 실패 3 이면 카운터가 1 로 돌아가 4회차가 재검토 없이 돌았다.
+        재검토는 그 시점까지를 한 번 통과시키는 것이지 실패를 없애는 것이 아니다.
+      Ⓔ 게이트를 부르는 곳이 `run_unit()` 하나뿐이라 RUNBOOK §3 을 손으로 관통하면 한 번도 평가되지 않았다.
+        계약 생성(`envelope build`)은 어느 경로로 돌리든 반드시 지나는 자리다.
+    """
+
+    def _build(self, run="run_x"):
+        return self._cli("envelope", "build", "--unit", self.unit, "--role", "implementer",
+                         "--run", run, "--base-sha", self.base, "--root", str(self.root))
+
+    def _write_attempts(self, *results, reviews=None):
+        data = _attempts(*results)
+        data["unit_id"] = self.unit
+        data["reviews"] = reviews or []
+        save_attempts(self.root, self.unit, data)
+
+    def _task(self, run):
+        return self.root / "docs/work" / self.unit / "task" / f"{run}-implementer.json"
+
+    # ── ③ 재검토는 카운터를 리셋하지 않는다 ──────────────────────────────────
+    def test_review_does_not_reset_counter(self):
+        data = _attempts("fail", "fail")
+        data["reviews"] = [{"after_attempt": 2, "conclusion": "완료 정의를 좁혔다", "by": "사람"}]
+        # 재검토 직후는 통과한다 — 사람이 그 시점까지를 봤다
+        self.assertTrue(gate(data)[0])
+        # 그 뒤 실패가 **하나만 더** 쌓여도 다시 막힌다. 종전에는 카운터가 1 로 돌아가 4회차까지 돌았다
+        data["attempts"].append({"n": 3, "run": "run_3", "base_sha": "c" * 40, "result": "fail"})
+        self.assertEqual(consecutive_failures(data), 3, "재검토는 실패를 지우지 않는다")
+        allowed, n, why = gate(data)
+        self.assertFalse(allowed, "재검토 뒤 실패 1회로 다시 막혀야 한다")
+        self.assertEqual(n, 3)
+        self.assertIn("재검토", why)
+
+    # ── ③ 성공은 여전히 리셋한다 ────────────────────────────────────────────
+    def test_pass_resets_counter(self):
+        data = _attempts("fail", "fail", "pass", "fail")
+        self.assertEqual(consecutive_failures(data), 1, "성공 뒤의 실패 1회만 센다")
+        self.assertTrue(gate(data)[0], "성공이 끼면 그 다음 실패 1회로는 막지 않는다")
+        # 성공 뒤에 다시 2연속이 쌓이면 그때는 막는다 — 리셋이 면제가 아니다
+        data["attempts"].append({"n": 5, "run": "run_5", "base_sha": "a" * 40, "result": "fail"})
+        self.assertFalse(gate(data)[0])
+
+    # ── Ⓔ 차단이면 계약을 만들지 않는다 ─────────────────────────────────────
+    def test_envelope_build_refuses_when_blocked(self):
+        self._write_attempts("fail", "fail")
+        code, out = self._build()
+        self.assertEqual(code, 1, out)
+        self.assertIn("반복 중단", out)
+        self.assertIn("연속 2회 실패", out)
+        # 무엇을 해야 푸는지 한국어로 말한다
+        self.assertIn("재검토", out)
+        self.assertIn("--after-review", out)
+        # 차단된 기동은 계약을 남기지 않는다
+        self.assertFalse(self._task("run_x").is_file())
+
+    # ── Ⓔ 안 걸린 경우엔 그대로 동작한다 ────────────────────────────────────
+    def test_envelope_build_allows_when_not_blocked(self):
+        # ① 시도 기록이 아예 없는 단위 — 지금 대부분이 그 상태다
+        self.assertFalse((self.root / "docs/work" / self.unit / "attempts.yaml").is_file())
+        code, out = self._build(run="run_none")
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self._task("run_none").is_file())
+        # ② 마지막이 pass 인 단위 — 성공이 카운터를 되돌렸다
+        self._write_attempts("fail", "fail", "pass")
+        code, out = self._build(run="run_pass")
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self._task("run_pass").is_file())
+
+    def test_a_released_attempt_can_rebuild_its_own_contract(self):
+        """재검토로 해제한 회차는 **자기 계약을 다시 만들 수 있어야** 한다.
+
+        진행 중(started)인 시도까지 재검토가 덮어야 할 대상으로 세면, `--after-review` 로 막 연 3회차의
+        워커가 계약을 다시 만들려는 순간 자기 자신에게 막힌다 — 입구에 선 게이트에서 그것은 교착이다."""
+        self._write_attempts("fail", "fail",
+                             reviews=[{"after_attempt": 2, "conclusion": "좁혔다", "by": "사람"}])
+        data = load_attempts(self.root, self.unit)
+        start_attempt(data, "run_third", self.base)
+        save_attempts(self.root, self.unit, data)
+        code, out = self._build(run="run_third")
+        self.assertEqual(code, 0, out)
+
+    def test_after_review_through_run_unit_still_walks_the_stages(self):
+        """게이트를 입구에 걸어도 `run-unit --after-review` 경로가 그대로 돈다.
+
+        1단계(계약 생성)가 같은 게이트를 다시 지나므로, 재검토는 그 전에 디스크에 남아야 한다."""
+        for run in ("run_a", "run_b"):
+            self._run(run=run)
+            record_result(self.unit, run, "fail", project_root=self.root)
+        res = self._run(run="run_c", after_review="완료 정의를 좁혔다", by="사람")
+        self.assertEqual(res["verdict"], "OK")
+        self.assertTrue(res["released_by_review"])
+        self.assertTrue(self._task("run_c").is_file())
 
 
 if __name__ == "__main__":
