@@ -17,10 +17,11 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준: 이 블록을 담은 커밋 자신 — `e1bc5b1` 의 다음 커밋 · 2026-08-29 밤)
+## 지금 상태 (기준 `144a676` · 2026-08-30)
 
-> 이 블록은 손으로 갱신한다. `git log --oneline e1bc5b1..HEAD` 가 이 커밋 하나면 최신이다. 그 뒤 커밋이 있으면 그 커밋들이
-> 아래 항목을 바꿨는지 먼저 본다 — 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
+> 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
+> `git log --oneline 144a676..HEAD` 가 이 CI 줄 갱신 커밋 하나면 최신이다. 그 뒤 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
 - **마일스톤:** **M2 완료 (2026-08-29 · D-76).** 근본 원인 재검토([폴더](../reviews/2026-08-29-codex-m2-rootcause-review/README.md)) 뒤 사용자가 추천안 5건을
   전부 확정했고(완료 정의 개정 · D-75 (b) · impl6 게이트 제외 · Q-11 미룸 · push 별도 승인) 같은 세션에서 실행했다:
@@ -28,15 +29,14 @@ authority: derived
   **impl5 실제 close EXIT 0**(`status: done` · `closed_at 2026-08-29T23:43:14+09:00` · 검사 6·재실행 6·EVIDENCE_LOG 16·REVIEW_VERDICT PASS · WARN 3) →
   페이로드 22파일 + close 산출물을 이 브랜치에 반영(봉투 앵커 5/5 ×2 · 검사 1·2·4·6 exit 0 at HEAD).
   **M2 완료 ≠ v1 릴리스 완료** — T2 Charter(V-2)·shadow 20건(V-10)·attach/update 는 M3~M4 의 잔여다.
-- **CI:** 이 세션의 커밋들은 push 하지 않았다(**push 는 별도 승인**, K-66). 마지막 CI run `33237273401`(`b53f08c`) success — 지금 HEAD 의 CI 는 미실행.
+- **CI:** 사용자 승인 뒤 push(`6fe0d23..144a676`, fast-forward) → run **`33289382316`**(`144a676`) **success**(job `check`, 2026-08-30 03:03Z).
   로컬: unittest **419 OK**(398 → 419: TestAdvisoryVerdict 17 + strict 계약 테스트 보강 4) · `compile --check`·`validate`·`doctor`·`parity --report`(EXIT 0 · 'advisory 면 7') PASS.
 - **다음 세션이 이어갈 자리 (순서대로):**
-  1. **push 승인** — 대상 브랜치 `Supervibecoder0709/mvp_planning`, 되돌리기는 `git revert`(로컬 커밋이라 force 불필요). 승인되면 push → CI 초록 확인 → 이 블록의 CI 줄 갱신.
-  2. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 하려면 task 2건을 `ready` 로 되돌리고 RUNBOOK §3 교체 형태로 1회(구현자 codex 1·검토자 claude 1·§6.6 표본 없음). 실패해도 M2 를 다시 열지 않는다.
-  3. **M3 진입 전 하네스 정비 1회(별도 작업 단위, 한 커밋 묶음):** RUNBOOK 수동 단계 자동화(`romeo run-unit` — 계약 생성→Orca 기동→회수→record→모으기) ·
+  1. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 하려면 task 2건을 `ready` 로 되돌리고 RUNBOOK §3 교체 형태로 1회(구현자 codex 1·검토자 claude 1·§6.6 표본 없음). 실패해도 M2 를 다시 열지 않는다.
+  2. **M3 진입 전 하네스 정비 1회(별도 작업 단위, 한 커밋 묶음):** RUNBOOK 수동 단계 자동화(`romeo run-unit` — 계약 생성→Orca 기동→회수→record→모으기) ·
      check-5(하네스 unittest)를 페이로드 `required_checks` 에서 분리하는 템플릿 규칙 · "관통 중 하네스 동결" 을 `AGENTS.core.md` 에 · 위협 모델을 constraints K-5x 로 승격 ·
      `review/SKILL.md` 에 FAIL 사유 열거(Q-10 (a)) · 문서 다이어트(progress ≤ 20KB) · §10 체크리스트 8~48 을 "완료 표" 로 접기.
-  4. **G-M3** — 계획 §7 M3(Charter·discovery·gate·doctor) 진입은 사용자 확정 게이트(D-52)부터.
+  3. **G-M3** — 계획 §7 M3(Charter·discovery·gate·doctor) 진입은 사용자 확정 게이트(D-52)부터.
 - **이번 세션에 끝난 것:** 근본 원인 재검토(47) · D-76 실행과 close·통합(48). 실행 상태 변경: 워크트리 `codex-m2-rootcause` 신설 · impl6 task 2건 `blocked`(D-76) · Orca Run 은 그대로.
 - **낡은 워크트리:** `impl-`~`impl4-`(관측 표본 원본) · `impl5-`(**close 된 산출물·증거·로그의 원본** — `.harness/runs` 로그는 커밋되지 않으므로 지우면 EVIDENCE_LOG 재검증이 불가능해진다) ·
   `impl6-`(미기동) · `codex-m2-review` · `codex-m2-rootcause`(리뷰 원본). 정리는 승인 대상이다(K-66).
@@ -127,7 +127,7 @@ authority: derived
 
 ### 2026-08-29 M2 close 이후 남은 것 (최신)
 
-- **원격 CI 는 미실행이다.** 이 세션의 커밋은 push 되지 않았다(별도 승인). 로컬 검사(unittest 419·compile·validate·doctor·parity)만 초록이다.
+- **원격 CI 는 `144a676` 까지 초록이다**(run `33289382316`). 그 뒤 커밋은 이 CI 줄 갱신뿐이다 — CI 는 push 마다 다시 본다.
 - **기본 구현자(claude)의 권한 강제는 여전히 미관측이다.** D-76 의 "권한 상한" 요소는 관측된 범위(검토자 read-only 두 런타임)로만 판정한다. 교체 구현자(codex `-s workspace-write`)의 외부 쓰기·승인 명령 차단도 부분 관측이다.
 - **검토 판정이 왜 흔들리는지는 모른다(Q-10).** D-76 은 그것을 게이트에서 뺀 것이지 줄인 것이 아니다. 재료: `--judge-verdict strict` 프로파일과 같은 산출물 5실행의 봉투. 첫 손댈 자리는 `review/SKILL.md` 의 FAIL 사유 열거.
 - **check-5 가 하네스 자신의 unittest 라 페이로드 close 가 하네스 리비전에 묶인다.** 이번엔 impl5(7f8ecd7)에서 닫아 문제없었지만, 다음 단위부터는 페이로드 검사와 하네스 검사를 분리하는 템플릿 규칙이 필요하다(다음 자리 3).
