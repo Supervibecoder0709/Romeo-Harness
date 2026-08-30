@@ -63,9 +63,11 @@ authority: derived
 | `rg` | `/Applications/ChatGPT.app/Contents/Resources/rg` — **정식 설치 아님** | `validate-repo-archive.sh`가 우연히 동작 중. K-20("rg + 스크립트")의 전제가 취약 → M1의 첫 T0 후보 |
 | 홈 레벨 자산 | `~/.claude/commands/race.md`, 스킬 `orca-cli`·`orchestration`·`skill-creator`·`explain`·`find-skills`·`computer-use`; `~/.codex/AGENTS.md`(persona), `~/.codex/config.toml`(model·effort·approval·sandbox 키 존재, 값 미열람) | 병렬 비교(`race`)·오케스트레이션은 이미 사용자 레벨에 존재 → 하네스가 재구현하지 않고 계약만 정의 |
 
-### 1.3 참고 저장소 18개와 라이선스
+### 1.3 참고 저장소 19개와 라이선스
 
 아카이브 문서 자체에는 18개 중 2개만 라이선스가 적혀 있어(C-H3 "부분"이 사실) GitHub API(`license.spdx_id`, 현재 기본 브랜치)와 고정 SHA 트리의 LICENSE 파일을 읽기 전용으로 대조했다.
+
+**2026-08-30 추가:** G-M3 선행(Q-06)으로 BMAD 본체를 `v6.10.0` 고정 SHA 로 아카이브해 19번째 행이 됐다. 이 행은 `_source.md` 에 라이선스가 적혀 있다.
 
 | 아카이브 (`archive/<name>`) | 고정 SHA | 라이선스 (API / 고정 SHA 실물) | `_source.md` 에 적는 값 (AC 대조용) |
 | --- | --- | --- | --- |
@@ -75,6 +77,7 @@ authority: derived
 | farion1231-cc-switch | `5ca9459` | MIT | `MIT` |
 | langchain-ai-openwiki | `a525ed8` | MIT | `MIT` |
 | bmad-…-creative-intelligence-suite | `0e4ff92` | API NOASSERTION / **실물 `LICENSE` = MIT (BMad Code, LLC)** | `MIT` |
+| bmad-code-org-BMAD-METHOD | `081e64e` | API NOASSERTION / **실물 `LICENSE` = MIT (BMad Code, LLC) + TRADEMARK NOTICE** (BMad™·BMad Method™·BMad Core™) | `MIT (code); BMad names, logos, and tagline are trademark-restricted` |
 | anthropics-skills | `3b3fad9` | API NONE / **루트 LICENSE 없음, 스킬별 `LICENSE.txt`** → 스킬 단위로 확인 필요 (단일 SPDX 값이 없다) | `루트 LICENSE 없음 · 스킬별 LICENSE.txt` |
 | orca-cli-orca | `5beeefc` | MIT (K-13: 기반 삼지 않음) | `MIT` |
 | sindresorhus-slugify | `7c318bd` | MIT | `MIT` |

@@ -9,13 +9,14 @@
 각 아카이브는 원본 레포를 수정하지 않고 읽기만 해서 작성했으며, 모든 서술은
 `_source.md` 에 기록된 40자리 커밋 SHA를 근거로 합니다.
 
-현재 **아카이브 18개**, 문서 **202개**.
+현재 **아카이브 19개**, 문서 **213개**.
 
 ## 목록
 
 | 아카이브 | 원본 레포 | 고정 커밋 | 라이선스 | 분석일 | 요약 |
 | --- | --- | --- | --- | --- | --- |
 | [`anthropics-skills`](anthropics-skills/) | [anthropics/skills](https://github.com/anthropics/skills) | [`3b3fad9`](https://github.com/anthropics/skills/commit/3b3fad96af16a10759d930941b4520ba0c40edae) <sup>main</sup> | 루트 LICENSE 없음 · 스킬별 LICENSE.txt | 2026-08-24 | anthropics/skills는 한 애플리케이션을 실행하는 저장소가 아니라 Claude가 특정 업무를 반복 가능하게 수행하도록 돕는 Skill 폴더의 참조·배포 묶음이다 |
+| [`bmad-code-org-BMAD-METHOD`](bmad-code-org-BMAD-METHOD/) | [bmad-code-org/BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) | [`081e64e`](https://github.com/bmad-code-org/BMAD-METHOD/commit/081e64ee5aab2316b912883f7bee528ee143ce36) <sup>v6.10.0</sup> | MIT (code); BMad names, logos, and tagline are trademark-restricted | 2026-08-30 | bmad-method npm CLI가 core/BMM을 포함한 선택 모듈을 프로젝트에 복사하고 IDE별 skill directory에 SKILL directory를 배치한다 |
 | [`bmad-code-org-bmad-module-creative-intelligence-suite`](bmad-code-org-bmad-module-creative-intelligence-suite/) | [bmad-code-org/bmad-module-creative-intelligence-suite](https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite) | [`0e4ff92`](https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite/commit/0e4ff9233a792db1a1cd00f22a482f338168cdc3) <sup>main</sup> | MIT | 2026-08-24 | CIS는 “아이디어를 빨리 내는 도구” 하나가 아니라, 문제 정의부터 검증·다음 행동까지 대화를 구조화하는 BMad용 prompt module이다 |
 | [`design-tokens-community-group`](design-tokens-community-group/) | [design-tokens/community-group](https://github.com/design-tokens/community-group) | [`16c902d`](https://github.com/design-tokens/community-group/commit/16c902d9327c18290e956a21130c445f1b88c40f) <sup>main</sup> | W3C Software and Document License | 2026-08-24 | 도구 간 디자인 토큰 교환 형식과 context별 resolver를 ReSpec으로 웹 명세로 만든다. Format의 원본은 교환용 파일 형식을 설명하며, Resolver는 light/dark 같은 여러 context의 토큰 조합을… |
 | [`dyoshikawa-rulesync`](dyoshikawa-rulesync/) | [dyoshikawa/rulesync](https://github.com/dyoshikawa/rulesync) | [`c3accea`](https://github.com/dyoshikawa/rulesync/commit/c3acceacec5463efe14ebb1b8be5fed5fa835e65) <sup>main</sup> | MIT | 2026-08-24 | Rulesync는 프로젝트의 통합 source인 .rulesync/를 여러 AI 코딩 도구가 읽는 규칙·명령·MCP·서브에이전트·스킬·hook·권한·check 형식으로 변환하는 Node.js CLI다 |
