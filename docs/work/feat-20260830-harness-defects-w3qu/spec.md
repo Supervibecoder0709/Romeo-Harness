@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-30T14:29:56+09:00'
+approved_at: '2026-08-30T19:58:04+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,10 @@ routing:
   history: []
 created: '2026-08-30'
 updated: '2026-08-30'
+approval_history:
+- {approved_at: '2026-08-30T14:29:56+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T19:58:04+09:00',
+  reason: 1차 관통의 검토자 FAIL findings 3건 반영 — check-6·8·9 가 AC-4·AC-2·AC-5 를 실제로 검사하지 않았다(check-9 의 agent_prompt_stalled
+    토큰은 승인 리비전에 이미 3번 있어 구현 전에도 통과했다). 확인란은 무변경}
 ---
 
 # 3차 관통이 드러낸 하네스 결함 5건 정비
@@ -92,17 +96,17 @@ required_checks:
     command: "bin/romeo fixtures parity --report"
     expect: exit 0
   - id: check-6
-    command: "bin/romeo compile --list-outputs"
-    expect: exit 0 이고 출력에 .agents/ 와 .harness/compiled.yaml 이 모두 있다
+    command: "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v"
+    expect: exit 0 — list_outputs 가 compile 이 실제로 건드리는 집합(planned·pruned·상태 파일)을 모두 담는지 검사한다
   - id: check-7
     command: "grep -c '6건' adapters/orca/prompts/implementer-brief.md || true"
     expect: 출력이 0 이다 (검사 개수를 고정한 표현이 남아 있지 않다)
   - id: check-8
-    command: "grep -n '한 줄' core/templates/tech-spec.md"
-    expect: exit 0 이고 변경 범위 절의 형식 제약을 인쇄한 줄이 나온다
+    command: "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v"
+    expect: exit 0 — romeo new 가 만든 spec 에 템플릿의 한 줄·백틱 제약이 그대로 나타나는지 검사한다
   - id: check-9
-    command: "grep -n 'agent_prompt_stalled' adapters/orca/RUNBOOK.md"
-    expect: exit 0 이고 늦은 채택 실패를 적은 줄이 함께 나온다
+    command: "grep -c '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md"
+    expect: 출력이 1 이상이다 — agent_prompt_stalled 토큰은 승인 리비전에 이미 3번 있어 검사가 되지 않는다
 ```
 
 
