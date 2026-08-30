@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/pbakaus/impeccable
 - Ref: main
 - Commit SHA: `56f44523f76efdcec813e67b38ee550e49b16f48`
+- License: Apache-2.0
 - Analysis timestamp: 2026-08-23T18:49:10Z
 
 ## 접근 방식과 한계

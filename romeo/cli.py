@@ -122,7 +122,7 @@ def cmd_fixtures(args):
             for p, e in errs.items():
                 print(f"PARITY_INVALID {p}: {'; '.join(e)}", file=sys.stderr)
             return 1
-        rep = run_parity(cases, harness_root=root)
+        rep = run_parity(cases, harness_root=root, judge_mode=getattr(args, "judge_verdict", None))
         print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_parity(rep))
         # 판정은 두 층이다(D-b). 검사기가 옳은지 확인하지 못한 실행은 게이트 통과를 주장할 수 없다 —
         # '해당 없음'(합성 0건)을 0 으로 접으면 아무것도 확인하지 않은 실행이 성공으로 읽힌다(K-51).
@@ -367,6 +367,8 @@ def build_parser():
                    help="생략 시 check·report 는 fixtures/requests, parity 는 fixtures/parity")
     s.add_argument("--report", action="store_true", help="(parity) 리포트 출력 — parity 는 기본이 리포트다")
     s.add_argument("--root", help="(parity) 결과 계약 스키마를 찾을 루트")
+    s.add_argument("--judge-verdict", choices=["advisory", "strict"], default=None,
+                   help="(parity) 판정 역할의 판정을 다루는 방식 — 기본 advisory(D-76: 인쇄만), strict 는 D-73·D-74 결박(Q-10 실험용)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_fixtures)
 

@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/anthropics/skills
 - Ref: `main` (GitHub API가 반환한 기본 브랜치)
 - Commit SHA: `3b3fad96af16a10759d930941b4520ba0c40edae`
+- License: 루트 LICENSE 없음 · 스킬별 LICENSE.txt
 - Analysis timestamp: 2026-08-24 03:49:12 KST (+0900)
 
 ## 재현 방법과 접근 범위

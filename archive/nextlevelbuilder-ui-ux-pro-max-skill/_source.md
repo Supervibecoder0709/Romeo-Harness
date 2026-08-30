@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
 - Ref: main
 - Commit SHA: `bc826e2267a36d98a2dcf5231e16c30ff546770f`
+- License: MIT
 - Analysis timestamp: 2026-08-23T18:49:19Z
 
 ## 분석 기준

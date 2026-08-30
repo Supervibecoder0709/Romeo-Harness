@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/w3c/aria-practices
 - Ref: `main` (GitHub REST API가 반환한 기본 브랜치)
 - Commit SHA: `7e4034b262bc0d25332e330d8a582aaf34113829`
+- License: W3C Software and Document License
 - Analysis timestamp: 2026-08-24 03:49:22 KST (+0900)
 
 ## 재현 방법과 접근 범위

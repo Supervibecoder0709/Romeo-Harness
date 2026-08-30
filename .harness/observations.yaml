@@ -271,3 +271,30 @@ result_schema_cli_flags:
   what_this_does_not_say: >-
     스키마를 두 CLI 가 받는 형태로 고치면 강제가 성립하는지는 시험하지 않았다 — anyOf 를 풀고 `$schema` 를 빼면 될 수도 있으나,
     그러면 역할별 제약(구현자 PASS 에 checks·evidence_ref 필수)이 스키마에서 사라진다. 그 제약은 envelope check 가 이미 강제하므로 시급하지 않다.
+
+# ---------------------------------------------------------------------------------------------
+m2_close:
+  observed_at: 2026-08-29
+  unit_id: feat-20260829-license-field-46an
+  decision: D-76(완료 정의 개정 — 검토 판정은 advisory) · D-75 (b) · 사용자 확정 2026-08-29 밤
+  worktree: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260829-license-field-46an   # 3차 기준 실행의 구현자 워크트리
+  romeo_binary: mvp_planning 체크아웃의 bin/romeo(e1bc5b1 + D-76 변경) — close 는 로그가 있는 impl5 를 --root 로
+  run: run_42710f6ac93b
+  product:
+    head_sha: 7f8ecd7449a5953d6b1d6b3b16d1113b4bae4f98
+    dirty_tree_hash: 7439ee6383d14880e09b4df02452010f376c2571602d929a82418468ff5e5160
+  close:
+    exit: 0
+    closed_at: '2026-08-29T23:43:14+09:00'
+    checks: REQUIRED_CHECK 6 · REQUIRED_CHECK_RERUN 6 · EVIDENCE_LOG 16(봉인 일치) · CHECK_PLAN_COMMITTED · AC_ALL_CHECKED · AC_TEXT_UNCHANGED · REVIEW_VERDICT PASS(run_42710f6ac93b · codex 검토자)
+    warns: [APPROVAL_CHAIN(옛 손 재승인), REVIEW_SUPERSEDED(옛 라운드 봉투 11건 — 지우지 않는다), REVIEW_SAMPLE(D-75 (b) — 1건으로 닫는다)]
+    dry_run_before: 같은 명령 --dry-run EXIT 0 (D-76 변경 전 22:59 · 변경 후 23:42 둘 다)
+  integrated_into_mvp_planning: 페이로드 22파일(archive/ 19 · scripts/ 3) + spec(status done)·evidence·result·review 봉투 · envelope check 5/5 ×2 · 검사 1·2·4·6 exit 0 at HEAD
+  parity_after_d76: fixtures parity --report EXIT 0 · 관측 2 · 합성 9 · advisory 면 7 · 게이트 줄 다음에 '검토 판정은 게이트가 아니다(D-76)'
+  swapped_run_skipped: impl6(run_e82929ee03da) 미기동 — D-76 ① · task_b1d012fbd58e·task_a88167812224 blocked
+  conclusion: >-
+    페이로드는 하네스가 못 닫은 것이 아니라 계획이 얹은 단계(전체 교체 재구현·검토 표본 8회·D-75 (a)) 때문에 닫히지 않고 있었다 —
+    완료 정의가 서자 같은 세션 안에 close 됐다. 그 close 가 대조한 것은 현재 트리의 재실행 6건이다(종점, K-51).
+  what_this_does_not_say: >-
+    검토 판정이 왜 흔들리는지(Q-10) · 기본 구현자(claude)의 권한 강제(여전히 미관측) · impl6 교체 실행이 현 base 에서 성공하는지 ·
+    원격 CI(push 전이라 미실행).

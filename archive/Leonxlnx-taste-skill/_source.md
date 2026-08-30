@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/Leonxlnx/taste-skill
 - Ref: main
 - Commit SHA: `72e299530e2eb31ed8da06181bc19f6c18a00821`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:54:46+09:00
 
 ## 고정 범위와 접근 방법

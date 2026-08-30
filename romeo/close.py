@@ -693,15 +693,16 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
     else:
         check("REVIEW_VERDICT", True, "; ".join(f"{n}: PASS" for n in passes))
         if len(passes) < REVIEW_PASS_SAMPLES:
-            # D-74 는 판정 역할의 면에 표본 2건 이상을 요구한다(한 번의 판정은 그 실행의 판정이다). close 에 같은 요구를
-            # 넣을지는 사용자 결정 사항(D-75)이라 지금은 막지 않고 드러낸다 — 산출물을 사소하게 바꿔 PASS 가 나올 때까지
-            # 검토를 반복하는 길이 이 줄에 보인다.
+            # D-75 (b) 확정(2026-08-29): close 는 현재 산출물의 PASS 1건으로 닫는다. 표본 2건은 참값을 만들지 않고
+            # 같은 산출물 재검토로 PASS 를 기다리는 룰렛만 연다 — 그 한계는 경고로 드러내되 막지 않는다(D-76 도 같은 논리).
+            # 바뀐 산출물만 새 검토 1건을 받는다.
             check("REVIEW_SAMPLE", False,
-                  f"현재 산출물에 PASS {len(passes)}건뿐이다 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). "
-                  f"close 에 표본 {REVIEW_PASS_SAMPLES}건 이상을 요구할지는 D-75 미확정", level="warning")
+                  f"현재 산출물에 PASS {len(passes)}건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). "
+                  f"D-75 (b) 확정: 1건으로 닫는다. 표본 {REVIEW_PASS_SAMPLES}건은 요구하지 않으며, "
+                  f"같은 산출물을 다시 검토해 PASS 를 기다리지 않는다", level="warning")
 
 
-# close 의 검토자 면이 요구할 PASS 표본 수. D-74 는 동등성 게이트에 2 를 요구한다 — close 에 같은 요구를 넣을지는 D-75 다.
+# D-74 가 게이트에 요구했던 표본 수. close 는 D-75 (b) 로 1건이면 닫고, 이 값은 경고 문구에만 쓴다(D-76 과 같은 논리).
 REVIEW_PASS_SAMPLES = 2
 # 검토자를 띄운 쪽이 검토 전후에 남기는 방어 검사의 라벨(RUNBOOK §4). 이 두 기록이 검토 시점의 산출물이다.
 DEFENSIVE_LABELS = ("review-tree-before", "review-tree-after")

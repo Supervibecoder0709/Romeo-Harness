@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/storybookjs/storybook
 - Ref: next
 - Commit SHA: `db12626a58d505f5551ae1d2c714c6249849212a`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:51:27+0900
 
 ## 범위와 접근 방식

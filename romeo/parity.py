@@ -53,6 +53,17 @@
 실행 간 분산일 수 있다. 그래서 판정 역할의 면은 각 면 `JUDGE_MIN_SAMPLES` 건 이상을 요구하고(`{files: [...]}`),
 표본이 모자라면 `VERDICT_UNSAMPLED`, 표본끼리 갈리면 `VERDICT_UNSTABLE` 로 판정에서 빼되 '비교 불가' 로 인쇄한다.
 구현자 면에는 이 요구가 없다 — 그 면이 묻는 것은 재현성이 아니라 같은 계약에서 같은 검사를 돌려 같은 결론을 냈는가다.
+
+**판정 역할의 자유 서술 판정은 게이트가 아니다(D-76, 2026-08-29 사용자 확정).** 위 두 전제(D-73·D-74)를 다 세워도
+같은 산출물·같은 런타임에서 판정이 흔들린다는 관측은 사라지지 않았고, 표본을 늘려도 참값이 생기지 않았다 —
+그 일치를 합격 조건으로 두는 한 게이트는 유한하게 닫히지 않는다(docs/reviews/2026-08-29-codex-m2-rootcause-review/).
+그래서 동등성 게이트는 **결정적 요소**만 센다: 봉투 스키마 · 역할 계약(앵커 검사)과 권한 상한 · required_checks(실행 역할) · 구현자 면의 gate 판정
+(수용 기준 AC 는 종료 검사 `close` 가 본다 — 동등성 리포트의 비교 항목이 아니다).
+판정 역할(검토자)의 면은 스키마·계약·checks 로만 비교하고, 그 판정과 전제(산출물 동일·표본·일관성)는 `advisory` 로 인쇄한다 —
+**숨기지 않되 세지 않는다**(K-51). 종전 결박은 `judge_mode="strict"` 프로파일로 남긴다(Q-10 의 판정 흔들림 실험용).
+합성 케이스는 `expect_advisory: {역할: 코드}` 로 검사기가 advisory 를 옳게 계산하는지 검증한다(`VERDICT_SAME` 은 선언하지 않는다).
+같은 선언을 strict 프로파일은 종전 기대로 번역해 읽는다 — 비교 불가 코드는 `expect_incomparable`, `VERDICT_DIFFERS` 는 `expect: differ` 로.
+그래서 합성 케이스는 한 벌이고 두 프로파일 모두 검사기 자기 검증이 선다.
 """
 import re
 from collections import Counter
@@ -67,6 +78,8 @@ from .util import load_json, load_yaml
 SCHEMA_PATH = "core/schemas/result-envelope.json"
 ROLES_DIR = "core/roles"
 CANON_REASON = "스키마 유효·required_checks 동일·gate 판정 동일"
+# 판정 역할만 비교한 행의 근거 — 그 면은 gate 판정을 비교하지 않으므로(D-76) 그 말을 쓰지 않는다.
+CANON_REASON_JUDGE = "스키마 유효·계약 앵커·required_checks 동일 (판정은 advisory)"
 ROLES = ("implementer", "reviewer")
 STATUSES = ("executed", "pending")
 CASE_ID_PATTERN = r"^pr-[a-z0-9]+(-[a-z0-9]+)*$"
@@ -100,6 +113,14 @@ INCOMPARABLE_CODES = (PRODUCT_DIFFERS, PRODUCT_UNKNOWN, VERDICT_UNSTABLE, VERDIC
 INCOMPARABLE_TEXT = "비교 불가"
 # 판정 역할의 면에 요구하는 최소 표본 수(D-74). 1건은 그 런타임의 판정이 아니라 그 실행의 판정이다.
 JUDGE_MIN_SAMPLES = 2
+# D-76: 판정 역할의 gate_verdict 일치는 게이트가 아니다. 기본은 advisory(인쇄만), strict 는 D-73·D-74 결박을 되살리는 실험 프로파일.
+JUDGE_VERDICT_MODES = ("advisory", "strict")
+JUDGE_VERDICT_MODE = "advisory"
+VERDICT_SAME = "VERDICT_SAME"
+VERDICT_DIFFERS = "VERDICT_DIFFERS"
+# 합성 케이스가 expect_advisory 로 선언할 수 있는 코드. VERDICT_SAME 은 기본값이라 선언하지 않는다.
+ADVISORY_CODES = INCOMPARABLE_CODES + (VERDICT_DIFFERS,)
+ADVISORY_TEXT = "advisory · 게이트 아님"
 
 # 관측 케이스의 앵커가 실재해야 하는 자리.
 WORK_DIR = "docs/work"
@@ -412,6 +433,7 @@ def _product_errors(case, status, observed, roles):
     빼는 근거를 케이스 작성자가 타이핑할 수 있으면, 갈린 검토자 면을 '산출물이 달랐다' 로 지울 수 있다(D-b)."""
     errs = []
     expected = case.get("expect_incomparable")
+    advisory = case.get("expect_advisory")
     if observed:
         for side in ("baseline", "swapped"):
             face = case.get(side)
@@ -421,11 +443,18 @@ def _product_errors(case, status, observed, roles):
         if expected is not None:
             errs.append("expect_incomparable 는 관측 케이스에 쓰지 않는다 — 비교 불가는 증거에서 계산되는 결과이지 "
                         "기대가 아니다(D-b)")
+        if advisory is not None:
+            errs.append("expect_advisory 는 관측 케이스에 쓰지 않는다 — advisory 는 봉투와 증거에서 계산되는 결과이지 "
+                        "기대가 아니다(D-b·D-76)")
         return errs
     if expected is not None and (
             not isinstance(expected, dict)
             or any(r not in ROLES or c not in INCOMPARABLE_CODES for r, c in expected.items())):
         errs.append(f"expect_incomparable 는 {{역할: 코드}} 매핑이다 — 역할 {list(ROLES)} · 코드 {list(INCOMPARABLE_CODES)}")
+    if advisory is not None and (
+            not isinstance(advisory, dict)
+            or any(r not in ROLES or c not in ADVISORY_CODES for r, c in advisory.items())):
+        errs.append(f"expect_advisory 는 {{역할: 코드}} 매핑이다 — 역할 {list(ROLES)} · 코드 {list(ADVISORY_CODES)}")
     if status == "pending":
         return errs
     base, swap = _results(case, "baseline"), _results(case, "swapped")
@@ -543,6 +572,8 @@ def check_parity_cases(cases, harness_root=None, project_root=None):
                 if role not in ROLES:
                     errs.append(f"{side}.results 의 역할 {role!r} 은 {list(ROLES)} 밖")
                 envs = _as_envelopes(env)
+                if not envs:
+                    errs.append(f"{side}.results.{role} 이 빈 목록이다 — 표본 0건은 결과가 아니다. 결과가 없으면 그 역할을 빼거나 status: pending 으로 선언한다")
                 # 표본을 여러 건 받는 것은 판정 역할뿐이다(D-74). 구현자 면이 묻는 것은 재현성이 아니라
                 # 같은 계약에서 같은 검사를 돌려 같은 결론을 냈는가이고, 두 구현자가 다른 바이트를
                 # 만드는 것은 정상이다 — 같은 구현자를 두 번 돌린 결과를 나란히 둘 자리가 없다.
@@ -656,19 +687,47 @@ def _judge_face_error(role, base_envs, swap_envs, base_products, swap_products):
     return None
 
 
-def compare_case(case, schema, roles=None, results=None, products=None):
+def _advisory_face(role, base_envs, swap_envs, base_products, swap_products):
+    """판정 역할의 면을 advisory 로 요약한다(D-76) — 게이트에 세지 않지만 리포트와 JSON 에 그대로 남긴다.
+
+    코드는 strict 프로파일이 냈을 값과 같다(산출물 다름·표본 부족·면 내부 갈림·판정 다름·판정 같음).
+    같은 계산을 두 벌 두지 않는다 — 다른 것은 그 값을 게이트에 세느냐뿐이다."""
+    verdicts = {side: [str(_verdict_key(e)[0]) for e in envs]
+                for side, envs in (("baseline", base_envs), ("swapped", swap_envs))}
+    shown = " / ".join(f"{side} {'·'.join(v)}" for side, v in verdicts.items())
+    bad = _judge_face_error(role, base_envs, swap_envs, base_products, swap_products)
+    if bad is not None:
+        # strict 가 '비교 불가' 라 부르는 자리다. advisory 에서는 면을 비교했으므로 그 말을 쓰지 않는다 — 판정만 비교하지 않는다.
+        code, why = bad["code"], (bad["detail"].replace(f"— {INCOMPARABLE_TEXT}:", "— 판정은 비교하지 않는다:")
+                                   .replace(f"— {INCOMPARABLE_TEXT}", "— 판정은 비교하지 않는다"))
+    elif _verdict_key(base_envs[0])[:2] != _verdict_key(swap_envs[0])[:2]:
+        code, why = VERDICT_DIFFERS, f"{VERDICT_DIFFERS} {role} 판정이 갈렸다 — 런타임의 차이일 수도, 실행 간 분산일 수도 있다(Q-10)"
+    else:
+        code, why = VERDICT_SAME, f"{VERDICT_SAME} {role} 판정이 같다"
+    return {"role": role, "code": code, "verdicts": verdicts,
+            "detail": f"{role} 판정({ADVISORY_TEXT}): {shown} — {why}"}
+
+
+def compare_case(case, schema, roles=None, results=None, products=None, judge_mode=None):
     """한 케이스의 두 면을 역할별로 짝지어 판정한다. 미실행 케이스는 비교하지 않는다.
 
     `results` 를 주면 그것을 비교한다 — 관측 케이스의 봉투는 케이스 파일이 아니라 앵커 검사를 통과한
     결과 계약 파일에서 온다(`resolve_case`). `products` 는 면별·역할별 산출물 식별이다 — 판정 역할
     (`_judges_product`)은 두 면의 산출물이 같을 때만 비교하고, 다르면 그 면을 `incomparable` 로 분리한다(D-73).
     관측 케이스는 비교 불가를 기대로 선언할 수 없으므로 `ok` 에 넣지 않고, 합성 케이스는 `expect_incomparable`
-    과 정확히 같아야 `ok` 다 — 검사기가 비교 불가를 잡는지도 검증 대상이다."""
+    과 정확히 같아야 `ok` 다 — 검사기가 비교 불가를 잡는지도 검증 대상이다.
+    `judge_mode` 는 판정 역할의 면을 어떻게 다루는가다(D-76): 기본 `advisory` 는 스키마·계약·checks 만 비교하고
+    판정과 그 전제를 `advisory` 에 적으며(합성 케이스는 `expect_advisory` 와 정확히 같아야 `ok`), `strict` 는
+    D-73·D-74 결박(비교 불가·VERDICT_DIFFERS)을 되살린다."""
+    mode = judge_mode or JUDGE_VERDICT_MODE
+    if mode not in JUDGE_VERDICT_MODES:
+        raise ValueError(f"judge_mode {mode!r} 는 {list(JUDGE_VERDICT_MODES)} 밖")
     roles = load_role_contracts() if roles is None else roles
     status = case.get("status", "executed")
     row = {"id": case.get("id"), "unit_id": case.get("unit_id"), "status": status,
            "kind": _kind(case), "roles": [], "expect": case.get("expect"), "actual": None,
-           "ok": False, "codes": [], "detail": [], "compared": [], "incomparable": []}
+           "ok": False, "codes": [], "detail": [], "compared": [], "incomparable": [],
+           "advisory": [], "judge_mode": mode}
     if status == "pending":
         row["detail"] = [case.get("pending_reason") or "실행 결과 없음"]
         return row
@@ -682,7 +741,7 @@ def compare_case(case, schema, roles=None, results=None, products=None):
     row["samples"] = {side: {r: len(v) for r, v in face.items()}
                       for side, face in (("baseline", base), ("swapped", swap))}
     codes, detail = [], []
-    compared, incomparable = [], []
+    compared, incomparable, advisory = [], [], []
     for side, face in (("baseline", base), ("swapped", swap)):
         for role in sorted(face):
             for env in face[role]:
@@ -698,14 +757,28 @@ def compare_case(case, schema, roles=None, results=None, products=None):
         detail.append(f"ROLE_SET_DIFFERS {sorted(base)}≠{sorted(swap)}")
     for role in sorted(set(base) & set(swap)):
         base_envs, swap_envs = base[role], swap[role]
+        if not base_envs or not swap_envs:
+            # 구조 검사가 먼저 잡지만, compare_case 를 직접 부르는 경로에서도 트레이스백 대신 판정 불가를 낸다.
+            codes.append("EVIDENCE_MISSING")
+            detail.append(f"EVIDENCE_MISSING {role} 표본이 비어 있다({len(base_envs)}·{len(swap_envs)}) — 결과 없는 면은 비교할 수 없다")
+            continue
+        base_env, swap_env = base_envs[0], swap_envs[0]
         if _judges_product(role, roles):
-            bad = _judge_face_error(role, base_envs, swap_envs,
-                                    (products.get("baseline") or {}).get(role),
-                                    (products.get("swapped") or {}).get(role))
+            base_prod = (products.get("baseline") or {}).get(role)
+            swap_prod = (products.get("swapped") or {}).get(role)
+            if mode == "advisory":
+                # D-76: 판정 역할의 면은 스키마·계약(위 앵커 검사)·checks 로만 비교한다. 판정은 advisory 다.
+                advisory.append(_advisory_face(role, base_envs, swap_envs, base_prod, swap_prod))
+                compared.append(role)
+                base_checks, swap_checks = _check_key(base_env), _check_key(swap_env)
+                if base_checks != swap_checks:
+                    codes.append("CHECKS_DIFFER")
+                    detail.append(_checks_detail(role, base_checks, swap_checks))
+                continue
+            bad = _judge_face_error(role, base_envs, swap_envs, base_prod, swap_prod)
             if bad is not None:
                 incomparable.append(bad)
                 continue
-        base_env, swap_env = base_envs[0], swap_envs[0]
         compared.append(role)
         base_checks, swap_checks = _check_key(base_env), _check_key(swap_env)
         if base_checks != swap_checks:
@@ -723,6 +796,7 @@ def compare_case(case, schema, roles=None, results=None, products=None):
     row["detail"] = detail
     row["compared"] = compared
     row["incomparable"] = incomparable
+    row["advisory"] = advisory
     if set(row["codes"]) & set(UNDECIDABLE_CODES):
         # 양면이 똑같아도 비교의 전제가 깨졌다. 케이스가 이것을 기대로 선언할 수는 없다.
         row["actual"] = "undecidable"
@@ -736,14 +810,26 @@ def compare_case(case, schema, roles=None, results=None, products=None):
     row["actual"] = "differ" if detail else "same"
     # 합성 케이스는 검사기가 비교 불가를 **정확히** 선언대로 잡았는지도 본다. 관측 케이스는 그것을
     # 기대로 선언할 수 없으므로(D-b) 비교 불가 면을 ok 에 넣지 않는다 — 판정에서 뺀다는 뜻이 그것이다.
+    observed_case = row["kind"] == OBSERVED_KIND
+    expect, expect_codes = row["expect"], set(case.get("expect_codes") or [])
+    exp_adv = case.get("expect_advisory") or {}
     found = {i["role"]: i["code"] for i in incomparable}
-    incomparable_ok = (row["kind"] == OBSERVED_KIND) or found == (case.get("expect_incomparable") or {})
-    if row["actual"] == "same":
-        row["ok"] = row["expect"] == "same" and incomparable_ok
+    found_adv = {a["role"]: a["code"] for a in advisory if a["code"] != VERDICT_SAME}
+    if mode == "advisory":
+        # 합성 케이스는 선언한 advisory 가 **정확히** 나와야 ok 다(D-76) — 검사기가 판정 흔들림·산출물 차이를
+        # 옳게 요약하는지도 검증 대상이다. VERDICT_SAME 은 기본값이라 선언하지 않는다. expect_incomparable 은 strict 의 선언이다.
+        incomparable_ok, advisory_ok = True, observed_case or found_adv == exp_adv
     else:
-        row["ok"] = (row["expect"] == "differ"
-                     and set(case.get("expect_codes") or []) <= set(row["codes"])
-                     and incomparable_ok)
+        # strict 는 같은 선언을 종전 기대로 번역해 읽는다 — 케이스 파일은 한 벌이고 두 프로파일이 다 자기 검증을 한다.
+        translated = {r: c for r, c in exp_adv.items() if c in INCOMPARABLE_CODES}
+        if any(c == VERDICT_DIFFERS for c in exp_adv.values()):
+            expect, expect_codes = "differ", expect_codes | {VERDICT_DIFFERS}
+        declared = case.get("expect_incomparable") if case.get("expect_incomparable") is not None else translated
+        incomparable_ok, advisory_ok = observed_case or found == declared, True
+    if row["actual"] == "same":
+        row["ok"] = expect == "same" and incomparable_ok and advisory_ok
+    else:
+        row["ok"] = expect == "differ" and expect_codes <= set(row["codes"]) and incomparable_ok and advisory_ok
     return row
 
 
@@ -754,19 +840,21 @@ def _anchor_failure_row(case, errs):
     return {"id": case.get("id"), "unit_id": case.get("unit_id"),
             "status": case.get("status", "executed"), "kind": _kind(case), "roles": [],
             "expect": case.get("expect"), "actual": "undecidable", "ok": False,
-            "codes": [ANCHOR_INVALID], "detail": list(errs), "compared": [], "incomparable": []}
+            "codes": [ANCHOR_INVALID], "detail": list(errs), "compared": [], "incomparable": [],
+            "advisory": []}
 
 
-def run_parity(cases, harness_root=None, project_root=None):
+def run_parity(cases, harness_root=None, project_root=None, judge_mode=None):
     root = Path(harness_root) if harness_root else HARNESS_ROOT
     proot = Path(project_root) if project_root else root
     schema = load_json(root / SCHEMA_PATH)
     roles = load_role_contracts(root)
+    mode = judge_mode or JUDGE_VERDICT_MODE
     rows = []
     for c in cases:
         resolved, products, resolve_errs = resolve_case(c, proot, root)
         rows.append(_anchor_failure_row(c, resolve_errs) if resolve_errs
-                    else compare_case(c, schema, roles, results=resolved, products=products))
+                    else compare_case(c, schema, roles, results=resolved, products=products, judge_mode=mode))
     executed = [r for r in rows if r["status"] != "pending"]
     pending = [r for r in rows if r["status"] == "pending"]
     matched = sum(1 for r in executed if r["ok"])
@@ -801,6 +889,9 @@ def run_parity(cases, harness_root=None, project_root=None):
         "incomparable": len(incomparable),
         "incomparable_faces": sum(len(r["incomparable"]) for r in executed),
         "observed_incomparable_faces": len(observed_incomparable_faces),
+        "judge_mode": mode,
+        "advisory_faces": sum(len(r.get("advisory") or []) for r in executed),
+        "observed_advisory_faces": sum(len(r.get("advisory") or []) for r in observed),
         "matched": matched, "checker_verdict": checker, "gate_verdict": gate, "verdict": gate,
         "same": sum(1 for r in executed if r["actual"] == "same"),
         "differ": len(differ), "expected_differ": sum(1 for r in differ if r["ok"]),
@@ -822,6 +913,8 @@ def format_parity(rep):
         head += f" · 판정 불가 {rep['undecidable']}"
     if rep.get("incomparable_faces"):
         head += f" · {INCOMPARABLE_TEXT} 면 {rep['incomparable_faces']}"
+    if rep.get("advisory_faces"):
+        head += f" · advisory 면 {rep['advisory_faces']}"
     lines = [head, ""]
     lines.append("| case | unit | 역할 | 출처 | 기대 | 판정 | 근거 |")
     lines.append("| --- | --- | --- | --- | --- | --- | --- |")
@@ -837,13 +930,17 @@ def format_parity(rep):
             # 비교 불가 면이 있는 행은 '부분' 이다 — 비교한 면의 결과와 뺀 면의 이유를 나란히 인쇄한다.
             mark = ("✓" if r["ok"] else "✗") + (" 부분" if excluded else "")
             compared = ", ".join(r.get("compared") or [])
+            judged = {a["role"] for a in r.get("advisory") or []}
+            # 판정 역할만 비교한 행은 gate 판정을 비교한 적이 없다 — 그 말을 근거에 쓰지 않는다(D-76).
+            canon = CANON_REASON if any(x not in judged for x in r.get("compared") or []) else CANON_REASON_JUDGE
             if r["detail"]:
                 parts = ["; ".join(r["detail"])]
             elif excluded:
-                parts = [f"{compared}: {CANON_REASON}"]
+                parts = [f"{compared}: {canon}"]
             else:
-                parts = [CANON_REASON]
-            reason = "; ".join(parts + excluded)
+                parts = [canon]
+            # 판정 역할의 advisory 는 같은 행에 나란히 인쇄한다 — 세지 않지만 숨기지 않는다(D-76·K-51).
+            reason = "; ".join(parts + excluded + [a["detail"] for a in r.get("advisory") or []])
             roles = ", ".join(r["roles"])
         lines.append(f"| {r['id']} | {r['unit_id']} | {roles} | {r['kind']} | {r['expect']} | {mark} | {reason} |")
     lines.append("")
@@ -868,6 +965,14 @@ def format_parity(rep):
                      f"같은 산출물을 두 판정 역할에게 보인 관측이 각 면 {JUDGE_MIN_SAMPLES} 건 이상 있어야 판정한다(D-73·D-74·K-51).")
     else:
         lines.append(f"핵심 동등성 게이트: {GATE_TEXT[rep['gate_verdict']]} — 관측 {rep['observed']}건으로 판정했다.")
+        advisory_faces = [(r["id"], a) for r in rep["rows"]
+                          if r["kind"] == OBSERVED_KIND and r["status"] != "pending" for a in r.get("advisory") or []]
+        if advisory_faces:
+            # 판정 역할의 판정은 게이트가 아니다(D-76). 이 판정은 결정적 요소(스키마·계약·checks·구현자 판정) 위에 섰다.
+            lines.append(f"검토 판정은 게이트가 아니다(D-76) — 관측 케이스의 {len(advisory_faces)}개 판정 역할 면은 "
+                         f"스키마·계약·checks 로만 비교했고 판정은 {ADVISORY_TEXT} 으로 인쇄했다: "
+                         + "; ".join(f"{cid}: {a['detail']}" for cid, a in advisory_faces) + ". "
+                         f"판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로 PASS 를 기다리지 않는다.")
         if excluded_faces:
             # 뺀 면을 숨기지 않는다. 이 판정은 비교한 면 위에만 서 있다(K-51).
             lines.append(f"{INCOMPARABLE_TEXT} — 관측 케이스의 {len(excluded_faces)}개 면을 판정에서 뺐다(D-73·D-74): "

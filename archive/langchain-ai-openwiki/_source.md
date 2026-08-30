@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/langchain-ai/openwiki
 - Ref: main
 - Commit SHA: `a525ed88fe1f189d08e0f0acf12f42caec2b600e`
+- License: MIT
 - Analysis timestamp: 2026-08-23T18:48:37Z
 
 ## 접근과 재현 범위

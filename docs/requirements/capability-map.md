@@ -85,7 +85,7 @@ draft → active → done
 | ID | 능력 | 근거 | v1 |
 | --- | --- | --- | --- |
 | C-C1 | 하나의 canonical 정의에서 Claude/Codex 네이티브 형식 컴파일 | S01 사용자 원문, S04 | ✅ 최소 |
-| C-C2 | "동일 워크플로우"를 같은 프롬프트가 아니라 **같은 schema·AC·권한·게이트·evidence**로 정의 | S01 KEEL 리뷰, S10 §9, COUNCIL Consensus 9 | ✅ |
+| C-C2 | "동일 워크플로우"를 같은 프롬프트가 아니라 **같은 schema·AC·권한·게이트·evidence**로 정의 — **D-76:** 여기서 '게이트' 는 결정적 게이트 판정이다. 검토자의 자유 서술 판정 일치는 요구하지 않는다(advisory) | S01 KEEL 리뷰, S10 §9, COUNCIL Consensus 9 | ✅ |
 | C-C3 | 공통 TaskEnvelope / ResultEnvelope로 두 CLI 출력 차이 흡수 | S10 §5 | ✅ |
 | C-C4 | 생성물에 source hash + managed marker, marker 밖 사용자 내용 보존 | S01 plan §1 | ✅ |
 | C-C5 | 양 런타임 semantic parity fixture | S10 최종, COUNCIL 우선순위 0 | ✅ |

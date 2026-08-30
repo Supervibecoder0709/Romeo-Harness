@@ -41,6 +41,11 @@
     구현자 면은 산출물과 무관하게 비교한다. 산출물 식별은 관측 케이스에서는 증거의 `head_sha`·`dirty_tree_hash` 에서
     읽고(케이스 파일의 선언은 구조 오류), 합성 케이스에서는 면마다 `product:` 로 선언한다. 비교할 면이 하나도
     남지 않은 관측은 게이트를 열지 못한다(미판정).
+19. **판정 역할의 자유 서술 판정은 게이트가 아니다(D-76).** 같은 산출물·같은 런타임에서도 판정이 흔들린다는 관측(D-74)
+    아래에서 그 일치는 결정적 합격 조건이 될 수 없다. 기본(`advisory`)에서 검토자 면은 스키마·계약·checks 로만 비교되고
+    판정과 그 전제(산출물 동일·표본·일관성)는 `advisory` 로 인쇄된다 — 세지 않되 숨기지 않는다. 합성 케이스는
+    `expect_advisory` 로 검사기가 그것을 옳게 요약하는지 검증한다. D-73·D-74 결박은 `judge_mode="strict"` 로만 산다(Q-10 실험용).
+    18번 계약의 테스트들은 그 strict 프로파일을 지킨다.
 """
 import contextlib
 import io
@@ -57,11 +62,11 @@ from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
 from romeo.evidence import run_command
-from romeo.parity import (ANCHOR_INVALID, CANON_REASON, INCOMPARABLE_TEXT, JUDGE_MIN_SAMPLES,
-                          NOT_APPLICABLE, PRODUCT_DIFFERS, PRODUCT_KEYS, PRODUCT_UNKNOWN,
-                          VERDICT_UNSAMPLED, VERDICT_UNSTABLE, WORK_DIR, check_parity_cases,
-                          compare_case, format_parity, load_parity_cases, load_role_contracts,
-                          run_parity)
+from romeo.parity import (ADVISORY_CODES, ADVISORY_TEXT, ANCHOR_INVALID, CANON_REASON, CANON_REASON_JUDGE, INCOMPARABLE_TEXT,
+                          JUDGE_MIN_SAMPLES, NOT_APPLICABLE, PRODUCT_DIFFERS, PRODUCT_KEYS, PRODUCT_UNKNOWN,
+                          VERDICT_DIFFERS, VERDICT_SAME, VERDICT_UNSAMPLED, VERDICT_UNSTABLE, WORK_DIR,
+                          check_parity_cases, compare_case, format_parity, load_parity_cases,
+                          load_role_contracts, run_parity)
 from romeo.policy import route
 from romeo.schema import validate
 from romeo.util import dump_yaml, load_json, load_yaml, project_root
@@ -241,8 +246,8 @@ class ObservedRun:
     def check(self, case):
         return check_parity_cases([case], harness_root=self.root).get("<메모리>", [])
 
-    def report(self, cases):
-        return run_parity(cases, harness_root=self.root)
+    def report(self, cases, judge_mode=None):
+        return run_parity(cases, harness_root=self.root, judge_mode=judge_mode)
 
 
 def envelope(role="implementer", verdict="PASS", blocked=None, checks=None, evidence=EVIDENCE,
@@ -1074,10 +1079,12 @@ class TestCli(unittest.TestCase):
 
 
 class TestProductPrecondition(unittest.TestCase):
-    """검토자 면은 두 면이 같은 산출물을 봤을 때만 비교한다(D-73) — 메모리 케이스로 전제의 양쪽을 깨본다."""
+    """검토자 면은 두 면이 같은 산출물을 봤을 때만 비교한다(D-73) — 메모리 케이스로 전제의 양쪽을 깨본다.
+
+    D-76 뒤 이 결박은 `strict` 프로파일에만 산다 — 이 클래스는 그 프로파일이 그대로인지 지킨다."""
 
     def compare(self, c):
-        return compare_case(c, RESULT_SCHEMA)
+        return compare_case(c, RESULT_SCHEMA, judge_mode="strict")
 
     def pair(self, base_verdict, swap_verdict, base_product=PRODUCT, swap_product=PRODUCT,
              samples=JUDGE_MIN_SAMPLES, **kw):
@@ -1153,17 +1160,24 @@ class TestProductPrecondition(unittest.TestCase):
         self.assertTrue(any("expect_incomparable" in e for e in errs.get("<메모리>", [])), errs)
 
     def test_repo_fixtures_cover_both_sides_of_the_precondition(self):
-        """저장소 합성 케이스에 '산출물 다름 → 비교 불가' 와 '같은 산출물인데 갈림 → 불일치' 가 둘 다 있다."""
+        """저장소 합성 케이스에 '산출물 다름' 과 '같은 산출물인데 갈림' 이 둘 다 있고, 기본 프로파일에서는 둘 다 advisory 다(D-76)."""
         rows = {r["id"]: r for r in run_parity(load_parity_cases(CASE_DIR))["rows"]}
-        self.assertEqual([i["code"] for i in rows["pr-product-differs"]["incomparable"]], [PRODUCT_DIFFERS])
+        self.assertEqual([a["code"] for a in rows["pr-product-differs"]["advisory"]], [PRODUCT_DIFFERS])
+        self.assertEqual(rows["pr-product-differs"]["incomparable"], [])
         self.assertTrue(rows["pr-product-differs"]["ok"])
-        self.assertIn("VERDICT_DIFFERS", rows["pr-reviewer-drift"]["codes"])
-        self.assertEqual(rows["pr-reviewer-drift"]["incomparable"], [])
+        self.assertEqual([a["code"] for a in rows["pr-reviewer-drift"]["advisory"]], [VERDICT_DIFFERS])
+        self.assertNotIn("VERDICT_DIFFERS", rows["pr-reviewer-drift"]["codes"])
+        self.assertEqual(rows["pr-reviewer-drift"]["actual"], "same")
         self.assertTrue(rows["pr-reviewer-drift"]["ok"])
+
+    def test_repo_fixtures_declare_advisory_not_incomparable(self):
+        """D-76 뒤 저장소 합성 케이스는 expect_incomparable 을 쓰지 않는다 — 기본 프로파일이 보지 않는 선언은 낡은 선언이다."""
+        for c in load_parity_cases(CASE_DIR):
+            self.assertNotIn("expect_incomparable", c, c.get("id"))
 
     def test_report_prints_the_partial_row_and_the_excluded_face(self):
         rep = run_parity([self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT,
-                                    expect_incomparable={"reviewer": PRODUCT_DIFFERS})])
+                                    expect_incomparable={"reviewer": PRODUCT_DIFFERS})], judge_mode="strict")
         text = format_parity(rep)
         self.assertEqual(rep["incomparable_faces"], 1)
         self.assertEqual(rep["checker_verdict"], "PASS")
@@ -1174,14 +1188,14 @@ class TestProductPrecondition(unittest.TestCase):
 
 
 class TestVerdictStability(unittest.TestCase):
-    """판정 역할의 면은 **자기 안에서 일관할 때만** 비교된다(D-74).
+    """판정 역할의 면은 **자기 안에서 일관할 때만** 비교된다(D-74) — `strict` 프로파일.
 
     2026-08-29 재현성 측정(Q-08)에서 같은 산출물에 같은 런타임을 세 번 돌려 PASS 1 · FAIL 2 가 나왔다.
     한 실행의 판정을 그 런타임의 판정으로 읽으면 두 면의 차이가 런타임의 차이인지 실행 간 분산인지
-    구분되지 않는다 — 그래서 표본을 요구하고, 흔들리면 판정에서 뺀다."""
+    구분되지 않는다 — 그래서 표본을 요구하고, 흔들리면 판정에서 뺀다. D-76 뒤 이 결박은 strict 에만 산다."""
 
     def compare(self, c):
-        return compare_case(c, RESULT_SCHEMA)
+        return compare_case(c, RESULT_SCHEMA, judge_mode="strict")
 
     def pair(self, base_verdict, swap_verdict, samples=JUDGE_MIN_SAMPLES, **kw):
         return case(base={"implementer": envelope(), "reviewer": reviewer_face(base_verdict, samples=samples)},
@@ -1261,17 +1275,39 @@ class TestObservedSameProduct(unittest.TestCase):
         self.assertEqual(row["incomparable"], [])
         self.assertEqual(rep["gate_verdict"], "PASS")
 
-    def test_reviewers_disagreeing_on_the_same_product_fail_the_gate(self):
-        """전제가 핑계가 되지 않는다 — 같은 산출물을 보고 갈린 검토자는 관측된 불일치다."""
+    def test_reviewers_disagreeing_on_the_same_product_fail_the_gate_in_strict(self):
+        """strict 프로파일 — 같은 산출물을 보고 갈린 검토자는 관측된 불일치다(D-73 의 결박)."""
         c = self.obs.case(base_review=self.obs.review_face("run-a"),
                           swap_review=self.obs.review_face("run-b", gate_verdict="FAIL"),
                           id="pr-observed-review-drift")
-        rep = self.obs.report([c])
+        rep = self.obs.report([c], judge_mode="strict")
         row = rep["rows"][0]
         self.assertIn("VERDICT_DIFFERS", row["codes"])
         self.assertIn("VERDICT_DIFFERS reviewer", " ".join(row["detail"]))
         self.assertEqual(row["incomparable"], [])
         self.assertEqual(rep["gate_verdict"], "FAIL")
+
+    def test_reviewers_disagreeing_on_the_same_product_is_advisory_by_default(self):
+        """D-76 — 같은 산출물을 보고 갈린 검토자 판정은 게이트를 깨지 않는다. 인쇄만 된다."""
+        c = self.obs.case(base_review=self.obs.review_face("run-a"),
+                          swap_review=self.obs.review_face("run-b", gate_verdict="FAIL"),
+                          id="pr-observed-review-drift")
+        rep = self.obs.report([c])
+        row = rep["rows"][0]
+        self.assertEqual(rep["judge_mode"], "advisory")
+        self.assertNotIn("VERDICT_DIFFERS", row["codes"])
+        self.assertEqual(row["compared"], ["implementer", "reviewer"], "검토자 면도 스키마·계약으로 비교됐다")
+        self.assertEqual([(a["role"], a["code"]) for a in row["advisory"]], [("reviewer", VERDICT_DIFFERS)])
+        self.assertEqual(row["advisory"][0]["verdicts"], {"baseline": ["PASS", "PASS"], "swapped": ["FAIL", "FAIL"]})
+        self.assertEqual(rep["gate_verdict"], "PASS")
+        text = format_parity(rep)
+        self.assertIn("검토 판정은 게이트가 아니다(D-76)", text)
+        self.assertIn(ADVISORY_TEXT, text)
+        self.assertNotIn("✓ 부분", text)
+
+    def test_observed_case_cannot_expect_advisory(self):
+        c = self.obs.case(expect_advisory={"reviewer": VERDICT_DIFFERS})
+        self.assertTrue(any("expect_advisory" in e for e in self.obs.check(c)))
 
     def test_observed_case_cannot_declare_its_product_inline(self):
         c = self.obs.case(base_review=self.obs.write_review("run-a"), swap_review=self.obs.write_review("run-b"))
@@ -1308,10 +1344,27 @@ class TestObservedDivergedProduct(unittest.TestCase):
     def test_evidence_records_different_products(self):
         self.assertNotEqual(self.obs.product("run-a"), self.obs.product("run-b"))
 
+    def test_reviewer_face_is_advisory_by_default(self):
+        """D-76 — 산출물이 다른 두 검토자 면은 '비교 불가' 가 아니라 스키마·계약으로 비교되고, 산출물 차이는 advisory 다."""
+        c = self.diverged_case()
+        self.assertEqual(self.obs.check(c), [])
+        rep = self.obs.report([c])
+        row = rep["rows"][0]
+        self.assertEqual(row["compared"], ["implementer", "reviewer"])
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual([(a["role"], a["code"]) for a in row["advisory"]], [("reviewer", PRODUCT_DIFFERS)])
+        self.assertEqual(rep["gate_verdict"], "PASS")
+        self.assertEqual(rep["observed_advisory_faces"], 1)
+        self.assertEqual(rep["observed_incomparable_faces"], 0)
+        text = format_parity(rep)
+        self.assertNotIn("✓ 부분", text)
+        self.assertIn(PRODUCT_DIFFERS, text)
+        self.assertIn("검토 판정은 게이트가 아니다(D-76)", text)
+
     def test_reviewer_face_is_excluded_and_the_gate_stands_on_the_implementer_face(self):
         c = self.diverged_case()
         self.assertEqual(self.obs.check(c), [], "케이스 파일에는 아무것도 더 적지 않았다 — 구조 오류가 없어야 한다")
-        rep = self.obs.report([c])
+        rep = self.obs.report([c], judge_mode="strict")
         row = rep["rows"][0]
         self.assertEqual(row["compared"], ["implementer"])
         self.assertEqual([(i["role"], i["code"]) for i in row["incomparable"]], [("reviewer", PRODUCT_DIFFERS)])
@@ -1322,13 +1375,13 @@ class TestObservedDivergedProduct(unittest.TestCase):
         self.assertEqual(rep["observed_incomparable_faces"], 1)
 
     def test_the_hashes_in_the_report_come_from_the_evidence(self):
-        detail = self.obs.report([self.diverged_case()])["rows"][0]["incomparable"][0]["detail"]
+        detail = self.obs.report([self.diverged_case()], judge_mode="strict")["rows"][0]["incomparable"][0]["detail"]
         for run in self.obs.RUNS:
             head, tree = self.obs.product(run)
             self.assertIn(f"{head[:7]}+{tree[:12]}", detail)
 
     def test_the_report_says_the_pass_is_partial(self):
-        text = format_parity(self.obs.report([self.diverged_case()]))
+        text = format_parity(self.obs.report([self.diverged_case()], judge_mode="strict"))
         self.assertIn("핵심 동등성 게이트: PASS", text)
         self.assertIn("✓ 부분", text)
         self.assertIn(f"{INCOMPARABLE_TEXT} — 관측 케이스의 1개 면을 판정에서 뺐다", text)
@@ -1336,7 +1389,7 @@ class TestObservedDivergedProduct(unittest.TestCase):
 
     def test_reviewer_only_observation_on_different_products_does_not_open_the_gate(self):
         c = self.diverged_case(implementer=False, id="pr-observed-review-only")
-        rep = self.obs.report([c])
+        rep = self.obs.report([c], judge_mode="strict")
         self.assertEqual(rep["rows"][0]["actual"], "incomparable")
         self.assertEqual(rep["gate_verdict"], "UNDETERMINED", "비교한 면이 하나도 없는 관측은 판정 근거가 아니다")
         text = format_parity(rep)
@@ -1357,13 +1410,160 @@ class TestObservedDivergedProduct(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
         try:
             write_cases(tmp.name, [self.diverged_case(), {**case(), "id": "pr-authored"}])
-            code, out, err = run_cli(["fixtures", "parity", tmp.name, "--root", str(self.obs.root)])
+            code, out, err = run_cli(["fixtures", "parity", tmp.name, "--root", str(self.obs.root),
+                                      "--judge-verdict", "strict"])
+            code2, out2, err2 = run_cli(["fixtures", "parity", tmp.name, "--root", str(self.obs.root)])
         finally:
             tmp.cleanup()
         self.assertEqual(code, 0, out + err)
         self.assertIn("핵심 동등성 게이트: PASS", out)
         self.assertIn(PRODUCT_DIFFERS, out)
         self.assertIn("비교한 면으로만 섰다", out)
+        # 기본 프로파일(D-76)은 같은 사실을 advisory 로 인쇄한다 — 뺀 면이 없으므로 '부분' 이 아니다.
+        self.assertEqual(code2, 0, out2 + err2)
+        self.assertIn("핵심 동등성 게이트: PASS", out2)
+        self.assertIn(PRODUCT_DIFFERS, out2)
+        self.assertIn("검토 판정은 게이트가 아니다(D-76)", out2)
+        self.assertNotIn("비교한 면으로만 섰다", out2)
+
+
+class TestAdvisoryVerdict(unittest.TestCase):
+    """D-76 — 판정 역할의 판정은 게이트가 아니다. 기본 프로파일이 그 판정을 옳게 요약하고, 세지 않는지 지킨다."""
+
+    def compare(self, c, **kw):
+        return compare_case(c, RESULT_SCHEMA, **kw)
+
+    def pair(self, base_verdict, swap_verdict, base_product=PRODUCT, swap_product=PRODUCT,
+             samples=JUDGE_MIN_SAMPLES, **kw):
+        return case(base={"implementer": envelope(), "reviewer": reviewer_face(base_verdict, samples=samples)},
+                    swap={"implementer": envelope(), "reviewer": reviewer_face(swap_verdict, samples=samples)},
+                    base_product=base_product, swap_product=swap_product, **kw)
+
+    def test_default_mode_is_advisory(self):
+        row = self.compare(self.pair("PASS", "PASS"))
+        self.assertEqual(row["judge_mode"], "advisory")
+
+    def test_unknown_mode_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.compare(self.pair("PASS", "PASS"), judge_mode="lenient")
+
+    def test_drift_on_the_same_product_is_advisory_not_a_mismatch(self):
+        row = self.compare(self.pair("PASS", "FAIL"))
+        self.assertEqual(row["actual"], "same")
+        self.assertNotIn("VERDICT_DIFFERS", row["codes"])
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual(row["compared"], ["implementer", "reviewer"], "검토자 면은 스키마·계약·checks 로 비교된다")
+        self.assertEqual([(a["role"], a["code"]) for a in row["advisory"]], [("reviewer", VERDICT_DIFFERS)])
+        self.assertFalse(row["ok"], "합성 케이스가 advisory 를 선언하지 않았으면 ok 가 아니다 — 검사기가 그것을 옳게 요약하는지도 검증 대상이다")
+
+    def test_declared_advisory_makes_the_synthetic_case_ok(self):
+        row = self.compare(self.pair("PASS", "FAIL", expect_advisory={"reviewer": VERDICT_DIFFERS}))
+        self.assertTrue(row["ok"])
+
+    def test_declaring_advisory_that_did_not_happen_is_not_ok(self):
+        row = self.compare(self.pair("PASS", "PASS", expect_advisory={"reviewer": VERDICT_DIFFERS}))
+        self.assertEqual(row["actual"], "same")
+        self.assertFalse(row["ok"])
+
+    def test_agreeing_faces_need_no_declaration(self):
+        row = self.compare(self.pair("PASS", "PASS"))
+        self.assertEqual([a["code"] for a in row["advisory"]], [VERDICT_SAME])
+        self.assertTrue(row["ok"])
+
+    def test_different_products_are_advisory_and_still_compared(self):
+        row = self.compare(self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT,
+                                     expect_advisory={"reviewer": PRODUCT_DIFFERS}))
+        self.assertEqual(row["compared"], ["implementer", "reviewer"])
+        self.assertEqual(row["incomparable"], [])
+        self.assertEqual([a["code"] for a in row["advisory"]], [PRODUCT_DIFFERS])
+        self.assertTrue(row["ok"])
+
+    def test_single_sample_and_flipping_face_are_advisory(self):
+        one = self.compare(self.pair("PASS", "FAIL", samples=1, expect_advisory={"reviewer": VERDICT_UNSAMPLED}))
+        self.assertEqual([a["code"] for a in one["advisory"]], [VERDICT_UNSAMPLED])
+        self.assertTrue(one["ok"])
+        flipping = [reviewer_envelope("PASS"), reviewer_envelope("FAIL")]
+        flip = self.compare(case(base={"implementer": envelope(), "reviewer": flipping},
+                                 swap={"implementer": envelope(), "reviewer": reviewer_face("FAIL")},
+                                 expect_advisory={"reviewer": VERDICT_UNSTABLE}))
+        self.assertEqual([a["code"] for a in flip["advisory"]], [VERDICT_UNSTABLE])
+        self.assertTrue(flip["ok"])
+
+    def test_advisory_records_every_verdict_it_saw(self):
+        row = self.compare(self.pair("PASS", "FAIL", expect_advisory={"reviewer": VERDICT_DIFFERS}))
+        self.assertEqual(row["advisory"][0]["verdicts"], {"baseline": ["PASS", "PASS"], "swapped": ["FAIL", "FAIL"]})
+        self.assertIn(ADVISORY_TEXT, row["advisory"][0]["detail"])
+
+    def test_reviewer_only_pair_is_compared_on_schema_and_contract(self):
+        """검토자만 있는 쌍도 비교할 면이 있다 — 봉투 스키마·역할 계약 동등성이다(D-76)."""
+        row = self.compare(case(base={"reviewer": reviewer_face()}, swap={"reviewer": reviewer_face()},
+                                swap_product=OTHER_PRODUCT, expect_advisory={"reviewer": PRODUCT_DIFFERS}))
+        self.assertEqual(row["actual"], "same")
+        self.assertEqual(row["compared"], ["reviewer"])
+        self.assertTrue(row["ok"])
+
+    def test_strict_mode_restores_the_binding(self):
+        row = self.compare(self.pair("PASS", "FAIL"), judge_mode="strict")
+        self.assertIn("VERDICT_DIFFERS", row["codes"])
+        self.assertEqual(row["advisory"], [])
+        excluded = self.compare(self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT), judge_mode="strict")
+        self.assertEqual([i["code"] for i in excluded["incomparable"]], [PRODUCT_DIFFERS])
+
+    def test_expect_advisory_must_name_roles_and_codes(self):
+        errs = check_parity_cases([self.pair("PASS", "PASS", expect_advisory={"janitor": "X"})])
+        self.assertTrue(any("expect_advisory" in e for e in errs.get("<메모리>", [])), errs)
+        errs = check_parity_cases([self.pair("PASS", "PASS", expect_advisory={"reviewer": VERDICT_SAME})])
+        self.assertTrue(any("expect_advisory" in e for e in errs.get("<메모리>", [])), "VERDICT_SAME 은 선언하지 않는다")
+        self.assertIn(VERDICT_DIFFERS, ADVISORY_CODES)
+
+    def test_empty_sample_list_is_refused_and_never_a_traceback(self):
+        """표본 0건은 결과가 아니다 — 구조 검사가 거절하고, compare_case 를 직접 불러도 판정 불가이지 예외가 아니다(리뷰 회귀)."""
+        c = case(base={"implementer": envelope(), "reviewer": []},
+                 swap={"implementer": envelope(), "reviewer": reviewer_face()})
+        errs = check_parity_cases([c], harness_root=REPO).get("<메모리>", [])
+        self.assertTrue(any("빈 목록" in e for e in errs), errs)
+        for mode in ("advisory", "strict"):
+            row = self.compare(c, judge_mode=mode)
+            self.assertEqual(row["actual"], "undecidable", mode)
+            self.assertIn("EVIDENCE_MISSING", row["codes"], mode)
+        empty_impl = case(base={"implementer": []}, swap={"implementer": envelope()})
+        self.assertEqual(self.compare(empty_impl)["actual"], "undecidable")
+
+    def test_strict_translates_expect_advisory_so_one_fixture_set_serves_both_profiles(self):
+        drift = self.compare(self.pair("PASS", "FAIL", expect_advisory={"reviewer": VERDICT_DIFFERS}), judge_mode="strict")
+        self.assertEqual(drift["actual"], "differ")
+        self.assertTrue(drift["ok"], "strict 는 advisory VERDICT_DIFFERS 선언을 expect differ 로 읽는다")
+        excluded = self.compare(self.pair("PASS", "FAIL", swap_product=OTHER_PRODUCT,
+                                          expect_advisory={"reviewer": PRODUCT_DIFFERS}), judge_mode="strict")
+        self.assertEqual([i["code"] for i in excluded["incomparable"]], [PRODUCT_DIFFERS])
+        self.assertTrue(excluded["ok"], "strict 는 advisory 비교 불가 코드 선언을 expect_incomparable 로 읽는다")
+        wrong = self.compare(self.pair("PASS", "PASS", expect_advisory={"reviewer": PRODUCT_DIFFERS}), judge_mode="strict")
+        self.assertFalse(wrong["ok"])
+
+    def test_repo_fixtures_pass_the_checker_in_both_profiles(self):
+        cases = load_parity_cases(CASE_DIR)
+        for mode in ("advisory", "strict"):
+            rep = run_parity(cases, judge_mode=mode)
+            self.assertEqual(rep["checker_verdict"], "PASS", f"{mode}: " + "; ".join(
+                f"{r['id']}: {r['detail']} {r['incomparable']}" for r in rep["rows"] if not r["ok"] and r["kind"] == "authored"))
+        code, out, _ = run_cli(["fixtures", "parity", str(CASE_DIR), "--judge-verdict", "strict"])
+        self.assertEqual(code, 0, out)
+
+    def test_reviewer_only_row_does_not_claim_gate_verdict_equality(self):
+        rep = run_parity([case(base={"reviewer": reviewer_face()}, swap={"reviewer": reviewer_face()})])
+        text = format_parity(rep)
+        self.assertIn(CANON_REASON_JUDGE, text)
+        self.assertNotIn(CANON_REASON, text, "판정 역할만 비교한 행에 'gate 판정 동일' 을 쓰지 않는다")
+
+    def test_report_prints_advisory_beside_the_canon_sentence(self):
+        rep = run_parity([self.pair("PASS", "FAIL", expect_advisory={"reviewer": VERDICT_DIFFERS})])
+        text = format_parity(rep)
+        self.assertEqual(rep["advisory_faces"], 1)
+        self.assertEqual(rep["checker_verdict"], "PASS")
+        self.assertIn(CANON_REASON, text)
+        self.assertIn(ADVISORY_TEXT, text)
+        self.assertIn("advisory 면 1", text)
+        self.assertNotIn(INCOMPARABLE_TEXT, text)
 
 
 if __name__ == "__main__":

@@ -641,7 +641,7 @@ A-02(정책표 정확도), A-03(3-tier 충분성), A-04(경로 불변 탐색성)
 | 8b | **G-M2 채택 게이트**(개정 3): superpowers 후보표 → 사용자 확정 → `provenance/imports.yaml` `accepted` + `vendor/obra-superpowers@b36e082/` 원문 복사 + 어댑터 투영 | imports.yaml에 `decided_at`·`decided_by`, 두 런타임 doctor discovery PASS, 충돌 fixture 3종 PASS(이중 기획 0·자동 트리거 0·경로/마커 충돌 0) |
 | 9 | `romeo compile` (Claude·Codex) + managed marker + 최소 `.harness/romeo.project.yaml` + provenance 첫 항목·NOTICE | 생성 파일 커밋, 마커 밖 텍스트 보존 테스트 PASS, doctor에서 양쪽 discovery 확인 |
 | 10 | Orca 런북으로 T1 관통(Claude 구현/Codex 리뷰) | Run·Task·worktree·evidence 2건·findings, close PASS, 리뷰 전후 `git status` 동일 |
-| 11 | 역할 교체 재현 + parity 보고 = **핵심 동등성 게이트** | `romeo fixtures parity --report` "동일" |
+| 11 | 역할 교체 재현 + parity 보고 = **핵심 동등성 게이트** — **개정 4(D-76):** 게이트는 결정적 요소(봉투 스키마·역할 계약·`required_checks`·구현자 판정)만 센다. 검토자의 자유 판정은 advisory | `romeo fixtures parity --report` EXIT 0 · "핵심 동등성 게이트: PASS" · 검토 판정은 advisory 로 인쇄(게이트 아님) |
 | 12 | 라이선스 필드 T1 결과물 | `archive/README.md` 라이선스 열, 18개 `_source.md` `License:` 줄, CI PASS |
 | 13 | M3: Charter·discovery·gate·capabilities·doctor | 시나리오 3·8·9 런북 PASS, hard gate 8 각 fixture ≥ 1 |
 | 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06) → 추천 스킬 후보표 → 사용자 확정 → `install` 프로브 + `/plan` 링크 | discovery fixture 카드에 BMAD 스킬 추천·산출물 링크 요구; `capabilities.yaml`에 `discovery.bmad` 프로브·Codex 지원 여부 표기 |
@@ -728,3 +728,16 @@ docs/planning/open-questions.md를 읽고, 정본과 이 지시가 충돌하면 
 **바꾸지 않은 것:** Thin Policy-Compiled Planning Spine, unit/mode/facet, 3분할, 상태 계약(§3.5), 핵심 동등성 게이트·v1 릴리스 게이트의 존재, Codex 리뷰 반영(§11) 전부. 개정 3은 척추가 무엇을 라우팅하는지(부품)를 보탠 것이지 척추를 바꾼 것이 아니다.
 
 **미검증:** A-11(vendored 스킬의 양 런타임 discovery), A-12(BMAD의 Codex 지원). 둘 다 G-M2·G-M3에서 실측한다.
+
+## 13. 개정 4 반영 기록 (2026-08-29) — M2 완료 정의
+
+3일째 닫히지 않던 M2 의 근본 원인 재검토([`docs/reviews/2026-08-29-codex-m2-rootcause-review/`](../reviews/2026-08-29-codex-m2-rootcause-review/README.md))를 받아
+사용자가 다음을 확정했다([D-76](../decisions/decision-register.md)).
+
+- **§4.1 M2 흐름의 마지막 줄 "같은 gate 판정"** 은 결정적 요소(봉투 스키마 · 역할 계약과 권한 상한 · `required_checks` · 구현자 면의 판정 — 수용 기준 AC 는 종료 검사가 본다)만 뜻한다.
+  검토자(LLM)의 자유 서술 판정 일치는 게이트가 아니라 리포트의 advisory 항목이다 — 같은 산출물·같은 런타임에서도 판정이 흔들린다는 관측(D-74) 아래에서
+  그 일치는 유한하게 닫히는 목표가 아니었다. §10 #11 의 확인 기준을 그에 맞게 고쳤다.
+- **D-75 는 (b)** — close 는 현재 산출물의 PASS 1건으로 닫고 표본 수는 경고로만 드러낸다.
+- **impl6 전체 교체 실행은 게이트 조건이 아니다** — 관측 케이스가 이미 교체 실행의 구현자 면을 담고 있다. **Q-11 승인 서명은 미룬다.** push 는 별도 승인이다.
+- **M2 완료 ≠ v1 릴리스 완료.** §4.2 의 게이트 두 개 구분은 그대로다 — T2 Charter·shadow 20건·attach 는 v1 릴리스 게이트(M4)의 잔여다.
+- 구현: `romeo/parity.py` `judge_mode`(기본 `advisory`, `strict` 는 D-73·D-74 결박 보존) · `fixtures/parity/*` `expect_advisory` · 테스트 398 → 419.

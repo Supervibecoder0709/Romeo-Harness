@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/sindresorhus/slugify
 - Ref: `main` (GitHub API가 반환한 현재 기본 브랜치)
 - Commit SHA: `7c318bd1aa4b4affab29761f15a9604323fe2a3b`
+- License: MIT
 - Analysis timestamp: 2026-08-13 08:51:12 KST (+0900)
 
 ## 재현 방법과 접근 범위

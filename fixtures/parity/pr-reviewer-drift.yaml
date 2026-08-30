@@ -1,18 +1,21 @@
-# 산출물 동일성 전제가 **핑계가 되지 않는지** 확인하는 음성 케이스(D-73).
+# 산출물 동일성 전제가 **핑계가 되지 않는지** 확인하는 케이스(D-73 → D-76).
+# **D-76(2026-08-29):** 판정 역할의 판정은 게이트가 아니다. 이 케이스가 검증하는 것은 검사기가 아래 상황을
+# `advisory` 로 옳게 요약하는가이다(`expect_advisory`). 종전 결박은 `--judge-verdict strict` 프로파일에만 남아 있다.
 #
 # 두 면의 산출물이 같다(product 가 같다). 같은 것을 보고도 검토자 판정이 PASS≠FAIL 로 갈렸다면
-# 그것은 런타임의 차이이고, 검사기는 이것을 비교 불가로 빼면 안 된다 — VERDICT_DIFFERS 로 잡아야 한다.
+# 그것은 런타임의 차이일 수도 실행 간 분산일 수도 있다(Q-10). D-76 아래에서 검사기는 이것을 게이트 불일치로 세지 않고
+# advisory VERDICT_DIFFERS 로 인쇄해야 한다(strict 프로파일에서는 종전처럼 VERDICT_DIFFERS 불일치다).
 # pr-product-differs 와 짝이다: 산출물이 다를 때만 빼고, 같을 때는 지금처럼 비교한다.
 #
 # 이 케이스는 손으로 쓴 합성 데이터다(source.kind: authored). 검사기가 도는지만 증명하고
 # 핵심 동등성 게이트를 통과시키지 못한다(D-b).
 ---
 id: pr-reviewer-drift
-title: 검토자 판정 표류 — 같은 산출물을 보고도 검토자 판정이 갈린다
+title: 검토자 판정 표류 — 같은 산출물을 보고도 검토자 판정이 갈린다 (advisory)
 unit_id: feat-20260828-license-field-a1b2
 status: executed
-expect: differ
-expect_codes: [VERDICT_DIFFERS]
+expect: same
+expect_advisory: {reviewer: VERDICT_DIFFERS}
 
 baseline:
   runtimes: {implementer: claude, reviewer: codex}

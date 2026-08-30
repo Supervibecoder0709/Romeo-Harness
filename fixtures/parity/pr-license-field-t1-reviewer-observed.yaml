@@ -16,6 +16,8 @@
 # cmp identical(sha256 eebccd2302f9…)이고, 봉투가 지목한 증거가 모두 기준 실행의 evidence 이며,
 # 각 실행의 review-tree-before/after 가 같은 log_sha256 을 냈다(방어 검사 전부 '유효').
 # 봉투를 인라인으로 적지 않는다(D-b). expect 는 관측 결과에 맞춰 고치지 않는다(D-b).
+# D-76(2026-08-29): 네 판정이 전부 FAIL 로 같다는 것은 '같은 실패 문자열' 이지 품질이 아니다 — 판정은 advisory 로만 인쇄되고
+# 이 케이스가 게이트에 보태는 것은 검토자 봉투의 스키마·계약 동등성뿐이다.
 ---
 id: pr-license-field-t1-reviewer-observed
 title: 아카이브 라이선스 필드 T1 — 같은 산출물을 본 두 검토자 (검토자-only 재실행 관측 · 재관통)

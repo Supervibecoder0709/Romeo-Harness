@@ -46,6 +46,11 @@ if ! matches '^[-*] Commit SHA: `[0-9a-f]{40}`$|^[-*] Commit SHA: [0-9a-f]{40}$'
   exit 1
 fi
 
+if ! matches '^[-*] License: .+$' "$archive_dir/_source.md"; then
+  printf 'FAIL: _source.md does not contain a License field\n' >&2
+  exit 1
+fi
+
 if ! matches '원문 위치|Source location|source location' "$archive_dir/04-components-table.md"; then
   printf 'FAIL: 04-components-table.md has no source-location column\n' >&2
   exit 1

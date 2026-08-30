@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/farion1231/cc-switch
 - Ref: main
 - Commit SHA: `5ca9459d50ea4beea6a81bbc509de6ec5b6b09ca`
+- License: MIT
 - Analysis timestamp: 2026-08-23T18:48:59Z
 
 ## 수집 방식과 한계

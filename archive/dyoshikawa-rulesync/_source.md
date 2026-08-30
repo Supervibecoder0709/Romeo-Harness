@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/dyoshikawa/rulesync
 - Ref: `main`
 - Commit SHA: `c3acceacec5463efe14ebb1b8be5fed5fa835e65`
+- License: MIT
 - Analysis timestamp: `2026-08-23T18:47:49Z`
 
 ## 접근 방식과 한계

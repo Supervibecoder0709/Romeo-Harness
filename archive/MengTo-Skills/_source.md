@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/MengTo/Skills
 - Ref: main
 - Commit SHA: `4c716b516b6b0143f3037631306b3730d2832344`
+- License: MIT
 - Analysis timestamp: 2026-08-23T18:47:06Z
 
 ## 접근 방식과 한계

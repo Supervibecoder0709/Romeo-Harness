@@ -2,7 +2,7 @@
 id: v1-scope
 type: requirements
 status: draft
-updated: 2026-08-27
+updated: 2026-08-29
 authority: canonical
 ---
 
@@ -61,15 +61,23 @@ v1의 유일한 합격 기준이다.
   → 런타임 B가 read-only reviewer
   → 현재 HEAD SHA에 묶인 commands·exit_codes·artifact_hash 증거
   → /plan-close 검증 통과 → status 확정 + current 갱신
-  → A/B 역할 교체 재현 → 동일 artifact 스키마·게이트 판정
+  → A/B 역할 교체 재현 → 동일 artifact 스키마 · 동일 required_checks · 동일 권한 상한 · 동일 결정적 게이트 판정
+     (검토자의 자유 서술 판정 일치는 게이트가 아니라 리포트의 advisory 항목 — 개정 4, D-76)
 ```
 
 합격 조건은 **역할 교체 재현**이다. 이것이 안 되면 하네스가 존재할 이유가 없다.
+
 이 경로가 통과하기 전에는 부품의 **벤더링·원칙 재작성·자체 제작**, 자기학습, 인덱스를 시작하지 않는다.
 `install`·`verbatim` 연결은 코어를 바꾸지 않으므로 채택 게이트를 거쳐 v1 안에서 허용하며,
 **동등성은 부품이 켜진 상태에서 증명한다** ([결정 D-58](../decisions/decision-register.md)).
 
-근거: S01 KEEL 리뷰 §1, S10 최종 결론, COUNCIL 구현 우선순위 5. 개정 3: 2026-08-27 사용자 재정의.
+**개정 4(2026-08-29, [D-76](../decisions/decision-register.md)):** 위 흐름의 '게이트 판정' 은 **결정적 요소**로 한정한다 —
+결과 봉투 스키마 · 역할 계약(앵커 검사)과 권한 상한 · `required_checks` 의 명령과 종료 코드 · 구현자 면의 gate 판정. 수용 기준(AC)은 종료 검사(`close`)가 본다 — 동등성 리포트의 비교 항목이 아니다. 검토자(LLM)의 자유 서술 판정(PASS/FAIL)은
+같은 산출물·같은 런타임에서도 흔들리는 것이 관측돼(D-74) **합격 조건으로 쓰지 않고** 동등성 리포트에 advisory 로 인쇄한다.
+판정이 왜 흔들리는지는 [Q-10](../planning/open-questions.md)이 가진다. M2 완료(핵심 동등성 게이트)와 v1 릴리스 완료(V-0~V-11)는 같은 말이 아니다.
+근거: `docs/reviews/2026-08-29-codex-m2-rootcause-review/`.
+
+근거: S01 KEEL 리뷰 §1, S10 최종 결론, COUNCIL 구현 우선순위 5. 개정 3: 2026-08-27 사용자 재정의. 개정 4: 2026-08-29 사용자 확정(D-76).
 
 ---
 

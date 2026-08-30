@@ -10,14 +10,17 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-08-29T12:34:57+09:00'
 approved_by: Supervibecoder0709
 base_sha: 0f7d73fdd84a8c40ab63b0b5da71d7844d4f4854
-closed_at: null
+closed_at: '2026-08-29T23:43:14+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_31e175742892.yaml, evidence/run_b5cdadaffcdc.yaml, evidence/run_5fc794f15236.yaml,
+  evidence/run_241a35112ca3.yaml, evidence/run_5dd1b2c232c7.yaml, evidence/run_222f508b5541.yaml, evidence/run_5a5a894aa26d.yaml,
+  evidence/run_6c143185ea1b.yaml, evidence/run_26fbe9fb7fab.yaml, evidence/run_410f3f12a645.yaml, evidence/run_ba40ff663b44.yaml,
+  evidence/run_42710f6ac93b.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -39,10 +42,10 @@ updated: '2026-08-29'
 - **왜 지금:** 지금은 18개 중 3개만 본문 어딘가에 라이선스를 언급하고, 헤더 필드로는 0개다. 부품을 가져올 때 라이선스를 매번 GitHub API로 다시 조회해야 하고(K-40~K-42가 요구하는 추적), 아카이브만 보고는 재사용 가능 여부를 알 수 없다. 값은 이미 `docs/planning/implementation-plan.md` §1.3에서 API와 고정 SHA 실물 대조로 확인해 두었다.
 - **기대 결과:** `archive/<이름>/_source.md` 를 열면 헤더 5줄째에 라이선스가 보이고, `archive/README.md` 표에 라이선스 열이 생기며, 라이선스 줄이 없는 새 아카이브는 `validate-repo-archive.sh` 가 FAIL 시킨다.
 - **수용 기준:**
-  - [ ] AC-1 `archive/*/_source.md` 18개 전부에 `- License: <값>` 줄이 있고, 값이 계획 §1.3 표의 **「`_source.md` 에 적는 값」 열**과 글자까지 일치한다 (그 열이 없던 것이 1차 검토의 지적이었다 — 이제 18개 모두 확정 값이 있다)
-  - [ ] AC-2 라이선스 줄이 없는 아카이브 사본은 `validate-repo-archive.sh` 가 FAIL 한다 (검사가 실제로 동작한다)
-  - [ ] AC-3 `archive/README.md` 목록 표에 라이선스 열이 있고 `generate-archive-index.py --check` 가 PASS 한다
-  - [ ] AC-4 기존 하네스 테스트가 그대로 통과한다 (회귀 없음)
+  - [x] AC-1 `archive/*/_source.md` 18개 전부에 `- License: <값>` 줄이 있고, 값이 계획 §1.3 표의 **「`_source.md` 에 적는 값」 열**과 글자까지 일치한다 (그 열이 없던 것이 1차 검토의 지적이었다 — 이제 18개 모두 확정 값이 있다)
+  - [x] AC-2 라이선스 줄이 없는 아카이브 사본은 `validate-repo-archive.sh` 가 FAIL 한다 (검사가 실제로 동작한다)
+  - [x] AC-3 `archive/README.md` 목록 표에 라이선스 열이 있고 `generate-archive-index.py --check` 가 PASS 한다
+  - [x] AC-4 기존 하네스 테스트가 그대로 통과한다 (회귀 없음)
 - **위험과 되돌리기:** 문서와 검증 스크립트만 바뀐다. 운영 데이터·외부 상태·CI 권한은 건드리지 않는다. 되돌리기는 `git revert <커밋>` 하나. 잘못된 라이선스 값을 적는 것이 유일한 실질 위험이고, 근거를 계획 §1.3 한 곳으로 고정해 대조 가능하게 둔다.
 - **결정 필요:** 없음
 
@@ -91,6 +94,17 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-29T23:43:14+09:00 · HEAD 7f8ecd7449a5 · 검사 기록 run_42710f6ac93b
 
-- (없음)
+- [evidence/run_31e175742892.yaml](evidence/run_31e175742892.yaml) — exit codes [0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_b5cdadaffcdc.yaml](evidence/run_b5cdadaffcdc.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_5fc794f15236.yaml](evidence/run_5fc794f15236.yaml) — exit codes [0, 0]
+- [evidence/run_241a35112ca3.yaml](evidence/run_241a35112ca3.yaml) — exit codes [0, 0]
+- [evidence/run_5dd1b2c232c7.yaml](evidence/run_5dd1b2c232c7.yaml) — exit codes [0, 0]
+- [evidence/run_222f508b5541.yaml](evidence/run_222f508b5541.yaml) — exit codes [0, 0]
+- [evidence/run_5a5a894aa26d.yaml](evidence/run_5a5a894aa26d.yaml) — exit codes [0, 0, 0, 0, 1, 0, 0, 0, 0]
+- [evidence/run_6c143185ea1b.yaml](evidence/run_6c143185ea1b.yaml) — exit codes [0, 0]
+- [evidence/run_26fbe9fb7fab.yaml](evidence/run_26fbe9fb7fab.yaml) — exit codes [0, 0]
+- [evidence/run_410f3f12a645.yaml](evidence/run_410f3f12a645.yaml) — exit codes [0, 0]
+- [evidence/run_ba40ff663b44.yaml](evidence/run_ba40ff663b44.yaml) — exit codes [0, 0, 0, 0, 1, 0, 1, 0, 0, 0]
+- [evidence/run_42710f6ac93b.yaml](evidence/run_42710f6ac93b.yaml) — exit codes [1, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

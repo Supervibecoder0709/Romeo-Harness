@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/design-tokens/community-group
 - Ref: main
 - Commit SHA: `16c902d9327c18290e956a21130c445f1b88c40f`
+- License: W3C Software and Document License
 - Analysis timestamp: 2026-08-24T03:53:13+09:00
 
 ## 접근 방식과 한계

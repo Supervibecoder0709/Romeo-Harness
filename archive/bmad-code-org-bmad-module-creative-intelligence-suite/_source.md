@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
 - Ref: main
 - Commit SHA: `0e4ff9233a792db1a1cd00f22a482f338168cdc3`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:49:24+0900
 
 ## 접근 방식과 한계

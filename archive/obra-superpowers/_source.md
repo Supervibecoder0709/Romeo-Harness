@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/obra/superpowers
 - Ref: main
 - Commit SHA: `b36e0829c6d0140e93cfef2ca599b1b07d4a7797`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:47:39+09:00
 
 ## 분석 방법과 재현 경계

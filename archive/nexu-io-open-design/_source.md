@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/nexu-io/open-design
 - Ref: `main` (GitHub API가 반환한 기본 브랜치)
 - Commit SHA: `35a38abf349bfbb53e2ae0252f0f21c8571890b2`
+- License: Apache-2.0
 - Analysis timestamp: 2026-08-24 03:50:33 KST (+0900)
 
 ## 재현 방법과 접근 범위

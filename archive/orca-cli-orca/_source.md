@@ -6,6 +6,8 @@
 
 - Commit SHA: `5beeefcb57555962bb93facc54b5f82484731802`
 
+- License: MIT
+
 - Analysis timestamp: 2026-08-23T18:44:16Z (2026-08-24 03:44:16 KST)
 
 ## 수집 방법과 범위

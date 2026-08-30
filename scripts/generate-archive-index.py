@@ -153,6 +153,9 @@ def collect(archive: pathlib.Path) -> dict:
     sha_m = re.search(r"[0-9a-f]{40}", field(src, "Commit SHA"))
     sha = sha_m.group(0) if sha_m else ""
 
+    # `- License:` 헤더 필드. 백틱을 벗기고 공백을 다듬는다. 없으면 em dash — 검증기가 따로 잡는다.
+    license_ = re.sub(r"\s+", " ", field(src, "License").replace("`", "")).strip() or "—"
+
     missing = [f for f in REQUIRED_FILES if not (archive / f).is_file()]
     missing += [f"{d}/" for d in REQUIRED_DIRS if not (archive / d).is_dir()]
 
@@ -162,6 +165,7 @@ def collect(archive: pathlib.Path) -> dict:
         "url": url,
         "ref": ref,
         "sha": sha,
+        "license": license_,
         "date": parse_date(field(src, "Analysis timestamp")),
         "summary": summary(archive),
         "docs": sum(1 for _ in archive.rglob("*.md")),
@@ -194,8 +198,8 @@ def render(entries: list[dict]) -> str:
     add("")
     add("## 목록")
     add("")
-    add("| 아카이브 | 원본 레포 | 고정 커밋 | 분석일 | 요약 |")
-    add("| --- | --- | --- | --- | --- |")
+    add("| 아카이브 | 원본 레포 | 고정 커밋 | 라이선스 | 분석일 | 요약 |")
+    add("| --- | --- | --- | --- | --- | --- |")
     for e in entries:
         commit = (
             f"[`{e['sha'][:7]}`]({e['url']}/commit/{e['sha']})" if e["sha"] and e["url"] else "—"
@@ -203,7 +207,7 @@ def render(entries: list[dict]) -> str:
         repo = f"[{e['slug']}]({e['url']})" if e["url"] else e["name"]
         add(
             f"| [`{e['name']}`]({e['name']}/) | {repo} | {commit} <sup>{cell(e['ref'])}</sup> "
-            f"| {e['date']} | {cell(e['summary'])} |"
+            f"| {cell(e['license'])} | {e['date']} | {cell(e['summary'])} |"
         )
     add("")
 

@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/first-fluke/oh-my-agent
 - Ref: main
 - Commit SHA: `7a2b46ebe670b14be628210ea45fd3ccc24ab5ee`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:55:56+09:00
 
 ## Analysis boundary

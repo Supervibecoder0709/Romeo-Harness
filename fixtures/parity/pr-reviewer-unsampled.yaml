@@ -1,4 +1,6 @@
-# 검사기가 **표본 부족**을 잡는지 확인하는 합성 케이스(D-74).
+# 검사기가 **표본 부족**을 잡는지 확인하는 합성 케이스(D-74 → D-76).
+# **D-76(2026-08-29):** 판정 역할의 판정은 게이트가 아니다. 이 케이스가 검증하는 것은 검사기가 아래 상황을
+# `advisory` 로 옳게 요약하는가이다(`expect_advisory`). 종전 결박은 `--judge-verdict strict` 프로파일에만 남아 있다.
 #
 # 두 면의 산출물이 같고 판정도 갈렸다(PASS≠FAIL). 예전 정의라면 VERDICT_DIFFERS 다.
 # 그런데 각 면의 표본이 1건뿐이다 — 그 판정이 그 런타임의 판정인지 그 실행의 판정인지 모른다.
@@ -14,7 +16,7 @@ title: 표본이 각 1건뿐이다 — 판정이 갈려도 비교 불가, 구현
 unit_id: feat-20260828-license-field-a1b2
 status: executed
 expect: same
-expect_incomparable: {reviewer: VERDICT_UNSAMPLED}
+expect_advisory: {reviewer: VERDICT_UNSAMPLED}
 
 baseline:
   runtimes: {implementer: claude, reviewer: codex}

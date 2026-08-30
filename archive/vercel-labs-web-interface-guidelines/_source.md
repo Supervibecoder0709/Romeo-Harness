@@ -3,6 +3,7 @@
 - Origin URL: https://github.com/vercel-labs/web-interface-guidelines
 - Ref: main
 - Commit SHA: `e3d624baaf29dc1fc645aff3e38f03e564d2d6b1`
+- License: MIT
 - Analysis timestamp: 2026-08-24T03:48:13+09:00
 
 ## 접근 방식과 한계
