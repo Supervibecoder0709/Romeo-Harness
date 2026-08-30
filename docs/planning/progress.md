@@ -17,55 +17,66 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `ae7b67a` · 2026-08-30 밤)
+## 지금 상태 (기준 `014e852` · 2026-08-30 밤)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline ae7b67a..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline 014e852..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
-- **마일스톤:** **M2 완료(2026-08-29 · D-76) · M3 진입 전 2차 정비는 관통 4회 전부 FAIL 로 중단(2026-08-30 밤).**
-  단위 `feat-20260830-harness-defects-w3qu` 는 **`status: active` 로 열려 있다** — close 하지 않았다.
-- **G-M3 선행 Q-06 은 해소됐다.** BMAD 본체 `v6.10.0`(`081e64ee5aab…`)을 아카이브했다(`460f992`) —
-  `archive/bmad-code-org-BMAD-METHOD/`, Core 13 + BMM 33 = **46개 SKILL** 을 파일 경로·산출물 경로·대화형 여부까지 표로.
-  검사 3건 실측: `validate-repo-archive.sh` PASS · 인덱스 19개 · `check-archive-licenses.py` PASS(계획 §1.3 표를 19행으로 늘렸다).
-  **G-M3 후보표는 아직 만들지 않았다** — 재료는 갖춰졌고 사용자 확정만 남았다(D-52).
-- **BMAD 가 계획의 두 전제를 뒤집었다:** ① **Codex 를 지원한다**(`platform-codes.yaml` 에서 preferred, 프로젝트 타깃 `.agents/skills`) —
-  계획 §7 M3 의 "Codex 미지원 시 정직 표기" 는 이 SHA 에서 틀리다. 다만 agent team(party-mode)은 Claude Code 전용이다.
-  ② **산출물 경로를 `_bmad-output/**` 로 고정하면 안 된다** — `project_knowledge` 기본값이 `docs` 라 `bmad-document-project` 는 `docs/**` 에 쓴다(K-62).
-  그리고 `.agents/skills` 가 `romeo compile` 의 쓰기 대상과 **겹친다**(K-64·K-68 에서 다뤄야 할 실제 충돌 지점).
-- **정비 단위는 왜 안 닫혔나 — 4회 관통, 4회 FAIL. 실패 원인이 매번 달랐다.**
-
-  | 회차 | run | 검토자 지적 | 실질 원인 |
-  | --- | --- | --- | --- |
-  | 1 | `run_f4f810c1baa6` | findings 5건 (확인란 무단 변경 · `list_outputs` pruned 누락 · check-6·8·9 가 AC 를 검사 안 함 · 검사 id 정규식 오인) | 검증 계획(목표) |
-  | 2 | `run_2b_harness_defects` | check-7 의 `\|\| true` 가 종료 코드를 항상 0 으로 만든다 | 검증 계획(목표) |
-  | 3 | `run_3c_harness_defects` | `.compile-*` staging 이 목록에 없다 | AC-4 가 문자 그대로는 달성 불가(목표) |
-  | 4 | `run_4d_harness_defects` | evidence 의 `spec_ref.sha256` 이 계약과 다르다 | **하네스의 절차적 모순** |
-
-  1~3 은 전부 반영해 고쳤다(재승인 3회 — `99e9031`·`5aa0c68`·`ae7b67a`). **확인란을 바꾼 것은 마지막 한 번뿐**이다(AC-4 한정).
-- **4회차 FAIL 은 흔들림이 아니라 체계적이다 — 표본 2건이 같은 사유로 FAIL 했다**(`run_4d_harness_defects` · `run_4d_review2`, §6.6 재실행 · 계약 `cmp` identical · 방어 검사 둘 다 유효).
-  `close --dry-run` 은 `AC_ALL_CHECKED`·`AC_TEXT_UNCHANGED`·`SPEC_UNCHANGED_SINCE_EVIDENCE` 를 **전부 PASS** 로 내고 `REVIEW_VERDICT` 만 FAIL 이다.
-  모순의 형태: **① `AC_ALL_CHECKED` 가 체크를 요구 → ② 체크하면 spec 해시가 바뀜(`d848729d`→`6796bef2`) → ③ evidence 는 그 시점 spec 을,
-  계약은 승인 커밋 spec 을 가리킴 → ④ 검토자가 둘의 일치를 요구 → 절차를 따르면 어떤 단위도 닫히지 않는다.**
-  하네스 자신은 이를 허용한다(`AC_TEXT_UNCHANGED` 가 "체크 표시 제외" 로 비교하는 것이 그 증거). **검토자만 이 규칙을 모른다** — Q-10 (a) 가 실증됐다.
-- **구현은 완성돼 있다(미커밋).** 워크트리 `impl-feat-20260830-harness-defects-w3qu` 에 9개 파일 —
-  검사 9건 exit 0 · unittest **455** · 봉투 앵커 5/5 양쪽 · 음성 대조 4건(check-6·8·9 와 새 check-7 이 구현 전에는 실패하는 것을 실측).
-  결함 5건(파서 사유·템플릿 제약·프롬프트 하드코딩·`compile --list-outputs` 29개+패턴·RUNBOOK 늦은 채택 관측)은 전부 반영됐다.
-- **이 관통이 새로 드러낸 하네스 결함 7건 (미반영 — 다음 정비 후보, 우선순위 순):**
-  ① **검토자 기준이 하네스 규칙과 충돌한다** — AC 체크로 인한 spec 해시 차이를 FAIL 로 본다. 고칠 자리는 `core/workflows/review/SKILL.md` 의 FAIL 사유 열거이거나 evidence 의 `spec_ref` 기록 방식(작업 트리 → `base_sha` 시점). **이것부터다.**
+- **마일스톤:** **M2 완료(2026-08-29 · D-76) · M3 진입 전 2차 정비 진행 중.**
+  **결함 ① 은 닫혔다**(`feat-20260830-reviewer-fail-reasons-938r` · `status: done` · 관통 1회 PASS).
+  단위 `feat-20260830-harness-defects-w3qu` 는 여전히 **`status: active`** 다 — 그 구현 9개 파일은
+  워크트리 `impl-feat-20260830-harness-defects-w3qu` 에 **미커밋**으로 살아 있다.
+- **결함 ① 이 무엇이었나, 무엇으로 닫혔나.** `spec.md` 지문을 두 곳이 **다른 시점**으로 뜬다 —
+  작업 계약은 승인 커밋 시점(`romeo/envelope.py`), 증거는 작업 트리 시점(`romeo/evidence.py`).
+  구현자가 절차대로 확인란을 체크하면 두 값이 갈라지는데, 하네스는 이를 허용하고(`AC_TEXT_UNCHANGED` 는
+  체크 표시를 뺀 문장만 대조 · `SPEC_UNCHANGED_SINCE_EVIDENCE` 는 `level="warning"`) **검토자만 그것을 FAIL 로 봤다.**
+  근본 원인은 `review/SKILL.md` 의 FAIL 사유 목록이 **충분조건만** 열거하고 "목록에 없으면 FAIL 이 아니다" 를
+  말하지 않은 것이다 — 4회 관통에서 매번 다른 사유가 나온 것이 그 증거다.
+  **고친 것(커밋 `0231364`):** 사유 8개에 코드를 붙이고 목록을 닫았다(`AC_UNMET`·`UNAPPROVED_ACTION`·
+  `OUT_OF_SCOPE_WRITE`·`CHECK_PLAN_CHANGED`·`EVIDENCE_NOT_RECORDED`·`CHECK_NOT_RERUNNABLE`·
+  `ROLE_CONTRACT_VIOLATION`·`FAILED_CHECK_CLAIMED_PASS`). 강제는 **두 겹**이다 — 스키마는 `fail_reasons` 의
+  목록 밖 코드를 거부하고(선택 필드라 옛 봉투는 통과), `close` 의 `REVIEW_FAIL_REASONS` 가 지금 닫으려는
+  산출물의 FAIL 봉투에 사유가 없으면 완료를 선언하지 않는다.
+- **왜 스키마 하나로 조이지 않았나(관통 중 재승인 사유).** `fixtures/parity` 관측 케이스 2건
+  (`pr-license-field-t1-observed`·`pr-license-field-t1-reviewer-observed`)이 이미 `done` 인
+  `feat-20260829-license-field-46an` 의 옛 FAIL 봉투 8건을 **직접 읽는다** — 조건부 필수로 조이면 `check-5` 와
+  `tests.test_parity` 가 깨진다. 그중 `run_b5cdadaffcdc-reviewer.json` 은 이번에 "FAIL 사유가 아니다" 라고
+  선언하는 **바로 그 사유**(`spec_ref.sha256` 불일치)로 FAIL 했으므로 붙일 코드가 애초에 없다.
+  과거 판정 기록은 소급 수정하지 않는다.
+- **이번 관통의 증거.** `run_c62036661689` · `base_sha 6065efd` · `required_checks` **10건 전부 exit 0**
+  (재실행 대조 포함) · 구현자 PASS · 검토자(codex read-only, `gpt-5.6-terra` xhigh) **PASS findings 0** ·
+  앵커 5/5 양쪽 · 방어 검사 `review-tree-before/after` 가 같은 트리 `fe4e2dd4c4da` ·
+  `close` 전 검사 PASS(`REVIEW_SAMPLE` 만 WARN — D-75 (b) 로 1건 확정). unittest 444 OK.
+- **남은 하네스 결함 (미반영 — 다음 정비 후보, 우선순위 순):**
   ② **`expect` 가 판정에 쓰이지 않는다** — `required_checks` 는 exit code 만 대조한다. 사람은 `expect` 를 조건으로 읽고 쓰지만 기계는 보지 않는다. 1·2회차 실패의 공통 원인이고, 검사 4개가 빈 검사였다.
-  ③ **반복 중단 카운터가 재검토로 리셋된다** — `romeo/run_unit.py:73` 은 "마지막 재검토 이후" 만 세는데, `AGENTS.core.md` §10 은 리셋 사유를 **성공으로만** 한정한다. 문서와 코드가 어긋나고, 재검토를 반복하면 중단선이 영원히 안 걸린다.
-  ④ **검토자에게 lifecycle 이 없다** — `worker-start` 에 샌드박스 전달 경로가 없어(`--help` 실측: `--agent`·`--model`·`--effort` 뿐) `-s read-only` 를 걸려면 비대화형 `-o` 경로뿐이고, 그 경로엔 `worker_done`·heartbeat·`ask` 가 없다. 완전 해결은 Orca 쪽 기능이거나 `agent_prompt_stalled` 원인 규명에 달렸다.
-  ⑤ **비대화형 검토자 경로에 Task 정리·완료 신호가 강제되지 않는다** — RUNBOOK §3.7 이 "사람이 `task-update` 로 정리해야 한다" 고만 적어 두 세션 연속 빠뜨렸다. 회수·정리·완료신호를 명령 하나로 묶어야 한다.
-  ⑥ **`codex exec` 가 argv 프롬프트를 받고도 stdin 을 기다린다** — 배경 실행에서 무한 대기(2026-08-30 실측: 4시간 51분, CPU 0.07초). RUNBOOK §4 의 명령형에 `< /dev/null` 이 없다.
-  ⑦ **논리 역할 이름과 provider 모델 id 가 구분되지 않는다** — `sol` 은 400(`ChatGPT 계정에서 지원되지 않음`), 실제 id 는 `gpt-5.6-sol`. 문서에 매핑이 없다.
+  ③ **반복 중단 카운터가 재검토로 리셋된다** — `romeo/run_unit.py:73` 은 "마지막 재검토 이후" 만 세는데 `AGENTS.core.md` §10 은 리셋 사유를 **성공으로만** 한정한다.
+  ④ **검토자 lifecycle 이 붙지 않는다 — 원인이 한 겹 더 드러났다.** `worker-start --terminal` 이 `state: failed`·`stage: dispatch_input`(`agent_prompt_stalled`)로 끝났다. RUNBOOK §3.7 실측 표는 이 실패가 **비대화형(`codex exec`) 전용**이라고 적지만, **TUI(`codex`)로 띄워도 같은 실패가 났다**. 진짜 원인은 대화형/비대화형이 아니라 **프롬프트를 `--command` 의 argv 로 주는 순간 lifecycle 주입이 갈 자리가 없다**는 것이다. §3.7 표를 이 관측으로 고쳐야 한다.
+  ⑤ **비대화형 검토자 경로에 Task 정리·완료 신호가 강제되지 않는다** — 이번에도 `task-update` 를 사람이 손으로 했다. 회수·정리·완료신호를 명령 하나로 묶어야 한다.
+  ⑥ **`codex exec` 가 argv 프롬프트를 받고도 stdin 을 기다린다** — RUNBOOK §4 의 명령형에 `< /dev/null` 이 없다.
+  ⑦ **논리 역할 이름과 provider 모델 id 가 구분되지 않는다** — `sol` 은 400, 실제 id 는 `gpt-5.6-sol`. 이번 검토자는 기본값 `gpt-5.6-terra` 로 돌았다.
+- **이번 관통이 새로 드러낸 것 3건 (전부 미반영):**
+  Ⓐ **`send --to dispatch:<id>` 로 보낸 답이 워커의 ask 스레드 타임아웃을 풀지 못한다.** 답이 도달했는데도 구현자가 900초 무응답으로 판단해 `escalation` 을 냈다. 그 메시지는 `check --run --peek` 수신함에도 보이지 않는다. RUNBOOK §3.5.2 는 이 경로를 식별자 전달용으로만 쓰는데, **질문에 답할 때 쓸 경로가 문서에 없다.** 실효 경로는 `send --to run:<id> --thread-id <질문 msg id>` 다.
+  Ⓑ **`worker-start` 가 실패해도 task spec 주입은 일어난다.** 관통 도중 재승인하면 계약이 바뀌는데 **orchestration task spec 을 갱신하는 절차가 RUNBOOK 에 없어**, 검토자가 낡은 해시(`d807…`)와 새 해시(`0f0d…`)를 **둘 다** 받았다. 이번엔 검토자가 새 값을 골라 넘어갔지만(봉투 `notes` 에 그 사실을 적었다) 운에 맡길 자리가 아니다.
+  Ⓒ **`tui-idle` 은 codex 의 작업 완료 신호가 아니다.** 작업 시작 직후에도 `satisfied: true` 가 나온다. 채택 전 대기에 쓰면 주입이 경쟁하고, 완료 판정에 쓰면 오탐이 난다. 완료는 **codex 세션 로그**(`~/.codex/sessions/<날짜>/rollout-*.jsonl` 의 `task_complete.last_agent_message`)에서 읽는 것이 확실했다.
+  운영 제약도 하나 확인됐다 — `orca terminal send` 는 codex 가 작업 중이면 `agent_prompt_stalled` 로 거부하고, 텍스트가 약 1KB 를 넘으면 실패한다. 긴 지시는 파일로 두고 짧은 한 줄로 가리킨다.
+- **G-M3 선행 Q-06 은 해소됐다.** BMAD 본체 `v6.10.0`(`081e64ee5aab…`)을 아카이브했다(`460f992`) —
+  `archive/bmad-code-org-BMAD-METHOD/`, Core 13 + BMM 33 = **46개 SKILL**. 검사 3건 실측 PASS.
+  **G-M3 후보표는 아직 만들지 않았다** — 재료는 갖춰졌고 사용자 확정만 남았다(D-52).
+- **BMAD 가 계획의 두 전제를 뒤집었다:** ① **Codex 를 지원한다**(`platform-codes.yaml` 에서 preferred, 타깃 `.agents/skills`) —
+  계획 §7 M3 의 "Codex 미지원 시 정직 표기" 는 이 SHA 에서 틀리다. ② **산출물 경로를 `_bmad-output/**` 로 고정하면 안 된다** —
+  `project_knowledge` 기본값이 `docs` 라 `bmad-document-project` 는 `docs/**` 에 쓴다(K-62).
+  그리고 `.agents/skills` 가 `romeo compile` 의 쓰기 대상과 **겹친다**(K-64·K-68 의 실제 충돌 지점).
 - **다음 세션이 이어갈 자리 (순서대로):**
-  1. **결함 ①을 고친다** — 이것이 닫히지 않으면 어떤 작업 단위도 close 되지 않는다. 관통 밖에서 한다(§10).
-  2. 그 수정을 포함해 **새 base 로 정비 단위를 재개** — 구현은 워크트리에 그대로 있으므로 재사용한다.
-  3. **G-M3 후보표 → 사용자 확정**(D-52). 재료는 `archive/bmad-code-org-BMAD-METHOD/04-components-table.md`·`05-pm-harness-notes.md` 에 있다.
-- **CI:** 오늘 푸시하지 않았다 — `460f992`·`99e9031`·`5aa0c68`·`ae7b67a` 는 로컬에만 있다. 푸시는 별도 승인 대상이다(K-66).
-- **낡은 워크트리:** 기존 목록에 더해 **`bmad-archive`**(아카이브 원본 · 회수 완료) · **`impl-feat-20260830-harness-defects-w3qu`**
-  (**구현 9개 파일이 미커밋으로 살아 있다 — 지우면 오늘 만든 것이 사라진다**). 정리는 승인 대상이다(K-66).
+  1. **`w3qu` 를 새 base 로 재개한다** — 결함 ① 이 닫혔으므로 4회차를 멈춰 세운 사유는 이제 재현되지 않는다.
+     구현은 워크트리에 그대로 있으므로 재사용한다. 재개 전 그 단위의 `required_checks` 가 새 `close` 검사
+     (`REVIEW_FAIL_REASONS`)와 어긋나지 않는지 본다.
+  2. **결함 Ⓑ 를 RUNBOOK 에 반영한다** — 관통 도중 재승인 시 task spec 갱신 절차. 1번을 돌리기 전에 하면 같은 함정을 피한다.
+  3. **G-M3 후보표 → 사용자 확정**(D-52). 재료는 `archive/bmad-code-org-BMAD-METHOD/04-components-table.md`·`05-pm-harness-notes.md`.
+- **CI:** 오늘 푸시하지 않았다 — `460f992`·`99e9031`·`5aa0c68`·`ae7b67a`·`a6cfb55`·`ed412cc`·`6065efd`·`0231364`·`014e852` 가 전부 로컬에만 있다. 푸시는 별도 승인 대상이다(K-66).
+- **낡은 워크트리:** 기존 목록에 더해 **`impl-feat-20260830-harness-defects-w3qu`**
+  (**구현 9개 파일이 미커밋 — 지우면 사라진다**) · **`impl-feat-20260830-reviewer-fail-reasons-938r`**
+  (이번 관통 · **커밋 `0231364` 로 통합 완료** — 지워도 안전하다). 정리는 승인 대상이다(K-66).
 - **문서 지연:** 「미검증·남은 위험」은 맨 위 소절(M2 close 이후)만 최신이다.
 
 ## 마일스톤
