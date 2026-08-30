@@ -19,4 +19,21 @@ attempts:
   note: AC-6 이 달성 불가능하게 쓰였다 — 'envelope.py 가 base 와 바이트가 같다' 는 Ⓔ 게이트(같은 파일에 들어간다)와 모순이다. check-15 도 HEAD
     기준이라 커밋만 하면 빈 검사가 된다. 산출물은 완성 상태(15건 중 14건 exit 0 · 전체 테스트 484 OK)이고 고칠 것은 AC 문장과 검사다
   settled_at: '2026-08-31T00:51:08+09:00'
-reviews: []
+- n: 3
+  run: run_6bd72dea65db
+  base_sha: c842dc09193a6fdb504237e0247e89991313c188
+  started_at: '2026-08-31T00:55:13+09:00'
+  result: pass
+  failure_class: null
+  note: 구현자 PASS(검사 16/16 exit 0, 두 번 기록 32건) · 검토자(codex read-only) PASS findings 1(advisory — 구현 단위
+    표 6행이 재승인된 AC-6 과 상충) · 앵커 5/5 양쪽 · 방어 검사 유효(bcab3e308fdb) · close PASS(REVIEW_SAMPLE 만 WARN)
+  settled_at: '2026-08-31T01:07:56+09:00'
+reviews:
+- after_attempt: 2
+  conclusion: 완료 정의는 달성 가능하다. 두 번의 실패는 모두 산출물이 아니라 목표 쪽이었고, 원인이 서로 다르며 둘 다 실측으로 닫혔다 — 1회차는 옛 작업 계약 35개가
+    바이트 재계산(close.py TASK_ANCHORED)으로 묶여 있다는 사실을 몰라 expect 삭제 범위를 잘못 잡은 것이고(옵션 C 로 템플릿 한정으로 좁혔다), 2회차는
+    AC-6 이 'envelope.py 가 base 와 바이트가 같다' 로 쓰여 같은 파일에 들어가는 Ⓔ 게이트와 논리적으로 모순된 것이다(달성 불가능한 AC 였다). 산출물은 이미
+    완성돼 있다 — 재승인 뒤 워크트리에서 검사 16건이 전부 exit 0 이고 전체 테스트 484건이 OK 다. 고친 것은 산출물이 아니라 AC-6 문장과 검사 두 줄이며, 교체한
+    검사는 리비전에 의존하지 않는 내용 검사로 base 0 · 구현 후 0 · 1회차 삭제본 1 의 3방향 대조를 실측했다. 3회차는 증거 기록과 봉투 작성만 남았다.
+  by: Supervibecoder0709
+  at: '2026-08-31T00:55:13+09:00'

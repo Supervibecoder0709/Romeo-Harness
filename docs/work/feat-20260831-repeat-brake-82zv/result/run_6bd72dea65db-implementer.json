@@ -1,0 +1,96 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260831-repeat-brake-82zv",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260831-repeat-brake-82zv/task/run_6bd72dea65db-implementer.json",
+    "sha256": "a5165438f7e0488ebb3f2d958507c4a6f104c4bd180d3d24b27d88af3293d3ff"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "! grep -qF 'expect:' core/templates/tech-spec.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json",
+      "exit_code": 0
+    },
+    {
+      "id": "check-15",
+      "command": "grep -qE 'item.+expect.+ = str' romeo/envelope.py",
+      "exit_code": 0
+    },
+    {
+      "id": "check-16",
+      "command": "grep -qE 'get.+expect' romeo/close.py",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "grep -qF '중단 게이트' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor",
+      "exit_code": 0
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo fixtures parity --report",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260831-repeat-brake-82zv/evidence/run_6bd72dea65db.yaml",
+  "notes": "3회차다. 산출물은 1·2회차(run_2e44c6ab0b3a·run_7fae68b8791b)에서 이미 완성됐고 이번 회차에서는 코드·스키마·템플릿·문서를 바꾸지 않았다 — 바뀐 것은 이 spec.md 의 수용 기준 체크박스(문장은 그대로, 표시만)와 하네스가 스스로 기록한 attempts.yaml 뿐이다. 앞선 두 실패는 둘 다 산출물이 아니라 목표 쪽 원인이었고(attempts.yaml 의 failure_class: goal) 재승인으로 닫혔다 — 1회차는 expect 삭제 범위(옛 작업 계약 35개의 바이트 재계산), 2회차는 AC-6 의 논리 모순과 리비전 의존 검사였다. 이번 run 은 required_checks 16건을 두 번 기록했다: 첫 기록(체크박스를 채우기 전 트리)과 재기록(채운 뒤 트리) 모두 16건 전부 exit 0 이고, 증거 docs/work/feat-20260831-repeat-brake-82zv/evidence/run_6bd72dea65db.yaml 의 commands 32건이 그것이다 — 체크박스 편집이 check-10(python3 -m unittest discover -s tests)·check-11·check-12·check-13·check-14 의 결론을 바꾸지 않는다는 실측이기도 하다. 수용 기준 대응: AC-1→check-1 · AC-2→check-2 · AC-3→check-3 · AC-4→check-4 와 이번 회차의 envelope build 성공(중단 게이트가 재검토 기록으로 풀린 뒤 계약이 만들어졌다) · AC-5→check-5·check-6 · AC-6→check-7·check-15·check-16 · AC-7→check-5 와 check-10 이 동시에 통과(tests/test_docs_evidence_close.py 에 expect 문자열이 0건) · AC-8→check-8(Q-12·Q-13·Q-14·Q-15·Q-16·Q-17 6건 등록) · AC-9→check-9(RUNBOOK §3.3 의 「중단 게이트」 절) · AC-10→check-10~check-14. FAIL 로 돌린 검사는 없다."
+}

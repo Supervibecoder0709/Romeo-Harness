@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-08-31T00:53:10+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-31T01:07:42+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_2e44c6ab0b3a.yaml, evidence/run_6bd72dea65db.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -51,16 +51,16 @@ approval_history:
 - **왜 지금:** 정비 반복이 끝나 보이지 않는 원인은 결함 수가 아니라 **멈추라고 말해 줄 장치가 꺼져 있는 것**이다. 실측 두 가지가 그것을 보여준다 — (a) 실패 1·2 → 재검토 → 실패 3 이면 카운터가 1 로 돌아가 **4회차가 재검토 없이 돈다**(`run_unit.py:78`), (b) 게이트를 부르는 곳이 `run_unit()` 하나뿐이라 **RUNBOOK §3 을 손으로 관통하면 게이트가 평가되지 않는다** — 직전 관통이 실제로 그랬다. 이 상태로 M3(BMAD 부품 46개)에 들어가면 같은 반복이 훨씬 비싼 자리에서 난다.
 - **기대 결과:** 같은 완료 정의를 향한 관통이 **연속 2회 실패하면, 어느 경로로 돌리든 3회차가 시작되지 않는다** — 사람이 재검토를 기록하기 전까지. 그리고 앞으로 누구도 `expect:` 에 조건을 써 놓고 기계가 볼 것이라 믿지 않는다. 이 단위 뒤에는 하네스 정비를 멈추고 M3 로 넘어간다.
 - **수용 기준:**
-  - [ ] AC-1 (③) 실패 2회 뒤 재검토가 기록돼 있어도, 그 다음 실패가 하나 더 쌓이면 **다시 차단된다** — 재검토는 카운터를 0 으로 만들지 않는다. `tests/test_run_unit.py` 의 회귀 테스트가 이것을 실행으로 보인다.
-  - [ ] AC-2 (③) **성공은 여전히 카운터를 0 으로 되돌린다** — 실패 2회 뒤 성공하면 그 다음 실패 1회로는 차단되지 않는다. 같은 파일의 회귀 테스트가 보인다.
-  - [ ] AC-3 (Ⓔ) 중단 조건에 걸린 단위에서 `bin/romeo envelope build` 가 **종료 코드 0 이 아니고**, 무엇이 왜 막혔는지와 어떻게 푸는지를 한국어로 말한다. 회귀 테스트가 보인다.
-  - [ ] AC-4 (Ⓔ) 중단 조건에 걸리지 않은 단위(시도 기록이 아예 없는 경우 포함)에서는 `envelope build` 가 **그대로 동작한다** — 이 단위 자신의 관통이 그 증거이고, 회귀 테스트도 보인다.
-  - [ ] AC-5 (②) `core/templates/tech-spec.md` 에 `expect:` 가 남아 있지 않고, 대신 **종료 코드 자체가 조건**이라는 문장과 그 이유가 인쇄되어 있다.
-  - [ ] AC-6 (②) `core/schemas/task-envelope.json` 의 `expect` 속성은 **남아 있고**, 그 설명에 **`판정에 쓰이지 않는다`** 가 적혀 있다. 그리고 **`expect` 를 다루는 코드가 되돌려져 있다** — `romeo/envelope.py` 의 `expect` 복사와 `romeo/close.py` 의 `_plan_key` 가 `base_sha` 의 것과 같이 동작한다. 코드에서 `expect` 를 없애면 옛 작업 계약 35개의 바이트 재계산이 깨진다(아래 위험 절). **`romeo/envelope.py` 전체가 base 와 같아야 한다는 뜻이 아니다** — 그 파일은 Ⓔ 의 게이트를 담으므로 base 와 다르다(2회차 관통이 그 모순을 드러냈다). (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
-  - [ ] AC-7 (②) `tests/test_docs_evidence_close.py` 가 템플릿의 `expect` 줄을 편집 앵커로 쓰지 않는다 — 템플릿에서 그 줄이 사라져도 그 파일의 테스트가 전부 통과한다.
-  - [ ] AC-8 (park) `docs/planning/open-questions.md` 에 넘기는 항목이 **`우회 가능 — v1 이후`** 표시와 함께 등록돼 있다 — ⑤(검토자 lifecycle 자동화) · Ⓓ(waiter 하나) · Ⓕ(task 사본이 merge 막음) · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`).
-  - [ ] AC-9 (Ⓔ) `adapters/orca/RUNBOOK.md` 가 **중단 게이트**가 어디서 걸리는지 말한다 — 손으로 관통해도 §3.3 에서 막힌다는 것.
-  - [ ] AC-10 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
+  - [x] AC-1 (③) 실패 2회 뒤 재검토가 기록돼 있어도, 그 다음 실패가 하나 더 쌓이면 **다시 차단된다** — 재검토는 카운터를 0 으로 만들지 않는다. `tests/test_run_unit.py` 의 회귀 테스트가 이것을 실행으로 보인다.
+  - [x] AC-2 (③) **성공은 여전히 카운터를 0 으로 되돌린다** — 실패 2회 뒤 성공하면 그 다음 실패 1회로는 차단되지 않는다. 같은 파일의 회귀 테스트가 보인다.
+  - [x] AC-3 (Ⓔ) 중단 조건에 걸린 단위에서 `bin/romeo envelope build` 가 **종료 코드 0 이 아니고**, 무엇이 왜 막혔는지와 어떻게 푸는지를 한국어로 말한다. 회귀 테스트가 보인다.
+  - [x] AC-4 (Ⓔ) 중단 조건에 걸리지 않은 단위(시도 기록이 아예 없는 경우 포함)에서는 `envelope build` 가 **그대로 동작한다** — 이 단위 자신의 관통이 그 증거이고, 회귀 테스트도 보인다.
+  - [x] AC-5 (②) `core/templates/tech-spec.md` 에 `expect:` 가 남아 있지 않고, 대신 **종료 코드 자체가 조건**이라는 문장과 그 이유가 인쇄되어 있다.
+  - [x] AC-6 (②) `core/schemas/task-envelope.json` 의 `expect` 속성은 **남아 있고**, 그 설명에 **`판정에 쓰이지 않는다`** 가 적혀 있다. 그리고 **`expect` 를 다루는 코드가 되돌려져 있다** — `romeo/envelope.py` 의 `expect` 복사와 `romeo/close.py` 의 `_plan_key` 가 `base_sha` 의 것과 같이 동작한다. 코드에서 `expect` 를 없애면 옛 작업 계약 35개의 바이트 재계산이 깨진다(아래 위험 절). **`romeo/envelope.py` 전체가 base 와 같아야 한다는 뜻이 아니다** — 그 파일은 Ⓔ 의 게이트를 담으므로 base 와 다르다(2회차 관통이 그 모순을 드러냈다). (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
+  - [x] AC-7 (②) `tests/test_docs_evidence_close.py` 가 템플릿의 `expect` 줄을 편집 앵커로 쓰지 않는다 — 템플릿에서 그 줄이 사라져도 그 파일의 테스트가 전부 통과한다.
+  - [x] AC-8 (park) `docs/planning/open-questions.md` 에 넘기는 항목이 **`우회 가능 — v1 이후`** 표시와 함께 등록돼 있다 — ⑤(검토자 lifecycle 자동화) · Ⓓ(waiter 하나) · Ⓕ(task 사본이 merge 막음) · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`).
+  - [x] AC-9 (Ⓔ) `adapters/orca/RUNBOOK.md` 가 **중단 게이트**가 어디서 걸리는지 말한다 — 손으로 관통해도 §3.3 에서 막힌다는 것.
+  - [x] AC-10 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
 - **위험과 되돌리기:** **`envelope build` 는 모든 관통의 입구다** — 잘못 걸면 어떤 관통도 시작하지 못한다. 그래서 AC-4 가 "안 걸린 경우엔 그대로 동작한다" 를 따로 요구하고, 이 단위 자신의 관통이 그 살아 있는 증거가 된다(이 단위가 돌았다는 것이 곧 입구가 막히지 않았다는 뜻이다). **`expect` 는 코드·스키마에서 지우지 않는다 — 1차 관통이 그 이유를 실측으로 드러냈다.** 옛 작업 계약 **35개**가 `expect` 를 담고 있고, `romeo/close.py:447` 의 `TASK_ANCHORED` 는 그 봉투를 **지금 코드로 다시 만들어 바이트로 대조**한다(스키마 검증이 아니다 — `additionalProperties` 를 풀어도 그대로 실패했다). `romeo/envelope.py` 가 `expect` 를 안 만드는 순간 옛 단위 6개의 앵커가 전부 어긋난다. 그래서 **템플릿에서만** 지운다 — `envelope.py` 는 `expect` 가 **있을 때만** 복사하므로 옛 spec 의 봉투는 재계산해도 그대로 나오고 새 spec 에는 애초에 생기지 않는다. 함정이 무는 자리는 사람이 새 spec 을 쓸 때이고 거기가 정확히 막힌다. AC-6 이 코드 두 파일의 무변경을, AC-10 의 `fixtures parity --report` 가 그 전제를 지킨다. 전부 이 저장소 안의 로컬 변경이고 외부 상태를 바꾸지 않으므로 되돌리기는 `git revert <커밋>` 한 번이다.
 - **결정 필요:** 없음 — 2026-08-31 사용자 확정. 브레이크(③·Ⓔ)와 `expect` 삭제(②)만 고치고 **나머지 우회 가능한 것은 전부 넘긴다.** 이 단위 뒤 하네스 정비를 멈추고 M3 로 간다.
 
@@ -85,7 +85,7 @@ approval_history:
 | 3 | Ⓔ 중단 게이트가 모든 관통의 입구에서 걸린다 | `romeo/envelope.py` 의 계약 생성 경로에서 그 단위의 `attempts.yaml` 을 읽어 `gate()` 를 평가하고, 차단이면 **계약을 만들지 않고** 종료 코드 0 이 아닌 오류로 끝낸다. 오류 문구는 연속 실패 수와 「재검토 결론을 기록해야 한다」와 그 방법을 한국어로 말한다. 우회 수단을 둘지는 구현자가 `run-unit --after-review` 경로와 견주어 정하고, 정한 이유를 결과 봉투 `notes` 에 적는다 | 소비: 1행의 `gate()` → 생산: `envelope build` 의 차단 경로 | `RepeatGate.test_envelope_build_refuses_when_blocked` — 차단 상태 attempts 를 가진 임시 단위에서 계약 생성이 **0 이 아닌 종료 코드**로 끝나고 계약 파일이 생기지 않는 것을 확인한다 | `git revert` |
 | 4 | Ⓔ 안 걸린 경우엔 그대로 동작한다 | 3행과 같은 자리. `attempts.yaml` 이 **없으면** 실패 0 으로 보아 통과시킨다 — 지금 대부분의 단위가 그 상태다 | 소비: 3행 → 생산: 같은 경로의 통과 분기 | `RepeatGate.test_envelope_build_allows_when_not_blocked` — 시도 기록이 없는 단위와 마지막이 `pass` 인 단위 **둘 다** 계약이 정상 생성되는 것을 확인한다 | `git revert` |
 | 5 | ② 템플릿이 함정을 더 만들지 않는다 | `core/templates/tech-spec.md` 의 검증 계획 예시에서 `expect:` 줄을 지우고, 그 자리에 **「종료 코드 자체가 조건」**이라는 문장과 이유(사람이 조건으로 쓴 문장을 기계가 읽지 않으면 그 검사는 빈 검사가 된다)를 인쇄한다. `\|\| true` 를 쓰지 말고 부정은 `!` 로 쓰라는 한 줄도 함께 넣는다 | 소비: 없음 → 생산: 템플릿 문구 | 템플릿에 `expect:` 가 **없고** `종료 코드 자체가 조건` 이 **있다** | `git revert` |
-| 6 | ② 필드를 코드·스키마에서 없앤다 | `core/schemas/task-envelope.json` 의 `expect` 속성, `romeo/envelope.py:189-190` 의 복사, `romeo/close.py:64` 의 대조 튜플에서 `expect` 를 뺀다. 세 줄이 전부다(grep 실측, 오탐 0). **`romeo/parity.py` 는 건드리지 않는다** — 그쪽 `expect` 는 fixture 의 기대 판정이다. 이미 `expect:` 를 가진 기존 spec 은 고치지 않는다 | 소비: 없음 → 생산: 계약 JSON 의 필드 구성 | `core/schemas/task-envelope.json` 에 `"expect"` 가 없고, `romeo/envelope.py`·`romeo/close.py` 에 `expect` 가 없다 | `git revert` |
+| 6 | ② 코드·스키마는 그대로 두고 스키마가 낡음을 말한다 | `core/schemas/task-envelope.json` 의 `expect` 속성을 **남기고** 그 `description` 에 「판정에 쓰이지 않는다」를 적는다. `romeo/envelope.py` 의 `expect` 복사와 `romeo/close.py` 의 `_plan_key` 는 **건드리지 않는다** — 옛 작업 계약 35개를 `TASK_ANCHORED` 가 지금 코드로 다시 만들어 바이트 대조하므로 코드에서 빼면 그 앵커가 전부 깨진다(1차 관통 실측). **`romeo/envelope.py` 전체가 base 와 같아야 한다는 뜻은 아니다** — 그 파일은 3행의 게이트를 담는다. `romeo/parity.py` 는 건드리지 않는다(그쪽 `expect` 는 fixture 의 기대 판정이다). 이미 `expect:` 를 가진 기존 spec 도 고치지 않는다 | 소비: 없음 → 생산: 스키마 설명과 `expect` 를 다루는 코드의 보존 | `core/schemas/task-envelope.json` 에 `판정에 쓰이지 않는다` 가 있고, `expect` 를 다루는 코드가 두 파일에 남아 있다 | `git revert` |
 | 7 | park — 넘기는 것이 기록으로 남는다 | `docs/planning/open-questions.md` 의 Q 절에 6건을 등록한다(Q-12 부터). 각 행에 **`우회 가능 — v1 이후`** 를 적고 우회 방법과 근거 위치를 함께 남긴다: ⑤ 검토자 lifecycle 자동화 · Ⓓ `check --wait` 는 Run 당 waiter 하나 · Ⓕ `task/` 사본이 `git merge --ff-only` 를 막는다 · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`). w3qu 는 **닫지도 폐기하지도 않고** `status: active` 로 park 하며 구현이 브랜치 `a1f543a` 에 보존돼 있다는 것을 적는다 | 소비: 없음 → 생산: open-questions 의 Q 행들 | `우회 가능 — v1 이후` 가 문서에 있다 | `git revert` |
 | 8 | Ⓔ 게이트가 어디서 걸리는지 문서가 말한다 | `adapters/orca/RUNBOOK.md` §3.3 에 **중단 게이트**가 그 자리에서 평가된다는 것과, 차단되면 무엇을 해야 하는지를 적는다. 손으로 관통해도 이 자리를 반드시 지난다는 것이 요점이다 | 소비: 3행 → 생산: RUNBOOK 문단 | `중단 게이트` 가 문서에 있다 | `git revert` |
 
@@ -140,6 +140,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-31T01:07:42+09:00 · HEAD 57b754fbb444 · 검사 기록 run_6bd72dea65db
 
-- (없음)
+- [evidence/run_2e44c6ab0b3a.yaml](evidence/run_2e44c6ab0b3a.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_6bd72dea65db.yaml](evidence/run_6bd72dea65db.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

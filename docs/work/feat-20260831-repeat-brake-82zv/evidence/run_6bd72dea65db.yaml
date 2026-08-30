@@ -1,0 +1,677 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_6bd72dea65db
+task_id: task_bcdaedba9a1b
+dispatch_id: ctx_a5ccc3236e80
+unit_id: feat-20260831-repeat-brake-82zv
+spec_ref:
+  path: docs/work/feat-20260831-repeat-brake-82zv/spec.md
+  sha256: b9daaa737babd519b4d9327f4ba55d332c51903ade6976073a8613c159c159e3
+base_sha: c842dc09193a6fdb504237e0247e89991313c188
+head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv
+started_at: '2026-08-31T00:56:47+09:00'
+finished_at: '2026-08-31T01:06:05+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:56:47+09:00'
+  finished_at: '2026-08-31T00:56:47+09:00'
+  seconds: 0.156
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/01-check-1.log
+  log_sha256: f9e0c48e14fe2cc431fc01bc7af9a88a32e48d91ac9b549e1135c3ba5e0b054e
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-2
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:56:47+09:00'
+  finished_at: '2026-08-31T00:56:47+09:00'
+  seconds: 0.167
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/02-check-2.log
+  log_sha256: 430e63cd0058431fc86ca0cb19849510c1c64d0c3bbfe6fc43554252108c0b2e
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-3
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:56:47+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.197
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/03-check-3.log
+  log_sha256: 20c1ab1e6998338983adfcc7aeddc5a76f16b951fbd4376b616122574d2a43f5
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-4
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.213
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/04-check-4.log
+  log_sha256: 96f090ab16b84fbf5e34be6419887a5f5f844013428e9a193157d58d011fdf96
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-5
+  command: '! grep -qF ''expect:'' core/templates/tech-spec.md'
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/05-check-5.log
+  log_sha256: cb281f2385c30d96e13b7ef4d53cfebc54b95445c34823195bc0d0413536517c
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-6
+  command: grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/06-check-6.log
+  log_sha256: 4b86cb658312d3665410d50d8d4a68344dff7056c27395b0c2c93c706bffbe62
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-7
+  command: grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/07-check-7.log
+  log_sha256: 89f6fd0982e8949134c182212584662dcd06d32220d50e44ac523afe52f3c25d
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-15
+  command: grep -qE 'item.+expect.+ = str' romeo/envelope.py
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/08-check-15.log
+  log_sha256: e40b30dc173b010001cbc6bddeffbe83c2f5139e16bb460d266f7001c77b1e1c
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-16
+  command: grep -qE 'get.+expect' romeo/close.py
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/09-check-16.log
+  log_sha256: 16fdb1b01455eecf001f5aac7b464a8a11caf66b67e3133836a9bda6e8761de5
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-8
+  command: grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/10-check-8.log
+  log_sha256: 383b1408318bf0b765406eb035b046cbfe9d8aa83ad9588250c86f7a0b50f80e
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-9
+  command: grep -qF '중단 게이트' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:56:48+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/11-check-9.log
+  log_sha256: 30d0e7f6dd02cc6140fb705aa4fb2edee8e5dbd885737fc66e3b7e310c9ba6ec
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-10
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-31T00:56:48+09:00'
+  finished_at: '2026-08-31T00:58:18+09:00'
+  seconds: 89.663
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/12-check-10.log
+  log_sha256: d7f47977c4189e7456fa4bb7307790158c3b0b7394f8c5372aaf21598616e2d3
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-11
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-31T00:58:18+09:00'
+  finished_at: '2026-08-31T00:58:18+09:00'
+  seconds: 0.095
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/13-check-11.log
+  log_sha256: 2c8702d3cd400e382d3ca1413332a3a44bb8d431228f6a09fe37b079ea696bec
+  stdout_tail: "_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/brief.md\
+    \ lines=61 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/spec.md\
+    \ lines=146 needs_input=0 unchecked_ac=10\n    WARN  UNCHECKED_AC 10개"
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-12
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-31T00:58:18+09:00'
+  finished_at: '2026-08-31T00:58:18+09:00'
+  seconds: 0.139
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/14-check-12.log
+  log_sha256: 4764d583135de5788850fc925c25bcdeea55114a96f0928cb1d9be562aad6cb0
+  stdout_tail: compile 검사 PASS
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-13
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-31T00:58:18+09:00'
+  finished_at: '2026-08-31T00:58:19+09:00'
+  seconds: 0.36
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/15-check-13.log
+  log_sha256: a2c701134f01c322450c6160d16aca1f3253e2364ccd5f4b093a949d53aad988
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-14
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-31T00:58:19+09:00'
+  finished_at: '2026-08-31T00:58:20+09:00'
+  seconds: 0.853
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/16-check-14.log
+  log_sha256: d44a1107b7a5991370f62554f86375a06d9101146ebf837be6e3d4dc6502c975
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-1
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:59:27+09:00'
+  finished_at: '2026-08-31T00:59:27+09:00'
+  seconds: 0.154
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/17-check-1.log
+  log_sha256: 978966853bd3caca38cc003ccce32676e162f50d2db425ba9fcc59f768bae74e
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-2
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:59:27+09:00'
+  finished_at: '2026-08-31T00:59:27+09:00'
+  seconds: 0.163
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/18-check-2.log
+  log_sha256: c2ef956fde3d313bf0938ad1e450ea8fdeeab4c82cd40f507677270697ed58cb
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-3
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:59:27+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.179
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/19-check-3.log
+  log_sha256: cc9ebb5e9f800fd977680d8319fc44304f8ea149d7642fefaa99bdd8242f5cc2
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-4
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.205
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/20-check-4.log
+  log_sha256: 5c3f41a2331173854e2b877c298de7f38c2962a1bafaabe7fe7e64dc15aae7f0
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-5
+  command: '! grep -qF ''expect:'' core/templates/tech-spec.md'
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/21-check-5.log
+  log_sha256: cb281f2385c30d96e13b7ef4d53cfebc54b95445c34823195bc0d0413536517c
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-6
+  command: grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/22-check-6.log
+  log_sha256: 4b86cb658312d3665410d50d8d4a68344dff7056c27395b0c2c93c706bffbe62
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-7
+  command: grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/23-check-7.log
+  log_sha256: 89f6fd0982e8949134c182212584662dcd06d32220d50e44ac523afe52f3c25d
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-15
+  command: grep -qE 'item.+expect.+ = str' romeo/envelope.py
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/24-check-15.log
+  log_sha256: e40b30dc173b010001cbc6bddeffbe83c2f5139e16bb460d266f7001c77b1e1c
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-16
+  command: grep -qE 'get.+expect' romeo/close.py
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/25-check-16.log
+  log_sha256: 16fdb1b01455eecf001f5aac7b464a8a11caf66b67e3133836a9bda6e8761de5
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-8
+  command: grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/26-check-8.log
+  log_sha256: 383b1408318bf0b765406eb035b046cbfe9d8aa83ad9588250c86f7a0b50f80e
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-9
+  command: grep -qF '중단 게이트' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T00:59:28+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/27-check-9.log
+  log_sha256: 30d0e7f6dd02cc6140fb705aa4fb2edee8e5dbd885737fc66e3b7e310c9ba6ec
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-10
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-31T00:59:28+09:00'
+  finished_at: '2026-08-31T01:00:54+09:00'
+  seconds: 85.694
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/28-check-10.log
+  log_sha256: f0e0fc0d3335f429b02602f52c995beb6df0bab2609ca3cd815fb48621830482
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-11
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-31T01:00:54+09:00'
+  finished_at: '2026-08-31T01:00:54+09:00'
+  seconds: 0.11
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/29-check-11.log
+  log_sha256: 3f16dc2b628055bad50bc5ede6b42161a59010beb14777b7e1a054ac68c9066f
+  stdout_tail: '=135 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/brief.md
+    lines=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/spec.md
+    lines=146 needs_input=0 unchecked_ac=0'
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-12
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-31T01:00:54+09:00'
+  finished_at: '2026-08-31T01:00:55+09:00'
+  seconds: 0.145
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/30-check-12.log
+  log_sha256: 4764d583135de5788850fc925c25bcdeea55114a96f0928cb1d9be562aad6cb0
+  stdout_tail: compile 검사 PASS
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-13
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-31T01:00:55+09:00'
+  finished_at: '2026-08-31T01:00:55+09:00'
+  seconds: 0.368
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/31-check-13.log
+  log_sha256: a2c701134f01c322450c6160d16aca1f3253e2364ccd5f4b093a949d53aad988
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-14
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-31T01:00:55+09:00'
+  finished_at: '2026-08-31T01:00:56+09:00'
+  seconds: 0.883
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/32-check-14.log
+  log_sha256: d44a1107b7a5991370f62554f86375a06d9101146ebf837be6e3d4dc6502c975
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/.harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-31T01:02:02+09:00'
+  finished_at: '2026-08-31T01:02:02+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/33-reviewer-brief.log
+  log_sha256: 5337d0a9699011a10a166df7bc5b76c7403aceade145b6e83c6c713a3fe24b55
+  stdout_tail: c49e882c0e5db585526e89f46c6866ff9ddfe522d27bcb43b39be61a754a633b  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/.harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/reviewer-brief.md
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-repeat-brake-82zv'
+  exit_code: 0
+  started_at: '2026-08-31T01:02:02+09:00'
+  finished_at: '2026-08-31T01:02:03+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/34-review-tree-before.log
+  log_sha256: bcab3e308fdb064ec27f8db274330cc5465d5963cf34d2b8ded03e454deee167
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-repeat-brake-82zv'
+  exit_code: 0
+  started_at: '2026-08-31T01:06:04+09:00'
+  finished_at: '2026-08-31T01:06:05+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/35-review-tree-after.log
+  log_sha256: bcab3e308fdb064ec27f8db274330cc5465d5963cf34d2b8ded03e454deee167
+  stdout_tail: ''
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260831-repeat-brake-82zv/review/run_6bd72dea65db-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-31T01:06:05+09:00'
+  finished_at: '2026-08-31T01:06:05+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_6bd72dea65db/36-review-record.log
+  log_sha256: 48acb5b22b79edc957df8a570bb863c047582c0bdd520da2dab133987366375e
+  stdout_tail: 9d0d86204bdf8fae014f1efec0d1217ab3cd92f97d6f8b073ddcafba9253ce62  docs/work/feat-20260831-repeat-brake-82zv/review/run_6bd72dea65db-reviewer.json
+  head_sha: 57b754fbb444f2339ef431841a42dbd8dcef7c7f
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/schemas/task-envelope.json
+- core/templates/tech-spec.md
+- docs/planning/open-questions.md
+- romeo/envelope.py
+- romeo/run_unit.py
+- tests/test_docs_evidence_close.py
+- tests/test_run_unit.py
+artifact_hash: 84018974676c0f9edb87d8cf2877ebf2cdbbff8eb4a621d06b85cc7d93754ff0
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-31T01:07:42+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-08-31T00:53:10+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_6bd72dea65db — 검증 계획 16건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 57b754fbb444 vs 현재 57b754fbb444
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 682e4deea426 vs 현재 682e4deea426 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — ! grep -qF ''expect:'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — grep -qF ''종료 코드 자체가 조건'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — grep -qF ''판정에 쓰이지 않는다'' core/schemas/task-envelope.json'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-15: exit 0 — grep -qE ''item.+expect.+ = str'' romeo/envelope.py'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-16: exit 0 — grep -qE ''get.+expect'' romeo/close.py'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — grep -qF ''우회 가능 — v1 이후'' docs/planning/open-questions.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — grep -qF ''중단 게이트'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-14: exit 0 — bin/romeo fixtures parity --report'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 36건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 16건이 승인 커밋 c842dc09193a 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — ! grep -qF ''expect:'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — grep -qF ''종료 코드 자체가 조건'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — grep -qF ''판정에 쓰이지 않는다'' core/schemas/task-envelope.json'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-15: 재실행도 exit 0 — grep -qE ''item.+expect.+ = str'' romeo/envelope.py'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-16: 재실행도 exit 0 — grep -qE ''get.+expect'' romeo/close.py'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — grep -qF ''우회 가능 — v1 이후'' docs/planning/open-questions.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — grep -qF ''중단 게이트'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-14: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 c842dc09193a 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'core/schemas/task-envelope.json', 'core/templates/tech-spec.md',
+      'docs/planning/open-questions.md', 'romeo/envelope.py', 'romeo/run_unit.py', 'tests/test_docs_evidence_close.py',
+      'tests/test_run_unit.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_6bd72dea65db-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'
