@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-31T00:37:20+09:00'
+approved_at: '2026-08-31T00:53:10+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -30,6 +30,12 @@ approval_history:
     깨진다. 막는 것은 스키마 검증이 아니라 재계산이라 additionalProperties 를 풀어도 실패했다. 사용자 확정(옵션 C): 템플릿에서만 지운다 — envelope.py
     는 expect 가 있을 때만 복사하므로 옛 봉투는 그대로 나오고 새 spec 에는 안 생긴다. AC-6 을 ''코드 두 파일이 base 와 바이트가 같다'' 로 바꾸고 AC-7(테스트
     앵커)을 더했으며 check-15 를 신설했다. 브레이크(③·Ⓔ)는 무변경'}
+- {approved_at: '2026-08-31T00:37:20+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T00:53:10+09:00',
+  reason: '2회차가 AC-6 의 논리 모순을 드러냈다 — ''romeo/envelope.py 가 base_sha 와 바이트가 같다'' 는 같은 파일에 들어가는 Ⓔ 게이트와 동시에
+    성립할 수 없다. 달성 불가능한 AC 였다. check-15 도 HEAD 기준이라 커밋 한 번에 내용과 무관하게 통과하는 빈 검사가 된다(w3qu 를 두 번 실패시킨 함정과 같은
+    형태). AC-6 을 ''expect 를 다루는 코드가 되돌려져 있다'' 로 바꾸고, check-15 를 리비전 비의존 내용 검사 2건(check-15·16)으로 교체했다 —
+    base 0 · 구현 후 0 · 1회차 삭제본 1 로 3방향 실측했다. 패턴에 백슬래시를 쓰지 않는다(YAML 큰따옴표 스칼라가 거부한다 — 실측). 산출물과 브레이크(③·Ⓔ)는
+    무변경'}
 ---
 
 # 반복 중단 브레이크를 실제로 걸고 expect 함정을 없앤다
@@ -50,7 +56,7 @@ approval_history:
   - [ ] AC-3 (Ⓔ) 중단 조건에 걸린 단위에서 `bin/romeo envelope build` 가 **종료 코드 0 이 아니고**, 무엇이 왜 막혔는지와 어떻게 푸는지를 한국어로 말한다. 회귀 테스트가 보인다.
   - [ ] AC-4 (Ⓔ) 중단 조건에 걸리지 않은 단위(시도 기록이 아예 없는 경우 포함)에서는 `envelope build` 가 **그대로 동작한다** — 이 단위 자신의 관통이 그 증거이고, 회귀 테스트도 보인다.
   - [ ] AC-5 (②) `core/templates/tech-spec.md` 에 `expect:` 가 남아 있지 않고, 대신 **종료 코드 자체가 조건**이라는 문장과 그 이유가 인쇄되어 있다.
-  - [ ] AC-6 (②) `core/schemas/task-envelope.json` 의 `expect` 속성은 **남아 있고**, 그 설명에 **`판정에 쓰이지 않는다`** 가 적혀 있다. 그리고 `romeo/envelope.py`·`romeo/close.py` 는 `base_sha` 와 **바이트가 같다** — 코드에서 `expect` 를 없애면 옛 작업 계약 35개의 바이트 재계산이 깨진다(아래 위험 절). (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
+  - [ ] AC-6 (②) `core/schemas/task-envelope.json` 의 `expect` 속성은 **남아 있고**, 그 설명에 **`판정에 쓰이지 않는다`** 가 적혀 있다. 그리고 **`expect` 를 다루는 코드가 되돌려져 있다** — `romeo/envelope.py` 의 `expect` 복사와 `romeo/close.py` 의 `_plan_key` 가 `base_sha` 의 것과 같이 동작한다. 코드에서 `expect` 를 없애면 옛 작업 계약 35개의 바이트 재계산이 깨진다(아래 위험 절). **`romeo/envelope.py` 전체가 base 와 같아야 한다는 뜻이 아니다** — 그 파일은 Ⓔ 의 게이트를 담으므로 base 와 다르다(2회차 관통이 그 모순을 드러냈다). (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
   - [ ] AC-7 (②) `tests/test_docs_evidence_close.py` 가 템플릿의 `expect` 줄을 편집 앵커로 쓰지 않는다 — 템플릿에서 그 줄이 사라져도 그 파일의 테스트가 전부 통과한다.
   - [ ] AC-8 (park) `docs/planning/open-questions.md` 에 넘기는 항목이 **`우회 가능 — v1 이후`** 표시와 함께 등록돼 있다 — ⑤(검토자 lifecycle 자동화) · Ⓓ(waiter 하나) · Ⓕ(task 사본이 merge 막음) · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`).
   - [ ] AC-9 (Ⓔ) `adapters/orca/RUNBOOK.md` 가 **중단 게이트**가 어디서 걸리는지 말한다 — 손으로 관통해도 §3.3 에서 막힌다는 것.
@@ -88,7 +94,8 @@ approval_history:
 required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대조한다.
 
 이 단위는 **하네스 저장소 자신**이 대상이므로 하네스 검사(check-10~14)가 정당한 검사다.
-check-1~9 와 check-15 는 이 단위가 만든 것을 직접 겨눈다. check-15 는 **코드 두 파일이 base 와 바이트가 같다**를 종료 코드로 본다 — 1차 관통이 그 두 파일을 고쳐 옛 봉투 35개를 깨뜨렸기 때문이다.
+check-1~9 와 check-15 는 이 단위가 만든 것을 직접 겨눈다. check-15·16 은 **`expect` 를 다루는 코드가 되돌려져 있다**를 종료 코드로 본다 — 1차 관통이 그 코드를 지워 옛 봉투 35개를 깨뜨렸기 때문이다. 두 검사는 리비전을 지목하지 않는다: `HEAD` 를 기준으로 쓰면 커밋 한 번에 내용과 무관하게 비어 **빈 검사**가 되고(2회차가 그 자리에서 멈췄다), 특정 SHA 를 박으면 재승인마다 낡는다. 세 상태에서 대조했다 — base `0` · 구현 후 `0` · 1회차 삭제본 `1`.
+패턴에 백슬래시를 쓰지 않는다 — YAML 큰따옴표 스칼라가 `\\[` 를 알 수 없는 escape 로 거부해 검증 계획 자체가 파싱되지 않는다(실측).
 
 **모든 검사는 종료 코드 자체가 조건이다.** `|| true` 를 쓰지 않고, 부정 조건은 `!` 로 쓴다.
 check-5~9 는 **구현 전 상태에서 전부 종료 코드 1** 인 것을 2026-08-31 에 실측했고, check-10~14 는 같은 시점에 전부 0 이었다.
@@ -111,7 +118,9 @@ required_checks:
   - id: check-7
     command: "grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json"
   - id: check-15
-    command: "git diff --quiet HEAD -- romeo/envelope.py romeo/close.py"
+    command: "grep -qE 'item.+expect.+ = str' romeo/envelope.py"
+  - id: check-16
+    command: "grep -qE 'get.+expect' romeo/close.py"
   - id: check-8
     command: "grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md"
   - id: check-9

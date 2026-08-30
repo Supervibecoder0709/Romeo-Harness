@@ -1,0 +1,76 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260831-repeat-brake-82zv",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260831-repeat-brake-82zv/spec.md",
+    "sha256": "f3c7592318cc3c2742e3b6953d4907c23d2f164663d22ccac65268e63cc9e10b"
+  },
+  "base_sha": "31a64a39e20b8a41a97f6184c843b4ff00414e3f",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter"
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter"
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked"
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked"
+    },
+    {
+      "id": "check-5",
+      "command": "! grep -qF 'expect:' core/templates/tech-spec.md"
+    },
+    {
+      "id": "check-6",
+      "command": "grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md"
+    },
+    {
+      "id": "check-7",
+      "command": "grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json"
+    },
+    {
+      "id": "check-15",
+      "command": "git diff --quiet HEAD -- romeo/envelope.py romeo/close.py"
+    },
+    {
+      "id": "check-8",
+      "command": "grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md"
+    },
+    {
+      "id": "check-9",
+      "command": "grep -qF '중단 게이트' adapters/orca/RUNBOOK.md"
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests"
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo validate"
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo compile --check"
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor"
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo fixtures parity --report"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}
