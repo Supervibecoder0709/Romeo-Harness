@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-08-30T13:20:52+09:00'
+approved_at: '2026-08-30T13:31:24+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -32,6 +32,9 @@ approval_history:
 - {approved_at: '2026-08-30T13:17:58+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T13:20:52+09:00',
   reason: 「변경 범위」의 바뀌는 파일·모듈 을 한 줄로 통합해 쓰기 상한 파서가 읽을 수 있게 했다. 경로 16건을 명시(compile 산출물과 romeo/envelope.py·close.py
     포함). 수용 기준·확인란·검증 계획 불변}
+- {approved_at: '2026-08-30T13:20:52+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T13:31:24+09:00',
+  reason: 쓰기 상한 누락 2건 보완 — romeo compile 은 .claude/ 와 .agents/ 양쪽에 쓰고 .harness/compiled.yaml 에 기록하는데 셋
+    중 둘이 변경 범위에 없었다. 구현자가 AC-2·AC-4 달성 불가를 보고해 확인했다. 경로 16→18건. 수용 기준·확인란·검증 계획 불변}
 ---
 # M3 진입 전 하네스 정비 — run-unit 자동화·코어 규칙 승격·문서 다이어트
 
@@ -69,7 +72,7 @@ approval_history:
 
 ## 변경 범위
 
-- 바뀌는 파일·모듈: `core/principles/AGENTS.core.md` (동결 규칙과 중단 기준) · `core/workflows/review/SKILL.md` (FAIL 사유 열거) · `core/templates/tech-spec.md` (페이로드 검사 분리 규칙) · `docs/requirements/constraints.md` (위협 모델 K-56~) · `docs/planning/progress.md` (감축) · `docs/planning/archive/` (신설) · `romeo/run_unit.py` (신설) · `romeo/cli.py` (서브커맨드 등록) · `romeo/envelope.py` · `romeo/close.py` · `tests/` (신규 테스트) · `docs/work/feat-20260830-harness-tuneup-6xcq/` (계약·증거·결과·attempts.yaml) · `CLAUDE.md` · `AGENTS.md` · `.claude/` · `adapters/` (뒤 넷은 romeo compile 산출물이며 손으로 고치지 않는다)
+- 바뀌는 파일·모듈: `core/principles/AGENTS.core.md` (동결 규칙과 중단 기준) · `core/workflows/review/SKILL.md` (FAIL 사유 열거) · `core/templates/tech-spec.md` (페이로드 검사 분리 규칙) · `docs/requirements/constraints.md` (위협 모델 K-56~) · `docs/planning/progress.md` (감축) · `docs/planning/archive/` (신설) · `romeo/run_unit.py` (신설) · `romeo/cli.py` (서브커맨드 등록) · `romeo/envelope.py` · `romeo/close.py` · `tests/` (신규 테스트) · `docs/work/feat-20260830-harness-tuneup-6xcq/` (계약·증거·결과·attempts.yaml) · `CLAUDE.md` · `AGENTS.md` · `.claude/` · `.agents/` · `.harness/compiled.yaml` (앞 다섯은 romeo compile 산출물이며 손으로 고치지 않는다 — compile 은 claude 쪽 .claude/ 와 codex 쪽 .agents/ 양쪽에 쓴다) · `adapters/` (compile 의 입력이자 RUNBOOK 갱신 대상)
 - 영향을 받는 부분: 이 저장소의 이후 모든 작업 단위. 부착 대상 프로젝트는 아직 없다(M5 이전).
   `run-unit` 은 기존 명령(`envelope build` · `envelope check` · `evidence record` · `fixtures parity`)을 호출하는 상위 계층이며 그 명령들의 판정 로직을 바꾸지 않는다.
 - 바꾸지 않는 것(비범위):
