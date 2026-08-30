@@ -1,6 +1,8 @@
 # 검사기가 판정 차이를 실제로 잡는지 확인하는 음성 케이스.
 #
 # 같은 검사를 같은 결과로 돌렸는데 게이트 판정만 갈렸다. 이것을 통과시키면 동등성 게이트가 무의미해진다.
+# **FAIL 사유 코드(2026-08-30):** 이 케이스의 FAIL 은 전부 '수용 기준이 충족되지 않았다' 는 판정이므로 `AC_UNMET` 이다.
+# 결과 계약이 FAIL 봉투에 닫힌 목록의 사유를 요구하게 되면서 기존 표본에 그 코드를 채웠다 — 판정 자체는 바뀌지 않았다.
 ---
 id: pr-verdict-drift
 title: 판정 표류 — 같은 검사인데 gate 판정이 갈린다
@@ -40,6 +42,7 @@ swapped:
         - {id: check-1, command: bash scripts/validate-repo-archive.sh archive/obra-superpowers, exit_code: 0}
       gate_verdict: FAIL
       blocked_reason: null
+      fail_reasons: [AC_UNMET]
       findings: []
       evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-d.yaml
 

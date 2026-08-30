@@ -31,6 +31,19 @@ def git(*args, cwd):
     return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
 
 
+def with_fail_reasons(env):
+    """FAIL 봉투에 사유 코드를 채운다 — 종료 검사가 현재 산출물의 FAIL 봉투에 사유를 요구한다.
+
+    표본을 만드는 자리마다 손으로 적으면 새 규칙이 표본 어디에 걸리는지 흩어진다. 사유 자체를 보는
+    테스트는 `fail_reasons` 를 직접 넘겨 덮고, **`fail_reasons=None` 을 넘기면 그 필드가 없는 옛 형식 봉투**가 된다."""
+    if "fail_reasons" in env and env["fail_reasons"] is None:
+        del env["fail_reasons"]
+    elif env.get("gate_verdict") == "FAIL" and "fail_reasons" not in env:
+        env["fail_reasons"] = ["AC_UNMET"]
+    return env
+
+
+
 class TestVerticalSlice(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
@@ -696,7 +709,7 @@ class TestCloseReviewVerdict(unittest.TestCase):
             "evidence_ref": f"docs/work/{self.unit}/evidence/{run}.yaml",
         }
         env.update(over)
-        return env
+        return with_fail_reasons(env)
 
     def _write_review(self, name, data, record=True):
         """검토 봉투를 남긴다. 기본은 하네스 명령(`review record`)으로 — 봉투를 쓰고 그 sha256 을 검토 run 의 증거에 봉인한다.
@@ -1281,6 +1294,95 @@ class TestCloseReviewVerdict(unittest.TestCase):
         ids, r = self._failed()
         self.assertIn("REVIEW_TASK_ANCHORED", ids)
         self.assertEqual(r["verdict"], "FAIL")
+
+
+class TestCloseRequiresFailReasonsOnFail(unittest.TestCase):
+    """AC-2 뒷겹 — 종료 검사가 **지금 닫으려는 산출물**의 FAIL 봉투에 사유를 요구한다.
+
+    앞겹(결과 계약 스키마)은 `fail_reasons` 의 값만 본다 — 그 필드가 생기기 전에 기록된 판정에도 같은 스키마가
+    걸리므로 조건부 필수를 걸 수 없다(`fixtures/parity` 의 관측 케이스가 이미 `done` 인 단위의 봉투를 읽는다).
+    그래서 '사유를 실제로 담았는가' 는 여기서만 요구하고, 대상은 현재 산출물의 FAIL 봉투뿐이다.
+
+    검사 대상 fixture 는 `TestCloseReviewVerdict` 의 것을 그대로 쓴다 — 같은 자리를 두 번 세우면
+    두 fixture 가 갈라지는 순간 두 검사가 서로 다른 것을 본다."""
+
+    setUp = TestCloseReviewVerdict.setUp
+    tearDown = TestCloseReviewVerdict.tearDown
+    _defensive = TestCloseReviewVerdict._defensive
+    _envelope = TestCloseReviewVerdict._envelope
+    _write_review = TestCloseReviewVerdict._write_review
+    _failed = TestCloseReviewVerdict._failed
+    _row = TestCloseReviewVerdict._row
+    _new_product = TestCloseReviewVerdict._new_product
+
+    CID = "REVIEW_FAIL_REASONS"
+
+    def _close(self):
+        return close_unit(self.unit, project_root=self.root, dry_run=True)
+
+    # ── 사유가 없으면 완료를 선언하지 않는다 ────────────────────────────────────
+    def test_a_fail_without_the_field_blocks_close(self):
+        self._write_review("run-test-reviewer.json",
+                           self._envelope("FAIL", fail_reasons=None,
+                                          findings=[{"summary": "수용 기준 2번의 근거가 없다"}]))
+        ids, r = self._failed()
+        self.assertIn(self.CID, ids, r["checks"])
+        row = self._row(r, self.CID)
+        self.assertEqual(row["level"], "error", row)
+        self.assertIn("run-test-reviewer.json", row["detail"])
+        self.assertIn("fail_reasons", row["detail"])
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_a_fail_with_an_empty_list_blocks_close(self):
+        """빈 배열은 스키마를 통과한다(앞겹은 값만 본다) — 막는 자리는 여기다."""
+        self._write_review("run-test-reviewer.json", self._envelope("FAIL", fail_reasons=[]))
+        ids, r = self._failed()
+        self.assertIn(self.CID, ids, r["checks"])
+        self.assertEqual(r["verdict"], "FAIL")
+
+    # ── 대상이 아닌 것은 막지 않는다 ───────────────────────────────────────────
+    def test_a_fail_that_names_its_reason_passes_this_check(self):
+        """판정은 여전히 FAIL 이지만 그것을 막는 것은 REVIEW_VERDICT 이지 이 검사가 아니다 —
+        두 사실을 한 검사에 묶으면 어느 쪽이 빠졌는지 구분되지 않는다."""
+        self._write_review("run-test-reviewer.json",
+                           self._envelope("FAIL", fail_reasons=["AC_UNMET"],
+                                          findings=[{"summary": "수용 기준 2번의 근거가 없다"}]))
+        ids, r = self._failed()
+        self.assertNotIn(self.CID, ids, r["checks"])
+        self.assertTrue(self._row(r, self.CID)["ok"])
+        self.assertIn("REVIEW_VERDICT", ids, "FAIL 판정 자체는 여전히 완료를 막는다")
+
+    def test_pass_and_blocked_envelopes_are_not_asked_for_a_reason(self):
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        r = self._close()
+        self.assertTrue(self._row(r, self.CID)["ok"], r["checks"])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+
+    def test_a_blocked_envelope_is_not_asked_for_a_reason(self):
+        """보지 못한 것에는 사유 코드가 없다 — BLOCKED 를 FAIL 로 대신 적지 않는 것과 같은 이유다."""
+        self._write_review("run-test-reviewer.json",
+                           self._envelope("BLOCKED", blocked_reason="BLOCKED_CAPABILITY"))
+        ids, r = self._failed()
+        self.assertNotIn(self.CID, ids, r["checks"])
+        self.assertTrue(self._row(r, self.CID)["ok"])
+        self.assertIn("REVIEW_VERDICT", ids)
+
+    def test_a_superseded_fail_is_not_asked_for_a_reason(self):
+        """다른 산출물을 본 옛 판정에 사유를 소급해 요구하지 않는다 — 그러면 이 검사가 하는 말이
+        '옛 판정이 옛 형식이다' 로 바뀌고, 고칠 수 없는 것으로 완료를 막게 된다."""
+        self._write_review("run-test-reviewer.json",
+                           self._envelope("FAIL", fail_reasons=None, findings=[{"summary": "옛 산출물의 결함"}]))
+        self._new_product("run-two")
+        self._write_review("run-two-reviewer.json", self._envelope("PASS", run="run-two"))
+        r = self._close()
+        self.assertTrue(self._row(r, self.CID)["ok"], r["checks"])
+        self.assertEqual(self._row(r, "REVIEW_SUPERSEDED")["level"], "warning")
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+
+    def test_the_check_is_always_printed(self):
+        """검사가 인쇄되지 않는 것과 통과한 것은 다르다 — 없는 검사는 사람이 통과로 읽는다."""
+        self._write_review("run-test-reviewer.json", self._envelope("PASS"))
+        self.assertIn(self.CID, {c["id"] for c in self._close()["checks"]})
 
 
 if __name__ == "__main__":

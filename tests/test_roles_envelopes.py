@@ -10,8 +10,12 @@
  7. blocked_reason 허용값이 정본에서 실측된 3개 그대로다.
  8. 결과 계약이 증거 소유 필드를 복제하지 않는다(K-63).
  9. 스키마 파일 머리가 기존 스키마 3종의 관례를 따른다.
+10. 검토자 FAIL 사유가 **닫힌 목록**이다 — 절차 파일의 코드 집합과 결과 계약 스키마의 enum 이 정확히 같다.
+11. 스키마가 그 목록을 강제한다 — FAIL 인데 사유가 없거나 목록 밖이면 거부하고, PASS·BLOCKED 는 사유 없이 통과한다.
+12. 확인란 체크로 생기는 spec_ref 지문 차이가 FAIL 사유가 아님이 절차 파일에 적혀 있다.
 """
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -34,6 +38,40 @@ FORBIDDEN_NAMES = ["claude", "codex", "orca", "anthropic", "openai", "gemini"]
 
 UNIT_ID = "feat-20260828-license-field-a1b2"
 SHA64 = "0" * 64
+
+REVIEW_SKILL = REPO / "core/workflows/review/SKILL.md"
+
+# 절차 파일의 FAIL 사유 목록에서 코드를 뽑는 규칙. 문서가 정본이고 이 상수는 **뽑는 방법**일 뿐이다 —
+# 코드 목록 자체를 여기 적으면 그 순간 정본이 둘이 되고, 테스트는 자기가 적은 것을 다시 읽는 동어반복이 된다.
+FAIL_ITEM_RE = re.compile(r"^\d+\. \*\*.+?\*\* — `([A-Z][A-Z0-9_]*)`", re.M)
+CLOSED_LIST_MARK = "이 목록에 없는 사유로"
+ESCAPE_HATCH_MARK = "findings"
+
+
+def fail_section(text):
+    """절차 파일에서 'FAIL 이다' 목록 절만 잘라낸다. 경고 절의 코드가 섞이면 닫힌 목록이 흐려진다."""
+    m = re.search(r"\*\*FAIL 이다.*?\n(.*?)\n\*\*경고에 그친다", text, re.S)
+    return m.group(1) if m else None
+
+
+def fail_codes_in_skill(text):
+    """FAIL 목록 절의 각 항목 제목에 붙은 코드를 **문서 순서대로** 돌려준다."""
+    section = fail_section(text)
+    return FAIL_ITEM_RE.findall(section) if section is not None else []
+
+
+def declares_closed_list(text):
+    """목록 밖 사유를 금지하는 선언이 있고, 그 문단 언저리에 대신 갈 길(findings)이 함께 있는가.
+
+    금지만 있고 길이 없으면 막다른 길이 된다 — 정당한 우려를 가진 검토자가 목록에 억지로 끼워 맞추게 된다."""
+    section = fail_section(text)
+    if section is None:
+        return False
+    paras = section.split("\n\n")
+    hits = [i for i, para in enumerate(paras) if CLOSED_LIST_MARK in para]
+    if not hits:
+        return False
+    return all(ESCAPE_HATCH_MARK in "\n\n".join(paras[i:i + 2]) for i in hits)
 
 
 def task_sample(role="implementer"):
@@ -65,6 +103,16 @@ def result_sample(role="implementer"):
                                                        "file": "docs/work/x/spec.md", "line": 12}],
         "evidence_ref": f"docs/work/{UNIT_ID}/evidence/run-a.yaml" if role == "implementer" else None,
     }
+
+
+def fail_sample(role="implementer", **over):
+    """FAIL 판정을 담은 결과 계약 표본. `fail_reasons` 는 호출자가 정한다(없는 경우도 표본이다)."""
+    sample = result_sample(role)
+    sample.update({"gate_verdict": "FAIL", "blocked_reason": None})
+    if role == "reviewer":
+        sample["checks"] = []
+    sample.update(over)
+    return sample
 
 
 class TestRoleFiles(unittest.TestCase):
@@ -332,6 +380,166 @@ class TestResultEnvelope(unittest.TestCase):
         # description 은 파일당 하나다(위 관례 테스트) — 그래서 이 사실은 최상위 설명이 말한다.
         self.assertIn("notes", self.schema["description"])
         self.assertIn("판정에 쓰이지 않는다", self.schema["description"])
+
+
+# ── FAIL 사유의 닫힌 목록(체크리스트: 검토자 판정 사유) ────────────────────────────
+# 문제: 절차 파일이 사유 8개를 "정본" 이라고 선언하면서 "이 목록에 없으면 FAIL 이 아니다" 를 말하지 않아,
+# 검토자가 목록 밖 사유로 게이트를 내릴 수 있었다(하네스가 허용하는 상태를 검토자가 FAIL 로 봤다).
+# 해소: 각 사유에 코드를 붙이고, 결과 계약 스키마가 FAIL 봉투에 그 코드를 요구한다 — 목록 밖은 기계가 거른다.
+
+
+class TestFailReasonsAreAClosedList(unittest.TestCase):
+    """AC-1 — 절차 파일의 코드 집합과 스키마 enum 이 정확히 같고, 목록이 닫혀 있다."""
+
+    def setUp(self):
+        self.skill = REVIEW_SKILL.read_text(encoding="utf-8")
+        self.schema = load_json(RESULT_SCHEMA)
+
+    def test_the_skill_gives_every_fail_reason_a_code(self):
+        codes = fail_codes_in_skill(self.skill)
+        self.assertEqual(len(codes), 8, f"FAIL 사유 8개에 코드가 붙어 있어야 한다 — 뽑힌 것: {codes}")
+        self.assertEqual(len(set(codes)), len(codes), f"코드가 중복된다: {codes}")
+
+    def test_skill_codes_and_schema_enum_are_exactly_the_same_set(self):
+        codes = fail_codes_in_skill(self.skill)
+        enum = self.schema["properties"]["fail_reasons"]["items"]["enum"]
+        self.assertEqual(sorted(codes), sorted(enum),
+                         "절차 파일과 스키마의 코드가 어긋난다 — "
+                         f"문서에만: {sorted(set(codes) - set(enum))} · 스키마에만: {sorted(set(enum) - set(codes))}")
+        self.assertEqual(codes, enum, "두 정본의 코드 순서까지 같게 둔다 — 읽는 사람이 번호로 대조한다")
+
+    def test_the_list_is_declared_closed_and_leaves_a_way_out(self):
+        self.assertTrue(declares_closed_list(self.skill),
+                        f"'{CLOSED_LIST_MARK}' 선언과 findings 로 가는 길이 FAIL 목록 절에 함께 있어야 한다")
+
+    # ── 거부 케이스 — 추출기가 문서를 실제로 읽는지, 상수를 되읽는지 가른다 ──────────
+    def test_extractor_reads_the_document_not_a_constant(self):
+        synthetic = ("**FAIL 이다 (하나라도 해당하면 `gate_verdict: FAIL`).**\n\n"
+                     "1. **가짜 사유 하나** — `ONLY_ONE`. 설명.\n"
+                     "2. **가짜 사유 둘** — `AND_TWO`. 설명.\n\n"
+                     "**경고에 그친다 (`findings` 에 담되).**\n")
+        self.assertEqual(fail_codes_in_skill(synthetic), ["ONLY_ONE", "AND_TWO"])
+
+    def test_a_code_without_a_backtick_title_is_not_counted(self):
+        synthetic = ("**FAIL 이다 (하나라도 해당하면 `gate_verdict: FAIL`).**\n\n"
+                     "1. **코드가 없는 항목.** 설명 안에 `LOOKS_LIKE_A_CODE` 가 있어도 세지 않는다.\n\n"
+                     "**경고에 그친다 (`findings` 에 담되).**\n")
+        self.assertEqual(fail_codes_in_skill(synthetic), [])
+
+    def test_missing_closed_list_declaration_is_detected(self):
+        without = self.skill.replace(CLOSED_LIST_MARK, "이 목록은 예시이고 다른 사유로도")
+        self.assertFalse(declares_closed_list(without), "선언을 지웠는데도 닫힌 목록으로 읽힌다")
+
+    def test_a_drifted_enum_is_detected(self):
+        codes = fail_codes_in_skill(self.skill)
+        for drifted in (codes[:-1], codes + ["NEW_REASON"]):
+            self.assertNotEqual(sorted(codes), sorted(drifted),
+                                "한쪽에만 있는 코드를 같은 집합으로 읽는다")
+
+
+class TestSchemaRejectsUnknownFailReasons(unittest.TestCase):
+    """AC-2 앞겹 — 스키마는 `fail_reasons` 의 **값**만 본다.
+
+    목록 밖 코드는 여기서 거부되고, 유효한 코드는 통과하며, 이 필드가 없는 봉투는 그대로 통과한다.
+    `gate_verdict` 로 조건부 필수를 걸지 않는 이유는 이 스키마가 **옛 판정 기록에도 걸리기** 때문이다 —
+    `fixtures/parity` 의 관측 케이스 2건이 이미 `done` 인 단위의 봉투를 읽어 같은 스키마로 검증한다.
+    사유를 실제로 담았는지는 뒷겹(종료 검사)이 지금 닫으려는 산출물의 봉투에 대해서만 요구한다."""
+
+    def setUp(self):
+        self.schema = load_json(RESULT_SCHEMA)
+        self.codes = self.schema["properties"]["fail_reasons"]["items"]["enum"]
+
+    def test_an_unlisted_code_is_rejected(self):
+        for bad in ("NOT_A_REASON", "ac_unmet", "", "REVIEWER_DISLIKES_IT"):
+            self.assertTrue(validate(fail_sample(fail_reasons=[bad]), self.schema),
+                            f"목록 밖 코드 {bad!r} 가 통과한다")
+        self.assertTrue(validate(fail_sample(fail_reasons=[self.codes[0], "NOT_A_REASON"]), self.schema),
+                        "유효한 코드와 섞으면 목록 밖 코드가 통과한다")
+
+    def test_a_non_array_value_is_rejected(self):
+        for bad in ("AC_UNMET", {"code": "AC_UNMET"}, 7, None):
+            self.assertTrue(validate(fail_sample(fail_reasons=bad), self.schema),
+                            f"배열이 아닌 값 {bad!r} 가 통과한다")
+
+    def test_listed_codes_are_accepted_for_both_roles(self):
+        for role in ("implementer", "reviewer"):
+            for reasons in ([self.codes[0]], self.codes, [self.codes[1], self.codes[-1]]):
+                self.assertEqual(validate(fail_sample(role, fail_reasons=reasons), self.schema), [],
+                                 f"{role}: 유효한 사유 {reasons} 를 담은 FAIL 이 거부됐다")
+
+    def test_an_envelope_without_the_field_still_passes(self):
+        """옛 판정 기록은 소급 수정하지 않는다 — 그 봉투에도 같은 스키마가 걸린다."""
+        for role in ("implementer", "reviewer"):
+            legacy = fail_sample(role)
+            self.assertNotIn("fail_reasons", legacy)
+            self.assertEqual(validate(legacy, self.schema), [],
+                             f"{role}: 사유 필드가 없는 옛 FAIL 봉투가 거부됐다")
+            self.assertEqual(validate(result_sample(role), self.schema), [],
+                             f"{role}: PASS 표본이 거부됐다")
+        blocked = result_sample()
+        blocked.update({"checks": [], "gate_verdict": "BLOCKED",
+                        "blocked_reason": "BLOCKED_CAPABILITY", "evidence_ref": None})
+        self.assertEqual(validate(blocked, self.schema), [])
+
+    def test_the_field_is_optional_and_the_gap_is_owned_by_the_closing_gate(self):
+        self.assertNotIn("fail_reasons", self.schema["required"])
+        self.assertEqual(validate(fail_sample(fail_reasons=[]), self.schema), [],
+                         "빈 배열은 스키마가 통과시킨다 — 그 자리를 막는 것은 종료 검사다(뒷겹)")
+        close_src = (REPO / "romeo/close.py").read_text(encoding="utf-8")
+        self.assertIn("fail_reasons", close_src,
+                      "앞겹이 값만 보므로 존재를 요구하는 뒷겹이 종료 검사에 있어야 한다")
+
+    def test_duplicates_are_declared_meaningless(self):
+        self.assertIs(self.schema["properties"]["fail_reasons"].get("uniqueItems"), True,
+                      "같은 사유를 두 번 적는 것은 사유를 하나 더 대는 것이 아니다")
+
+    def test_every_key_is_reachable_through_the_role_branches(self):
+        """`anyOf` 세 갈래가 전부 additionalProperties 를 닫고 있다 — 한 갈래라도 키를 빠뜨리면
+        그 갈래로 판정되는 봉투에서 이 필드가 '허용되지 않은 키' 가 된다."""
+        for branch in self.schema["anyOf"]:
+            self.assertIn("fail_reasons", branch["properties"])
+
+
+class TestSpecHashDifferenceIsNotAFailReason(unittest.TestCase):
+    """AC-3 — 확인란 체크로 생기는 spec_ref 지문 차이는 판정을 바꾸지 않는다는 조항이 절차 파일에 있다."""
+
+    ANCHORS = ("AC_TEXT_UNCHANGED", "SPEC_UNCHANGED_SINCE_EVIDENCE")
+
+    def setUp(self):
+        self.skill = REVIEW_SKILL.read_text(encoding="utf-8")
+
+    def _clause(self, text=None):
+        text = self.skill if text is None else text
+        m = re.search(r"\*\*판정을 바꾸지 않는 것\.\*\*(.*?)(?=\n## )", text, re.S)
+        return m.group(1) if m else None
+
+    def test_the_clause_exists_in_the_verdict_neutral_section(self):
+        clause = self._clause()
+        self.assertIsNotNone(clause, "'판정을 바꾸지 않는 것' 절을 찾지 못했다")
+        self.assertIn("spec_ref", clause, "지문 차이가 무엇의 차이인지 지목하지 않는다")
+        self.assertIn("확인란", clause, "무엇이 그 차이를 만드는지(확인란 체크) 적혀 있지 않다")
+
+    def test_the_clause_names_both_harness_checks_as_grounds(self):
+        clause = self._clause()
+        for name in self.ANCHORS:
+            self.assertIn(name, clause,
+                          f"근거로 지목해야 할 {name} 가 조항에 없다 — 하네스가 이를 허용한다는 증거가 사라진다")
+
+    def test_the_named_checks_exist_in_the_closing_gate(self):
+        """지목한 이름이 실재해야 근거다 — 문서에만 있는 검사 이름은 주장일 뿐이다(K-51)."""
+        close_src = (REPO / "romeo/close.py").read_text(encoding="utf-8")
+        for name in self.ANCHORS:
+            self.assertIn(name, close_src, f"{name} 가 종료 검사에 없다")
+
+    # ── 거부 케이스 ──────────────────────────────────────────────────────────
+    def test_a_clause_missing_an_anchor_is_detected(self):
+        for name in self.ANCHORS:
+            without = self.skill.replace(name, "다른_검사")
+            self.assertNotIn(name, self._clause(without) or "",
+                             f"{name} 를 지워도 조항이 그대로 읽힌다")
+
+    def test_a_missing_section_reads_as_absent_not_as_pass(self):
+        self.assertIsNone(self._clause("절이 없는 문서\n\n## 다른 절\n"))
 
 
 if __name__ == "__main__":

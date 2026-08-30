@@ -1,0 +1,66 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260830-reviewer-fail-reasons-938r",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260830-reviewer-fail-reasons-938r/spec.md",
+    "sha256": "c803c5a96cf2ca5374a5f5c922e341a76a3becdb564d739af35d2e1b75ef3f01"
+  },
+  "base_sha": "6065efd37c68ed69ff415db74fbdb168bef93fa5",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests -t . -v",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo compile --check",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo doctor",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo fixtures parity --report",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_roles_envelopes.TestFailReasonsAreAClosedList -v",
+      "expect": "exit 0 — AC-1. SKILL.md 에서 뽑은 코드 집합과 스키마 enum 이 정확히 같은지, 닫힌 목록 선언이 있는지 검사한다"
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest tests.test_roles_envelopes.TestSchemaRejectsUnknownFailReasons -v",
+      "expect": "exit 0 — AC-2 앞겹. 목록 밖 코드는 스키마가 거부하고 유효한 코드는 통과하며 필드가 없는 옛 봉투도 통과하는지 검사한다"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest tests.test_roles_envelopes.TestSpecHashDifferenceIsNotAFailReason -v",
+      "expect": "exit 0 — AC-3. spec_ref 지문 차이 조항이 SKILL.md 에 있고 두 근거 검사 이름을 지목하는지 검사한다"
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestBriefCarriesFailReasons -v",
+      "expect": "exit 0 — AC-4. 검토자 프롬프트의 출력 예시와 본문이 코드 8개를 담는지 검사한다"
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseRequiresFailReasonsOnFail -v",
+      "expect": "exit 0 — AC-2 뒷겹. 현재 산출물의 FAIL 봉투에 사유가 없으면 close 가 완료를 선언하지 않는지 검사한다"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

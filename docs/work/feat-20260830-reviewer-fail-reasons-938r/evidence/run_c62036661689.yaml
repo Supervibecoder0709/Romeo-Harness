@@ -1,0 +1,393 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_c62036661689
+task_id: task_ed4c014e5bac
+dispatch_id: ctx_4f0ff0ffeeec
+unit_id: feat-20260830-reviewer-fail-reasons-938r
+spec_ref:
+  path: docs/work/feat-20260830-reviewer-fail-reasons-938r/spec.md
+  sha256: c60bebc1e629d1137063c503b4263d7c02e4abdf50e9d4565ce54e354044e63f
+base_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-reviewer-fail-reasons-938r
+started_at: '2026-08-30T22:36:00+09:00'
+finished_at: '2026-08-30T22:47:20+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest discover -s tests -t . -v
+  exit_code: 0
+  started_at: '2026-08-30T22:36:00+09:00'
+  finished_at: '2026-08-30T22:37:30+09:00'
+  seconds: 89.995
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/01-check-1.log
+  log_sha256: 966f98b5b7bd8031dd74f0ad43b663e692dbd6626e96aa7600dffc06e9d341dc
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-2
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-30T22:37:30+09:00'
+  finished_at: '2026-08-30T22:37:30+09:00'
+  seconds: 0.159
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/02-check-2.log
+  log_sha256: 817a8c7ca781c230fe8b48f66ef84eb1012f2d066fe42434c07a18dc51aa0165
+  stdout_tail: compile 검사 PASS
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-3
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-30T22:37:30+09:00'
+  finished_at: '2026-08-30T22:37:30+09:00'
+  seconds: 0.09
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/03-check-3.log
+  log_sha256: ab08de9bad8b35ea3a0b8541b616f359ee6e6342f90ce7e15e92b5c9b5b64b9a
+  stdout_tail: "rca/workspaces/Romeo-Harness/impl-feat-20260830-reviewer-fail-reasons-938r/docs/work/feat-20260830-reviewer-fail-reasons-938r/brief.md\
+    \ lines=75 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-reviewer-fail-reasons-938r/docs/work/feat-20260830-reviewer-fail-reasons-938r/spec.md\
+    \ lines=145 needs_input=0 unchecked_ac=5\n    WARN  UNCHECKED_AC 5개"
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-4
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-30T22:37:30+09:00'
+  finished_at: '2026-08-30T22:37:31+09:00'
+  seconds: 0.431
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/04-check-4.log
+  log_sha256: 493b9b76d160e730525e0deb1c2ea06a822a0771d993d8911d3d3771fbcb8778
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-5
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-30T22:37:31+09:00'
+  finished_at: '2026-08-30T22:37:32+09:00'
+  seconds: 0.911
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/05-check-5.log
+  log_sha256: c85176c452b74d28a5dd3faa30ac6215bfcd0ea766bcbd78ced9e4f52170245d
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-6
+  command: python3 -m unittest tests.test_roles_envelopes.TestFailReasonsAreAClosedList -v
+  exit_code: 0
+  started_at: '2026-08-30T22:37:32+09:00'
+  finished_at: '2026-08-30T22:37:32+09:00'
+  seconds: 0.057
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/06-check-6.log
+  log_sha256: 00f4ebb41ce21ce6c949cc0ffdaa70a65ee01e209a62c272e0e56f153118eb76
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-7
+  command: python3 -m unittest tests.test_roles_envelopes.TestSchemaRejectsUnknownFailReasons -v
+  exit_code: 0
+  started_at: '2026-08-30T22:37:32+09:00'
+  finished_at: '2026-08-30T22:37:32+09:00'
+  seconds: 0.052
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/07-check-7.log
+  log_sha256: 81a24d5dddfbea606dd456d95c4b43aca1b10cd9165efcbbf9130878111a4c77
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-8
+  command: python3 -m unittest tests.test_roles_envelopes.TestSpecHashDifferenceIsNotAFailReason -v
+  exit_code: 0
+  started_at: '2026-08-30T22:37:32+09:00'
+  finished_at: '2026-08-30T22:37:32+09:00'
+  seconds: 0.053
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/08-check-8.log
+  log_sha256: c000df0797140fca482f9e2aa7c3ff31950dc77f47cda71a11a2aa6185c0579b
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-9
+  command: python3 -m unittest tests.test_reviewer_brief.TestBriefCarriesFailReasons -v
+  exit_code: 0
+  started_at: '2026-08-30T22:37:32+09:00'
+  finished_at: '2026-08-30T22:37:32+09:00'
+  seconds: 0.054
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/09-check-9.log
+  log_sha256: b762e2b6fea8e1107aa500e7af6e8df5dfb55618a7a89ed7d127e0d04e31df16
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: check-10
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseRequiresFailReasonsOnFail -v
+  exit_code: 0
+  started_at: '2026-08-30T22:37:32+09:00'
+  finished_at: '2026-08-30T22:37:38+09:00'
+  seconds: 5.51
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/10-check-10.log
+  log_sha256: 4086b64d211d9428d45a2feb725988fcb257a846a29fe3fc93d073c5ae167e8a
+  stdout_tail: ''
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-reviewer-fail-reasons-938r'
+  exit_code: 0
+  started_at: '2026-08-30T22:39:06+09:00'
+  finished_at: '2026-08-30T22:39:07+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/11-review-tree-before.log
+  log_sha256: d5589f01939eaad051dba177dc57c172c11a9adffe8cd46d57a068ea9587eec8
+  stdout_tail: "schemas/result-envelope.json\n M core/workflows/review/SKILL.md\n M fixtures/parity/pr-product-differs.yaml\n\
+    \ M fixtures/parity/pr-reviewer-drift.yaml\n M fixtures/parity/pr-reviewer-unsampled.yaml\n M fixtures/parity/pr-reviewer-unstable.yaml\n\
+    \ M fixtures/parity/pr-verdict-drift.yaml\n M romeo/close.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_reviewer_brief.py\n M tests/test_roles_envelopes.py"
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-reviewer-fail-reasons-938r/.harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-30T22:39:18+09:00'
+  finished_at: '2026-08-30T22:39:18+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/12-reviewer-brief.log
+  log_sha256: ef4048c7d3783d1ea1a595e94b5707a570973f550292e729bc198415a831a39c
+  stdout_tail: ff2c60ab2d1d487f355cc257903bb23497a3b06e787a8573a55cc23704b8b179  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-reviewer-fail-reasons-938r/.harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/reviewer-brief.md
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-reviewer-fail-reasons-938r'
+  exit_code: 0
+  started_at: '2026-08-30T22:46:50+09:00'
+  finished_at: '2026-08-30T22:46:50+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/13-review-tree-after.log
+  log_sha256: d5589f01939eaad051dba177dc57c172c11a9adffe8cd46d57a068ea9587eec8
+  stdout_tail: "schemas/result-envelope.json\n M core/workflows/review/SKILL.md\n M fixtures/parity/pr-product-differs.yaml\n\
+    \ M fixtures/parity/pr-reviewer-drift.yaml\n M fixtures/parity/pr-reviewer-unsampled.yaml\n M fixtures/parity/pr-reviewer-unstable.yaml\n\
+    \ M fixtures/parity/pr-verdict-drift.yaml\n M romeo/close.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_reviewer_brief.py\n M tests/test_roles_envelopes.py"
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260830-reviewer-fail-reasons-938r/review/run_c62036661689-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-30T22:47:20+09:00'
+  finished_at: '2026-08-30T22:47:20+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260830-reviewer-fail-reasons-938r/run_c62036661689/14-review-record.log
+  log_sha256: 683e65d82420d8753d3af6292edeae3437b814cc50cdacbbceeabe71dcb24df7
+  stdout_tail: 875e70cf8bd8e5467760590dac302905d6330ed503a02c42c8653de663636408  docs/work/feat-20260830-reviewer-fail-reasons-938r/review/run_c62036661689-reviewer.json
+  head_sha: 6065efd37c68ed69ff415db74fbdb168bef93fa5
+  dirty_tree_hash: fe4e2dd4c4da0dc390e4a2e03935dd08cd599a2a2ebe4f33cb40db2e4b26b226
+changed_files:
+- adapters/orca/prompts/reviewer-brief.md
+- core/schemas/result-envelope.json
+- core/workflows/review/SKILL.md
+- fixtures/parity/pr-product-differs.yaml
+- fixtures/parity/pr-reviewer-drift.yaml
+- fixtures/parity/pr-reviewer-unsampled.yaml
+- fixtures/parity/pr-reviewer-unstable.yaml
+- fixtures/parity/pr-verdict-drift.yaml
+- romeo/close.py
+- tests/test_docs_evidence_close.py
+- tests/test_reviewer_brief.py
+- tests/test_roles_envelopes.py
+artifact_hash: 6669d29bffa1a6ec5cd7603a4104b53f6f166454740cb8ae0bd27c2b9538b481
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-30T22:51:13+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-08-30T22:30:22+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_c62036661689 — 검증 계획 10건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 6065efd37c68 vs 현재 6065efd37c68
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence fe4e2dd4c4da vs 현재 fe4e2dd4c4da (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest discover -s tests -t . -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_roles_envelopes.TestFailReasonsAreAClosedList
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest tests.test_roles_envelopes.TestSchemaRejectsUnknownFailReasons
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest tests.test_roles_envelopes.TestSpecHashDifferenceIsNotAFailReason
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — python3 -m unittest tests.test_reviewer_brief.TestBriefCarriesFailReasons
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseRequiresFailReasonsOnFail
+      -v'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 14건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 10건이 승인 커밋 6065efd37c68 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest discover -s tests -t . -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_roles_envelopes.TestFailReasonsAreAClosedList
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest tests.test_roles_envelopes.TestSchemaRejectsUnknownFailReasons
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest tests.test_roles_envelopes.TestSpecHashDifferenceIsNotAFailReason
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — python3 -m unittest tests.test_reviewer_brief.TestBriefCarriesFailReasons
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseRequiresFailReasonsOnFail
+      -v'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 6065efd37c68 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/prompts/reviewer-brief.md', 'core/schemas/result-envelope.json',
+      'core/workflows/review/SKILL.md', 'fixtures/parity/pr-product-differs.yaml', 'fixtures/parity/pr-reviewer-drift.yaml',
+      'fixtures/parity/pr-reviewer-unsampled.yaml', 'fixtures/parity/pr-reviewer-unstable.yaml', 'fixtures/parity/pr-verdict-drift.yaml',
+      'romeo/close.py', 'tests/test_docs_evidence_close.py', 'tests/test_reviewer_brief.py', 'tests/test_roles_envelopes.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_c62036661689-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

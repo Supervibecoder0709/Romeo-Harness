@@ -63,6 +63,7 @@
   "checks": [],
   "gate_verdict": "PASS | FAIL | BLOCKED",
   "blocked_reason": null,
+  "fail_reasons": ["AC_UNMET"],
   "findings": [{"summary": "무엇이 왜 문제인가", "file": "경로", "line": 0}],
   "evidence_ref": "docs/work/<id>/evidence/<evidence-run>.yaml",
   "notes": "선택 — 판정의 맥락. 판정에 쓰이지 않는다"
@@ -72,6 +73,16 @@
 - `checks` 는 **비운다** — 검사를 실행하지 않는 역할이 검사를 싣는 것은 계약 위반이다.
 - `gate_verdict` 는 수용 기준마다 그것을 뒷받침하는 증거를 지목할 수 있을 때만 `PASS` 다. 지목하지 못하면 `FAIL`, 판정 자체를 못 하면
   `BLOCKED`(그때 `blocked_reason` 은 `BLOCKED_CAPABILITY`·`BLOCKED_APPROVAL`·`BLOCKED_DOCS` 중 하나).
+- `fail_reasons` 는 `gate_verdict` 가 FAIL 일 때만 적고, 여덟 개 코드 중에서만 고른다 — `AC_UNMET`(수용 기준 미달·미지목) ·
+  `UNAPPROVED_ACTION`(승인 전 상태 변경) · `OUT_OF_SCOPE_WRITE`(계약 밖 쓰기) · `CHECK_PLAN_CHANGED`(검증 계획의 사후 변경) ·
+  `EVIDENCE_NOT_RECORDED`(손으로 만든 증거) · `CHECK_NOT_RERUNNABLE`(재실행 불가능한 검사에 완료가 걸려 있다) ·
+  `ROLE_CONTRACT_VIOLATION`(역할 계약 위반) · `FAILED_CHECK_CLAIMED_PASS`(실패한 검사가 통과로 주장됐다).
+  해당하는 것을 모두 적는다. 각 코드가 정확히 무엇인지는 `core/workflows/review/SKILL.md` 의 「무엇이 FAIL 사유인가」 가 정의한다.
+- **이 목록에 없는 사유로 게이트를 내리지 않는다.** 목록 밖에서 진짜 문제를 발견하면 `findings` 로 적고 판정은 `PASS` 로 낸다 —
+  그것을 새 사유로 삼을지는 사람이 정한다(K-61). 사유를 적지 않은 FAIL 도, 목록 밖 코드를 담은 FAIL 도 결과 계약 스키마가 거부한다.
+- 작업 계약과 증거의 `spec_ref.sha256` 이 다른 것은 FAIL 사유가 아니다 — 구현자가 확인란의 수용 기준 체크박스를 채우면
+  두 지문은 정상적으로 갈라진다(계약은 승인 커밋 시점, 증거는 작업 트리 시점). 하네스의 `AC_TEXT_UNCHANGED` 는 체크 표시를 빼고
+  문장만 대조하고 `SPEC_UNCHANGED_SINCE_EVIDENCE` 는 경고 수준이다. 판정 대상은 지문이 아니라 확인란의 **문장**이다.
 - `evidence_ref` 는 네가 읽은 그 증거다 — 위 경로 그대로. `PASS` 를 내면서 이것이 비어 있으면 동등성 판정이 판정 불가로 떨어뜨린다.
 - `findings` 의 각 항목은 근거(파일·줄)를 갖는다. 사실·가정·추천을 섞지 않는다.
 - 경로는 전부 자기 작업 루트 기준 상대 경로다. 절대 경로를 적으면 종료 검사가 저장소 밖으로 거부한다.

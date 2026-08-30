@@ -12,6 +12,8 @@
 #
 # 이 케이스는 손으로 쓴 합성 데이터다(source.kind: authored). 검사기가 도는지만 증명하고
 # 핵심 동등성 게이트를 통과시키지 못한다(D-b).
+# **FAIL 사유 코드(2026-08-30):** 이 케이스의 FAIL 은 전부 '수용 기준이 충족되지 않았다' 는 판정이므로 `AC_UNMET` 이다.
+# 결과 계약이 FAIL 봉투에 닫힌 목록의 사유를 요구하게 되면서 기존 표본에 그 코드를 채웠다 — 판정 자체는 바뀌지 않았다.
 ---
 id: pr-reviewer-unstable
 title: 한 면의 표본이 자기 안에서 갈린다 — 검토자 면은 비교 불가, 구현자 면만 비교한다
@@ -58,6 +60,7 @@ baseline:
         checks: []
         gate_verdict: FAIL
         blocked_reason: null
+        fail_reasons: [AC_UNMET]
         findings:
           - {summary: 루트에 등록되지 않은 미추적 파일이 남아 있다, file: archive/README.md, line: 16}
         evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-i.yaml
@@ -89,6 +92,7 @@ swapped:
         checks: []
         gate_verdict: FAIL
         blocked_reason: null
+        fail_reasons: [AC_UNMET]
         findings:
           - {summary: 루트에 등록되지 않은 미추적 파일이 남아 있다, file: archive/README.md, line: 16}
         evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-j.yaml
@@ -101,6 +105,7 @@ swapped:
         checks: []
         gate_verdict: FAIL
         blocked_reason: null
+        fail_reasons: [AC_UNMET]
         findings:
           - {summary: 루트에 등록되지 않은 미추적 파일이 남아 있다, file: archive/README.md, line: 16}
         evidence_ref: docs/work/feat-20260828-license-field-a1b2/evidence/run-j.yaml

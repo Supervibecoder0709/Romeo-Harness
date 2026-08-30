@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-reviewer-fail-reasons-938r",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-reviewer-fail-reasons-938r/task/run_c62036661689-reviewer.json",
+    "sha256": "0f0d278eac97269b2c42f027c36270d0b7c1a1b32a1f72f96ac863c5c8a833fc"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-reviewer-fail-reasons-938r/evidence/run_c62036661689.yaml",
+  "notes": "재승인 뒤 두 역할 계약의 base_sha와 required_checks 10건이 일치한다. 재승인 전 계약 값은 판정에 사용하지 않았다."
+}

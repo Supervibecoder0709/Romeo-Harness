@@ -695,6 +695,17 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
               + f". 현재 산출물은 {_product_text(product) if product else '?'} 이다"
               f"(검사 기록 run 의 head_sha+dirty_tree_hash, D-73)",
               level="warning")
+    # FAIL 사유의 뒷겹. 결과 계약 스키마는 `fail_reasons` 의 **값**만 본다 — 그 필드가 생기기 전에 기록된 판정에도
+    # 같은 스키마가 걸리므로 조건부 필수를 걸 수 없다(fixtures/parity 의 관측 케이스가 옛 봉투를 읽는다).
+    # 그래서 '사유를 실제로 담았는가' 는 여기서 **지금 닫으려는 산출물의 봉투에 대해서만** 요구한다.
+    # 다른 산출물·재승인 전 승인의 봉투(REVIEW_SUPERSEDED)와 PASS·BLOCKED 는 대상이 아니다 —
+    # 낡은 기록을 소급해 막으면 이 검사가 하는 말이 '옛 판정이 옛 형식이다' 로 바뀐다.
+    no_reasons = [n for n, e in current
+                  if e.get("gate_verdict") == "FAIL" and not (e.get("fail_reasons") or [])]
+    check("REVIEW_FAIL_REASONS", not no_reasons,
+          "; ".join(f"{n}: gate_verdict FAIL 인데 fail_reasons 가 비었다 — "
+                    f"무엇이 게이트를 내렸는지 닫힌 목록의 코드로 적는다"
+                    f"(core/workflows/review/SKILL.md 「무엇이 FAIL 사유인가」)" for n in no_reasons))
     bad = [(n, e) for n, e in current if e.get("gate_verdict") != "PASS"]
     passes = [n for n, e in current if e.get("gate_verdict") == "PASS"]
     if not verdicts:

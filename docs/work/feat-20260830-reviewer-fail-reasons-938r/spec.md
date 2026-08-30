@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-08-30T22:30:22+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-30T22:51:13+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_c62036661689.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -55,11 +55,11 @@ approval_history:
   확인란 체크로 인한 지문 차이를 FAIL 로 보는 판정이 재현되지 않고, `w3qu` 를 새 base 로 재개할 수 있게 된다.
   검토자가 목록 밖의 진짜 문제를 발견하면 `findings` 로 적고 판정은 `PASS` 로 낸다 — 사유를 목록에 더할지는 사람이 정한다(K-61).
 - **수용 기준:**
-  - [ ] AC-1 `core/workflows/review/SKILL.md` 의 FAIL 사유 8개에 각각 코드가 붙어 있고, "이 목록에 없는 사유로 `gate_verdict` 를 `FAIL` 로 내지 않는다" 는 취지의 닫힌 목록 선언이 있으며, 그 코드 집합이 `core/schemas/result-envelope.json` 의 `fail_reasons` 열거값과 **정확히 같다**(한쪽에만 있는 코드가 없다).
-  - [ ] AC-2 FAIL 사유가 두 겹으로 강제된다 — ① 결과 봉투 스키마는 `fail_reasons` 에 목록 밖 코드가 들어 있으면 **거부하고**, 유효한 코드만 담으면 통과하며, 그 필드가 아예 없는 봉투(스키마를 조이기 전에 기록된 옛 판정 포함)는 그대로 통과한다. ② `bin/romeo close` 는 **지금 닫으려는 산출물에 대한** 검토자 봉투가 `gate_verdict` 가 `FAIL` 인데 `fail_reasons` 가 없거나 비어 있으면 완료를 선언하지 않는다.
-  - [ ] AC-3 4회차를 멈춰 세운 사유가 FAIL 사유가 아님이 `core/workflows/review/SKILL.md` 에 적혀 있다 — 작업 계약과 증거의 `spec_ref.sha256` 이 확인란 체크 때문에 달라지는 것은 판정을 바꾸지 않는다는 조항이 있고, 그 근거로 `AC_TEXT_UNCHANGED`(체크 표시를 뺀 비교)와 `SPEC_UNCHANGED_SINCE_EVIDENCE`(경고 수준)를 지목한다.
-  - [ ] AC-4 검토자 프롬프트 `adapters/orca/prompts/reviewer-brief.md` 의 출력 예시에 `fail_reasons` 가 있고, 유효한 코드 목록이 프롬프트 본문에 인쇄된다 — 검토자가 계약을 보기 위해 다른 파일을 열지 않아도 된다.
-  - [ ] AC-5 회귀가 없다 — `python3 -m unittest discover -s tests -t . -v` · `bin/romeo compile --check` · `bin/romeo validate` · `bin/romeo doctor` · `bin/romeo fixtures parity --report` 가 모두 종료 코드 0 이다.
+  - [x] AC-1 `core/workflows/review/SKILL.md` 의 FAIL 사유 8개에 각각 코드가 붙어 있고, "이 목록에 없는 사유로 `gate_verdict` 를 `FAIL` 로 내지 않는다" 는 취지의 닫힌 목록 선언이 있으며, 그 코드 집합이 `core/schemas/result-envelope.json` 의 `fail_reasons` 열거값과 **정확히 같다**(한쪽에만 있는 코드가 없다).
+  - [x] AC-2 FAIL 사유가 두 겹으로 강제된다 — ① 결과 봉투 스키마는 `fail_reasons` 에 목록 밖 코드가 들어 있으면 **거부하고**, 유효한 코드만 담으면 통과하며, 그 필드가 아예 없는 봉투(스키마를 조이기 전에 기록된 옛 판정 포함)는 그대로 통과한다. ② `bin/romeo close` 는 **지금 닫으려는 산출물에 대한** 검토자 봉투가 `gate_verdict` 가 `FAIL` 인데 `fail_reasons` 가 없거나 비어 있으면 완료를 선언하지 않는다.
+  - [x] AC-3 4회차를 멈춰 세운 사유가 FAIL 사유가 아님이 `core/workflows/review/SKILL.md` 에 적혀 있다 — 작업 계약과 증거의 `spec_ref.sha256` 이 확인란 체크 때문에 달라지는 것은 판정을 바꾸지 않는다는 조항이 있고, 그 근거로 `AC_TEXT_UNCHANGED`(체크 표시를 뺀 비교)와 `SPEC_UNCHANGED_SINCE_EVIDENCE`(경고 수준)를 지목한다.
+  - [x] AC-4 검토자 프롬프트 `adapters/orca/prompts/reviewer-brief.md` 의 출력 예시에 `fail_reasons` 가 있고, 유효한 코드 목록이 프롬프트 본문에 인쇄된다 — 검토자가 계약을 보기 위해 다른 파일을 열지 않아도 된다.
+  - [x] AC-5 회귀가 없다 — `python3 -m unittest discover -s tests -t . -v` · `bin/romeo compile --check` · `bin/romeo validate` · `bin/romeo doctor` · `bin/romeo fixtures parity --report` 가 모두 종료 코드 0 이다.
 - **위험과 되돌리기:** ① 스키마를 조이면 **정당한 FAIL 도 코드가 없으면 못 낸다** — 그 경로(findings 로 적고 PASS, 사유 추가는 사람이 결정)를 `review/SKILL.md` 에 함께 적어 막다른 길을 만들지 않는다. ② **이 spec 의 1차 판단이 틀렸다(1회차 관통에서 드러났다).** `feat-20260829-license-field-46an` 의 옛 FAIL 봉투는 재검증 경로 밖이 아니다 — `fixtures/parity` 의 관측 케이스 2건(`pr-license-field-t1-observed`·`pr-license-field-t1-reviewer-observed`)이 그 봉투 8건을 직접 읽어 결과 봉투 스키마로 검증한다. 그래서 `fail_reasons` 를 조건부 **필수**로 조이면 `check-5` 와 `tests.test_parity` 가 실패한다. AC-2 를 두 겹(스키마는 값만·close 가 존재를)으로 나눈 것이 그 대응이고, 과거 판정 기록은 소급 수정하지 않는다. 특히 `run_b5cdadaffcdc-reviewer.json` 은 이번에 "FAIL 사유가 아니다" 라고 선언하는 바로 그 사유(`spec_ref.sha256` 불일치)로 FAIL 했으므로 붙일 코드가 애초에 없다. ③ `fixtures/parity` 6건은 갱신 대상이라 잘못 고치면 동등성 게이트가 깨진다 — check-5 가 잡는다. **되돌리기:** 전부 저장소 안 로컬 변경이다. `git revert <커밋>`, 미커밋이면 `git checkout -- <파일>`. 컴파일 산출물은 `bin/romeo compile` 재실행으로 복구한다.
 - **결정 필요:** 없음 (수정 강도와 검증 방식은 2026-08-30 사용자 확정 — 문서 + 봉투 스키마 강제, 평소대로 관통)
 
@@ -139,6 +139,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-30T22:51:13+09:00 · HEAD 6065efd37c68 · 검사 기록 run_c62036661689
 
-- (없음)
+- [evidence/run_c62036661689.yaml](evidence/run_c62036661689.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
