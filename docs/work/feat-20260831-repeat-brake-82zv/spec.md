@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-31T00:11:32+09:00'
+approved_at: '2026-08-31T00:37:20+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,12 @@ routing:
   history: []
 created: '2026-08-31'
 updated: '2026-08-31'
+approval_history:
+- {approved_at: '2026-08-31T00:11:32+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T00:37:20+09:00',
+  reason: '1차 관통이 spec 의 전제를 실측으로 반증했다 — expect 를 코드·스키마에서 지우면 옛 작업 계약 35개의 바이트 재계산(close.py:447 TASK_ANCHORED)이
+    깨진다. 막는 것은 스키마 검증이 아니라 재계산이라 additionalProperties 를 풀어도 실패했다. 사용자 확정(옵션 C): 템플릿에서만 지운다 — envelope.py
+    는 expect 가 있을 때만 복사하므로 옛 봉투는 그대로 나오고 새 spec 에는 안 생긴다. AC-6 을 ''코드 두 파일이 base 와 바이트가 같다'' 로 바꾸고 AC-7(테스트
+    앵커)을 더했으며 check-15 를 신설했다. 브레이크(③·Ⓔ)는 무변경'}
 ---
 
 # 반복 중단 브레이크를 실제로 걸고 expect 함정을 없앤다
@@ -44,17 +50,18 @@ updated: '2026-08-31'
   - [ ] AC-3 (Ⓔ) 중단 조건에 걸린 단위에서 `bin/romeo envelope build` 가 **종료 코드 0 이 아니고**, 무엇이 왜 막혔는지와 어떻게 푸는지를 한국어로 말한다. 회귀 테스트가 보인다.
   - [ ] AC-4 (Ⓔ) 중단 조건에 걸리지 않은 단위(시도 기록이 아예 없는 경우 포함)에서는 `envelope build` 가 **그대로 동작한다** — 이 단위 자신의 관통이 그 증거이고, 회귀 테스트도 보인다.
   - [ ] AC-5 (②) `core/templates/tech-spec.md` 에 `expect:` 가 남아 있지 않고, 대신 **종료 코드 자체가 조건**이라는 문장과 그 이유가 인쇄되어 있다.
-  - [ ] AC-6 (②) `core/schemas/task-envelope.json` 과 `romeo/envelope.py`·`romeo/close.py` 에서 `expect` 가 사라졌다. (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
-  - [ ] AC-7 (park) `docs/planning/open-questions.md` 에 넘기는 항목이 **`우회 가능 — v1 이후`** 표시와 함께 등록돼 있다 — ⑤(검토자 lifecycle 자동화) · Ⓓ(waiter 하나) · Ⓕ(task 사본이 merge 막음) · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`).
-  - [ ] AC-8 (Ⓔ) `adapters/orca/RUNBOOK.md` 가 **중단 게이트**가 어디서 걸리는지 말한다 — 손으로 관통해도 §3.3 에서 막힌다는 것.
-  - [ ] AC-9 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
-- **위험과 되돌리기:** **`envelope build` 는 모든 관통의 입구다** — 잘못 걸면 어떤 관통도 시작하지 못한다. 그래서 AC-4 가 "안 걸린 경우엔 그대로 동작한다" 를 따로 요구하고, 이 단위 자신의 관통이 그 살아 있는 증거가 된다(이 단위가 돌았다는 것이 곧 입구가 막히지 않았다는 뜻이다). `expect` 삭제는 옛 봉투를 건드리지 않는다 — 결과 봉투에는 그 필드가 없고, 옛 작업 계약을 스키마로 재검증하는 경로도 없다. AC-9 의 `fixtures parity --report` 가 그 전제를 지킨다. 전부 이 저장소 안의 로컬 변경이고 외부 상태를 바꾸지 않으므로 되돌리기는 `git revert <커밋>` 한 번이다.
+  - [ ] AC-6 (②) `core/schemas/task-envelope.json` 의 `expect` 속성은 **남아 있고**, 그 설명에 **`판정에 쓰이지 않는다`** 가 적혀 있다. 그리고 `romeo/envelope.py`·`romeo/close.py` 는 `base_sha` 와 **바이트가 같다** — 코드에서 `expect` 를 없애면 옛 작업 계약 35개의 바이트 재계산이 깨진다(아래 위험 절). (`romeo/parity.py` 의 `expect` 는 **다른 것**이므로 건드리지 않는다.)
+  - [ ] AC-7 (②) `tests/test_docs_evidence_close.py` 가 템플릿의 `expect` 줄을 편집 앵커로 쓰지 않는다 — 템플릿에서 그 줄이 사라져도 그 파일의 테스트가 전부 통과한다.
+  - [ ] AC-8 (park) `docs/planning/open-questions.md` 에 넘기는 항목이 **`우회 가능 — v1 이후`** 표시와 함께 등록돼 있다 — ⑤(검토자 lifecycle 자동화) · Ⓓ(waiter 하나) · Ⓕ(task 사본이 merge 막음) · w3qu 잔여 3건(템플릿 한 줄 · 프롬프트 하드코딩 · `compile --list-outputs`).
+  - [ ] AC-9 (Ⓔ) `adapters/orca/RUNBOOK.md` 가 **중단 게이트**가 어디서 걸리는지 말한다 — 손으로 관통해도 §3.3 에서 막힌다는 것.
+  - [ ] AC-10 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
+- **위험과 되돌리기:** **`envelope build` 는 모든 관통의 입구다** — 잘못 걸면 어떤 관통도 시작하지 못한다. 그래서 AC-4 가 "안 걸린 경우엔 그대로 동작한다" 를 따로 요구하고, 이 단위 자신의 관통이 그 살아 있는 증거가 된다(이 단위가 돌았다는 것이 곧 입구가 막히지 않았다는 뜻이다). **`expect` 는 코드·스키마에서 지우지 않는다 — 1차 관통이 그 이유를 실측으로 드러냈다.** 옛 작업 계약 **35개**가 `expect` 를 담고 있고, `romeo/close.py:447` 의 `TASK_ANCHORED` 는 그 봉투를 **지금 코드로 다시 만들어 바이트로 대조**한다(스키마 검증이 아니다 — `additionalProperties` 를 풀어도 그대로 실패했다). `romeo/envelope.py` 가 `expect` 를 안 만드는 순간 옛 단위 6개의 앵커가 전부 어긋난다. 그래서 **템플릿에서만** 지운다 — `envelope.py` 는 `expect` 가 **있을 때만** 복사하므로 옛 spec 의 봉투는 재계산해도 그대로 나오고 새 spec 에는 애초에 생기지 않는다. 함정이 무는 자리는 사람이 새 spec 을 쓸 때이고 거기가 정확히 막힌다. AC-6 이 코드 두 파일의 무변경을, AC-10 의 `fixtures parity --report` 가 그 전제를 지킨다. 전부 이 저장소 안의 로컬 변경이고 외부 상태를 바꾸지 않으므로 되돌리기는 `git revert <커밋>` 한 번이다.
 - **결정 필요:** 없음 — 2026-08-31 사용자 확정. 브레이크(③·Ⓔ)와 `expect` 삭제(②)만 고치고 **나머지 우회 가능한 것은 전부 넘긴다.** 이 단위 뒤 하네스 정비를 멈추고 M3 로 간다.
 
 
 ## 변경 범위
 
-- 바뀌는 파일·모듈: `romeo/run_unit.py` · `romeo/envelope.py` · `romeo/close.py` · `core/schemas/task-envelope.json` · `core/templates/tech-spec.md` · `adapters/orca/RUNBOOK.md` · `docs/planning/open-questions.md` · `tests/test_run_unit.py` · `docs/work/feat-20260831-repeat-brake-82zv/`
+- 바뀌는 파일·모듈: `romeo/run_unit.py` · `romeo/envelope.py` · `romeo/close.py` · `core/schemas/task-envelope.json` · `core/templates/tech-spec.md` · `adapters/orca/RUNBOOK.md` · `docs/planning/open-questions.md` · `tests/test_run_unit.py` · `tests/test_docs_evidence_close.py` · `docs/work/feat-20260831-repeat-brake-82zv/`
 - 영향을 받는 부분: **다음 모든 관통의 입구**(`envelope build` 가 중단 게이트를 평가한다) · `bin/romeo new` 가 만드는 모든 새 spec(템플릿에서 `expect` 가 빠진다) · `run-unit` 의 차단 판정 · 이미 `expect:` 를 가진 기존 spec 은 그대로 둔다(과거 기록을 소급 수정하지 않는다 — 여분의 YAML 키로 남고 파싱을 깨지 않는다).
 - 바꾸지 않는 것(비범위): `romeo/parity.py` 의 `expect`(**다른 것** — fixture 의 기대 판정 same/differ) · 코어 규칙 문장(`core/principles/AGENTS.core.md` §10 — 코드를 문장에 맞추는 것이지 그 반대가 아니다) · 권한 상한(`.harness/bindings.yaml`·`.claude/settings.json`) · 정책표(`core/policy/*.yaml`) · `fixtures/` · `docs/work/feat-20260830-harness-defects-w3qu/`(park 한다 — 닫지도 폐기하지도 않는다) · `docs/planning/progress.md`(통합 뒤 별도로 갱신한다)
 
@@ -81,7 +88,7 @@ updated: '2026-08-31'
 required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대조한다.
 
 이 단위는 **하네스 저장소 자신**이 대상이므로 하네스 검사(check-10~14)가 정당한 검사다.
-check-1~9 는 이 단위가 만든 것을 직접 겨눈다 — 순서대로 구현 단위 1~8행이다(4행은 두 경우를 한 테스트가 덮는다).
+check-1~9 와 check-15 는 이 단위가 만든 것을 직접 겨눈다. check-15 는 **코드 두 파일이 base 와 바이트가 같다**를 종료 코드로 본다 — 1차 관통이 그 두 파일을 고쳐 옛 봉투 35개를 깨뜨렸기 때문이다.
 
 **모든 검사는 종료 코드 자체가 조건이다.** `|| true` 를 쓰지 않고, 부정 조건은 `!` 로 쓴다.
 check-5~9 는 **구현 전 상태에서 전부 종료 코드 1** 인 것을 2026-08-31 에 실측했고, check-10~14 는 같은 시점에 전부 0 이었다.
@@ -102,7 +109,9 @@ required_checks:
   - id: check-6
     command: "grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md"
   - id: check-7
-    command: "! grep -q '\"expect\"' core/schemas/task-envelope.json && ! grep -q 'expect' romeo/envelope.py romeo/close.py"
+    command: "grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json"
+  - id: check-15
+    command: "git diff --quiet HEAD -- romeo/envelope.py romeo/close.py"
   - id: check-8
     command: "grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md"
   - id: check-9

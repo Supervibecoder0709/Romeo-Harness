@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260831-repeat-brake-82zv
+attempts:
+- n: 1
+  run: run_2e44c6ab0b3a
+  base_sha: 6f4ef05ed56ec2b83b5559bb8c743dbff159cf9b
+  started_at: '2026-08-31T00:11:46+09:00'
+  result: fail
+  failure_class: goal
+  note: 승인된 spec 의 전제가 틀렸다 — expect 삭제가 옛 작업 계약 35개의 바이트 재계산(close.py:447 TASK_ANCHORED)을 깨뜨린다. 스키마 검증이
+    아니라 재계산 경로였다. 구현자가 실측으로 잡아 질문했고 사용자가 옵션 C(템플릿에서만 삭제)를 확정했다. 브레이크(③·Ⓔ)는 회귀 테스트 25건과 함께 완성됐고 워크트리에 남는다
+  settled_at: '2026-08-31T00:34:58+09:00'
+reviews: []
