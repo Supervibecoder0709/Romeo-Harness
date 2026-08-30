@@ -1,0 +1,14 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260830-reviewer-fail-reasons-938r
+attempts:
+- n: 1
+  run: run_c62036661689
+  base_sha: ed412cc5e471d0a894b9a6f75500db362d7627ad
+  started_at: '2026-08-30T21:57:22+09:00'
+  result: pass
+  failure_class: null
+  note: 관통 1회로 PASS. 도중 재승인 1회(구현자가 spec 위험 (2) 의 사실 오류를 발견해 질문 — parity 관측 케이스가 이미 done 인 단위의 옛 FAIL
+    봉투를 읽는다). base_sha ed412cc → 6065efd, required_checks 9건 → 10건. 검토자는 codex read-only TUI 로 돌았고 worker-start
+    --terminal 이 agent_prompt_stalled 로 실패해 lifecycle 없이 파일 회수 경로로 처리했다
+  settled_at: '2026-08-30T22:53:54+09:00'
+reviews: []
