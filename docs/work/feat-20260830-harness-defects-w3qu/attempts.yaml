@@ -1,0 +1,45 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260830-harness-defects-w3qu
+attempts:
+- n: 1
+  run: run_f4f810c1baa6
+  base_sha: c7e5cbfc60e45ad0b2838f5b13f218bc46233dc2
+  started_at: '2026-08-30T14:32:44+09:00'
+  result: fail
+  failure_class: outputs
+  note: 검토자 FAIL findings 5건 — 전부 실측 재현됨
+  settled_at: '2026-08-30T19:53:36+09:00'
+- n: 2
+  run: run_2b_harness_defects
+  base_sha: 99e90316f562e4cc3d1596bc96c2eeafcb621aca
+  started_at: '2026-08-30T20:01:27+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL 1건 — check-7 의 '|| true' 가 AC-3 위반을 통과시킨다. 실측 재현됨
+  settled_at: '2026-08-30T20:27:42+09:00'
+- n: 3
+  run: run_3c_harness_defects
+  base_sha: 5aa0c6802e689332799bbd88e2831ffe2cf8bad8
+  started_at: '2026-08-30T20:33:33+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL 1건 — compile 이 저장소 루트에 .compile-* staging 을 만드는데(compile.py:622 mkdtemp) list_outputs
+    가 인쇄하지 않는다. 이름이 매번 다르므로 문자 그대로 '전부 인쇄' 는 패턴으로만 가능하다
+  settled_at: '2026-08-30T20:51:08+09:00'
+- n: 4
+  run: run_4d_harness_defects
+  base_sha: ae7b67af6a0fbc4fc836a5f5b25ea8c784b637a6
+  started_at: '2026-08-30T20:55:04+09:00'
+  result: fail
+  failure_class: harness
+  note: 검토자 FAIL 1건 — evidence 의 spec_ref.sha256 이 계약과 다르다는 지적. 원인은 구현자가 AC 체크박스를 채운 것이고, 하네스는 AC_TEXT_UNCHANGED(체크
+    표시 제외)와 SPEC_UNCHANGED_SINCE_EVIDENCE 로 이를 명시적으로 허용한다. 검토자 기준을 따르면 AC 를 체크하는 순간 어떤 단위도 닫을 수 없다
+  settled_at: '2026-08-30T21:14:41+09:00'
+reviews:
+- after_attempt: 2
+  conclusion: 남은 결함은 check-7 한 건이고 고치는 법이 명확하다 — '|| true' 가 종료 코드를 항상 0 으로 만든 것이므로 '! grep -q' 로 바꾸면
+    명령 자체가 조건이 된다. 그 교체의 음성 대조(위반 주입 exit 1 · 정상 exit 0)를 3회차 기동 전에 이미 통과했다. 나머지 8건은 2회차에서 exit 0 이고 새
+    검사 3건은 음성 대조까지 끝났으므로 완료 정의는 달성 가능하다. 두 번의 실패 원인은 모두 산출물이 아니라 검증 계획(목표) 쪽이었고, 그 근본인 'required_checks
+    가 exit code 만 대조하고 expect 문장은 판정에 쓰이지 않는다' 는 구조적 결함은 이 단위 밖의 별도 단위로 다룬다.
+  by: Supervibecoder0709
+  at: '2026-08-30T20:33:33+09:00'
