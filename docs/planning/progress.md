@@ -17,29 +17,35 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `144a676` · 2026-08-30)
+## 지금 상태 (기준 `ef30e96` · 2026-08-30)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline 144a676..HEAD` 가 이 CI 줄 갱신 커밋 하나면 최신이다. 그 뒤 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline ef30e96..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
-- **마일스톤:** **M2 완료 (2026-08-29 · D-76).** 근본 원인 재검토([폴더](../reviews/2026-08-29-codex-m2-rootcause-review/README.md)) 뒤 사용자가 추천안 5건을
-  전부 확정했고(완료 정의 개정 · D-75 (b) · impl6 게이트 제외 · Q-11 미룸 · push 별도 승인) 같은 세션에서 실행했다:
-  정본 개정 → `romeo/parity.py` 판정 축소(검토 판정은 `advisory`, D-73·D-74 결박은 `--judge-verdict strict` 로 보존) → 하네스 동결 검사 →
-  **impl5 실제 close EXIT 0**(`status: done` · `closed_at 2026-08-29T23:43:14+09:00` · 검사 6·재실행 6·EVIDENCE_LOG 16·REVIEW_VERDICT PASS · WARN 3) →
-  페이로드 22파일 + close 산출물을 이 브랜치에 반영(봉투 앵커 5/5 ×2 · 검사 1·2·4·6 exit 0 at HEAD).
+- **마일스톤:** **M2 완료(2026-08-29 · D-76) · M3 진입 전 하네스 정비 완료(2026-08-30).**
+  정비 단위 `feat-20260830-harness-tuneup-6xcq` 가 `status: done`(`closed_at 2026-08-30T14:02:34+09:00`)으로 닫히고 `ef30e96` 으로 이 브랜치에 통합됐다. 8항목:
+  위협 모델 → `constraints.md` K-56~K-59 · `AGENTS.core.md` §10(관통 중 하네스 동결 + 연속 2회 실패 시 3회차 중단, `--after-review` 로 해제) ·
+  `review/SKILL.md` 의 FAIL 사유 열거(Q-10 (a)) · 페이로드 검사 분리 규칙과 `close.harness_own_checks` ·
+  **`romeo run-unit` 신설**(5단계 dry-run · `docs/work/<id>/attempts.yaml` · 반복 중단 강제) · `progress.md` 113,436 → 14,683 bytes 와 `docs/planning/archive/` 5파일.
   **M2 완료 ≠ v1 릴리스 완료** — T2 Charter(V-2)·shadow 20건(V-10)·attach/update 는 M3~M4 의 잔여다.
-- **CI:** 사용자 승인 뒤 push(`6fe0d23..144a676`, fast-forward) → run **`33289382316`**(`144a676`) **success**(job `check`, 2026-08-30 03:03Z).
-  로컬: unittest **419 OK**(398 → 419: TestAdvisoryVerdict 17 + strict 계약 테스트 보강 4) · `compile --check`·`validate`·`doctor`·`parity --report`(EXIT 0 · 'advisory 면 7') PASS.
+- **검증:** `run_0dd59c8f75de` 에 `required_checks` **9건 exit 0**, close 의 재실행 9건도 exit 0 · 검토자(codex read-only) `gate_verdict PASS` findings 0 ·
+  §4 방어 검사 before/after 의 `log_sha256` 동일(read-only 강제가 §3 기동 경로에서 걸린 관측) · 봉투 앵커 5/5 ×2 ·
+  **통합 뒤 HEAD 에서 9건 재실측 exit 0**(unittest 444 OK · `compile --check`·`validate`·`doctor`·`parity --report` PASS).
+- **CI:** `ef30e96` 은 **아직 push 하지 않았다** — push 는 별도 승인이다(K-66). 마지막 성공 run 은 `33289382316`(`144a676`).
 - **다음 세션이 이어갈 자리 (순서대로):**
-  1. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 하려면 task 2건을 `ready` 로 되돌리고 RUNBOOK §3 교체 형태로 1회(구현자 codex 1·검토자 claude 1·§6.6 표본 없음). 실패해도 M2 를 다시 열지 않는다.
-  2. **M3 진입 전 하네스 정비 1회(별도 작업 단위, 한 커밋 묶음):** RUNBOOK 수동 단계 자동화(`romeo run-unit` — 계약 생성→Orca 기동→회수→record→모으기) ·
-     check-5(하네스 unittest)를 페이로드 `required_checks` 에서 분리하는 템플릿 규칙 · "관통 중 하네스 동결" 을 `AGENTS.core.md` 에 · 위협 모델을 constraints K-5x 로 승격 ·
-     `review/SKILL.md` 에 FAIL 사유 열거(Q-10 (a)) · 문서 다이어트(progress ≤ 20KB) · §10 체크리스트 8~48 을 "완료 표" 로 접기.
+  1. **`ef30e96` push 와 CI 확인** — 사용자 승인 뒤. 하네스 정비가 CI 에서 도는 것은 아직 미검증이다.
+  2. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 실패해도 M2 를 다시 열지 않는다.
   3. **G-M3** — 계획 §7 M3(Charter·discovery·gate·doctor) 진입은 사용자 확정 게이트(D-52)부터.
-- **이번 세션에 끝난 것:** 근본 원인 재검토(47) · D-76 실행과 close·통합(48). 실행 상태 변경: 워크트리 `codex-m2-rootcause` 신설 · impl6 task 2건 `blocked`(D-76) · Orca Run 은 그대로.
-- **낡은 워크트리:** `impl-`~`impl4-`(관측 표본 원본) · `impl5-`(**close 된 산출물·증거·로그의 원본** — `.harness/runs` 로그는 커밋되지 않으므로 지우면 EVIDENCE_LOG 재검증이 불가능해진다) ·
-  `impl6-`(미기동) · `codex-m2-review` · `codex-m2-rootcause`(리뷰 원본). 정리는 승인 대상이다(K-66).
+- **이 관통이 드러낸 하네스 결함 5건 (미반영 — 다음 정비 후보):**
+  ① `required_checks` 의 `expect` 문구에 콜론이 들어가면 `envelope build` 가 파이썬 traceback 으로 죽는다(사유를 알려주지 않는다).
+  ② 「변경 범위」의 `바뀌는 파일·모듈:` 은 **한 줄**이어야 쓰기 상한 파서가 읽는데, 그 제약이 `core/templates/tech-spec.md` 에 없다 — 상한을 정하는 줄이다.
+  ③ `adapters/orca/prompts/implementer-brief.md` 에 `required_checks 6건` 이 하드코딩돼 있다(이전 단위의 개수).
+  ④ `romeo compile` 이 어디에 쓰는지가 어디에도 정리돼 있지 않아 상한에서 `.agents/` 와 `.harness/compiled.yaml` 을 빠뜨렸다 — 구현자가 기동 직후 보고해 재승인했다(1차 위임 폐기).
+  ⑤ RUNBOOK §3.7 의 `worker-start --terminal` 채택이 `tui-idle` 을 기다린 뒤에도 `agent_prompt_stalled` 로 실패했다. §3.7 은 '너무 일찍 채택하면 경쟁한다' 만 적고 **너무 늦어도 실패한다**는 것은 적지 않는다. 비대화형 + `-o` 회수로 우회했다.
+- **낡은 워크트리:** `impl-`~`impl4-`(관측 표본 원본) · `impl5-`(M2 close 산출물 원본) · `impl6-`(미기동) · `codex-m2-review` · `codex-m2-rootcause` ·
+  `impl-feat-20260830-harness-tuneup-6xcq`(1차 위임, 파일 변경 0) · **`impl2-feat-20260830-harness-tuneup-6xcq`(이번 close 의 산출물·증거·로그 원본 — `.harness/runs` 는 커밋되지 않으므로 지우면 EVIDENCE_LOG 재검증이 불가능해진다)**.
+  정리는 승인 대상이다(K-66).
 - **문서 지연:** 「미검증·남은 위험」은 맨 위 소절(M2 close 이후)만 최신이다. 그 아래 소절들은 각 날짜 기준이며 상당수가 D-76 으로 닫혔거나 후속 단위로 넘어갔다.
 
 ## 마일스톤
