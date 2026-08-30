@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-30T19:58:04+09:00'
+approved_at: '2026-08-30T20:32:18+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -28,6 +28,9 @@ approval_history:
 - {approved_at: '2026-08-30T14:29:56+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T19:58:04+09:00',
   reason: 1차 관통의 검토자 FAIL findings 3건 반영 — check-6·8·9 가 AC-4·AC-2·AC-5 를 실제로 검사하지 않았다(check-9 의 agent_prompt_stalled
     토큰은 승인 리비전에 이미 3번 있어 구현 전에도 통과했다). 확인란은 무변경}
+- {approved_at: '2026-08-30T19:58:04+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T20:32:18+09:00',
+  reason: 2차 관통의 검토자 FAIL 1건 반영 — check-7 의 '|| true' 가 종료 코드를 항상 0 으로 만들어 AC-3 위반을 통과시켰다(실측 재현). '! grep
+    -q' 로 바꿔 종료 코드 자체가 조건이 되게 했다. 확인란은 무변경}
 ---
 
 # 3차 관통이 드러낸 하네스 결함 5건 정비
@@ -99,8 +102,8 @@ required_checks:
     command: "python3 -m unittest tests.test_compile.TestListOutputsCoversEverythingCompileWrites -v"
     expect: exit 0 — list_outputs 가 compile 이 실제로 건드리는 집합(planned·pruned·상태 파일)을 모두 담는지 검사한다
   - id: check-7
-    command: "grep -c '6건' adapters/orca/prompts/implementer-brief.md || true"
-    expect: 출력이 0 이다 (검사 개수를 고정한 표현이 남아 있지 않다)
+    command: "! grep -q '6건' adapters/orca/prompts/implementer-brief.md"
+    expect: exit 0 — 매치가 있으면 ! 가 1 로 뒤집어 검사가 실패한다. 종료 코드 자체가 조건이다
   - id: check-8
     command: "python3 -m unittest tests.test_docs.TestNewSpecCarriesChangeScopeConstraint -v"
     expect: exit 0 — romeo new 가 만든 spec 에 템플릿의 한 줄·백틱 제약이 그대로 나타나는지 검사한다
