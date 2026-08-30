@@ -183,10 +183,12 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
     if out["isolation"] not in WORKSPACES:
         raise ValueError(f"{unit_id}: 격리가 {out['isolation']!r} 다 — 문서 패키지가 없는 분류에는 작업 계약을 만들지 않는다")
-    # 검사는 id 와 명령뿐이다. 종료 코드 자체가 조건이므로 기대를 따로 적는 자리를 두지 않는다 —
-    # 사람이 조건으로 쓰는데 기계가 판정에 쓰지 않는 필드는 함정이었다(2026-08-31, 이 단위).
-    checks = [{"id": str(rc.get("id") or ""), "command": str(rc.get("command") or "")}
-              for rc in required_checks(body)]
+    checks = []
+    for rc in required_checks(body):
+        item = {"id": str(rc.get("id") or ""), "command": str(rc.get("command") or "")}
+        if rc.get("expect") is not None:
+            item["expect"] = str(rc["expect"])
+        checks.append(item)
     env = {
         "schema": SCHEMA_ID,
         "unit_id": unit_id,

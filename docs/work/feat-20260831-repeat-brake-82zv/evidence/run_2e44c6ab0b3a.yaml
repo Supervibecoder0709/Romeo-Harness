@@ -1,0 +1,210 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_2e44c6ab0b3a
+task_id: task_c2ee089e864f
+dispatch_id: ctx_542503f8c149
+unit_id: feat-20260831-repeat-brake-82zv
+spec_ref:
+  path: docs/work/feat-20260831-repeat-brake-82zv/spec.md
+  sha256: 0b1287c964e13869427b6aba6f5b9db009da8366478917c327223fa3de6b6fb5
+base_sha: 31a64a39e20b8a41a97f6184c843b4ff00414e3f
+head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv
+started_at: '2026-08-31T00:47:06+09:00'
+finished_at: '2026-08-31T00:48:36+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:47:06+09:00'
+  finished_at: '2026-08-31T00:47:06+09:00'
+  seconds: 0.146
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/01-check-1.log
+  log_sha256: 7213f828a14f5a305b1a826c957917ccaaa07589786a544e4a9c38a24cd3f71a
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-2
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter
+  exit_code: 0
+  started_at: '2026-08-31T00:47:06+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.158
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/02-check-2.log
+  log_sha256: bd8429774978ba3c6dddbae18d624410d699c6ecc9dbb19d9b0d3673666aa9c9
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-3
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.149
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/03-check-3.log
+  log_sha256: c6e0789ee8b7c8817c53e350c5c5a158b731342d209caa137f2f1ac59b99b948
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-4
+  command: python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.21
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/04-check-4.log
+  log_sha256: 577e449da6abe557ebb8194d85c0ac7c42f328a96a8fec6f9e29619f943e3a51
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-5
+  command: '! grep -qF ''expect:'' core/templates/tech-spec.md'
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/05-check-5.log
+  log_sha256: fbf67eb5b732621743cbeca9e6075eb30dea31c2c48cff356f43e6f15b87ef5f
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-6
+  command: grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/06-check-6.log
+  log_sha256: 749875badac08b1273954341772896457eb4fcacb966c66c386ef497458408d9
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-7
+  command: grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/07-check-7.log
+  log_sha256: 100e1806eeda1d6aecba42db910e9022b5a7ee8b0f8b5250b8734947a0fc8309
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-15
+  command: git diff --quiet HEAD -- romeo/envelope.py romeo/close.py
+  exit_code: 1
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:07+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/08-check-15.log
+  log_sha256: d01787aa375c2a5ab23f37fd77b122b33080024d0098f05524de3163eacb2dbd
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-8
+  command: grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md
+  exit_code: 0
+  started_at: '2026-08-31T00:47:07+09:00'
+  finished_at: '2026-08-31T00:47:08+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/09-check-8.log
+  log_sha256: e1f1cc214ce10c9f9e8254157dfe8612caf0396713cf471d0b31e3c8645fc804
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-9
+  command: grep -qF '중단 게이트' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-31T00:47:08+09:00'
+  finished_at: '2026-08-31T00:47:08+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/10-check-9.log
+  log_sha256: e8a88fec796a825b8f72250ead5402630711c704d520a6537db9bbc617afa7b5
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-10
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-31T00:47:08+09:00'
+  finished_at: '2026-08-31T00:48:34+09:00'
+  seconds: 86.16
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/11-check-10.log
+  log_sha256: 06045de771b812e8c12ae85dd975d95a30a382b7956ba0ec5f76b138bf48dcdd
+  stdout_tail: ''
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-11
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-31T00:48:34+09:00'
+  finished_at: '2026-08-31T00:48:34+09:00'
+  seconds: 0.094
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/12-check-11.log
+  log_sha256: f4fc46f285f25e2ec041ce7eee3c0667c0b0cd5a72b13facd4f99bc6b688e71f
+  stdout_tail: "ed_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/brief.md\
+    \ lines=61 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260831-repeat-brake-82zv/docs/work/feat-20260831-repeat-brake-82zv/spec.md\
+    \ lines=137 needs_input=0 unchecked_ac=1\n    WARN  UNCHECKED_AC 1개"
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-12
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-31T00:48:34+09:00'
+  finished_at: '2026-08-31T00:48:34+09:00'
+  seconds: 0.141
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/13-check-12.log
+  log_sha256: af6e7896062262652e9dd568cdf492b44e41d1f54abba729ec21179ad35130f8
+  stdout_tail: compile 검사 PASS
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-13
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-31T00:48:34+09:00'
+  finished_at: '2026-08-31T00:48:35+09:00'
+  seconds: 0.36
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/14-check-13.log
+  log_sha256: 2dbf39a32fda7ef2af62515807d719f83b21125a6f6f9b96025bb6ccb5051a1b
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+- id: check-14
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-31T00:48:35+09:00'
+  finished_at: '2026-08-31T00:48:36+09:00'
+  seconds: 0.902
+  log: .harness/runs/feat-20260831-repeat-brake-82zv/run_2e44c6ab0b3a/15-check-14.log
+  log_sha256: c279dc640e933ce7a24897b961b543e07f74718e5125cb8481fe23abf4f0f78d
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: f22819f91c387f84c887869a853098ecfbd935d3
+  dirty_tree_hash: a315e9e087de8b4596761f7f9c3db170ffc836ee80832169b3ade667e3797af5
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/schemas/task-envelope.json
+- core/templates/tech-spec.md
+- docs/planning/open-questions.md
+- romeo/close.py
+- romeo/envelope.py
+- romeo/run_unit.py
+- tests/test_docs_evidence_close.py
+- tests/test_run_unit.py
+artifact_hash: 5fc5e7be9cc1b3709c63663da110a74fa822a325270153072ff0011c9e393dd8
+reviewer: null
+verdict: null
+approvals: []

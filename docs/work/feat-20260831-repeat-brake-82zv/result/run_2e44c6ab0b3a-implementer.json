@@ -1,0 +1,91 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260831-repeat-brake-82zv",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260831-repeat-brake-82zv/task/run_2e44c6ab0b3a-implementer.json",
+    "sha256": "96021a90ecc4f11060e6c969d62c39b7f809609a586e220a703c9adc28cc169f"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_review_does_not_reset_counter",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_pass_resets_counter",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_refuses_when_blocked",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_run_unit.RepeatGate.test_envelope_build_allows_when_not_blocked",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "! grep -qF 'expect:' core/templates/tech-spec.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -qF '종료 코드 자체가 조건' core/templates/tech-spec.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "grep -qF '판정에 쓰이지 않는다' core/schemas/task-envelope.json",
+      "exit_code": 0
+    },
+    {
+      "id": "check-15",
+      "command": "git diff --quiet HEAD -- romeo/envelope.py romeo/close.py",
+      "exit_code": 1
+    },
+    {
+      "id": "check-8",
+      "command": "grep -qF '우회 가능 — v1 이후' docs/planning/open-questions.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "grep -qF '중단 게이트' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor",
+      "exit_code": 0
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo fixtures parity --report",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260831-repeat-brake-82zv/evidence/run_2e44c6ab0b3a.yaml",
+  "notes": "이 관통은 재승인(31a64a3) 뒤의 것이다. 1차 승인(6f4ef05)으로 시작해 expect 를 코드·스키마에서 지웠다가,\n그 변경이 옛 작업 계약 35개(6단위)의 바이트 재계산을 깨뜨린다는 것을 실측으로 확인하고 멈춰 질문했다.\n사용자가 옵션 C(템플릿에서만 지운다)로 재승인해 범위가 바뀌었고, 아래는 재승인된 계획 15건에 대한 결과다.\n\n■ 판정: FAIL — check-15 (git diff --quiet HEAD -- romeo/envelope.py romeo/close.py) 가 exit 1 이다.\n나머지 14건은 전부 exit 0 이다(run_2e44c6ab0b3a 의 check-1~14).\n\n■ check-15 가 실패한 이유 — 내 변경 때문이다. 무관하다고 주장하지 않는다.\n그러나 이 검사는 이 단위에서 통과할 수 없는 형태다. 두 가지가 겹쳐 있다.\n(1) 이 단위는 정의상 romeo/envelope.py 를 고쳐야 한다 — AC-3·AC-4 의 Ⓔ 게이트(repeat_gate)가 그 파일에 들어간다.\n    검사가 비교하는 대상에 이 단위의 산출물이 들어 있으므로, 구현이 미커밋인 동안 exit 1 은 필연이다.\n(2) 기준점이 HEAD 다. HEAD(f22819f)에는 1차 관통이 남긴 상태 — 즉 재승인이 되돌리라고 한 바로 그 상태 —\n    가 커밋돼 있다. 그래서 이 검사를 지금 통과시키는 방법은 '고치지 않고 그대로 두는 것' 이고,\n    반대로 재승인이 요구한 복원을 하면 반드시 exit 1 이 된다. 커밋하면 무조건 exit 0 이 되므로\n    어느 쪽이든 AC-6 이 지키려던 것을 재지 못한다. 그래서 커밋으로 통과를 만들지 않았다.\n\n■ AC-6 의 실질 목적은 달성됐고 다른 검사가 그것을 직접 증명한다.\nAC-6 이 지키려는 것은 '코드에서 expect 를 지우면 옛 봉투 35개의 TASK_ANCHORED 가 깨진다' 이다.\n- romeo/close.py 는 base_sha(31a64a3) 와 바이트가 같다 (git diff --quiet 31a64a3 -- romeo/close.py → exit 0).\n- romeo/envelope.py 의 expect 복사 로직(rc.get(\"expect\") is not None 분기)은 base 와 같은 코드로 복원했다.\n  그 파일이 base 와 다른 부분은 repeat_gate 추가분뿐이다.\n- 그 결과 check-14 (bin/romeo fixtures parity --report) 가 exit 0 이고, check-10 (unittest discover, 484건) 도 exit 0 이다.\n  1차 관통에서 이 두 검사는 각각 exit 1 · 실패 9건이었다. 옛 봉투 35개의 앵커가 살아 있다는 직접 증거다.\n그래서 AC-6 체크박스는 비워 뒀다 — 문장이 요구하는 'romeo/envelope.py 가 base_sha 와 바이트가 같다' 는\n지목할 증거가 없기 때문이다(실제로 다르다). AC-6 의 그 구절과 AC-3·AC-4 는 문자 그대로 양립하지 않는다.\n검증 계획도 확인란 문장도 고치지 않았다(D-27) — 고칠 것은 그 문장이지 증거가 아니다.\n\n■ 사람이 정할 것 (재승인 대상이라 구현자가 손대지 않았다)\ncheck-15 를 의도대로 재려면 기준을 HEAD 가 아니라 승인 커밋으로 두고 대상을 좁히는 편이 맞다.\n예: \"git diff --quiet 31a64a39e20b -- romeo/close.py\" (close.py 무변경) 와\n    \"git diff 31a64a39e20b -- romeo/envelope.py | grep -qF 'rc.get(\\\"expect\\\")'\" 의 부정이 아닌 형태 —\n즉 'expect 복사 로직이 남아 있다' 를 직접 재는 검사. 지금 형태는 커밋 시점에만 좌우된다.\nAC-6 의 'envelope.py 도 바이트가 같다' 는 Ⓔ 게이트와 충돌하므로 close.py 로 한정하는 것이 실측에 맞다.\n\n■ 구현 단위 3행이 결과 봉투에 적으라고 한 결정 — envelope build 에 재검토 우회 수단을 두지 않았다.\nrun-unit --after-review 경로와 견주어 그렇게 정한 이유는 둘이다.\n(1) 재검토 결론의 기록 창구를 하나로 유지한다. 두 곳에서 기록할 수 있으면 어느 쪽이 정본인지 모호해지고,\n    envelope build 는 계약을 만드는 명령이지 사람의 재검토 결론을 받는 창구가 아니다.\n(2) 계약 생성은 지금 '같은 입력이면 바이트까지 같은 계약' 이 성립하는 부수효과 없는 명령이다.\n    거기에 attempts.yaml 쓰기를 더하면 그 성질이 깨진다.\n대신 차단 메시지가 bin/romeo run-unit --after-review 의 전체 명령줄을 인쇄하므로, 손으로 도는 사람도 한 단계만 더 밟는다.\n\n■ 게이트를 build_envelope 이 아니라 write_envelope 에 건 이유도 실측에서 왔다.\n종료 검사가 봉투를 대조할 때 build_envelope 을 다시 부른다(close.py 의 재계산 대조). 거기서 막으면\n차단된 단위는 지난 관통의 판정조차 대조하지 못한다. 막아야 할 것은 새 관통의 시작이므로 쓰는 자리에 걸었다.\n\n■ gate() 의 재검토 해제 조건을 '판정 난 마지막 시도'(_settled_through) 기준으로 둔 이유.\n구현 단위 1행은 _reviewed_through >= len(attempts) 를 제안했지만, 그대로 두면 run-unit --after-review 로\n막 연 3회차가 start_attempt 로 attempts 를 하나 늘린 직후 자기 계약을 다시 만들지 못한다 —\n입구에 선 게이트에서 그것은 교착이다. 진행 중(started)인 시도는 아직 재검토의 대상이 아니므로 세지 않는다.\n두 기준의 차이는 진행 중 시도가 있을 때뿐이고, AC-1·AC-2 의 판정은 어느 쪽이든 같다.\n회귀 테스트 RepeatGate.test_a_released_attempt_can_rebuild_its_own_contract 가 이 자리를 고정한다.\n함께 run_unit() 이 재검토를 계약 생성 **전에** 디스크에 남기도록 고쳤다 — 1단계가 같은 게이트를 다시 지나기 때문이다."
+}

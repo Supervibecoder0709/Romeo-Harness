@@ -356,8 +356,8 @@ class TestVerticalSlice(unittest.TestCase):
         빠진 검사는 REQUIRED_CHECK 가 잡는다. 조용히 마지막 파일을 읽는 것과 구분돼야 한다."""
         self._fill_spec(tick_ac=True)
         fm, body = frontmatter.read(self.spec)
-        body = body.replace('    command: "true"\n    expect: exit 0\n',
-                            '    command: "true"\n    expect: exit 0\n  - id: check-2\n    command: "echo two"\n    expect: exit 0\n')
+        body = body.replace('    command: "true"\n',
+                            '    command: "true"\n  - id: check-2\n    command: "echo two"\n')
         frontmatter.write(self.spec, fm, body)
         approve_unit(self.unit, "tester", project_root=self.root)
         self._implement_and_commit()
@@ -436,13 +436,13 @@ class TestVerticalSlice(unittest.TestCase):
         원본은 승인 커밋의 계획이다 — 계획을 바꾸려면 재승인해야 하고 재승인은 승인 커밋을 옮긴다."""
         self._fill_spec(tick_ac=True)
         fm, body = frontmatter.read(self.spec)
-        body = body.replace('    command: "true"\n    expect: exit 0\n',
-                            '    command: "true"\n    expect: exit 0\n  - id: check-2\n    command: "false"\n    expect: exit 0\n')
+        body = body.replace('    command: "true"\n',
+                            '    command: "true"\n  - id: check-2\n    command: "false"\n')
         frontmatter.write(self.spec, fm, body)
         approve_unit(self.unit, "tester", project_root=self.root)
         self._implement_and_commit()
         fm, body = frontmatter.read(self.spec)
-        body = body.replace('  - id: check-2\n    command: "false"\n    expect: exit 0\n', "")
+        body = body.replace('  - id: check-2\n    command: "false"\n', "")
         frontmatter.write(self.spec, fm, body)
         git("add", ".", cwd=self.root)
         git("commit", "-q", "-m", "drop the failing check", cwd=self.root)
@@ -587,7 +587,7 @@ class TestEvidenceIsReExecuted(unittest.TestCase):
         self._prepare("true")
         fm, body = frontmatter.read(self.spec)
         frontmatter.write(self.spec, fm, body.replace(
-            '    expect: exit 0', '    expect: exit 0\n    rerun: false\n    rerun_reason: "배포는 두 번 하지 않는다"'))
+            '    command: "true"', '    command: "true"\n    rerun: false\n    rerun_reason: "배포는 두 번 하지 않는다"'))
         r, _f, unverified = self._close()
         self.assertIn("REQUIRED_CHECK_RERUN", unverified)
         self.assertIn("배포는 두 번 하지 않는다", format_close(r))
