@@ -17,10 +17,10 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `ef30e96` · 2026-08-30)
+## 지금 상태 (기준 `ebce412` · 2026-08-30)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline ef30e96..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline ebce412..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
 - **마일스톤:** **M2 완료(2026-08-29 · D-76) · M3 진입 전 하네스 정비 완료(2026-08-30).**
@@ -32,11 +32,10 @@ authority: derived
 - **검증:** `run_0dd59c8f75de` 에 `required_checks` **9건 exit 0**, close 의 재실행 9건도 exit 0 · 검토자(codex read-only) `gate_verdict PASS` findings 0 ·
   §4 방어 검사 before/after 의 `log_sha256` 동일(read-only 강제가 §3 기동 경로에서 걸린 관측) · 봉투 앵커 5/5 ×2 ·
   **통합 뒤 HEAD 에서 9건 재실측 exit 0**(unittest 444 OK · `compile --check`·`validate`·`doctor`·`parity --report` PASS).
-- **CI:** `ef30e96` 은 **아직 push 하지 않았다** — push 는 별도 승인이다(K-66). 마지막 성공 run 은 `33289382316`(`144a676`).
+- **CI:** 사용자 승인 뒤 push(`9947c62..ebce412`, fast-forward) → run **`33294013175`**(`ebce412`) **success**(job `check`, 51s, 2026-08-30 05:07Z). 정비가 CI 에서 도는 것이 확인됐다.
 - **다음 세션이 이어갈 자리 (순서대로):**
-  1. **`ef30e96` push 와 CI 확인** — 사용자 승인 뒤. 하네스 정비가 CI 에서 도는 것은 아직 미검증이다.
-  2. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 실패해도 M2 를 다시 열지 않는다.
-  3. **G-M3** — 계획 §7 M3(Charter·discovery·gate·doctor) 진입은 사용자 확정 게이트(D-52)부터.
+  1. **(선택) impl6 교체 실행 1회** — D-76 ①: 게이트 조건이 아니다. 실패해도 M2 를 다시 열지 않는다.
+  2. **G-M3** — 계획 §7 M3(Charter·discovery·gate·doctor) 진입은 사용자 확정 게이트(D-52)부터. **여기가 다음 자리다.**
 - **이 관통이 드러낸 하네스 결함 5건 (미반영 — 다음 정비 후보):**
   ① `required_checks` 의 `expect` 문구에 콜론이 들어가면 `envelope build` 가 파이썬 traceback 으로 죽는다(사유를 알려주지 않는다).
   ② 「변경 범위」의 `바뀌는 파일·모듈:` 은 **한 줄**이어야 쓰기 상한 파서가 읽는데, 그 제약이 `core/templates/tech-spec.md` 에 없다 — 상한을 정하는 줄이다.
