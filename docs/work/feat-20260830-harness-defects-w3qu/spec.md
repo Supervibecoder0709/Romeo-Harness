@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-30T20:32:18+09:00'
+approved_at: '2026-08-30T20:54:15+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -31,6 +31,11 @@ approval_history:
 - {approved_at: '2026-08-30T19:58:04+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T20:32:18+09:00',
   reason: 2차 관통의 검토자 FAIL 1건 반영 — check-7 의 '|| true' 가 종료 코드를 항상 0 으로 만들어 AC-3 위반을 통과시켰다(실측 재현). '! grep
     -q' 로 바꿔 종료 코드 자체가 조건이 되게 했다. 확인란은 무변경}
+- {approved_at: '2026-08-30T20:32:18+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-30T20:54:15+09:00',
+  reason: '3차 관통의 검토자 FAIL 1건 반영 — compile 이 저장소 루트에 .compile-* staging 을 만드는데(compile.py:622 mkdtemp,
+    실패 시 보존) list_outputs 가 인쇄하지 않았다. 이름이 매번 달라 문자 그대로의 ''전부 인쇄'' 는 달성 불가능하므로, AC-4 를 ''완료 뒤 남기는 산출물은
+    전부, 컴파일 중에만 있는 staging 은 패턴 한 줄'' 로 한정한다. 세 번의 실패가 모두 완료 정의 쪽 원인이었고(§10), ''전부'' 의 끝을 정하지 않으면 4회차도
+    같은 이유로 실패한다는 판단이다'}
 ---
 
 # 3차 관통이 드러낸 하네스 결함 5건 정비
@@ -49,7 +54,7 @@ approval_history:
   - [ ] AC-1 `expect` 문구에 콜론이 든 spec 으로 `bin/romeo envelope build` 를 돌리면 파이썬 traceback 이 아니라 **어느 검사의 어느 줄이 검증 계획 YAML 을 깨뜨렸는지 지목하는 한국어 오류**가 나오고 종료 코드가 0 이 아니다.
   - [ ] AC-2 `core/templates/tech-spec.md` 의 「변경 범위」에 '바뀌는 파일·모듈 은 **한 줄**이어야 하고 각 항목의 경로를 백틱으로 감싸야 한다' 는 제약과 그 이유가 인쇄되어 있고, `bin/romeo new` 로 새로 만든 spec 에 그 문구가 그대로 나타난다.
   - [ ] AC-3 `adapters/orca/prompts/implementer-brief.md` 에 검사 개수를 고정한 표현이 남아 있지 않다 — 개수는 계약이 정하고 프롬프트는 그것을 가리키기만 한다.
-  - [ ] AC-4 `bin/romeo compile --list-outputs` 가 컴파일이 실제로 쓰는 경로를 전부 인쇄한다 — 어댑터별 지침 파일과 스킬 디렉터리에 더해 `.agents/` 와 `.harness/compiled.yaml` 이 빠짐없이 들어 있다.
+  - [ ] AC-4 `bin/romeo compile --list-outputs` 가 **컴파일이 완료 뒤 남기는 산출물 경로**를 전부 인쇄한다 — 어댑터별 지침 파일과 스킬 디렉터리에 더해 `.agents/` 와 `.harness/compiled.yaml` 이 빠짐없이 들어 있다. 컴파일 **중에만** 존재하는 staging 디렉터리(`.compile-*`, 저장소 루트, 실패 시 보존)는 `mkdtemp` 라 이름이 매번 달라 미리 인쇄할 수 없으므로 **패턴 한 줄로 표시**한다 — 목록의 목적은 쓰기 상한을 정하는 것이고, 그 상한은 패턴으로 세울 수 있다.
   - [ ] AC-5 `adapters/orca/RUNBOOK.md` §3.7 에 '너무 늦게 채택해도 `agent_prompt_stalled` 로 실패한다' 는 관측과, 그때 쓴 우회(비대화형 기동 + 결과 파일 회수)가 적혀 있다.
   - [ ] AC-6 기존 검사가 회귀하지 않는다 — unittest 전체와 `compile --check`·`validate`·`doctor`·`fixtures parity --report` 가 모두 종료 코드 0.
 - **위험과 되돌리기:** ①④ 는 `romeo/` 아래 코드를 건드리고, 그 중 ① 은 **모든 위임의 입구**(계약 생성)에 있다 — 잘못 고치면 `envelope build` 자체가 막힌다. 그래서 AC-6 이 기존 9건 재실행을 요구한다. 전부 이 저장소 안의 로컬 변경이고 외부 상태를 바꾸지 않으므로, 되돌리기는 `git revert <커밋>` 한 번이다. 워크트리에서 작업하므로 통합 전에는 이 브랜치가 그대로 남는다.
