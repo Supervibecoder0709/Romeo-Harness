@@ -1,0 +1,401 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_0dd59c8f75de
+task_id: task_b306292e8263
+dispatch_id: ctx_4f76343b4285
+unit_id: feat-20260830-harness-tuneup-6xcq
+spec_ref:
+  path: docs/work/feat-20260830-harness-tuneup-6xcq/spec.md
+  sha256: 33b4c0a3a2e04b045142384020b13a65e713ec5ca824b3557951ef4daf1a2030
+base_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq
+started_at: '2026-08-30T13:48:24+09:00'
+finished_at: '2026-08-30T13:59:22+09:00'
+commands:
+- id: run-unit-dry-run
+  command: bin/romeo run-unit --unit feat-20260830-harness-tuneup-6xcq --run run_0dd59c8f75de --base-sha
+    9a1f989
+  exit_code: 0
+  started_at: '2026-08-30T13:48:24+09:00'
+  finished_at: '2026-08-30T13:48:25+09:00'
+  seconds: 0.131
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/01-run-unit-dry-run.log
+  log_sha256: 1895bf0ddfae436c3d2ee1a55569fb7add180552dc53d721f8276b3745c16d7d
+  stdout_tail: "e/run_0dd59c8f75de.yaml\n        results.implementer: docs/work/feat-20260830-harness-tuneup-6xcq/result/run_0dd59c8f75de-implementer.json\n\
+    \        results.reviewer: docs/work/feat-20260830-harness-tuneup-6xcq/review/run_0dd59c8f75de-reviewer.json\n\
+    \  기록: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq/docs/work/feat-20260830-harness-tuneup-6xcq/attempts.yaml"
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-1
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-30T13:48:38+09:00'
+  finished_at: '2026-08-30T13:49:56+09:00'
+  seconds: 77.971
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/02-check-1.log
+  log_sha256: 8984aac22b7aed6fc582bb8f4888bbb23c00a861240e4b40a97fa272b6bb11a4
+  stdout_tail: ''
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-2
+  command: ./bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-30T13:49:56+09:00'
+  finished_at: '2026-08-30T13:49:56+09:00'
+  seconds: 0.14
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/03-check-2.log
+  log_sha256: 73ffbc1394705fa44540988b1b1ebed43e45e6809d05eef2b93c6de28d0c676a
+  stdout_tail: compile 검사 PASS
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-3
+  command: ./bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-30T13:49:56+09:00'
+  finished_at: '2026-08-30T13:49:56+09:00'
+  seconds: 0.084
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/04-check-3.log
+  log_sha256: 59cfeb35ce38f999ce75b1dc7c1696da23af3521ba7307bc2ac7070466a05092
+  stdout_tail: "aces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq/docs/work/feat-20260830-harness-tuneup-6xcq/brief.md\
+    \ lines=71 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq/docs/work/feat-20260830-harness-tuneup-6xcq/spec.md\
+    \ lines=154 needs_input=0 unchecked_ac=8\n    WARN  BUDGET_EXCEEDED 154 > 150\n    WARN  UNCHECKED_AC\
+    \ 8개"
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-4
+  command: ./bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-30T13:49:56+09:00'
+  finished_at: '2026-08-30T13:49:57+09:00'
+  seconds: 0.355
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/05-check-4.log
+  log_sha256: 79c274a6e3f35d7a3f8d396966c87d09c8523c918a4eea45467a420f091dc70e
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-5
+  command: ./bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-30T13:49:57+09:00'
+  finished_at: '2026-08-30T13:49:58+09:00'
+  seconds: 0.862
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/06-check-5.log
+  log_sha256: 97c8bfb4482141185571e0b2c40d9c6e9657aea992221c5f98e69e37cf022cd7
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-6
+  command: test "$(wc -c < docs/planning/progress.md | tr -d ' ')" -le 20480
+  exit_code: 0
+  started_at: '2026-08-30T13:49:58+09:00'
+  finished_at: '2026-08-30T13:49:58+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/07-check-6.log
+  log_sha256: 54f58be1aeb11b97c42d9b8c2974c62023b0ba8a58141a5a2825805560775c8b
+  stdout_tail: ''
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-7
+  command: ./bin/romeo run-unit --help
+  exit_code: 0
+  started_at: '2026-08-30T13:49:58+09:00'
+  finished_at: '2026-08-30T13:49:58+09:00'
+  seconds: 0.045
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/08-check-7.log
+  log_sha256: d6d9b6224ef519d315830056f2e3ed2d6cbbd4afe8f7bbd45d05b24f247a77f0
+  stdout_tail: "r-review AFTER_REVIEW\n                        연속 실패 뒤 사람이 완료 정의를 재검토한 결론. 주면 기록하고 진행한다(AGENTS.core\n\
+    \                        §10)\n  --by BY               (--after-review) 재검토한 사람\n  --result {pass,fail}\
+    \  (record) 이 회차의 판정\n  --failure-class {outputs,harness,goal}\n                        (record) 사람이\
+    \ 적는 실패 분류. 기록만 하고 차단 판정에 쓰지 않는다\n  --note NOTE           (record) 이 회차에 대해 남길 한 줄\n  --root ROOT\n\
+    \  --json"
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-8
+  command: cd docs/planning && miss=0; for l in $(grep -oE '\]\([^)#]+\)' progress.md | sed -E 's/^\]\(//;s/\)$//'
+    | grep -v '^http'); do [ -e "$l" ] || { echo "MISSING $l"; miss=1; }; done; test $miss -eq 0
+  exit_code: 0
+  started_at: '2026-08-30T13:49:58+09:00'
+  finished_at: '2026-08-30T13:49:58+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/09-check-8.log
+  log_sha256: 723e0f4c223e7ee61718a0fe43f21e5f3e8316fe939348c990458fc488a618be
+  stdout_tail: ''
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: check-9
+  command: python3 -m unittest tests.test_run_unit
+  exit_code: 0
+  started_at: '2026-08-30T13:49:58+09:00'
+  finished_at: '2026-08-30T13:50:00+09:00'
+  seconds: 2.202
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/10-check-9.log
+  log_sha256: b6043a441b9d40105d6b463738834c4363d764c4aa559ea97e0ee7a623aa7d3f
+  stdout_tail: ''
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-tuneup-6xcq'
+  exit_code: 0
+  started_at: '2026-08-30T13:52:18+09:00'
+  finished_at: '2026-08-30T13:52:18+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/11-review-tree-before.log
+  log_sha256: 66ffb0df2f237f21f6289b1e1b623384aac37b71ed54304c6ce6588a1b96d616
+  stdout_tail: "ers/claude/workflows/review.md\n M adapters/codex/workflows/review.md\n M adapters/orca/RUNBOOK.md\n\
+    \ M core/principles/AGENTS.core.md\n M core/templates/tech-spec.md\n M core/workflows/review/SKILL.md\n\
+    \ M docs/planning/progress.md\n M docs/requirements/constraints.md\n M romeo/cli.py\n M romeo/close.py\n\
+    ?? docs/planning/archive/\n?? romeo/run_unit.py\n?? tests/test_payload_checks.py\n?? tests/test_run_unit.py"
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq/.harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-30T13:52:18+09:00'
+  finished_at: '2026-08-30T13:52:19+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/12-reviewer-brief.log
+  log_sha256: 98a2c1653a02477dad36dfb8b9e4317a077e35170f8a811297ea6fac93d2fa3c
+  stdout_tail: 66c0138031408d169fd5ed329fbf22505a7a1c19a7bd9145c853fc2cad9c8b09  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl2-feat-20260830-harness-tuneup-6xcq/.harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/reviewer-brief.md
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-harness-tuneup-6xcq'
+  exit_code: 0
+  started_at: '2026-08-30T13:59:13+09:00'
+  finished_at: '2026-08-30T13:59:13+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/13-review-tree-after.log
+  log_sha256: 66ffb0df2f237f21f6289b1e1b623384aac37b71ed54304c6ce6588a1b96d616
+  stdout_tail: "ers/claude/workflows/review.md\n M adapters/codex/workflows/review.md\n M adapters/orca/RUNBOOK.md\n\
+    \ M core/principles/AGENTS.core.md\n M core/templates/tech-spec.md\n M core/workflows/review/SKILL.md\n\
+    \ M docs/planning/progress.md\n M docs/requirements/constraints.md\n M romeo/cli.py\n M romeo/close.py\n\
+    ?? docs/planning/archive/\n?? romeo/run_unit.py\n?? tests/test_payload_checks.py\n?? tests/test_run_unit.py"
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260830-harness-tuneup-6xcq/review/run_0dd59c8f75de-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-30T13:59:22+09:00'
+  finished_at: '2026-08-30T13:59:22+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260830-harness-tuneup-6xcq/run_0dd59c8f75de/14-review-record.log
+  log_sha256: 246bb9809b516d7b219df3a21b938ce6b82312d6b5bb506e4459419e0c397109
+  stdout_tail: 81526acd6e3bbd7d5bfa99ed2631c403a27ae2f11fe4acfecb19a15a61e69915  docs/work/feat-20260830-harness-tuneup-6xcq/review/run_0dd59c8f75de-reviewer.json
+  head_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  dirty_tree_hash: a137ec6a4ad06397b16920d4338a3793a6e760651a70d1bdeeaedcfb8efc54f4
+changed_files:
+- .agents/skills/review/SKILL.md
+- .claude/skills/review/SKILL.md
+- AGENTS.md
+- CLAUDE.md
+- adapters/claude/workflows/review.md
+- adapters/codex/workflows/review.md
+- adapters/orca/RUNBOOK.md
+- core/principles/AGENTS.core.md
+- core/templates/tech-spec.md
+- core/workflows/review/SKILL.md
+- docs/planning/archive/README.md
+- docs/planning/archive/checklist-8-48.md
+- docs/planning/archive/milestones.md
+- docs/planning/archive/risks-2026-08-29.md
+- docs/planning/archive/session-log.md
+- docs/planning/progress.md
+- docs/requirements/constraints.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/run_unit.py
+- tests/test_payload_checks.py
+- tests/test_run_unit.py
+artifact_hash: 150732473c5b935f487f2c7308e1a233e979faa8a92999492a9e70711c969f83
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-30T14:02:34+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 154 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-08-30T13:31:24+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_0dd59c8f75de — 검증 계획 9건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 9a1f9898b088 vs 현재 9a1f9898b088
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence a137ec6a4ad0 vs 현재 a137ec6a4ad0 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — ./bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — ./bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — ./bin/romeo doctor'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — ./bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — test "$(wc -c < docs/planning/progress.md | tr -d '' '')" -le 20480'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — ./bin/romeo run-unit --help'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — cd docs/planning && miss=0; for l in $(grep -oE ''\]\([^)#]+\)'' progress.md
+      | sed -E ''s/^\]\(//;s/\)$//'' | grep -v ''^http''); do [ -e "$l" ] || { echo "MISSING $l"; miss=1;
+      }; done; test $miss -eq 0'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — python3 -m unittest tests.test_run_unit'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 14건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 9건이 승인 커밋 9a1f9898b088 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — ./bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — ./bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — ./bin/romeo doctor'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — ./bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — test "$(wc -c < docs/planning/progress.md | tr -d '' '')" -le 20480'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — ./bin/romeo run-unit --help'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — cd docs/planning && miss=0; for l in $(grep -oE ''\]\([^)#]+\)'' progress.md
+      | sed -E ''s/^\]\(//;s/\)$//'' | grep -v ''^http''); do [ -e "$l" ] || { echo "MISSING $l"; miss=1;
+      }; done; test $miss -eq 0'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 9a1f9898b088 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.agents/skills/review/SKILL.md', '.claude/skills/review/SKILL.md', 'AGENTS.md',
+      'CLAUDE.md', 'adapters/claude/workflows/review.md', 'adapters/codex/workflows/review.md', 'adapters/orca/RUNBOOK.md',
+      'core/principles/AGENTS.core.md', 'core/templates/tech-spec.md', 'core/workflows/review/SKILL.md',
+      'docs/planning/archive/README.md', 'docs/planning/archive/checklist-8-48.md', 'docs/planning/archive/milestones.md',
+      'docs/planning/archive/risks-2026-08-29.md', 'docs/planning/archive/session-log.md', 'docs/planning/progress.md',
+      'docs/requirements/constraints.md', 'romeo/cli.py', 'romeo/close.py', 'romeo/run_unit.py', 'tests/test_payload_checks.py',
+      'tests/test_run_unit.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_0dd59c8f75de-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

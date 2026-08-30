@@ -10,14 +10,14 @@ gates: [privacy-security]
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-08-30T13:31:24+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-30T14:02:34+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_0dd59c8f75de.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:gate.any=kept', 'profile:uncertainty.medium=kept',
@@ -56,14 +56,14 @@ approval_history:
   ③ 세션 첫 문서가 20KB 이하가 되고, 덜어낸 서술은 `docs/planning/archive/` 에서 그대로 읽을 수 있다.
   ④ 관통이 연속 2회 실패하면 3회차 기동이 그 자리에서 멈추고, 사람이 완료 정의를 재검토할 때까지 반복이 계속되지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 `romeo run-unit` 이 실재하고, dry-run 으로 5단계(작업 계약 생성 → 위임 명령 출력 → 결과 회수·앵커 검증 → evidence 기록 → 관측 모으기)를 순서대로 수행한다. 실제 기동(`--spawn`)의 실측은 이 단위의 범위가 아니다
-  - [ ] AC-2 "관통 중에는 하네스를 고치지 않는다" 가 `core/principles/AGENTS.core.md` 에 있고, `romeo compile` 산출물인 두 런타임 지침 파일에 같은 문구로 들어 있다
-  - [ ] AC-3 위협 모델(무엇을 막고 무엇을 막지 못하는가)이 `docs/requirements/constraints.md` 의 K-56 이후 번호로 있고, `progress.md` 는 원문 대신 그 링크만 갖는다. 옮기는 과정에서 문장을 고치지 않는다
-  - [ ] AC-4 `core/workflows/review/SKILL.md` 가 "무엇이 FAIL 사유인가" 를 열거하고, 그것이 두 런타임의 review 스킬 산출물에 반영돼 있다 (Q-10 (a))
-  - [ ] AC-5 페이로드(부착 대상) 작업 단위의 `required_checks` 에 하네스 자신의 테스트를 넣지 않는 규칙이 `core/templates/tech-spec.md` 에 있고, 그 규칙을 검사하는 테스트가 있다
-  - [ ] AC-6 `docs/planning/progress.md` 가 20,480 bytes 이하이고, 덜어낸 서술은 `docs/planning/archive/` 에 있으며 문서 안의 상대 링크 중 깨진 것이 0 이다
-  - [ ] AC-7 기존 검사가 전부 통과한다 — unittest · `compile --check` · `validate` · `doctor` · `fixtures parity --report`
-  - [ ] AC-8 관통 반복 중단 기준이 `AGENTS.core.md` 에 규칙으로 있고, `romeo run-unit` 이 그것을 강제한다 — 같은 작업 단위에서 **연속 2회 실패**가 기록돼 있으면 3회차 기동을 exit 1 로 거부하고, `--after-review "<재검토 결론>"` 이 주어지면 그 결론을 기록하고 진행한다. 관통 성공 시 연속 카운터가 0 으로 돌아가고, base_sha 가 바뀌어도 리셋되지 않는다
+  - [x] AC-1 `romeo run-unit` 이 실재하고, dry-run 으로 5단계(작업 계약 생성 → 위임 명령 출력 → 결과 회수·앵커 검증 → evidence 기록 → 관측 모으기)를 순서대로 수행한다. 실제 기동(`--spawn`)의 실측은 이 단위의 범위가 아니다
+  - [x] AC-2 "관통 중에는 하네스를 고치지 않는다" 가 `core/principles/AGENTS.core.md` 에 있고, `romeo compile` 산출물인 두 런타임 지침 파일에 같은 문구로 들어 있다
+  - [x] AC-3 위협 모델(무엇을 막고 무엇을 막지 못하는가)이 `docs/requirements/constraints.md` 의 K-56 이후 번호로 있고, `progress.md` 는 원문 대신 그 링크만 갖는다. 옮기는 과정에서 문장을 고치지 않는다
+  - [x] AC-4 `core/workflows/review/SKILL.md` 가 "무엇이 FAIL 사유인가" 를 열거하고, 그것이 두 런타임의 review 스킬 산출물에 반영돼 있다 (Q-10 (a))
+  - [x] AC-5 페이로드(부착 대상) 작업 단위의 `required_checks` 에 하네스 자신의 테스트를 넣지 않는 규칙이 `core/templates/tech-spec.md` 에 있고, 그 규칙을 검사하는 테스트가 있다
+  - [x] AC-6 `docs/planning/progress.md` 가 20,480 bytes 이하이고, 덜어낸 서술은 `docs/planning/archive/` 에 있으며 문서 안의 상대 링크 중 깨진 것이 0 이다
+  - [x] AC-7 기존 검사가 전부 통과한다 — unittest · `compile --check` · `validate` · `doctor` · `fixtures parity --report`
+  - [x] AC-8 관통 반복 중단 기준이 `AGENTS.core.md` 에 규칙으로 있고, `romeo run-unit` 이 그것을 강제한다 — 같은 작업 단위에서 **연속 2회 실패**가 기록돼 있으면 3회차 기동을 exit 1 로 거부하고, `--after-review "<재검토 결론>"` 이 주어지면 그 결론을 기록하고 진행한다. 관통 성공 시 연속 카운터가 0 으로 돌아가고, base_sha 가 바뀌어도 리셋되지 않는다
 - **위험과 되돌리기:** 코어 규칙과 템플릿을 바꾸므로 **이 저장소의 다음 작업이 곧바로 바뀐 규칙 아래 돈다**(하네스가 하네스를 만든다).
   잘못되면 `git revert <커밋>` 으로 되돌린다 — 한 커밋 묶음이라 되돌리기 단위가 하나다. 문서 감축분은 `archive/` 파일과 git 이력 양쪽에 남아 소실되지 않는다.
   운영 데이터·외부 저장소·배포는 건드리지 않는다.
@@ -148,6 +148,6 @@ hard gate 가 발동했다. 승인 전 상태 변경 0건.
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-30T14:02:34+09:00 · HEAD 9a1f9898b088 · 검사 기록 run_0dd59c8f75de
 
-- (없음)
+- [evidence/run_0dd59c8f75de.yaml](evidence/run_0dd59c8f75de.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

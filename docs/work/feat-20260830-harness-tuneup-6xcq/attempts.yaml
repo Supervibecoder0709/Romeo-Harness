@@ -1,0 +1,12 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260830-harness-tuneup-6xcq
+attempts:
+- n: 1
+  run: run_0dd59c8f75de
+  base_sha: 9a1f9898b0882779e34e420f4036ef0174ce790f
+  started_at: '2026-08-30T13:48:25+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []

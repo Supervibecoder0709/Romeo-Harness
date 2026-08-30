@@ -59,6 +59,19 @@ JSON Schema 로는 유효해서 검사기로는 잡히지 않고 그 CLI 를 호
 
 ## 3. 실행 순서
 
+**이 절의 순서를 한 명령으로 묶은 것이 `bin/romeo run-unit` 이다.** 5단계(계약 생성 → 위임 명령 출력 →
+결과 회수·앵커 검증 → 증거 확인 → 관측 모으기)를 순서대로 수행하고, 자기가 하지 못하는 자리에서는
+그 자리에 필요한 명령을 인쇄한다. **기동은 기본이 dry-run 이고 `--spawn` 을 명시했을 때만 실제로 띄운다**(K-66) —
+그 기동 경로는 아직 실측되지 않았다(§11). 회차 기록(`docs/work/<id>/attempts.yaml`)과 반복 중단 기준
+(연속 2회 실패 → 3회차 거부, `--after-review "<결론>"` 으로 해제)도 그 명령이 소유한다(`AGENTS.core.md` §10).
+
+```bash
+bin/romeo run-unit --unit <작업 단위 id> --run <run-id> --base-sha <base-sha>   # dry-run
+bin/romeo run-unit record --unit <작업 단위 id> --run <run-id> --result pass|fail [--failure-class outputs|harness|goal]
+```
+
+아래 절들은 그 명령이 무엇을 왜 그 순서로 하는지의 원본이다 — 손으로 돌려야 할 때와 자동화가 멈춘 자리를 읽는 곳이다.
+
 ### 3.0 경로 규약 — 계약 경로는 한 값이다
 
 봉투(작업 계약·결과 계약) **안에 적히는 경로는 전부 그것을 읽거나 쓰는 워커의 작업 루트 기준 상대 경로**다.

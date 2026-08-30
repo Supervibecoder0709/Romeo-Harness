@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-tuneup-6xcq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-tuneup-6xcq/task/run_0dd59c8f75de-reviewer.json",
+    "sha256": "efd05976b49bfffc88d1fcbad5e2d23a70e13a66a3bd104de9099727c3ff7af2"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-tuneup-6xcq/evidence/run_0dd59c8f75de.yaml",
+  "notes": "구현자·검토자 계약의 base_sha는 모두 9a1f9898b0882779e34e420f4036ef0174ce790f이다. required_checks 9건은 계약·증거·구현자 결과에서 일치하며, 모든 기록은 exit 0과 원시 로그의 head/tree 봉인을 가진다. 현재 변경은 구현자 allowed_paths 안에 있고, 가드 대상 행동은 없다. 검사는 재실행하지 않았다."
+}

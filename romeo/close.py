@@ -38,6 +38,27 @@ def required_checks(body):
     return data.get("required_checks") or []
 
 
+# 하네스 자신을 대상으로 하는 검사. 페이로드(하네스를 부착한 프로젝트) 작업 단위의 검증 계획에는 넣지 않는다 —
+# 하네스가 깨진 동안 그 단위의 산출물이 멀쩡해도 완료가 서지 않고, 어느 쪽이 깨졌는지 구분되지 않는다
+# (근거: feat-20260829-license-field-46an 의 check-5). 규칙의 원본은 core/templates/tech-spec.md 의 검증 계획 절이다.
+HARNESS_OWN_CHECK_RE = re.compile(
+    r"(?:^|[\s;&|(])(?:python3?\s+-m\s+unittest\b"
+    r"|(?:\./)?(?:bin/)?romeo\s+(?:compile|validate|doctor|fixtures|vendor|notices)\b)")
+
+
+def harness_own_checks(plan):
+    """검증 계획 안에서 **하네스 자신**을 검사하는 항목들을 돌려준다. 판정하지 않고 열거만 한다.
+
+    이 저장소(하네스 자신)의 작업 단위에서는 그 검사가 정당하므로 여기서 차단하지 않는다 —
+    페이로드인지 아닌지는 부르는 쪽이 안다(`romeo/run_unit.py` 의 1단계가 작업 루트와 하네스 루트를 비교한다)."""
+    out = []
+    for rc in plan or []:
+        command = str((rc or {}).get("command") or "")
+        if HARNESS_OWN_CHECK_RE.search(command):
+            out.append({"id": str((rc or {}).get("id") or ""), "command": command})
+    return out
+
+
 def _plan_key(plan):
     """검증 계획을 대조용 형태로 줄인다 — 무엇을 어떤 기대로 실행하기로 했는가."""
     return [(str((rc or {}).get("id")), str((rc or {}).get("command")), str((rc or {}).get("expect")))

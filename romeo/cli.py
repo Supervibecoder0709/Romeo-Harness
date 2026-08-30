@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -239,6 +239,20 @@ def cmd_close(args):
     return 0 if res["verdict"] == "PASS" else 1
 
 
+def cmd_run_unit(args):
+    from .run_unit import format_record, format_run, record_result, run_unit
+    if args.action == "record":
+        res = record_result(args.unit, args.run, args.result, project_root=_root(args),
+                            failure_class=args.failure_class, note=args.note)
+        print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_record(res))
+        return 0
+    res = run_unit(args.unit, project_root=_root(args), run=args.run, base_sha=args.base_sha,
+                   spawn=args.spawn, after_review=args.after_review, by=args.by)
+    print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_run(res))
+    # 중단 기준에 걸린 기동은 통과가 아니다 — 3회차를 그 자리에서 멈추는 것이 이 명령의 일이다(AGENTS.core §10).
+    return 1 if res["verdict"] == "BLOCKED_REPEAT" else 0
+
+
 def cmd_id(args):
     from .ids import new_id
     print(new_id(args.unit, args.slug))
@@ -453,6 +467,27 @@ def build_parser():
     s.add_argument("--rerun-timeout", type=int, default=RERUN_TIMEOUT,
                    help=f"재실행 대조 한 건의 상한(초, 기본 {RERUN_TIMEOUT}). 초과하면 미검증이다")
     s.set_defaults(fn=cmd_close)
+
+    s = sub.add_parser("run-unit", help="관통 1회를 5단계로 엮는다 (계약 → 위임 명령 → 회수·앵커 → 증거 → 관측). "
+                                        "기동은 기본이 dry-run 이고 --spawn 을 명시해야 실제로 띄운다")
+    s.add_argument("action", nargs="?", default="start", choices=["start", "record"],
+                   help="start(기본) 관통 1회를 돌린다 · record 그 회차의 판정을 attempts.yaml 에 남긴다")
+    s.add_argument("--unit", required=True)
+    s.add_argument("--run", required=True, help="계약·증거·결과 봉투를 묶는 run id — RUNBOOK §3.2 의 Run id 를 그대로 쓴다")
+    s.add_argument("--base-sha", dest="base_sha",
+                   help="승인된 spec.md 가 들어 있는 커밋. 생략하면 이력에서 승인 커밋을 찾는다(D-a)")
+    s.add_argument("--spawn", action="store_true",
+                   help="위임 명령을 실제로 실행한다. 없으면 인쇄만 한다 — 기동은 비용이 드는 실행이다(K-66)")
+    s.add_argument("--after-review", dest="after_review",
+                   help="연속 실패 뒤 사람이 완료 정의를 재검토한 결론. 주면 기록하고 진행한다(AGENTS.core §10)")
+    s.add_argument("--by", help="(--after-review) 재검토한 사람")
+    s.add_argument("--result", choices=["pass", "fail"], help="(record) 이 회차의 판정")
+    s.add_argument("--failure-class", dest="failure_class", choices=["outputs", "harness", "goal"],
+                   help="(record) 사람이 적는 실패 분류. 기록만 하고 차단 판정에 쓰지 않는다")
+    s.add_argument("--note", help="(record) 이 회차에 대해 남길 한 줄")
+    s.add_argument("--root")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_run_unit)
 
     s = sub.add_parser("id", help="ID 생성")
     s.add_argument("--unit", required=True, choices=["T0", "T1", "T2"])

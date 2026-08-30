@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-tuneup-6xcq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-harness-tuneup-6xcq/task/run_0dd59c8f75de-implementer.json",
+    "sha256": "956d775d3bc2019943eb2e6c54b74f3a2b5b662b5a007c3bc82f666ba86e0a60"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "./bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "./bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "./bin/romeo doctor",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "./bin/romeo fixtures parity --report",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "test \"$(wc -c < docs/planning/progress.md | tr -d ' ')\" -le 20480",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "./bin/romeo run-unit --help",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "cd docs/planning && miss=0; for l in $(grep -oE '\\]\\([^)#]+\\)' progress.md | sed -E 's/^\\]\\(//;s/\\)$//' | grep -v '^http'); do [ -e \"$l\" ] || { echo \"MISSING $l\"; miss=1; }; done; test $miss -eq 0",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_run_unit",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-harness-tuneup-6xcq/evidence/run_0dd59c8f75de.yaml",
+  "notes": "구현 단위 6개를 전부 반영했다. 검사 9건은 같은 산출물(head 9a1f989 · 이 run 의 마지막 기록) 위에서 전부 exit 0 이다.\nAC 근거 — AC-1: run_0dd59c8f75de 의 run-unit-dry-run(exit 0)이 5단계를 순서대로 인쇄했고 1단계가 두 계약을 실제로 썼다 (sha256 956d775d3bc2 · efd05976b49b — 위임 전에 있던 파일과 바이트가 같아 계약의 결정성이 같은 run 안에서 확인됐다), check-7 이 명령의 실재를 본다.\nAC-2: core/principles/AGENTS.core.md §10 · CLAUDE.md·AGENTS.md 양쪽 managed block(check-2 exit 0).\nAC-3: docs/requirements/constraints.md §8 의 K-56~K-59 (progress.md 원문을 <br> 로만 잇고 문장은 고치지 않았다) · progress.md 자리에는 링크 5줄만 남았다(check-3·check-8 exit 0).\nAC-4: core/workflows/review/SKILL.md 「무엇이 FAIL 사유인가」 8항목 + 경고 4항목 + BLOCKED. 두 런타임 산출물에는 그 절을 판정의 유일한 근거로 지목하는 7번이 들어 있다 — 컴파일러가 코어 본문을 복제하지 않는 설계라(romeo/compile.py 의 _render_skill) 목록 자체는 코어에만 두고 양쪽이 같은 목록을 보게 했다(check-2 exit 0).\nAC-5: core/templates/tech-spec.md 검증 계획 절의 규칙 + romeo/close.py 의 harness_own_checks + tests/test_payload_checks.py 6건(check-1 exit 0).\nAC-6: progress.md 14,683 bytes(check-6 exit 0) · docs/planning/archive/ 5파일 · 상대 링크 깨짐 0(check-8 exit 0).\nAC-7: check-1~5 전부 exit 0.\nAC-8: AGENTS.core.md §10 반복 중단 + romeo/run_unit.py 의 gate/consecutive_failures, check-9(tests.test_run_unit 19건) exit 0 — 반례 4건이 각각 test_third_attempt_is_refused_after_two_failures · test_after_review_releases_and_is_recorded · test_success_resets_the_counter · test_changing_base_sha_does_not_unblock 이고, CLI 종료 코드 1/0 은 test_cli_exits_1_when_blocked_and_0_otherwise 가 본다.\n미검증으로 남긴 것 — run-unit --spawn 의 실제 기동 경로는 실행하지 않았다(spec 의 비범위). 코드는 자리표시자가 없는 명령까지만 실행하고 첫 자리표시자에서 멈추게 돼 있다(romeo/run_unit.py 의 _stage_delegate). RUNBOOK §11 의 미실측 항목은 그대로다.\nattempts.yaml 의 이 회차(n=1 · run_0dd59c8f75de)는 result: started 로 남겼다 — 관통의 성패는 검토자 판정과 종료 검사가 정하므로 구현자가 pass 를 적지 않는다. 회차 판정은 `bin/romeo run-unit record --unit <id> --run <run> --result pass|fail` 로 남긴다."
+}
