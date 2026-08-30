@@ -1,0 +1,14 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-runbook-delegation-gaps-biae",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-runbook-delegation-gaps-biae/task/run_583f325f5c94-reviewer.json",
+    "sha256": "10331d9d52fb6ae7597b09920b03a9597be502e2b30999b1d40442d757429a5d"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-runbook-delegation-gaps-biae/evidence/run_583f325f5c94.yaml"
+}

@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-08-30T23:24:44+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-30T23:45:52+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_583f325f5c94.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -39,14 +39,14 @@ updated: '2026-08-30'
 - **왜 지금:** 여섯 건 모두 **다음 위임에서 그대로 다시 걸리는 것**이고, 바로 다음 작업이 `feat-20260830-harness-defects-w3qu` 의 5회차 관통이다. ⒶⒷⒸ 는 직전 관통에서 실제로 걸렸다 — Ⓐ 는 답이 도달했는데도 구현자가 900초 무응답으로 판단해 escalation 을 냈고, Ⓑ 는 검토자가 낡은 해시와 새 해시를 둘 다 받았으며(이번엔 운으로 넘어갔다), Ⓒ 는 완료 판정에 오탐을 냈다. 코어 규칙 §10 은 관통 중 하네스 변경을 금지하므로, 고칠 수 있는 구간은 관통과 관통 **사이**인 지금뿐이다.
 - **기대 결과:** 다음 관통을 도는 사람이 이 여섯 가지를 문서에서 찾을 수 있다 — 기억이나 지난 세션의 대화에 의존하지 않는다. 그리고 `w3qu` 의 AC-5 가 요구한 관측이 ④ 의 새 서술 **안으로 흡수**되어, §3.7 에 원인을 서로 다르게 지목하는 두 문단이 남지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 (Ⓐ) RUNBOOK 에 워커의 질문에 **답하는** 명령형이 있다 — `--to run:<run-id> --thread-id` 형태를 쓰고, `--to dispatch:<id>` 로 보낸 답이 ask 스레드를 풀지 못했다는 관측이 함께 적혀 있다.
-  - [ ] AC-2 (Ⓑ) `### 3.4.1` 소절이 신설되어, 관통 도중 재승인하면 무엇이 어긋나는지(검토자가 **낡은 해시**를 받는다)와 그때 밟을 절차가 적혀 있다.
-  - [ ] AC-3 (Ⓒ) `tui-idle` 이 **완료 신호가 아니다**라는 것과, 완료를 실제로 읽은 자리(`task_complete.last_agent_message`)가 적혀 있다.
-  - [ ] AC-4 (④) §3.7 의 실측 표가 **`프롬프트가 argv 에 있는가`** 를 축으로 다시 그려져 있고, 옛 표의 '대화형 여부' 축(`에 넣은 것 |` 헤더)은 남아 있지 않다.
-  - [ ] AC-5 (이관분) 그 새 서술 안에 `tui-idle` 을 **기다린 뒤에 채택해도** `agent_prompt_stalled` 로 실패했다는 관측이 보존되어 있다 — `w3qu` 의 AC-5 가 요구한 것이 이 단위에서 충족된다.
-  - [ ] AC-6 (⑥) §4 의 검토자 실행 명령 블록 안에 `< /dev/null` 이 있다.
-  - [ ] AC-7 (⑦) **논리 역할 이름**이 **모델 id 가 아니다**라는 것과, 실제 id 를 아는 방법이 적혀 있다.
-  - [ ] AC-8 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
+  - [x] AC-1 (Ⓐ) RUNBOOK 에 워커의 질문에 **답하는** 명령형이 있다 — `--to run:<run-id> --thread-id` 형태를 쓰고, `--to dispatch:<id>` 로 보낸 답이 ask 스레드를 풀지 못했다는 관측이 함께 적혀 있다.
+  - [x] AC-2 (Ⓑ) `### 3.4.1` 소절이 신설되어, 관통 도중 재승인하면 무엇이 어긋나는지(검토자가 **낡은 해시**를 받는다)와 그때 밟을 절차가 적혀 있다.
+  - [x] AC-3 (Ⓒ) `tui-idle` 이 **완료 신호가 아니다**라는 것과, 완료를 실제로 읽은 자리(`task_complete.last_agent_message`)가 적혀 있다.
+  - [x] AC-4 (④) §3.7 의 실측 표가 **`프롬프트가 argv 에 있는가`** 를 축으로 다시 그려져 있고, 옛 표의 '대화형 여부' 축(`에 넣은 것 |` 헤더)은 남아 있지 않다.
+  - [x] AC-5 (이관분) 그 새 서술 안에 `tui-idle` 을 **기다린 뒤에 채택해도** `agent_prompt_stalled` 로 실패했다는 관측이 보존되어 있다 — `w3qu` 의 AC-5 가 요구한 것이 이 단위에서 충족된다.
+  - [x] AC-6 (⑥) §4 의 검토자 실행 명령 블록 안에 `< /dev/null` 이 있다.
+  - [x] AC-7 (⑦) **논리 역할 이름**이 **모델 id 가 아니다**라는 것과, 실제 id 를 아는 방법이 적혀 있다.
+  - [x] AC-8 기존 검사가 회귀하지 않는다 — `python3 -m unittest discover -s tests` · `bin/romeo validate` · `compile --check` · `doctor` · `fixtures parity --report` 가 모두 종료 코드 0.
 - **위험과 되돌리기:** 바뀌는 것은 문서 한 개뿐이고 실행되는 코드가 아니다. 잘못 써도 명령이 깨지지 않고 **다음 사람이 잘못된 절차를 따르는** 형태로만 해를 끼친다 — 그래서 AC-4 가 옛 서술의 **제거**까지 요구한다(두 서술이 공존하면 어느 쪽이 맞는지 알 수 없다). 되돌리기는 `git revert <커밋>` 한 번이고, 저장소 밖 상태를 바꾸지 않는다. 워크트리에서 작업하므로 통합 전에는 그 브랜치가 그대로 남는다. **되돌리면 안 되는 부작용은 없다.**
 - **결정 필요:** 없음 — 2026-08-30 확정. (a) `w3qu` 의 AC-5 를 이 단위로 이관한다. (b) 이 단위를 `w3qu` 5회차보다 **먼저** 돌린다.
 
@@ -129,6 +129,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-30T23:45:52+09:00 · HEAD b760144dad0d · 검사 기록 run_583f325f5c94
 
-- (없음)
+- [evidence/run_583f325f5c94.yaml](evidence/run_583f325f5c94.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

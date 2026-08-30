@@ -57,6 +57,25 @@ JSON Schema 로는 유효해서 검사기로는 잡히지 않고 그 CLI 를 호
 
 `--model` 과 `--effort` 는 **넘기지 않는다** — 계정 기본값을 쓴다(K-12). `--effort` 는 `--model` 을 요구하고, 둘 다 `--terminal` 과 결합할 수 없다(실측).
 
+**넘기고 싶어지더라도 손에 있는 이름을 그대로 넣지 않는다 — 논리 역할 이름은 모델 id 가 아니다.**
+사람이 모델을 부를 때 쓰는 이름(예: 검토에 쓰는 모델을 부르는 짧은 이름)은 그 런타임의 **논리 역할 이름**이고,
+API 가 받는 **모델 id 가 아니다**. 그 이름을 `--model` 값으로 그대로 넘기면 HTTP 400 으로 끝난다.
+실제 id 는 그 이름 앞에 제품군·버전 접두사가 붙은 **다른 문자열**이다.
+
+값은 여기 박지 않는다 — 박으면 낡는다. 대신 **조회하는 방법**을 적는다(2026-08-30 실측, 종료 코드 0 둘 다).
+
+```bash
+# (a) 이 계정의 기본 모델 id — 아무 것도 넘기지 않았을 때 실제로 도는 값
+grep -n '^model' ~/.codex/config.toml
+
+# (b) 어떤 실행이 실제로 어느 모델로 돌았는가 — 그 세션의 원시 로그
+grep -o '"model":"[^"]*"' ~/.codex/sessions/<YYYY>/<MM>/<DD>/rollout-*.jsonl | sort -u
+```
+
+(b) 는 사후 확인이라 (a) 보다 강하다 — 넘긴 값이 아니라 그 실행이 남긴 값을 읽는다.
+**직전 관통의 검토자가 실제로 돈 모델은 계정 기본값이었다**(플래그를 넘기지 않았으므로 (a) 와 (b) 가 같은 값이었다).
+그래서 이 문서가 `--model` 을 넘기지 않는다는 것과 "검토자가 어느 모델로 돌았는지 모른다" 는 다른 말이다 — (b) 로 읽을 수 있다.
+
 ## 3. 실행 순서
 
 **이 절의 순서를 한 명령으로 묶은 것이 `bin/romeo run-unit` 이다.** 5단계(계약 생성 → 위임 명령 출력 →
@@ -278,6 +297,28 @@ orca orchestration task-create --run <run-id> \
 검토자는 만들지 말고 `BLOCKED_CAPABILITY` 로 끝낸다.
 성공 신호: `.ok == true` 와 task id. 이후 `orca orchestration task-list --run <run-id> --brief --json` 으로 두 건이 보인다.
 
+### 3.4.1 관통 도중 재승인했다면 — 이미 넘긴 `--spec` 은 갱신되지 않는다
+
+**무엇이 어긋나는가.** 재승인은 `spec.md` 를 바꾸고(확인란·수용 기준·`approved_at`), 그러면 새 승인 커밋에서
+`envelope build` 가 내는 계약이 달라진다 — `spec_ref.sha256` 이 바뀌므로 계약 파일 자체의 sha256 도 바뀐다.
+그런데 §3.4 의 `task-create --spec` 은 **그 시점의 값을 문자열로 복사해 둔 것**이다. 재승인 뒤에도 그 문자열은
+그대로 남고, `worker-start --terminal` 이 채택한 터미널에 주입하는 것도 그 문자열이다.
+그 결과 검토자는 **낡은 해시**(주입된 `--spec` 이 실은 값)와 새 해시(§3.7 의 `fill_brief.py` 가 `--task-sha256` 으로
+그 자리에서 다시 계산해 절차 파일에 적은 값)를 **둘 다** 받는다. 어느 쪽을 `task_envelope_ref.sha256` 에 옮겨
+적을지는 검토자의 선택이 되고, 그 선택은 §3.8 의 앵커 검사에서 통과와 거부를 가른다.
+직전 관통에서 실제로 두 값이 함께 도달했다 — 그 실행은 검토자가 새 해시를 골라 우연히 넘어갔다.
+**우연을 절차로 두지 않는다.**
+
+**밟을 절차 — Run 을 새로 만든다.** 이미 만든 Task 의 `--spec` 을 갱신하는 명령은 없다(2026-08-30 실측).
+`orca orchestration task-update --help` 가 받는 것은 `--id`·`--status`·`--result`·`--run`·`--from`·`--retry-request`
+뿐이고 `--spec` 이 없다. `orca orchestration --help` 의 명령 목록에도 Task 의 spec 을 고치는 명령이 없다.
+그래서 재승인이 일어나면 그 Run 은 **끝났거나 중단된 것으로 보고**, 새 승인 커밋을 `<base-sha>` 로 삼아
+§3.2(Run 생성)부터 다시 시작한다. 새 `<run-id>` 로 계약을 새로 만들고(§3.3·§3.5.1) Task 도 새로 만든다.
+
+이것은 코어 규칙 §10(동결)과 같은 결론이다 — 관통 도중 기준이 바뀌면 그 관통이 낸 판정은 무엇이 만든 것인지
+말할 수 없으므로, 바꾸려면 관통을 끝내거나 중단하고 **새 base 로 다시 시작한다.** 옛 Run 의 Task 는
+`task-update --id <task> --run <run> --status failed` 로 닫아 두어 DAG 에 열린 채 남지 않게 한다.
+
 ### 3.5 구현자 기동
 
 **기동 전 조건.** §3.1 의 확인 3개(승인·`ls-tree` 8행·`--help` 프로브 2개)가 전부 통과해야 한다.
@@ -391,6 +432,30 @@ orca orchestration check --run <run-id> --wait \
 바인딩된 Run 은 `--ack <delivery_id>` 전까지 같은 Delivery 를 계속 되돌려준다 — 배치의 모든 메시지를 처리한 뒤에 ack 한다.
 워커가 사람만 답할 수 있는 프롬프트에 멈춰 있는지는 `orca orchestration worker-show --dispatch <id> --json` 의 `observation.agentWait` 로 본다. `null` 은 "찾아봤고 없다", 필드 부재는 "보지 못했다" 이지 "대기 중이 아니다" 가 아니다(실측 Notes). 대기 중인 워커는 실패가 아니다.
 
+**워커가 낸 질문에 답한다 — 받는 자리만 있고 답하는 자리가 없으면 워커는 타임아웃까지 막혀 있다.**
+위 대기가 `question` 을 돌려주거나 워커가 `orca orchestration ask` 로 막혀 있으면, 답은 **그 질문 메시지의 스레드로** 보낸다.
+
+```bash
+orca orchestration send \
+  --to run:<run-id> --thread-id <질문 msg id> \
+  --run <run-id> \
+  --subject "답: <질문 요약>" \
+  --body "<답 본문>" \
+  --json
+```
+
+`--to run:<run-id> --thread-id` 가 실효 경로다. 두 플래그 모두 `orca orchestration send --help` 실측이다 —
+`--to <run:id|dispatch:id|legacy_handle>` 와 `--thread-id <id>`. `--thread-id` 에 넣는 값은 그 질문 메시지의 id 이고,
+`check --wait` 가 돌려준 `messages[]` 나 `orca orchestration check --run <run-id> --peek --json` 에서 읽는다.
+
+**`--to dispatch:<id>` 로 보낸 답은 ask 스레드를 풀지 못했다(2026-08-30 관측 · 표본 1건).**
+같은 답을 §3.5.2 와 같은 형태(`--to dispatch:<구현자 dispatch-id>`)로 보냈고 보낸 쪽에는 종료 코드 0 · `.ok == true`
+가 떴는데, 워커의 `ask` 는 풀리지 않았고 `orca orchestration check --run <run-id> --peek --json` 수신함에도
+그 메시지가 보이지 않았다. 그 관통의 구현자는 답이 오지 않았다고 판단해 900초 뒤 `escalation` 을 냈다.
+`--to dispatch:` 의 `.ok == true` 는 "중계를 접수했다" 이지 "워커가 읽었다" 가 아니다 — §3.5.2 의 성공 신호와 같은 성질이다.
+표본이 1건이므로 `--to dispatch:` 가 답을 **항상** 못 나른다고 단정하지 않는다. 규칙이 아니라 **관측으로 적는다** —
+`--to run: --thread-id` 쪽은 도달을 봤고 `--to dispatch:` 쪽은 도달을 보지 못했다는 것이 지금 아는 전부다.
+
 ### 3.7 검토자 기동 — 강제 수단을 걸고 띄우는 2단계
 
 검토자는 구현자가 바꾼 코드를 봐야 하므로 **구현자의 워크트리를 그대로** 가리킨다. 기존 워크트리에는 생성 플래그를 붙이지 않는다(거부된다).
@@ -400,20 +465,38 @@ passthrough(`--`) 도 없다(실측). 즉 §4 가 정본이라고 선언한 강�
 `--agent` 로 띄우면 검토자는 아무 샌드박스 없이 기동된다. 그래서 **강제 수단이 걸린 명령을 터미널로 띄우고, 그 터미널을 워커로 채택**한다.
 두 명령 모두 `--help` 실측이고, `worker-start` 는 `(--agent <agent> | --terminal <handle>)` 로 택일이다.
 
-**`--command` 에 넣는 것은 비대화형 실행이 아니라 대화형(TUI) 실행이다 — 2026-08-29 관통에서 확정.**
-같은 강제 수단(`-s read-only`)을 두 형태로 시험했고 결과가 정반대였다.
+**채택의 성패를 가르는 변수는 '대화형이냐' 가 아니라 `프롬프트가 argv 에 있는가` 다.**
+`worker-start --terminal` 은 채택한 터미널에 **task spec 과 lifecycle 프리앰블을 입력으로 주입**한다.
+그 주입을 받을 입력이 없는 실행은 채택되지 않는다. 프롬프트를 argv 로 이미 받은 실행은 입력을 더 받지 않으므로
+주입이 갈 곳이 없다 — 그 실행이 대화형이든 아니든 같다.
 
-| `--command` 에 넣은 것 | `worker-start --terminal` 결과 |
-| --- | --- |
-| `codex exec -s read-only …` (비대화형) | **실패** — `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled` |
-| `codex -s read-only` (TUI) | **성공** — `state: ready` · `stage: input_accepted` |
+| `--command` 에 준 실행 형태 | 프롬프트가 argv 에 있는가 | `worker-start --terminal` 결과 |
+| --- | --- | --- |
+| `codex exec -s read-only … "<프롬프트>"` (비대화형) | **있다** | **실패** — `state: failed` · `stage: dispatch_input` · `last_failure: agent_prompt_stalled` (2026-08-29) |
+| `codex -s read-only` (TUI · 프롬프트를 붙이지 않음) | 없다 | **성공** — `state: ready` · `stage: input_accepted` (2026-08-29) |
+| `codex -s read-only -C <경로> "$(cat …)"` (TUI · 프롬프트를 붙임) | **있다** | **실패** — 같은 `agent_prompt_stalled` (2026-08-30) |
 
-이유는 두 명령이 프롬프트를 받는 자리가 다르기 때문이다. `worker-start --terminal` 은 채택한 터미널에
-**task spec 과 lifecycle 프리앰블을 입력으로 주입**한다. 비대화형 실행은 프롬프트를 argv 로 이미 받고 입력을 더 받지 않으므로
-그 주입이 갈 곳이 없다. 그 실행은 계속 돌지만(argv 로 받은 일은 한다) **Dispatch 는 실패로 settle 되고
+**세 번째 행이 옛 서술을 뒤집는다.** 옛 표의 축은 '대화형이냐' 였고 그 축으로는 3행을 설명하지 못한다 —
+3행은 대화형인데 실패했다. 두 실패 행의 공통점은 **프롬프트가 argv 에 있다**는 것 하나뿐이다.
+argv 로 프롬프트를 받은 실행은 계속 돌지만(argv 로 받은 일은 한다) **Dispatch 는 실패로 settle 되고
 `worker_done`·heartbeat·`ask` 가 전부 없다** — 즉 §3.6 의 대기가 그 워커에게는 영원히 오지 않는다.
 
-따라서 검토자는 **TUI 로 띄운다.** 그러면 세 가지가 동시에 성립한다.
+**`tui-idle` 을 기다린 뒤에 채택해도 같은 실패가 났다(2026-08-30 관측 · 표본 1건).**
+아래 (1) 의 `orca terminal wait --for tui-idle` 이 `.result.wait.satisfied == true` 를 돌려준 **뒤에**
+`worker-start --terminal` 을 불렀는데도 3행과 같은 실패(`state: failed` · `stage: dispatch_input` ·
+`last_failure: agent_prompt_stalled`)가 났다. 그러므로 원인은 **채택 시점**이 아니다 — 기다려도 실패했다.
+'너무 일찍 채택했다' 와 '프롬프트가 argv 에 있다' 는 서로 다른 실패인데 **같은 증상(`agent_prompt_stalled`)** 을 내므로,
+증상만 보고 시점 탓으로 읽으면 몇 번을 다시 기다려도 같은 자리에서 멈춘다. 표본이 1건이라 규칙으로 단정하지 않고 관측으로 적는다.
+
+**그래서 아래 (1) 의 `CMD` 는 지금 3행의 형태다 — 이 경로는 미해결이다.** `CMD` 는 절차 파일과 계약 JSON 을
+`"$(cat '$P'; cat '$T')"` 로 argv 에 실어 넘긴다. 그것이 프롬프트를 검토자에게 도달시키는 방법이면서
+동시에 채택을 깨뜨리는 이유다. 확인된 우회는 하나뿐이다 — **워커로 채택하지 않고** 터미널만 만들어
+비대화형(`codex exec -s read-only`)으로 돌리고 `-o <파일>` 출력으로 결과를 회수한 뒤
+`task-update` 로 Task 를 정리하는 것이다(아래 "비대화형 형태를 굳이 쓸 이유가 있다면" 문단과 같은 대가).
+argv 를 비운 TUI 로 띄우고 프롬프트를 주입에 맡기는 형태는 **아직 이 문서의 절차로 관측되지 않았다** —
+그 형태에서 `$P`·`$T` 가 검토자에게 어떻게 도달하는지가 미확인이기 때문이다(§11.2).
+
+따라서 검토자를 **채택된 워커로** 돌리려면 **TUI 로 띄운다.** 그러면 세 가지가 동시에 성립한다.
 
 1. 강제가 걸린다 — 그 런타임의 TUI 도 같은 `-s/--sandbox` 플래그를 받는다(`codex --help` 실측).
 2. lifecycle 이 산다 — 주입을 받을 수 있으므로 `worker_done` 을 보낼 수 있고 §3.6 의 대기가 성립한다.
@@ -475,13 +558,31 @@ orca terminal create \
 (c) `orca terminal list --worktree "path:$W" --json` 에서 같은 제목의 행을 찾아 다시 (b) 로 확인한다.
 **확인되기 전에는 (2) 로 넘어가지 않는다.**
 
-TUI 는 기동에 시간이 걸리므로 (2) 전에 준비를 기다린다 — 기다리지 않고 채택하면 주입이 기동과 경쟁한다.
+TUI 는 기동에 시간이 걸리므로 (2) 전에 준비를 기다린다.
 
 ```bash
 orca terminal wait --terminal "$HANDLE" --for tui-idle --timeout-ms 90000 --json
 ```
 
 성공 신호: `.result.wait.satisfied == true` 이고 `.result.wait.status == "running"`(실측).
+
+**`tui-idle` 은 완료 신호가 아니다 — 그리고 채택 성공의 보장도 아니다.**
+이 신호가 말하는 것은 "지금 그 TUI 가 무언가를 그리고 있지 않다" 뿐이다. **작업이 시작된 직후에도 `satisfied: true` 가 나왔다.**
+그래서 두 가지로 쓰면 안 된다.
+
+- **완료 판정에 쓰면 오탐이 난다.** 아직 돌고 있는 워커를 끝난 것으로 읽는다.
+- **채택 전 대기에만 기대도 부족하다.** 만족을 받고 채택해도 위 3행의 실패가 났다 — 원인이 시점이 아니기 때문이다.
+
+**완료를 실제로 읽은 자리는 그 런타임의 세션 로그다.** 검토자가 낸 마지막 메시지(결과 계약 JSON 본문)는
+`~/.codex/sessions/<YYYY>/<MM>/<DD>/rollout-*.jsonl` 의 `task_complete.last_agent_message` 에 실려 있었다(2026-08-30 실측).
+채택된 워커라면 완료 신호는 §3.6 의 `worker_done` 이고, 채택하지 않은 비대화형 실행이라면 `-o` 가 만드는
+**출력 파일의 존재**다(§11.1 — `terminal wait --for exit` 은 그 터미널의 셸이 살아 있어 만료된다).
+어느 경우에도 `tui-idle` 은 그 자리를 대신하지 않는다.
+
+```bash
+# 완료를 세션 로그에서 읽는다 — 채택도 -o 도 없이 돌아간 실행의 마지막 수단
+grep -o '"last_agent_message":"[^"]*"' ~/.codex/sessions/<YYYY>/<MM>/<DD>/rollout-*.jsonl | tail -1
+```
 
 **절차 파일에 계약 해시를 적어 준다 — 적지 않으면 두 런타임의 판정이 갈린다(2026-08-29 관통에서 확정).**
 
@@ -744,8 +845,13 @@ P=$W/.harness/runs/<id>/<run-id>/reviewer-brief.md   # fill_brief.py 가 채운 
 
 codex exec -s read-only -C <검토 대상 워크트리 절대경로> \
   -o <위임한 쪽이 지정한 파일> \
-  "$(cat "$P"; cat "$T")"
+  "$(cat "$P"; cat "$T")" < /dev/null
 ```
+
+**`< /dev/null` 을 뺀 채로 돌리면 멈춰 선다.** 프롬프트를 argv 로 이미 넘겼는데도 이 실행이 stdin 을 계속 기다려
+아무 것도 인쇄하지 않은 채 매달린 관측이 있다(2026-08-30). 빈 입력을 명시적으로 닫아 주면 그 대기가 사라진다.
+위 §3.7 의 TUI 형태에는 붙이지 않는다 — 그쪽은 주입을 받을 입력이 있어야 채택된다(§3.7 의 표).
+교체 실행의 `claude -p` 형태에서 같은 대기가 나는지는 **관측하지 않았다**(§11.2).
 
 `-s` 는 **모델이 만든 셸 명령**에 적용되는 샌드박스 정책이고(`codex exec --help` 문구 그대로), 허용값은 `read-only`·`workspace-write`·`danger-full-access` 다. `-C/--cd` 는 작업 루트, `-o/--output-last-message <FILE>` 은 마지막 메시지를 떨어뜨릴 파일이다. `-o` 의 대상 경로는 검토자가 고르는 것이 아니라 위임한 쪽이 고른다.
 `--output-schema` 는 넘기지 않는다 — 이 저장소의 스키마로는 HTTP 400 이다(§2 의 경고 문단).
@@ -1135,7 +1241,7 @@ orca orchestration gate-list --json
 역할 교체 실행(구현자 codex · 검토자 claude). 아래 목록은 그 실행 전후로 나뉜다.
 `관측` 은 실행해서 봤다는 뜻이고, `미검증` 은 아직 실행으로 확인하지 못했다는 뜻이다(K-51).
 
-### 11.1 관측된 것 (2026-08-29 관통)
+### 11.1 관측된 것 (2026-08-29·2026-08-30 관통)
 
 | 무엇 | 관측 결과 |
 | --- | --- |
@@ -1162,6 +1268,12 @@ orca orchestration gate-list --json
 | **같은 산출물에 같은 검토자 런타임을 다시 띄우면 판정이 재현되는가** (2026-08-29 · Q-08 (a) · Run `run_241a35112ca3`·`run_5dd1b2c232c7`·`run_222f508b5541`) | **재현되지 않는다 — 두 런타임 다.** §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번, claude 검토자를 한 번 더 띄웠다. 산출물 고정의 근거: 검토자 계약 다섯 개가 `cmp` identical(`f79f4bc1…`), 방어 검사 스냅샷 열 개가 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 12:17 까지 트리 불변), 봉투마다 두 체크아웃에서 `envelope check` 5개 PASS. **판정: codex `PASS`(0) · `FAIL`(1) · `FAIL`(4) · claude `FAIL`(6) · `PASS`(8).** codex 의 `run_5dd1b2c232c7` 이 낸 4건은 claude 의 6건과 실질적으로 겹친다(루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함) — 보는 능력의 차이가 아니다. claude 의 두 번째 실행은 findings 를 **더 많이**(8건) 내고도 게이트 판정은 `PASS` 였다 — findings 수와 판정이 같은 방향으로 움직이지도 않는다. 기동 경로가 교란 변수로 남는다(PASS 가 나온 codex 실행만 TUI). 이 관측이 **D-74**(재현성 요구)의 근거다. 해석은 `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility` |
 | **coordinator 터미널과 Run 의 바인딩** (2026-08-29) | **한 번에 한 Run 에만 바인딩된다.** `run-create` 는 그 터미널을 새 Run 에 바인딩하므로, Run 을 둘 만들면 뒤에 만든 것이 바인딩되고 앞의 Run 에 대한 `task-create`·`task-update` 는 `consumer_fenced: This coordinator terminal is bound to <다른 run>` 으로 거부된다(종료 코드 0 · `.ok == false`). 전환은 `orca orchestration run-use --id <run-id>` 다 — **`--run` 이 아니라 `--id`** 를 받는다(`--run` 은 `invalid_argument`). `run-current --json` 이 지금 바인딩된 Run 을 보여준다 |
 | **`terminal wait --for exit` 이 비대화형 실행의 종료를 알려주는가** (2026-08-29) | **못 한다.** `terminal create --command` 로 만든 터미널은 그 명령이 끝나도 셸이 살아 있어 `--for exit` 이 만료된다 — 900초를 줬는데 4~5분에 끝난 두 실행 모두 `ok:false · code:timeout` 이었다(그런데 CLI 자신의 종료 코드는 0 이다 — `.ok` 를 읽지 않으면 성공으로 오독한다). 실제 완료 신호는 `-o` 가 만드는 **출력 파일의 존재**다. §6.6 5 가 "완료는 출력 파일의 표식으로 기다린다" 고 한 이유가 이것이다 |
+| **`worker-start --terminal` 채택의 성패를 가르는 변수** (2026-08-30) | **`프롬프트가 argv 에 있는가` 다 — '대화형이냐' 가 아니다.** TUI(`codex -s read-only`)로 띄워도 프롬프트를 `--command` 의 argv 에 실으면 비대화형과 같은 `agent_prompt_stalled` 로 실패했다. `terminal wait --for tui-idle` 이 `satisfied: true` 를 낸 **뒤에** 채택해도 같았다 — 원인이 채택 시점이 아니라는 뜻이다. 표본 1건. §3.7 의 표 |
+| **`tui-idle` 이 완료 신호인가** (2026-08-30) | **아니다.** 작업이 시작된 직후에도 `satisfied: true` 가 나왔다 — 완료 판정에 쓰면 오탐이다. 완료를 실제로 읽은 자리는 `~/.codex/sessions/<YYYY>/<MM>/<DD>/rollout-*.jsonl` 의 `task_complete.last_agent_message` 였다(결과 계약 JSON 본문이 그 자리에 실려 있었다). §3.7 |
+| **워커가 낸 질문에 답이 도달하는 경로** (2026-08-30) | **`send --to run:<run-id> --thread-id <질문 msg id>` 다.** 같은 답을 `--to dispatch:<id>` 로 보낸 실행은 `.ok == true` 였는데도 워커의 `ask` 를 풀지 못했고 `check --run --peek` 수신함에도 보이지 않았다 — 그 구현자는 900초 뒤 `escalation` 을 냈다. 표본 1건이라 `--to dispatch:` 의 실패를 규칙으로 단정하지 않는다. §3.6 |
+| **이미 만든 Task 의 `--spec` 을 갱신할 수 있는가** (2026-08-30) | **없다.** `task-update --help` 가 받는 것은 `--id`·`--status`·`--result`·`--run`·`--from`·`--retry-request` 뿐이고, `orchestration --help` 의 명령 목록에도 spec 을 고치는 명령이 없다. 그래서 관통 도중 재승인하면 Run 을 새로 만든다(§3.4.1) |
+| **`codex exec` 가 argv 로 프롬프트를 받고도 stdin 을 기다리는가** (2026-08-30) | **기다린다.** 아무 것도 인쇄하지 않은 채 매달렸고, `< /dev/null` 로 빈 입력을 닫아 주면 그 대기가 사라진다. §4 의 명령 블록 |
+| **논리 역할 이름을 `--model` 에 넘길 수 있는가** (2026-08-30) | **없다 — HTTP 400.** 사람이 모델을 부르는 짧은 이름은 논리 역할 이름이고 API 가 받는 모델 id 가 아니다. 실제 id 는 접두사가 붙은 다른 문자열이며, 계정 기본값은 `~/.codex/config.toml` 의 `model` 키, 그 실행이 실제로 쓴 값은 세션 로그의 `"model"` 필드로 읽는다(둘 다 종료 코드 0 으로 실측). 직전 관통의 검토자는 플래그를 넘기지 않았으므로 계정 기본값으로 돌았다. §2 |
 
 ### 11.2 아직 미검증인 것
 
@@ -1185,3 +1297,8 @@ orca orchestration gate-list --json
   게이트 FAIL 은 관측 2건으로 선 판정이지 재현성의 증거는 아니다.
 - 이 문서가 지시하는 실패·복구 경로(§7) 중 실제로 밟은 것은 `worker-start` 실패 1건(`agent_prompt_stalled`)뿐이다.
   `residualResources` 가 비어 있지 않은 경우, `worker-stop`·`worker-abandon` 은 밟지 않았다.
+- **argv 를 비운 TUI 로 검토자를 띄우고 프롬프트를 `worker-start` 의 주입에 맡기는 형태.** §3.7 의 표가 그 형태만 채택에
+  성공했다고 말하지만, 그때 절차 파일(`$P`)과 계약 JSON(`$T`)이 검토자에게 어떻게 도달하는지는 관측하지 않았다.
+  지금 §3.7 (1) 의 `CMD` 는 그 둘을 argv 에 실어 넘기는 형태이므로 채택이 깨지는 쪽이다 — **이 경로는 미해결이다.**
+- **교체 검토자(`claude -p …`)도 argv 프롬프트로 stdin 을 기다리는지.** codex 쪽에서만 관측했고 `< /dev/null` 도 그쪽 블록에만 붙였다(§4).
+- **`--to dispatch:<id>` 로 보낸 답이 ask 스레드를 풀지 못하는 것이 재현되는지.** 표본 1건이다(§3.6). 실효 경로(`--to run: --thread-id`) 쪽도 표본 1건이다.

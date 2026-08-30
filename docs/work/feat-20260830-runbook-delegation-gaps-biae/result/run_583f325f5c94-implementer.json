@@ -1,0 +1,76 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260830-runbook-delegation-gaps-biae",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260830-runbook-delegation-gaps-biae/task/run_583f325f5c94-implementer.json",
+    "sha256": "04d6fac6af1c8c0de9adb8ed32ec4e1c31889f219be5c3cbb1e99c1f0e28d454"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "grep -qF -- '--to run:<run-id> --thread-id' adapters/orca/RUNBOOK.md && grep -qF 'ask 스레드' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "grep -qE '^### 3\\.4\\.1 ' adapters/orca/RUNBOOK.md && grep -qF '낡은 해시' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -qF '완료 신호가 아니다' adapters/orca/RUNBOOK.md && grep -qF 'task_complete.last_agent_message' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "grep -qF '프롬프트가 argv 에 있는가' adapters/orca/RUNBOOK.md && ! grep -qF '에 넣은 것 |' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "grep -qF '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md && grep -qF 'agent_prompt_stalled' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -A8 -F 'codex exec -s read-only -C' adapters/orca/RUNBOOK.md | grep -qF '< /dev/null'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "grep -qF '논리 역할 이름' adapters/orca/RUNBOOK.md && grep -qF '모델 id 가 아니다' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo doctor",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo fixtures parity --report",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260830-runbook-delegation-gaps-biae/evidence/run_583f325f5c94.yaml",
+  "notes": "구현 단위 2 의 (c) 는 실측으로 정했다 — run_583f325f5c94 의 `orca orchestration task-update --help` 와 `orca orchestration --help` 가 Task 의 `--spec` 을 갱신하는 플래그·명령을 내놓지 않으므로, §3.4.1 의 정본을 「Run 을 새로 만든다」로 적고 그 실측 근거를 소절 안에 남겼다. 구현 단위 4 를 쓰면서 이 문서 자신의 §3.7 (1) `CMD` 가 새 표의 세 번째 행(프롬프트를 argv 에 실은 TUI = 채택 실패)과 같은 형태라는 것이 드러났다. 그 기동 형태를 바꾸는 것은 이 단위의 범위가 아니고(변경 범위: RUNBOOK 문서 하나) 동작하는 대체 형태를 관측하지도 못했으므로, 고치지 않고 §3.7 과 §11.2 에 **미해결**로 드러냈다 — 확인된 우회(비대화형 + `-o` + `task-update`)만 정본으로 남겼다. 다음 관통의 판단 재료다. §11 에 손댄 것은 새 서술이 §11.2 를 두 번 참조하기 때문이다 — 참조가 가리키는 항목이 없으면 문서가 자기모순이 된다. gate_verdict PASS 의 근거는 evidence run_583f325f5c94 의 check-1~12 가 전부 exit 0 인 것이다."
+}

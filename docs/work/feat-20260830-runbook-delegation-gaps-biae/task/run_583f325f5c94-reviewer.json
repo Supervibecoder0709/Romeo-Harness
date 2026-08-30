@@ -1,0 +1,76 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260830-runbook-delegation-gaps-biae",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260830-runbook-delegation-gaps-biae/spec.md",
+    "sha256": "718bf852bedfebcf6740418561102d4d14ab546cd7bd6c71e257c6ca7ab7e62f"
+  },
+  "base_sha": "b760144dad0dd04dcdd1857ee06959d001d84363",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "grep -qF -- '--to run:<run-id> --thread-id' adapters/orca/RUNBOOK.md && grep -qF 'ask 스레드' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "grep -qE '^### 3\\.4\\.1 ' adapters/orca/RUNBOOK.md && grep -qF '낡은 해시' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "grep -qF '완료 신호가 아니다' adapters/orca/RUNBOOK.md && grep -qF 'task_complete.last_agent_message' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "grep -qF '프롬프트가 argv 에 있는가' adapters/orca/RUNBOOK.md && ! grep -qF '에 넣은 것 |' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-5",
+      "command": "grep -qF '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md && grep -qF 'agent_prompt_stalled' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-6",
+      "command": "grep -A8 -F 'codex exec -s read-only -C' adapters/orca/RUNBOOK.md | grep -qF '< /dev/null'",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-7",
+      "command": "grep -qF '논리 역할 이름' adapters/orca/RUNBOOK.md && grep -qF '모델 id 가 아니다' adapters/orca/RUNBOOK.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest discover -s tests",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo compile --check",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo doctor",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo fixtures parity --report",
+      "expect": "exit 0"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

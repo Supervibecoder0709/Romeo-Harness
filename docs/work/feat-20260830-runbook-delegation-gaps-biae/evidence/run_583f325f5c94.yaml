@@ -1,0 +1,417 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_583f325f5c94
+task_id: task_9f6a87ca31cd
+dispatch_id: ctx_68604a452e71
+unit_id: feat-20260830-runbook-delegation-gaps-biae
+spec_ref:
+  path: docs/work/feat-20260830-runbook-delegation-gaps-biae/spec.md
+  sha256: 251bdb2e6e36d6a330fb26e7b75fc3b6306ec48182374b85ac10f74ef708b8a9
+base_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-runbook-delegation-gaps-biae
+started_at: '2026-08-30T23:34:53+09:00'
+finished_at: '2026-08-30T23:42:28+09:00'
+commands:
+- id: check-1
+  command: grep -qF -- '--to run:<run-id> --thread-id' adapters/orca/RUNBOOK.md && grep -qF 'ask 스레드'
+    adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:53+09:00'
+  finished_at: '2026-08-30T23:34:53+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/01-check-1.log
+  log_sha256: 3ff0d6f5a67017e1a817e188e116e32648c6e50ec7edfa5b2640d263e85539c8
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-2
+  command: grep -qE '^### 3\.4\.1 ' adapters/orca/RUNBOOK.md && grep -qF '낡은 해시' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:53+09:00'
+  finished_at: '2026-08-30T23:34:53+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/02-check-2.log
+  log_sha256: dfd7e0b23e4f504247db24b9a217ebb17618d3ab10b78fcea282fbb49b45d382
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-3
+  command: grep -qF '완료 신호가 아니다' adapters/orca/RUNBOOK.md && grep -qF 'task_complete.last_agent_message'
+    adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:34:54+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/03-check-3.log
+  log_sha256: 38a120c2a7acc6f1c1c20d7e6382f63fc29d905f7ca8cfd8f3321c349a82ed0e
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-4
+  command: grep -qF '프롬프트가 argv 에 있는가' adapters/orca/RUNBOOK.md && ! grep -qF '에 넣은 것 |' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:34:54+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/04-check-4.log
+  log_sha256: 1ddec869960819ffaa40f8d4971e75d1f14726727632dc5b25a7933e57669d7f
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-5
+  command: grep -qF '기다린 뒤에 채택해도' adapters/orca/RUNBOOK.md && grep -qF 'agent_prompt_stalled' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:34:54+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/05-check-5.log
+  log_sha256: 4b6ed7347b894c909e126f49c4ac794871a7bc1a9678a233e2e859b22c5f453c
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-6
+  command: grep -A8 -F 'codex exec -s read-only -C' adapters/orca/RUNBOOK.md | grep -qF '< /dev/null'
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:34:54+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/06-check-6.log
+  log_sha256: adc39cbcba8052efc9976e07aa096732b0ed0815a980ffdfe16bc3b7bc5260c2
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-7
+  command: grep -qF '논리 역할 이름' adapters/orca/RUNBOOK.md && grep -qF '모델 id 가 아니다' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:34:54+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/07-check-7.log
+  log_sha256: 327a600fba9e7ad466e5a2398131f17a17022f8614e170253ded096cfc06c654
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-8
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-30T23:34:54+09:00'
+  finished_at: '2026-08-30T23:36:21+09:00'
+  seconds: 87.046
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/08-check-8.log
+  log_sha256: 605295a44e969329dfcaea4433d6b6ce9abbee80c6c6f9c28bde904997044062
+  stdout_tail: ''
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-9
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-30T23:36:21+09:00'
+  finished_at: '2026-08-30T23:36:21+09:00'
+  seconds: 0.097
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/09-check-9.log
+  log_sha256: fd056d5172e67bcb1910ac4a008096652e04cbc8dad92de48af92aa6cfacd091
+  stdout_tail: "spaces/Romeo-Harness/impl-feat-20260830-runbook-delegation-gaps-biae/docs/work/feat-20260830-runbook-delegation-gaps-biae/brief.md\
+    \ lines=61 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-runbook-delegation-gaps-biae/docs/work/feat-20260830-runbook-delegation-gaps-biae/spec.md\
+    \ lines=135 needs_input=0 unchecked_ac=8\n    WARN  UNCHECKED_AC 8개"
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-10
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-30T23:36:21+09:00'
+  finished_at: '2026-08-30T23:36:21+09:00'
+  seconds: 0.141
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/10-check-10.log
+  log_sha256: fc5c9c5f9f0a543bd1d63603918f65874eef1eef4d9af0090651e4df2e9250f8
+  stdout_tail: compile 검사 PASS
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-11
+  command: bin/romeo doctor
+  exit_code: 0
+  started_at: '2026-08-30T23:36:21+09:00'
+  finished_at: '2026-08-30T23:36:22+09:00'
+  seconds: 0.365
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/11-check-11.log
+  log_sha256: 5e76cddd167ab271a06056909f4abc548a71f8a1b8e2255129fbb60c85c9b341
+  stdout_tail: "목록에 나타나는지는 아직 관찰하지 않았다(2026-08-28 기준 미관찰).** 그래서 skills 목록에 그 둘이 없고, doctor 는 이 런타임을 \"\
+    부분 관찰\" 로 인쇄한다. (증거: docs/reviews/2026-08-28-codex-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일\
+    \ 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자 고지: 일치\n\n## 충돌 fixture (4종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: check-12
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-30T23:36:22+09:00'
+  finished_at: '2026-08-30T23:36:23+09:00'
+  seconds: 0.9
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/12-check-12.log
+  log_sha256: 5c48e5b41f7137f0388922fdb514fddde5988b1d3d0eb8b946730c8dba031b19
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-runbook-delegation-gaps-biae/.harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-30T23:38:27+09:00'
+  finished_at: '2026-08-30T23:38:27+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/13-reviewer-brief.log
+  log_sha256: b0d3a9c1e347c360d37a8723fe7273487b7f1109af36d998d575ff38345c5753
+  stdout_tail: 35cddc5ab482b64e0f2b65728d1c47df90ce1a8fbb99249e765f866aeab7fe9a  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260830-runbook-delegation-gaps-biae/.harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/reviewer-brief.md
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-runbook-delegation-gaps-biae'
+  exit_code: 0
+  started_at: '2026-08-30T23:38:30+09:00'
+  finished_at: '2026-08-30T23:38:30+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/14-review-tree-before.log
+  log_sha256: 5a94292fe56c1bf235de5d095fe02d8c9c03142194dfcb4172909cc37a00dbd3
+  stdout_tail: M adapters/orca/RUNBOOK.md
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260830-runbook-delegation-gaps-biae'
+  exit_code: 0
+  started_at: '2026-08-30T23:42:08+09:00'
+  finished_at: '2026-08-30T23:42:08+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/15-review-tree-after.log
+  log_sha256: 5a94292fe56c1bf235de5d095fe02d8c9c03142194dfcb4172909cc37a00dbd3
+  stdout_tail: M adapters/orca/RUNBOOK.md
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260830-runbook-delegation-gaps-biae/review/run_583f325f5c94-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-30T23:42:28+09:00'
+  finished_at: '2026-08-30T23:42:28+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260830-runbook-delegation-gaps-biae/run_583f325f5c94/16-review-record.log
+  log_sha256: 38a93beadce93a3a36f24bd2c5906315b573685a6a02104a3608a4f0736140a5
+  stdout_tail: 59166ba3c73913f563d9ba9a23821f1f7982de308d93cb0b78d41ca96eee911a  docs/work/feat-20260830-runbook-delegation-gaps-biae/review/run_583f325f5c94-reviewer.json
+  head_sha: b760144dad0dd04dcdd1857ee06959d001d84363
+  dirty_tree_hash: 3662723a6abf507d266b69aad332a7e95790af3f5378a24cb21c254ace5716b3
+changed_files:
+- adapters/orca/RUNBOOK.md
+artifact_hash: 67eeac11e8e732df8f9a5e966a54d1cc284a8c4c90c701d0ddcd10da991621a0
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-08-30T23:45:52+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-08-30T23:24:44+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_583f325f5c94 — 검증 계획 12건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence b760144dad0d vs 현재 b760144dad0d
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 3662723a6abf vs 현재 3662723a6abf (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — grep -qF -- ''--to run:<run-id> --thread-id'' adapters/orca/RUNBOOK.md
+      && grep -qF ''ask 스레드'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — grep -qE ''^### 3\.4\.1 '' adapters/orca/RUNBOOK.md && grep -qF ''낡은 해시''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — grep -qF ''완료 신호가 아니다'' adapters/orca/RUNBOOK.md && grep -qF ''task_complete.last_agent_message''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — grep -qF ''프롬프트가 argv 에 있는가'' adapters/orca/RUNBOOK.md && ! grep -qF ''에
+      넣은 것 |'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — grep -qF ''기다린 뒤에 채택해도'' adapters/orca/RUNBOOK.md && grep -qF ''agent_prompt_stalled''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — grep -A8 -F ''codex exec -s read-only -C'' adapters/orca/RUNBOOK.md | grep
+      -qF ''< /dev/null'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — grep -qF ''논리 역할 이름'' adapters/orca/RUNBOOK.md && grep -qF ''모델 id 가 아니다''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo fixtures parity --report'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 16건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 12건이 승인 커밋 b760144dad0d 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — grep -qF -- ''--to run:<run-id> --thread-id'' adapters/orca/RUNBOOK.md
+      && grep -qF ''ask 스레드'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — grep -qE ''^### 3\.4\.1 '' adapters/orca/RUNBOOK.md && grep -qF ''낡은
+      해시'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — grep -qF ''완료 신호가 아니다'' adapters/orca/RUNBOOK.md && grep -qF ''task_complete.last_agent_message''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — grep -qF ''프롬프트가 argv 에 있는가'' adapters/orca/RUNBOOK.md && ! grep -qF
+      ''에 넣은 것 |'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — grep -qF ''기다린 뒤에 채택해도'' adapters/orca/RUNBOOK.md && grep -qF ''agent_prompt_stalled''
+      adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — grep -A8 -F ''codex exec -s read-only -C'' adapters/orca/RUNBOOK.md
+      | grep -qF ''< /dev/null'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — grep -qF ''논리 역할 이름'' adapters/orca/RUNBOOK.md && grep -qF ''모델 id
+      가 아니다'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — bin/romeo doctor'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 b760144dad0d 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_583f325f5c94-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'
