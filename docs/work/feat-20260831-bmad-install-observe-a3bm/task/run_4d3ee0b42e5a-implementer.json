@@ -6,7 +6,7 @@
     "path": "docs/work/feat-20260831-bmad-install-observe-a3bm/spec.md",
     "sha256": "c1d9e69a36090ddae6ea52688d1e579ec977535a5b7dae33ae5c09db8df88320"
   },
-  "base_sha": "767721c5d9d11650a447f9cc207f46a1e66bd920",
+  "base_sha": "1ae907dda5b820cb4e92c86a73cb8be930cdef50",
   "allowed_paths": [
     "docs/work/feat-20260831-bmad-install-observe-a3bm/",
     "core/policy/capabilities.yaml",

@@ -8,3 +8,9 @@ __pycache__/
 
 # macOS
 .DS_Store
+
+# BMAD 설치 산출물 — 관측만 하고 저장소에 커밋하지 않는다 (feat-20260831-bmad-install-observe-a3bm AC-7)
+_bmad/
+_bmad-output/
+.claude/skills/bmad-*
+.agents/skills/bmad-*

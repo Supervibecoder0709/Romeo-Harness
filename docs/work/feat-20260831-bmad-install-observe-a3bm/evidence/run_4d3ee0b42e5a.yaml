@@ -1,0 +1,850 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_4d3ee0b42e5a
+task_id: task_549f11b68a6f
+dispatch_id: ctx_8fce603b1cd9
+unit_id: feat-20260831-bmad-install-observe-a3bm
+spec_ref:
+  path: docs/work/feat-20260831-bmad-install-observe-a3bm/spec.md
+  sha256: 7b85807fb80c3ee84514ba13ba870bfddb47dc4bd47a6f88ed79d3083c6d26b8
+base_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl4-feat-20260831-bmad-install-observe-a3bm
+started_at: '2026-08-31T21:43:10+09:00'
+finished_at: '2026-08-31T22:10:12+09:00'
+commands:
+- id: skills-before
+  command: find .claude/skills .agents/skills -type f -exec shasum -a 256 {} + | sort | tee docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256
+  exit_code: 0
+  started_at: '2026-08-31T21:43:59+09:00'
+  finished_at: '2026-08-31T21:43:59+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/01-skills-before.log
+  log_sha256: 2695ed292bbc6913b17ced4276085129ad0601e78b550d55af7034a3cb26781b
+  stdout_tail: 'lls/systematic-debugging/find-polluter.sh
+
+    e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26  .agents/skills/systematic-debugging/condition-based-waiting.md
+
+    e89fec8400d6cd50f43407cec9fab50976ba4d55d0ec2eb51c0bd68036b54c26  .claude/skills/systematic-debugging/condition-based-waiting.md
+
+    ee3e07230f4d3d7a346d21b490209dd0ef3d6749c239fcd71b87305b9011822b  .agents/skills/implement/SKILL.md'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: home-skills-before
+  command: find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f -not -path "*/.system/*" 2>/dev/null
+    | sed "s|^$HOME|~|" | sort | tee docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt
+  exit_code: 0
+  started_at: '2026-08-31T21:44:04+09:00'
+  finished_at: '2026-08-31T21:44:04+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/02-home-skills-before.log
+  log_sha256: 4bc1b1dce1e1ece14df40758eb255433f86e027196f0a3a81c6cb868f87a7355
+  stdout_tail: '~/.claude/skills/explain/assets/explain-template.html
+
+    ~/.claude/skills/explain/references/pm-translation-rules.md
+
+    ~/.claude/skills/explain/references/visual-components.md
+
+    ~/.claude/skills/explain/SKILL.md'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: home-skills-before-full
+  command: find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f 2>/dev/null | sed "s|^$HOME|~|" |
+    sort | tee docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before-full.txt
+  exit_code: 0
+  started_at: '2026-08-31T21:44:05+09:00'
+  finished_at: '2026-08-31T21:44:05+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/03-home-skills-before-full.log
+  log_sha256: 8e22f5b0676419ca1aa32a782c4ab0c4274d6d2fc99260c4b1f96892a5ca81ab
+  stdout_tail: 's/skill-installer-small.svg
+
+    ~/.codex/skills/.system/skill-installer/assets/skill-installer.png
+
+    ~/.codex/skills/.system/skill-installer/LICENSE.txt
+
+    ~/.codex/skills/.system/skill-installer/scripts/github_utils.py
+
+    ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py
+
+    ~/.codex/skills/.system/skill-installer/scripts/list-skills.py
+
+    ~/.codex/skills/.system/skill-installer/SKILL.md'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: skills-verify-preinstall
+  command: shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256
+  exit_code: 0
+  started_at: '2026-08-31T21:44:18+09:00'
+  finished_at: '2026-08-31T21:44:18+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/04-skills-verify-preinstall.log
+  log_sha256: ec8bd6331581450246c0bb3d9b6a37ab257ab2a5d380cab172fa2acb23547a24
+  stdout_tail: 'KILL.md: OK
+
+    .agents/skills/requesting-code-review/SKILL.md: OK
+
+    .claude/skills/requesting-code-review/SKILL.md: OK
+
+    .agents/skills/systematic-debugging/find-polluter.sh: OK
+
+    .claude/skills/systematic-debugging/find-polluter.sh: OK
+
+    .agents/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .claude/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .agents/skills/implement/SKILL.md: OK'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: gitignore-check
+  command: mkdir -p _bmad _bmad-output && git check-ignore -q _bmad && git check-ignore -q _bmad-output
+    && git check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe
+  exit_code: 0
+  started_at: '2026-08-31T21:44:18+09:00'
+  finished_at: '2026-08-31T21:44:18+09:00'
+  seconds: 0.032
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/05-gitignore-check.log
+  log_sha256: d6f5eca707758b9064100a81e0982724357cb9b262d25ecb6fd196d7a6057285
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: install-codex
+  command: npx bmad-method install --directory . --modules core,bmm,cis --tools codex --yes
+  exit_code: 0
+  started_at: '2026-08-31T21:44:34+09:00'
+  finished_at: '2026-08-31T21:44:37+09:00'
+  seconds: 3.164
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/06-install-codex.log
+  log_sha256: 73d5bd03392b8b9cced7f952aaa34c639dc52ba510194e82293208a6a8a97346
+  stdout_tail: 'to do!                                                                    │
+
+    │ │                                                                            │
+
+    │ │      Blog, Docs and Guides: https://bmadcode.com/                          │
+
+    │ │      Community: https://discord.gg/gk8jAdXWmj                              │
+
+    │ ╰────────────────────────────────────────────────────────────────────────────╯'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: skills-verify-after-codex
+  command: shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256
+  exit_code: 0
+  started_at: '2026-08-31T21:44:49+09:00'
+  finished_at: '2026-08-31T21:44:49+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/07-skills-verify-after-codex.log
+  log_sha256: ec8bd6331581450246c0bb3d9b6a37ab257ab2a5d380cab172fa2acb23547a24
+  stdout_tail: 'KILL.md: OK
+
+    .agents/skills/requesting-code-review/SKILL.md: OK
+
+    .claude/skills/requesting-code-review/SKILL.md: OK
+
+    .agents/skills/systematic-debugging/find-polluter.sh: OK
+
+    .claude/skills/systematic-debugging/find-polluter.sh: OK
+
+    .agents/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .claude/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .agents/skills/implement/SKILL.md: OK'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: home-verify-after-codex-full
+  command: find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f 2>/dev/null | sed "s|^$HOME|~|" |
+    sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before-full.txt
+  exit_code: 0
+  started_at: '2026-08-31T21:44:49+09:00'
+  finished_at: '2026-08-31T21:44:49+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/08-home-verify-after-codex-full.log
+  log_sha256: 6f7ba1db2b8cc434f929a7fb4fdb8f954961788063aebc0be863ad54bcb8da9f
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: install-both
+  command: npx bmad-method install --directory . --modules core,bmm,cis --tools codex,claude-code --action
+    update --yes
+  exit_code: 0
+  started_at: '2026-08-31T21:44:55+09:00'
+  finished_at: '2026-08-31T21:44:57+09:00'
+  seconds: 2.037
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/09-install-both.log
+  log_sha256: 6e427d0c06c352d9571b817dce05440ae3e629a3b5c0a6c63767560a7ee81741
+  stdout_tail: 'to do!                                                                    │
+
+    │ │                                                                            │
+
+    │ │      Blog, Docs and Guides: https://bmadcode.com/                          │
+
+    │ │      Community: https://discord.gg/gk8jAdXWmj                              │
+
+    │ ╰────────────────────────────────────────────────────────────────────────────╯'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: skills-verify-after-both
+  command: shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256
+  exit_code: 0
+  started_at: '2026-08-31T21:45:04+09:00'
+  finished_at: '2026-08-31T21:45:04+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/10-skills-verify-after-both.log
+  log_sha256: ec8bd6331581450246c0bb3d9b6a37ab257ab2a5d380cab172fa2acb23547a24
+  stdout_tail: 'KILL.md: OK
+
+    .agents/skills/requesting-code-review/SKILL.md: OK
+
+    .claude/skills/requesting-code-review/SKILL.md: OK
+
+    .agents/skills/systematic-debugging/find-polluter.sh: OK
+
+    .claude/skills/systematic-debugging/find-polluter.sh: OK
+
+    .agents/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .claude/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .agents/skills/implement/SKILL.md: OK'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: home-verify-after-both-full
+  command: find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f 2>/dev/null | sed "s|^$HOME|~|" |
+    sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before-full.txt
+  exit_code: 0
+  started_at: '2026-08-31T21:45:04+09:00'
+  finished_at: '2026-08-31T21:45:04+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/11-home-verify-after-both-full.log
+  log_sha256: 6f7ba1db2b8cc434f929a7fb4fdb8f954961788063aebc0be863ad54bcb8da9f
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: bmad-both-dirs
+  command: ls -d .claude/skills/bmad-* .agents/skills/bmad-* > /dev/null && echo "claude=$(ls -d .claude/skills/bmad-*
+    | wc -l) agents=$(ls -d .agents/skills/bmad-* | wc -l)"
+  exit_code: 0
+  started_at: '2026-08-31T21:45:04+09:00'
+  finished_at: '2026-08-31T21:45:04+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/12-bmad-both-dirs.log
+  log_sha256: d70edfb20a1df3a6b26a3bdfebd6f5e1807c89b2f5eacd5992b87accd6b48836
+  stdout_tail: claude=      59 agents=      59
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: probe-present
+  command: 'bin/romeo doctor 2>&1 | grep -q "discovery.bmad: present"'
+  exit_code: 0
+  started_at: '2026-08-31T21:45:22+09:00'
+  finished_at: '2026-08-31T21:45:23+09:00'
+  seconds: 0.628
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/13-probe-present.log
+  log_sha256: da8c60feb98935f17da600a150adf16f36b17d21ba5dd26d26f223cbf7d353ed
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: probe-print
+  command: bin/romeo doctor 2>&1 | grep -A3 "discovery.bmad"
+  exit_code: 0
+  started_at: '2026-08-31T21:45:23+09:00'
+  finished_at: '2026-08-31T21:45:23+09:00'
+  seconds: 0.539
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/14-probe-print.log
+  log_sha256: 2272b7d7d589b1620550b66d968499069510b75eee67b130ba72055dd4a5e0dc
+  stdout_tail: "tc), 'lastUpdated': datetime.datetime(2026, 8, 31, 12, 44, 57, 198000, tzinfo=datetime.timezone.utc),\
+    \ 'source': 'external', 'npmPackage': 'bmad-creative-intelligence-suite', 'repoUrl': 'https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite',\
+    \ 'channel': 'stable', 'sha': '97298b22fee1c7e482710d3a8414adb5cfccccd9'}\n      platform_codes: codex,\
+    \ claude-code\n      설치 흔적일 뿐 실행 증거가 아니다"
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: manifest-exists
+  command: test -f _bmad/_config/manifest.yaml
+  exit_code: 0
+  started_at: '2026-08-31T21:45:23+09:00'
+  finished_at: '2026-08-31T21:45:23+09:00'
+  seconds: 0.003
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/15-manifest-exists.log
+  log_sha256: 99a30ef3b2fd47c0af9dbb627f069adc0bf9dc8f074fb6a0f3349c1db537b71c
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: runtime-load-claude
+  command: claude -p --max-turns 1 --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config
+    "도구를 하나도 쓰지 말고 즉시 답하라. 지금 이 세션에 런타임이 제공한 스킬 목록(Skill 도구로 호출 가능한 이름)만 보고, 그 이름을 한 줄에 하나씩 전부 인쇄하라. 파일
+    시스템을 읽지 말고 설명·머리말도 붙이지 마라." < /dev/null
+  exit_code: 0
+  started_at: '2026-08-31T21:47:42+09:00'
+  finished_at: '2026-08-31T21:47:47+09:00'
+  seconds: 4.594
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/16-runtime-load-claude.log
+  log_sha256: ae060dd480f77d810997496166bddee0d46a11b44635aabc0c4525e87362cffc
+  stdout_tail: '이 세션에는 Skill 도구가 제공되지 않았습니다. 사용 가능한 도구는 Glob, Grep, Read 세 개뿐이라 인쇄할 스킬 이름 목록이 없습니다.
+
+
+    (CLAUDE.md에 나열된 `plan`, `implement` 등은 문서 내용이지 이 세션에서 호출 가능한 스킬이 아닙니다.)'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: runtime-load-claude-skilltool
+  command: claude -p --max-turns 1 --tools "Skill" --allowedTools "Skill" --strict-mcp-config "스킬을 호출하지
+    말고 즉시 답하라. 이 세션에 제공된 사용 가능한 스킬(available skills) 목록의 이름을 한 줄에 하나씩 전부 인쇄하라. 설명·머리말 없이 이름만." < /dev/null
+  exit_code: 0
+  started_at: '2026-08-31T21:48:14+09:00'
+  finished_at: '2026-08-31T21:48:29+09:00'
+  seconds: 14.954
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/17-runtime-load-claude-skilltool.log
+  log_sha256: cea898345848756489146563a2d2443aeb8ca4d2db4483adea695a9f83352739
+  stdout_tail: 'anything:understand-explain
+
+    understand-anything:understand-knowledge
+
+    understand-anything:understand-onboard
+
+    claude-council:council-execution
+
+    claude-council:deep-execution
+
+    claude-council:local-council-execution
+
+    claude-council:provider-integration
+
+    dataviz
+
+    update-config
+
+    keybindings-help
+
+    code-review
+
+    simplify
+
+    fewer-permission-prompts
+
+    loop
+
+    schedule
+
+    claude-api
+
+    workflow-authoring
+
+    run
+
+    init
+
+    security-review'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: runtime-load-codex
+  command: codex exec -s read-only --skip-git-repo-check -C "$PWD" "스킬을 호출하지 말고 즉시 답하라. 파일 시스템을 읽지 말고,
+    이 세션에 런타임이 제공한 사용 가능한 스킬(available skills) 목록의 이름만 한 줄에 하나씩 전부 인쇄하라. 설명·머리말 없이 이름만." < /dev/null
+  exit_code: 0
+  started_at: '2026-08-31T21:48:40+09:00'
+  finished_at: '2026-08-31T21:49:18+09:00'
+  seconds: 37.253
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/18-runtime-load-codex.log
+  log_sha256: cb4af3c597e0b9c17ec5cd39ed35bdc8b3fc16403146abd2f7b6f49ab7cea426
+  stdout_tail: 'ter-use
+
+    documents:documents
+
+    find-skills
+
+    korean-legal-case-prep:beopsuny
+
+    korean-legal-case-prep:korean-law-case-prep
+
+    korean-legal-case-prep:legalize-kr
+
+    orca-cli
+
+    orca-per-workspace-env
+
+    orchestration
+
+    pdf:pdf
+
+    presentations:Presentations
+
+    sites:sites-building
+
+    sites:sites-hosting
+
+    skill-creator
+
+    spreadsheets:Spreadsheets
+
+    spreadsheets:excel-live-control
+
+    template-creator:template-creator
+
+    visualize:visualize'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: workflow-direct-call-claude
+  command: 'claude -p --max-turns 6 --tools "Skill" "Read" "Glob" --allowedTools "Skill" "Read" "Glob"
+    --strict-mcp-config "agent 를 거치지 않고 Skill 도구로 bmad-cis-design-thinking 을 직접 호출하라. 완주시키지 말고 첫 단계가 시작되는
+    지점에서 멈춘다. 그다음 다음 세 가지를 보고하라: (1) 그 SKILL 이 로드됐는가 (2) 로드된 SKILL 의 첫 지시가 무엇인가 (3) config.yaml 이나 persistent
+    facts 를 스스로 해석하려 했는가. 파일을 만들거나 고치지 마라." < /dev/null'
+  exit_code: 0
+  started_at: '2026-08-31T21:49:48+09:00'
+  finished_at: '2026-08-31T21:50:46+09:00'
+  seconds: 57.306
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/19-workflow-direct-call-claude.log
+  log_sha256: 7fafbe204cc689b4329bb777c76c85d106d5b52e3584196bdccf3244f2050a62
+  stdout_tail: 'view` 만 대상으로 하고 있어서, bmad 계열은 아직 덮이지 않은 상태로 보입니다.
+
+    - **`<template-output>` 마다 즉시 파일 저장 + 4지선다 대기**가 행동 제약에 박혀 있어, 완주시키면 파일 쓰기가 7단계 × 2~3회 발생합니다.
+
+
+    ---
+
+
+    **결정한 것:** 활성화 Step 1 직전에서 멈췄습니다 — "첫 단계가 시작되는 지점"을 워크플로 Step 1 이 아니라 활성화 Step 1 로 읽었습니다. 활성화 단계가
+    스크립트 실행·설정 해석·파일 접근을 전부 포함하고 있어서, 그걸 돌리면 (3) 번 질문의 답이 관측이 아니라 제 행동의 결과가 되기 때문입니다.
+
+
+    **사용한 스킬:** `bmad-cis-design-thinking` (Skill 도구 직접 호출, agent 경유 없음)'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 5ed1409cd80cfac04df307493c0e79daed8a432525efa0fefae82704f095052b
+- id: check-1
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-08-31T21:56:00+09:00'
+  finished_at: '2026-08-31T21:57:35+09:00'
+  seconds: 95.177
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/20-check-1.log
+  log_sha256: 38c1e7c9411e116c493b31fa8eba4c44c1904cad21b6e5f31aef19ceb19313bc
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-2
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-31T21:57:35+09:00'
+  finished_at: '2026-08-31T21:57:36+09:00'
+  seconds: 0.116
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/21-check-2.log
+  log_sha256: e4b472b8b2467c448b48c0a0ba7df5f83dfdddbf44306440704d4ad568fca285
+  stdout_tail: 'unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl4-feat-20260831-bmad-install-observe-a3bm/docs/work/feat-20260831-repeat-brake-82zv/brief.md
+    lines=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl4-feat-20260831-bmad-install-observe-a3bm/docs/work/feat-20260831-repeat-brake-82zv/spec.md
+    lines=147 needs_input=0 unchecked_ac=0'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-3
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-08-31T21:57:36+09:00'
+  finished_at: '2026-08-31T21:57:36+09:00'
+  seconds: 0.173
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/22-check-3.log
+  log_sha256: 17033baa97781bd00249fa02647dbc3a560102d625c444e509ef61b4db499cc8
+  stdout_tail: compile 검사 PASS
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-4
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-08-31T21:57:36+09:00'
+  finished_at: '2026-08-31T21:57:37+09:00'
+  seconds: 0.585
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/23-check-4.log
+  log_sha256: 5a4a1ad0f18af5c9f9eb52ee4a9507600b01e6109cf91c69415461d427dbb401
+  stdout_tail: "bmad-module-creative-intelligence-suite', 'channel': 'stable', 'sha': '97298b22fee1c7e482710d3a8414adb5cfccccd9'}\n\
+    \      platform_codes: codex, claude-code\n      설치 흔적일 뿐 실행 증거가 아니다\n  미설치는 결함이 아니다 — 이 절은 인쇄만 하고\
+    \ 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS · 이 머신의 런타임: PASS\n주의: claude\
+    \ · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-5
+  command: shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256
+  exit_code: 0
+  started_at: '2026-08-31T21:57:37+09:00'
+  finished_at: '2026-08-31T21:57:37+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/24-check-5.log
+  log_sha256: 26d14c138ab86a901ee9b0f7da51956e15121dcf17fd366bbc080fcdea3f1efe
+  stdout_tail: 'KILL.md: OK
+
+    .agents/skills/requesting-code-review/SKILL.md: OK
+
+    .claude/skills/requesting-code-review/SKILL.md: OK
+
+    .agents/skills/systematic-debugging/find-polluter.sh: OK
+
+    .claude/skills/systematic-debugging/find-polluter.sh: OK
+
+    .agents/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .claude/skills/systematic-debugging/condition-based-waiting.md: OK
+
+    .agents/skills/implement/SKILL.md: OK'
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-6
+  command: test -f _bmad/_config/manifest.yaml
+  exit_code: 0
+  started_at: '2026-08-31T21:57:37+09:00'
+  finished_at: '2026-08-31T21:57:37+09:00'
+  seconds: 0.003
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/25-check-6.log
+  log_sha256: 9afd55ff1d260491a740cded4cef65e9756d5c15a95015041f14c41be0143ba7
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-7
+  command: 'bin/romeo doctor 2>&1 | grep -q ''discovery.bmad: present'''
+  exit_code: 0
+  started_at: '2026-08-31T21:57:37+09:00'
+  finished_at: '2026-08-31T21:57:37+09:00'
+  seconds: 0.571
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/26-check-7.log
+  log_sha256: 3cf8691990f4f8c9dcfdf051129fa377bffecf461ab02bae6ff4ee725bfa60c9
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-8
+  command: find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f -not -path "*/.system/*" 2>/dev/null
+    | sed "s|^$HOME|~|" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt
+  exit_code: 0
+  started_at: '2026-08-31T21:57:37+09:00'
+  finished_at: '2026-08-31T21:57:37+09:00'
+  seconds: 0.008
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/27-check-8.log
+  log_sha256: 9950d65ac561e064c4137dba427739cd9e66afd633a8eb49d86c7c0502ec62bb
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-9
+  command: git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore -q .claude/skills/bmad-probe
+    && git check-ignore -q .agents/skills/bmad-probe
+  exit_code: 0
+  started_at: '2026-08-31T21:57:38+09:00'
+  finished_at: '2026-08-31T21:57:38+09:00'
+  seconds: 0.026
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/28-check-9.log
+  log_sha256: 9756514d66f1f3a35e6ae05687bf6a2f73ae5b84177b356560fd5d97fec6bf40
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-10
+  command: '! git status --porcelain --untracked-files=all | grep -qE ''^\?\? (_bmad|\.claude/skills/bmad-|\.agents/skills/bmad-)'''
+  exit_code: 0
+  started_at: '2026-08-31T21:57:38+09:00'
+  finished_at: '2026-08-31T21:57:38+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/29-check-10.log
+  log_sha256: 0716be3c176c28fe2317a3fb6abb97a34d0cfad6ad7f470ac5adb39ce8122914
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-11
+  command: '! grep -q ''흉내 낸 테스트로만 확인했다'' core/policy/capabilities.yaml'
+  exit_code: 0
+  started_at: '2026-08-31T21:57:38+09:00'
+  finished_at: '2026-08-31T21:57:38+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/30-check-11.log
+  log_sha256: 1787caa016a8afac17f63be4b58e7e29dbf6f082b935e52731254fbf21a2782e
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: check-12
+  command: python3 -c "import yaml; d=yaml.safe_load(open('.harness/observations.yaml')); assert 'bmad_install'
+    in d"
+  exit_code: 0
+  started_at: '2026-08-31T21:57:38+09:00'
+  finished_at: '2026-08-31T21:57:38+09:00'
+  seconds: 0.041
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/31-check-12.log
+  log_sha256: 89c1cabe2d67e3fc1c1bb4fe796eda4bc4a50f911256331808aebb768fbed26f
+  stdout_tail: ''
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-bmad-install-observe-a3bm'
+  exit_code: 0
+  started_at: '2026-08-31T22:01:26+09:00'
+  finished_at: '2026-08-31T22:01:26+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/32-review-tree-before.log
+  log_sha256: 31cd041d6ec69246825775a6048d395a99f80896cd819781e2fb677c58ddac80
+  stdout_tail: "M .gitignore\n M core/policy/capabilities.yaml\n M provenance/imports.yaml"
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl4-feat-20260831-bmad-install-observe-a3bm/.harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-31T22:01:36+09:00'
+  finished_at: '2026-08-31T22:01:36+09:00'
+  seconds: 0.038
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/33-reviewer-brief.log
+  log_sha256: f88d76619fa0b969216185599a229c79f7512e45bcbd6a72e584e0946d4618de
+  stdout_tail: 7ac17775c8a1371900bb5962314674af0e7034d5c64d1024990b7319ea43e0f8  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl4-feat-20260831-bmad-install-observe-a3bm/.harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/reviewer-brief.md
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-bmad-install-observe-a3bm'
+  exit_code: 0
+  started_at: '2026-08-31T22:10:03+09:00'
+  finished_at: '2026-08-31T22:10:03+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/34-review-tree-after.log
+  log_sha256: 31cd041d6ec69246825775a6048d395a99f80896cd819781e2fb677c58ddac80
+  stdout_tail: "M .gitignore\n M core/policy/capabilities.yaml\n M provenance/imports.yaml"
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260831-bmad-install-observe-a3bm/review/run_4d3ee0b42e5a-reviewer.json
+  exit_code: 0
+  started_at: '2026-08-31T22:10:12+09:00'
+  finished_at: '2026-08-31T22:10:12+09:00'
+  seconds: 0.031
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/35-review-record.log
+  log_sha256: a66e066a06836a742ce15f02184f71479702c3bc8979f71e9c1edbf8e466d93f
+  stdout_tail: b6f9e363ed99943fd377c9a9ee7c4437319d4241cc0beb5750d37b1b957fc94e  docs/work/feat-20260831-bmad-install-observe-a3bm/review/run_4d3ee0b42e5a-reviewer.json
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 3ae18642ec27f1c60a792841421cbd264297fdd508554a76fc88b5c3c3763bbf
+changed_files:
+- .gitignore
+- core/policy/capabilities.yaml
+- provenance/imports.yaml
+artifact_hash: 45b43eee8ac266b9d0bd278b6f635f1c09f560ebf99f7365b37f95ea329ea2fc
+reviewer: null
+verdict: PASS
+approvals:
+- guard: production-deploy
+  approved_at: '2026-08-31T21:43:10+09:00'
+  approved_by: Supervibecoder0709
+  note: '영향 범위: npx 로 외부 Node 패키지(bmad-method)를 내려받아 이 버리는 워크트리에서 실행한다. 쓰기 대상은 저장소 안 .claude/skills ·
+    .agents/skills · _bmad/ · _bmad-output/ 이고 운영 환경·사용자 데이터·외부 서비스는 없다. 복구: git checkout -- .claude/skills
+    .agents/skills · rm -rf _bmad _bmad-output · 최후에는 워크트리 폐기(메인 체크아웃 무영향). 저장소 밖(홈 전역 스킬 디렉터리)은 되돌리지
+    않고 설치 직전 목록과 직후 대조로 관측해 변화가 보이면 중단한다. 승인 근거: spec 확인란 approved_at 2026-08-31T21:35:37+09:00.'
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/approve-01-production-deploy.log
+  log_sha256: 59299a452bc67acc9a8865ba8c3136eed158a929dc77701be7c90bd74d0fb2c3
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- guard: deletion
+  approved_at: '2026-08-31T21:43:17+09:00'
+  approved_by: Supervibecoder0709
+  note: '영향 범위: BMAD 설치기가 romeo 스킬이 사는 .claude/skills · .agents/skills 에 쓰므로 기존 스킬 파일이 지워질 수 있다(관측 대상
+    자체다). 되돌리기 실패 시 rm -rf _bmad _bmad-output 로 설치본을 지운다. 복구: 두 디렉터리는 git 추적이므로 git checkout -- .claude/skills
+    .agents/skills 로 복원되고 bin/romeo compile 이 코어에서 다시 만든다. 사전 백업: 설치 직전 두 디렉터리 전 파일의 sha256 목록을 evidence/skills-before.sha256
+    에 고정한다. 승인 근거: spec 확인란 approved_at 2026-08-31T21:35:37+09:00.'
+  log: .harness/runs/feat-20260831-bmad-install-observe-a3bm/run_4d3ee0b42e5a/approve-02-deletion.log
+  log_sha256: 22e706479e157c521243003f3a43ebc83b54d09b8371382736a6e05e63665af7
+  head_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+close:
+  at: '2026-08-31T22:14:02+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-08-31T21:35:37+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_4d3ee0b42e5a — 검증 계획 12건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 1ae907dda5b8 vs 현재 1ae907dda5b8
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 3ae18642ec27 vs 현재 3ae18642ec27 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — test -f _bmad/_config/manifest.yaml'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — bin/romeo doctor 2>&1 | grep -q ''discovery.bmad: present'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f -not -path "*/.system/*"
+      2>/dev/null | sed "s|^$HOME|~|" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore
+      -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — ! git status --porcelain --untracked-files=all | grep -qE ''^\?\? (_bmad|\.claude/skills/bmad-|\.agents/skills/bmad-)'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — ! grep -q ''흉내 낸 테스트로만 확인했다'' core/policy/capabilities.yaml'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — python3 -c "import yaml; d=yaml.safe_load(open(''.harness/observations.yaml''));
+      assert ''bmad_install'' in d"'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 35건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: GUARD_APPROVED
+    ok: true
+    level: error
+    detail: production-deploy (운영 배포) 승인 기록 1건 — 원시 로그와 일치
+  - id: GUARD_APPROVED
+    ok: true
+    level: error
+    detail: deletion (삭제) 승인 기록 1건 — 원시 로그와 일치
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 12건이 승인 커밋 767721c5d9d1 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — test -f _bmad/_config/manifest.yaml'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — bin/romeo doctor 2>&1 | grep -q ''discovery.bmad: present'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — find "$HOME/.codex/skills" "$HOME/.claude/skills" -type f -not -path
+      "*/.system/*" 2>/dev/null | sed "s|^$HOME|~|" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — git check-ignore -q _bmad && git check-ignore -q _bmad-output && git
+      check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — ! git status --porcelain --untracked-files=all | grep -qE ''^\?\?
+      (_bmad|\.claude/skills/bmad-|\.agents/skills/bmad-)'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — ! grep -q ''흉내 낸 테스트로만 확인했다'' core/policy/capabilities.yaml'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — python3 -c "import yaml; d=yaml.safe_load(open(''.harness/observations.yaml''));
+      assert ''bmad_install'' in d"'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 767721c5d9d1 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.gitignore', 'core/policy/capabilities.yaml', 'provenance/imports.yaml']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_4d3ee0b42e5a-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

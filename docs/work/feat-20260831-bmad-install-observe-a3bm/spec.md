@@ -10,14 +10,14 @@ gates: [privacy-security]
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-08-31T21:35:37+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-31T22:14:02+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_4d3ee0b42e5a.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:gate.any=kept', 'profile:mode.experiment=kept', 'profile:uncertainty.medium=kept',
@@ -56,13 +56,13 @@ approval_history:
 - **왜 지금:** 라우터는 이미 BMAD 스킬 11종을 추천하고 있는데, 그 스킬들이 설치했을 때 실제로 쓸 수 있는지는 아무도 확인하지 않았다. 프로브의 `present` 분기는 marker 파일을 흉내 낸 테스트로만 확인됐다. 추천을 관측에 근거하게 만드는 것이 G-M3 5단계의 남은 절반이다.
 - **기대 결과:** ① romeo 스킬(claude 11종·codex 12종)이 설치 뒤에도 그대로다 ② 프로브가 실제 설치본에서 처음으로 `present` 를 낸다 ③ 두 런타임의 스킬 목록에 `bmad-*` 가 나타났는지가 실행 출력으로 기록된다 ④ `capabilities.yaml` 의 "테스트로만 확인했다" 가 실측 기록으로 바뀐다. **공존이 불가능하다는 결과도 유효한 결과다** — 그때는 되돌리고 멈춘 뒤 사람에게 돌아온다.
 - **수용 기준:**
-  - [ ] AC-1 설치 **직전**에 두 스킬 디렉터리의 sha256 목록을 파일로 고정하고, 설치 후 그 대조가 전부 통과한다 — romeo 스킬이 하나도 바뀌지 않았다.
-  - [ ] AC-2 저장소 밖(홈의 전역 스킬 디렉터리)에 변화가 없다. 설치 직전에 뜬 목록과 설치 후 목록이 같다. **비교에서 `*/.system/*` 은 뺀다** — 1회차에서 codex 런타임을 띄우는 것 자체가 `~/.codex/skills/.system/` 을 통째로 다시 쓴다는 것이 관측됐고(설치기가 한 일이 아니다), 이 단위는 codex 를 반드시 띄우므로 그것을 넣은 채로는 통과할 수 없는 검사가 된다. 그 대신 설치 **직후마다** 대조해 설치기 자신의 쓰기를 잡는다.
-  - [ ] AC-3 `_bmad/_config/manifest.yaml` 이 생기고 `romeo doctor` 의 능력 프로브가 `discovery.bmad: present` 를 인쇄한다.
-  - [ ] AC-4 설치 뒤에도 `romeo compile --check` · `romeo doctor --strict --scope repository` · `romeo validate` · 하네스 테스트가 전부 통과한다. **`--strict` 가 붙어야 판정이 된다** — 1회차에서 `bin/romeo doctor` 만으로는 저장소 결함이 있어도 exit 0 이라 빈 검사였다(Q-21).
-  - [ ] AC-5 두 런타임 각각의 스킬 목록에 `bmad-*` 가 나타났는지, CIS workflow 1종을 agent 없이 직접 호출했을 때 시작되는지가 실행 출력과 함께 `.harness/observations.yaml` 에 기록된다. **"나타나지 않았다" 도 유효한 기록**이며 그렇게 적는다.
-  - [ ] AC-6 `core/policy/capabilities.yaml` 에서 "marker 파일을 흉내 낸 테스트로만 확인했다" 문장이 사라지고 실측 기록으로 대체된다. `provenance/imports.yaml` 의 `bmad-cis.unverified` 도 같은 시점에 갱신된다.
-  - [ ] AC-7 설치 산출물이 git 에 들어가지 않는다 — `_bmad/` · `_bmad-output/` · 두 스킬 디렉터리의 `bmad-*` 가 무시되고, 추적 트리에 untracked 로 남지 않는다.
+  - [x] AC-1 설치 **직전**에 두 스킬 디렉터리의 sha256 목록을 파일로 고정하고, 설치 후 그 대조가 전부 통과한다 — romeo 스킬이 하나도 바뀌지 않았다.
+  - [x] AC-2 저장소 밖(홈의 전역 스킬 디렉터리)에 변화가 없다. 설치 직전에 뜬 목록과 설치 후 목록이 같다. **비교에서 `*/.system/*` 은 뺀다** — 1회차에서 codex 런타임을 띄우는 것 자체가 `~/.codex/skills/.system/` 을 통째로 다시 쓴다는 것이 관측됐고(설치기가 한 일이 아니다), 이 단위는 codex 를 반드시 띄우므로 그것을 넣은 채로는 통과할 수 없는 검사가 된다. 그 대신 설치 **직후마다** 대조해 설치기 자신의 쓰기를 잡는다.
+  - [x] AC-3 `_bmad/_config/manifest.yaml` 이 생기고 `romeo doctor` 의 능력 프로브가 `discovery.bmad: present` 를 인쇄한다.
+  - [x] AC-4 설치 뒤에도 `romeo compile --check` · `romeo doctor --strict --scope repository` · `romeo validate` · 하네스 테스트가 전부 통과한다. **`--strict` 가 붙어야 판정이 된다** — 1회차에서 `bin/romeo doctor` 만으로는 저장소 결함이 있어도 exit 0 이라 빈 검사였다(Q-21).
+  - [x] AC-5 두 런타임 각각의 스킬 목록에 `bmad-*` 가 나타났는지, CIS workflow 1종을 agent 없이 직접 호출했을 때 시작되는지가 실행 출력과 함께 `.harness/observations.yaml` 에 기록된다. **"나타나지 않았다" 도 유효한 기록**이며 그렇게 적는다.
+  - [x] AC-6 `core/policy/capabilities.yaml` 에서 "marker 파일을 흉내 낸 테스트로만 확인했다" 문장이 사라지고 실측 기록으로 대체된다. `provenance/imports.yaml` 의 `bmad-cis.unverified` 도 같은 시점에 갱신된다.
+  - [x] AC-7 설치 산출물이 git 에 들어가지 않는다 — `_bmad/` · `_bmad-output/` · 두 스킬 디렉터리의 `bmad-*` 가 무시되고, 추적 트리에 untracked 로 남지 않는다.
 - **위험과 되돌리기:** 위험은 셋이다. ① `npx` 가 **외부 Node 코드를 받아 실행**한다 — 무엇을 쓰는지 사전에 알 수 없다. ② 설치 대상이 romeo 스킬이 사는 바로 그 두 디렉터리다 — 지워지면 `/plan` 자체가 안 돈다. ③ 아카이브 [E09] 는 codex 설치 경로에 **전역 `~/.codex/skills`** 를 적고 있다 — 저장소 밖이라 워크트리 격리로 막히지 않는다. 되돌리기: 저장소 안은 두 디렉터리가 git 추적이고 트리가 clean 이므로 `git checkout -- .claude/skills .agents/skills` 로 복원되고, `romeo compile` 로도 재생성된다. 작업 자체가 **버리는 워크트리**에서 일어나므로 메인 체크아웃은 처음부터 손대지 않는다. 저장소 밖은 되돌리지 않고 **먼저 관측해 멈춘다** — 설치 직전에 전역 목록을 떠 두고, 변화가 보이면 그 자리에서 중단하고 보고한다.
 - **결정 필요:** 없음 — 설치 승인 자체가 이 확인란의 승인이다. **설치를 몇 번에 나눠 어떤 순서로 실행할지는 방법이므로 구현 단위 표가 정한다** — 확인란은 결과와 그 이유만 담는다. 3회차에서 확인란이 방법(「한 번에 하나씩」)을 못박는 바람에 그 방법으로는 AC-5 를 달성할 수 없다는 것이 실행 중에 드러났고, 구현자는 관측을 위해 결합 설치를 했으며 검토자는 그것을 승인되지 않은 행위로 정확히 잡았다 — 둘 다 옳았고 결함은 승인된 문장에 있었다(Q-24).
 
@@ -141,6 +141,6 @@ hard gate(privacy-security)가 발동했다. 승인 전 상태 변경 0건.
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-31T22:14:02+09:00 · HEAD 1ae907dda5b8 · 검사 기록 run_4d3ee0b42e5a
 
-- (없음)
+- [evidence/run_4d3ee0b42e5a.yaml](evidence/run_4d3ee0b42e5a.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
