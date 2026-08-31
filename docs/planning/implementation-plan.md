@@ -451,7 +451,7 @@ Romeo-Harness/
 | 게이트 | 시점 | 부품 | 확정하는 것 |
 | --- | --- | --- | --- |
 | G-M2 | M2 진입(첫 작업) | Superpowers | **닫힘 2026-08-27 (D-67)** — 7종 14파일 `verbatim`, 4종 deferred, 3종+visual companion rejected, override 3건 |
-| G-M3 | M3 진입 | BMAD 본체+CIS | **닫힘 2026-08-31 (D-77)** — 라우터 추천 **11종**(BMM 5 + core 2 + CIS workflow 4) `install`, deferred 5(`prd`·`architecture`·brownfield 2·`ux`→G-M6), excluded 40(persona 12·구현계 13·core 중복 15). 산출물은 `inputs:` 링크(경로 하드코딩 없음), **Codex 는 지원된다**(표기 내용이 뒤집힘) |
+| G-M3 | M3 진입 | BMAD 본체+CIS | **닫힘 2026-08-31 (D-77)** — 라우터 추천 **11종**(BMM 5 + core 2 + CIS workflow 4) `install`, deferred 5(`prd`·`architecture`·brownfield 2·`ux`→G-M6), excluded 40(persona 12·구현계 13·core 중복 15). 산출물은 `inputs:` 링크(경로 하드코딩 없음), **Codex 는 지원된다**(표기 내용이 뒤집힘). **부착(4단계) 닫힘 2026-08-31** — 프로브·추천·fixture 는 섰고 **실제 설치 관측(5단계)만 남았다** |
 | G-M6 | UI 프로젝트 발생 | WIG·taste·impeccable·ui-ux-pro-max | `verbatim` 파일 목록, `DESIGN.md` 스키마, ui-ux-pro-max 라이선스 판정 |
 | G-M7 | v1 통과 후 **+ 어댑터 managed block 규약 K-68 통과 후**(D-70) | OpenWiki | 부착 대상 프로젝트, `.openwikiignore`, 갱신 시점, `AGENTS.md`·`CLAUDE.md` 블록 소유권 분리 |
 
@@ -647,7 +647,7 @@ A-02(정책표 정확도), A-03(3-tier 충분성), A-04(경로 불변 탐색성)
 | 11 | 역할 교체 재현 + parity 보고 = **핵심 동등성 게이트** — **개정 4(D-76):** 게이트는 결정적 요소(봉투 스키마·역할 계약·`required_checks`·구현자 판정)만 센다. 검토자의 자유 판정은 advisory | `romeo fixtures parity --report` EXIT 0 · "핵심 동등성 게이트: PASS" · 검토 판정은 advisory 로 인쇄(게이트 아님) |
 | 12 | 라이선스 필드 T1 결과물 | `archive/README.md` 라이선스 열, 18개 `_source.md` `License:` 줄, CI PASS |
 | 13 | M3: Charter·discovery·gate·capabilities·doctor | 시나리오 3·8·9 런북 PASS, hard gate 8 각 fixture ≥ 1 |
-| 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06 ✅) → 추천 스킬 후보표 ✅ → 사용자 확정 ✅ (**1·2·3단계 닫힘 2026-08-31 · D-77**) → 남은 것은 §6.1 **4·5단계**: `install` 프로브 + `/plan` 링크 + K-68 검증 | discovery fixture 카드에 BMAD 스킬 추천·산출물 링크 요구; `capabilities.yaml`에 `discovery.bmad` 프로브·Codex 지원 여부 표기 |
+| 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06 ✅) → 추천 스킬 후보표 ✅ → 사용자 확정 ✅ (**1·2·3단계 닫힘 2026-08-31 · D-77**) → **4단계 닫힘 2026-08-31**(`feat-20260831-bmad-attach-probe-tgnb` close): `capabilities.yaml` 의 `discovery.bmad` 프로브 + `parts.bmad-cis` accepted + 추천 11종(정식 id) + 카드의 `inputs:` 요구 + 충돌 fixture c5·c6·c7. **5단계는 절반** — 설치 없이 확인 가능한 것만 했다 | discovery fixture 카드가 추천 11종·`inputs:` 요구·프로브 결과를 인쇄(실측); doctor 충돌 fixture 7종 통과. **남은 것**: BMAD 실제 설치 후 두 런타임 discovery 관측 — `.agents/skills` 를 installer 가 어떻게 다루는지가 그 단계의 위험이다 |
 | 14 | M4: find·context·승격·metrics | 중복 제안 1건, `docs/current/` 1건, 지표 표 출력, 깨진 링크 0 |
 | 15 | shadow mode 20건 완료 + **v1 릴리스 게이트 판정** | 분류 수정률·gate 누락 수 집계, V-0~V-10 전부 증거로 충족 → v1 완료 선언 |
 | 16 | M5(v1.1): attach·update·rollback — preflight·파일별 승인·원자적 적용·백업 복원 | 샌드박스 + 실제 프로젝트 1건, dirty/untracked 충돌 fixture 포함 시나리오 10 PASS |
