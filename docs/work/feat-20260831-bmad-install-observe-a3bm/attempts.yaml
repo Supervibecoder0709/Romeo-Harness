@@ -12,4 +12,16 @@ attempts:
     라는 환경 사실을 단언해 깨졌고(하네스 결함, tests/ 는 allowed_paths 밖 + §10 동결), check-8 은 codex 를 띄우는 것 자체가 ~/.codex/skills/.system/
     을 다시 쓰기 때문에 이 단위에서 설계상 통과할 수 없는 검사다(검증 계획 결함). 정비는 관통 사이에 한다.
   settled_at: '2026-08-31T18:45:20+09:00'
+- n: 2
+  run: run_6165c4796868
+  base_sha: 54dd04d3ffff29faadf17717f31cd61f1e93df4a
+  started_at: '2026-08-31T19:45:33+09:00'
+  result: fail
+  failure_class: harness
+  note: '검사 12건 전부 exit 0 으로 실행됐고 관측도 전부 성공했다(공존·프로브 present·두 런타임 discovery·workflow 직접 호출). 1회차가 남긴
+    K-62 위반(capabilities.yaml 의 _bmad-output 하드코딩)도 닫혔다. 막힌 것은 하나뿐이다 — romeo/util.py:67 의 시크릿 패턴이 파일명
+    ''skills-before'' 를 토큰으로 오탐해(sk + 10자 이상) evidence 에 기록되는 명령 문자열이 훼손되고, close.py:316 은 원문으로 정확 조회하므로
+    check-5·check-8 이 ''명령 없음'' 으로 떨어진다. close --dry-run 실측: FAIL 3건 = check-5 · check-8 · HAS_REVIEW(검토자
+    미실행). 나머지 전부 PASS.'
+  settled_at: '2026-08-31T20:12:57+09:00'
 reviews: []
