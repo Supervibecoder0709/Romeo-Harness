@@ -40,6 +40,19 @@ attempts:
   failure_class: null
   note: null
   settled_at: null
+- n: 5
+  run: run_923ba2a01bb4
+  base_sha: 91ac38b34dae7f8e94fa489b1a2a04fccf8a48bd
+  started_at: '2026-08-31T20:21:30+09:00'
+  result: fail
+  failure_class: outputs
+  note: 구현자는 성공했다 — 검사 12/12 exit 0, close 의 기록·재실행 대조 12/12 PASS, 봉투 앵커 양쪽 5/5, 방어 검사 유효(before/after
+    log_sha256 동일 1b0f9cab081e). 검토자(codex read-only)가 FAIL 을 냈고 findings 3건은 전부 정당하다. ① UNAPPROVED_ACTION
+    — 확인란이 '한 번에 하나씩' 을 못박았는데 --tools 가 교체라 두 런타임 동시 관측(AC-5)에는 결합 설치가 물리적으로 필요했다. 확인란이 자기 수용 기준을 금지한
+    것이므로 spec 결함이다. ② ③ 증거 결속 — docs/work/<id>/ 는 dirty_tree_hash·changed_files·artifact_hash 에서 제외되는데
+    baseline 파일을 그 안에 리다이렉트로 만들어 내용이 원시 로그에 남지 않았다(stdout_tail 3건 전부 빈 문자열, 실측). '설치 직전 상태' 라는 주장에 앵커가
+    없다. 고칠 자리는 spec 두 곳이다 — 확인란의 설치 순서 문장과, baseline 을 tee 로 만들어 원시 로그에 봉인하는 구현 단위.
+  settled_at: '2026-08-31T21:16:08+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다. 근거 셋. ① 2회차(run_6165c4796868)에서 required_checks 12건이 전부 exit 0 으로 실행됐다 —
