@@ -14,4 +14,19 @@ attempts:
     리비전에서 돌리면 [''a/x.py'',''a/y.py''] 로 떨어진다 — 고친 검사는 실제로 판별력이 있고 구현자의 변경이 그 조건을 이미 만족한다. 재승인(23:45)으로
     base 가 바뀌므로 이 Run 은 중단하고 새 base 로 다시 시작한다(RUNBOOK §3.4.1 · AGENTS.core §10).'
   settled_at: '2026-08-31T23:56:18+09:00'
+- n: 2
+  run: run_e5c7c10f80aa
+  base_sha: deae0aa27a86750ff766441354ab07476e3bc7d2
+  started_at: '2026-08-31T23:57:16+09:00'
+  result: fail
+  failure_class: harness
+  note: '구현자는 완전히 통과했다 — required_checks 14/14 exit 0, gate_verdict PASS, findings 0, changed_files 8건
+    전부 allowed_paths 안. 1회차가 막힌 자리(한 글자 오타)는 재승인 deae0aa 로 닫혔고 check-1·check-2 가 exit 0 이 됐다. 이번에 막은 것은
+    다른 자리다 — romeo/evidence.py:389 의 앵커 대조가 원시 로그의 첫 물리 줄 하나만 기록된 명령 전체와 비교해, 개행을 담은 명령은 어떤 구현으로도 EVIDENCE_ANCHORED
+    를 통과할 수 없다. 14건 중 개행을 담은 것은 check-9 뿐이고 나머지 13건은 command_log_state 가 True 다(실측). base_sha 시점에 이미 있던
+    결함이고 romeo/evidence.py 는 이 run 의 changed_files 밖이다. 코디네이터 실측 추가: close 는 이것을 무시하지 않는다 — close.py:155-166
+    이 EVIDENCE_LOG 를 level=error 로 FAIL 시키고 close.py:597 의 EVIDENCE_ANCHORED 도 FAIL 이므로 봉투만 내고 넘어가는 선택지는
+    없다. 사람이 (B)를 골랐다 — 변경 범위에 romeo/evidence.py·tests/test_docs_evidence_close.py 를 더하고 AC-9·구현 단위 7행·check-15·check-16
+    을 넣어 재승인하고 새 base 로 3회차를 돌린다.'
+  settled_at: '2026-09-01T00:27:07+09:00'
 reviews: []
