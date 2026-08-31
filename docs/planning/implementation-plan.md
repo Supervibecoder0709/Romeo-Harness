@@ -408,7 +408,7 @@ Romeo-Harness/
 | 저장소 | 채택 후보 요소 | 방식(후보) | 채택 이유 | 충돌 지점 → 통합 규약 처리 | 라이선스 | 게이트 | 검증 방법 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | obra/superpowers | **채택 7종 14파일**: `test-driven-development`(+`writing-good-tests.md`) · `systematic-debugging`(+참고 4·`find-polluter.sh`) · `verification-before-completion` · `requesting-code-review`(+`code-reviewer.md`) · `receiving-code-review` · `using-git-worktrees` · `finishing-a-development-branch`. **보류 4종**: `writing-plans` · `executing-plans` · `subagent-driven-development` · `dispatching-parallel-agents` | **`verbatim`** 7종 (M2, G-M2 닫힘 2026-08-27) — D-67. 보류 4종은 `deferred`(M3 재검토), `brainstorming`·`using-superpowers`·`writing-skills`·visual companion 은 `rejected` | 승인 이후 개발 규율의 빈칸(D-33). 채택 7종은 **나가는 참조가 세트 안에서 닫혀 깨진 링크 0**(고정 SHA 실측); 공식 porting guide가 C-C6의 출처라 원문 그대로가 벤더 중립 | **보류 사유(실측)**: `writing-plans` 는 "Every plan MUST start with this header" 로 계획 원본을 2개로 만들고(K-61) 제외 확정된 `brainstorming` 을 전제(깨진 링크) · `executing-plans` 는 제외 확정된 `using-superpowers/references/` 를 읽으라 지시(깨진 링크) + 6·7번을 REQUIRED SUB-SKILL 로 요구 · `subagent-driven-development` 는 "A running plan does not wait on a human" 으로 D-60 승인 모델과 정반대이고 자체 ledger 로 K-63 침범 · `dispatching-parallel-agents` 는 `Subagent (general-purpose)` 리터럴 지시로 전역 Orca 규칙과 충돌. **채택분 override**: `using-git-worktrees` 의 도구 지목 → `orca worktree create`, `finishing-a-development-branch` 의 merge/push/삭제 → deny 목록(K-66), `requesting-code-review` 의 `general-purpose` → 역할 바인딩 치환 | MIT | G-M2 **닫힘** | doctor discovery 양 런타임(A-11); 충돌 fixture 3종(K-68); 깨끗한 세션에서 T0 요청 시 brainstorming이 안 뜨고 `/plan`만 뜨는 transcript; 구현 후 fresh command output |
-| BMAD 본체 + CIS | 라우터가 추천할 스킬 후보: `bmad-brainstorming`, `bmad-product-brief`, `bmad-prd`, `bmad-cis-design-thinking` / `innovation-strategy` / `problem-solving` / `storytelling`; 산출물 `_bmad-output/**` | **`install`** 프로젝트별 + `/plan` 링크 (M3) — D-55 | 불확실성 축(D-32); 사용자 실사용("내가 써본 기획 하네스 중 가장 정교", `~/bmad-ordi` 6.10.0+CIS 0.2.1) | 매 template-output 뒤 체크포인트 대기·persona 인사 → K-60 라우터가 discovery/T2에서만 켬 · `_bmad/`+`customize.toml`+`uv run` = 3번째 SSOT → K-63 벤더링 없음 · `stepsCompleted` → K-63 참고용 · Claude 전용 설치(`ides: [claude-code]`) → K-68 정직 표기(A-12) · 본체 미아카이브 → Q-06 선행 | MIT (CIS 고정 SHA 실물; 본체는 아카이브 후 확인) | G-M3 | `capabilities.yaml` `discovery.bmad` 프로브; discovery fixture 카드가 스킬 추천 + 산출물 링크 요구; 링크 없는 산출물은 close 거부 |
+| BMAD 본체 + CIS | **확정 11종(D-77)**: `bmad-product-brief`·`bmad-prfaq`·`bmad-{domain,market,technical}-research`(BMM 5) + `bmad-brainstorming`·`bmad-forge-idea`(core 2) + `bmad-cis-design-thinking`/`innovation-strategy`/`problem-solving`/`storytelling`(CIS 4). `bmad-prd`·`bmad-architecture` 는 **deferred**(K-61 — Tech Spec `## 확인란`·`## 변경 범위`·인터페이스 열이 그 자리다). 산출물 경로는 **하드코딩하지 않는다** — `project_knowledge` 기본값이 `docs` 다 | **`install`** 프로젝트별 + `/plan` 링크 (M3) — D-55·D-77 | 불확실성 축(D-32); 사용자 실사용("내가 써본 기획 하네스 중 가장 정교", `~/bmad-ordi` 6.10.0+CIS 0.2.1) | 매 template-output 뒤 체크포인트 대기·persona 인사 → K-60 라우터가 discovery/T2에서만 켬 · `_bmad/`+`customize.toml`+`uv run` = 3번째 SSOT → K-63 벤더링 없음 · `stepsCompleted` → K-63 참고용 · Claude 전용 설치(`ides: [claude-code]`) → K-68 정직 표기(A-12) · 본체 미아카이브 → Q-06 선행 | MIT (CIS 고정 SHA 실물; 본체는 아카이브 후 확인) | G-M3 | `capabilities.yaml` `discovery.bmad` 프로브; discovery fixture 카드가 스킬 추천 + 산출물 링크 요구; 링크 없는 산출물은 close 거부 |
 | langchain-ai/openwiki | 도구 자체(`begin`/`finish` lifecycle, Claims, managed block) | **`install`** (v2, A-07) — D-56. 개정 2의 "원칙만 참고" 라벨은 오기 | 파생 지식 계층(D-23) | managed block 이름 → K-64 소유자 마커 · 계획 문서를 현재 기능으로 오해 → K-62 `.openwikiignore`에 `docs/work/**` · worktree마다 갱신 → D-24 기준 브랜치 반영 후 1건씩 | MIT | G-M7 | 실제 프로젝트 1건 부착 후 갱신 3회, `openwiki_finish.status=complete` |
 | pbakaus/impeccable | 스킬 본문, finish-reviewer `recapture/ship` 판정, `PRODUCT.md`/`DESIGN.md` 계약 | **`verbatim`**(스킬·판정) + **`rewrite`**(계약 스키마) (M6) | 디자인 완료 기준(C-G4) | CLI·hook·4 서브에이전트 → K-65·K-66 제외; "hook exit 0은 증거 아님" | Apache-2.0 (NOTICE) | G-M6 | 375/768/1440 스크린샷 없이는 close 불가 |
 | vercel-labs/web-interface-guidelines | `AGENTS.md`(MUST/SHOULD/NEVER), `command.md`(`file:line` 출력 계약) | **`verbatim`** 파일 2개 (M6) | UI 감사 규칙 | `install.sh`(전역 홈·`main` 비고정) → K-67 제외 | MIT | G-M6 | 감사 결과가 `file:line`으로 나오고 예외 승인 기록이 남는지 |
@@ -451,7 +451,7 @@ Romeo-Harness/
 | 게이트 | 시점 | 부품 | 확정하는 것 |
 | --- | --- | --- | --- |
 | G-M2 | M2 진입(첫 작업) | Superpowers | **닫힘 2026-08-27 (D-67)** — 7종 14파일 `verbatim`, 4종 deferred, 3종+visual companion rejected, override 3건 |
-| G-M3 | M3 진입 | BMAD 본체+CIS | 라우터가 추천할 스킬(discovery/T2별), 산출물 링크 규약, Codex 미지원 표기 |
+| G-M3 | M3 진입 | BMAD 본체+CIS | **닫힘 2026-08-31 (D-77)** — 라우터 추천 **11종**(BMM 5 + core 2 + CIS workflow 4) `install`, deferred 5(`prd`·`architecture`·brownfield 2·`ux`→G-M6), excluded 40(persona 12·구현계 13·core 중복 15). 산출물은 `inputs:` 링크(경로 하드코딩 없음), **Codex 는 지원된다**(표기 내용이 뒤집힘) |
 | G-M6 | UI 프로젝트 발생 | WIG·taste·impeccable·ui-ux-pro-max | `verbatim` 파일 목록, `DESIGN.md` 스키마, ui-ux-pro-max 라이선스 판정 |
 | G-M7 | v1 통과 후 **+ 어댑터 managed block 규약 K-68 통과 후**(D-70) | OpenWiki | 부착 대상 프로젝트, `.openwikiignore`, 갱신 시점, `AGENTS.md`·`CLAUDE.md` 블록 소유권 분리 |
 
@@ -517,7 +517,7 @@ Romeo-Harness/
 
 - **사용자 가치:** 큰 요청은 Charter로, 불확실한 요청은 discovery로 라우팅되고, 위험 요청은 승인 없이는 진행되지 않으며, 없는 도구는 정직하게 보고된다.
 - **왜 지금:** 정책표의 조건부 행이 실제로 발동하는지 확인. T2·discovery는 문서만으로 검증 가능(dry).
-- **만들 것:** `core/templates/charter.md`, packages.yaml의 T2·discovery·gate 행, `core/policy/capabilities.yaml`, `romeo doctor` 확장(MCP·브라우저 3모드 프로브), Orca `gate-create` 승인 흐름, `scenarios/` 런북 3·8·9. 실행 가드 집행 규칙: `execution-guards.yaml` 항목이 걸리면 정확한 대상·영향·백업·복구를 채운 뒤에만 `gate-create`가 생성되고, 승인 전 상태 변경 0건을 검사한다. **개정 3 — G-M3:** BMAD 본체+CIS를 `install` 부품으로 연결한다(D-55) — `capabilities.yaml`에 `discovery.bmad` 프로브(`_bmad/_config/manifest.yaml` 존재, 6.10.0 / CIS 0.2.1 고정, Codex 지원 여부), `/plan`이 `mode=discovery` 또는 T2로 판정하면 분류 카드에 사용자가 G-M3에서 확정한 BMAD 스킬(예: `bmad-cis-design-thinking`, `bmad-product-brief`, `bmad-prd`)을 추천하고, 그 산출물(`_bmad-output/**`)을 Brief/Charter frontmatter `inputs:`로 링크(복사 아님, K-62). 벤더링·템플릿 재작성은 하지 않는다.
+- **만들 것:** `core/templates/charter.md`, packages.yaml의 T2·discovery·gate 행, `core/policy/capabilities.yaml`, `romeo doctor` 확장(MCP·브라우저 3모드 프로브), Orca `gate-create` 승인 흐름, `scenarios/` 런북 3·8·9. 실행 가드 집행 규칙: `execution-guards.yaml` 항목이 걸리면 정확한 대상·영향·백업·복구를 채운 뒤에만 `gate-create`가 생성되고, 승인 전 상태 변경 0건을 검사한다. **개정 3 — G-M3:** BMAD 본체+CIS를 `install` 부품으로 연결한다(D-55) — `capabilities.yaml`에 `discovery.bmad` 프로브(`_bmad/_config/manifest.yaml` 존재, 6.10.0 / CIS 0.2.1 고정, 설치된 platform code), `/plan`이 `mode=discovery` 또는 T2로 판정하면 분류 카드에 **D-77 이 확정한 11종**(`bmad-product-brief`·`bmad-prfaq`·research 3종·`bmad-brainstorming`·`bmad-forge-idea`·CIS 4종)을 추천하고, 그 산출물을 Brief/Charter frontmatter `inputs:`로 링크(복사 아님, K-62). **산출물 경로를 `_bmad-output/**` 로 고정하지 않는다** — `bmm` 의 `project_knowledge` 기본값이 `docs` 라 그 경로가 우리 `docs/**` 와 겹친다. **Codex 는 지원된다**(D-77 정정): `platform-codes.yaml` 에서 `codex` 는 preferred 이고 타깃이 `.agents/skills` 인데, 그 경로는 `romeo compile` 의 쓰기 대상과 겹치므로 K-64·K-68 검증이 이 지점을 봐야 한다. 벤더링·템플릿 재작성은 하지 않는다.
 - **선행 조건:** M2, **G-M3 채택 게이트**(선행: Q-06 BMAD 본체 `/repo` 고정 SHA 아카이브 → 추천 스킬 후보표 → 사용자 확정).
 - **관찰 가능한 결과:** (시나리오 3) discovery fixture가 `SPEC_READY` 차단 + 첫 마일스톤 spike + 분류 카드가 BMAD/CIS 스킬을 추천하고 산출물 링크를 요구(G-M3 결과); (9) "archive 1개 삭제" 요청에 deletion gate 발동 → `gate-create` → 거부 시 `BLOCKED_APPROVAL` evidence; (8) "iOS 시뮬레이터 스크린샷 검증" 요청에 `BLOCKED_CAPABILITY` + 대안 목록.
 - **검증:** 각 시나리오 런북의 기대 판정과 실제 카드·evidence 대조; 재분류(T0→T1 승격) 경로에서 이전 frontmatter가 `routing.history`에 보존되는지.
@@ -647,7 +647,7 @@ A-02(정책표 정확도), A-03(3-tier 충분성), A-04(경로 불변 탐색성)
 | 11 | 역할 교체 재현 + parity 보고 = **핵심 동등성 게이트** — **개정 4(D-76):** 게이트는 결정적 요소(봉투 스키마·역할 계약·`required_checks`·구현자 판정)만 센다. 검토자의 자유 판정은 advisory | `romeo fixtures parity --report` EXIT 0 · "핵심 동등성 게이트: PASS" · 검토 판정은 advisory 로 인쇄(게이트 아님) |
 | 12 | 라이선스 필드 T1 결과물 | `archive/README.md` 라이선스 열, 18개 `_source.md` `License:` 줄, CI PASS |
 | 13 | M3: Charter·discovery·gate·capabilities·doctor | 시나리오 3·8·9 런북 PASS, hard gate 8 각 fixture ≥ 1 |
-| 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06) → 추천 스킬 후보표 → 사용자 확정 → `install` 프로브 + `/plan` 링크 | discovery fixture 카드에 BMAD 스킬 추천·산출물 링크 요구; `capabilities.yaml`에 `discovery.bmad` 프로브·Codex 지원 여부 표기 |
+| 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06 ✅) → 추천 스킬 후보표 ✅ → 사용자 확정 ✅ (**1·2·3단계 닫힘 2026-08-31 · D-77**) → 남은 것은 §6.1 **4·5단계**: `install` 프로브 + `/plan` 링크 + K-68 검증 | discovery fixture 카드에 BMAD 스킬 추천·산출물 링크 요구; `capabilities.yaml`에 `discovery.bmad` 프로브·Codex 지원 여부 표기 |
 | 14 | M4: find·context·승격·metrics | 중복 제안 1건, `docs/current/` 1건, 지표 표 출력, 깨진 링크 0 |
 | 15 | shadow mode 20건 완료 + **v1 릴리스 게이트 판정** | 분류 수정률·gate 누락 수 집계, V-0~V-10 전부 증거로 충족 → v1 완료 선언 |
 | 16 | M5(v1.1): attach·update·rollback — preflight·파일별 승인·원자적 적용·백업 복원 | 샌드박스 + 실제 프로젝트 1건, dirty/untracked 충돌 fixture 포함 시나리오 10 PASS |
@@ -723,6 +723,7 @@ docs/planning/open-questions.md를 읽고, 정본과 이 지시가 충돌하면 
 | 통합 규약 K-60~K-69 + 부품별 충돌 지점 적용표 | §6.2, `constraints.md` 7절 | D-53 |
 | Superpowers 규율 세트 `verbatim` 후보(`brainstorming`·`using-superpowers` 제외); implement/review 워크플로우는 호출 껍데기 | §6, M2 | D-54 |
 | BMAD 본체+CIS `install` + `/plan` 링크(벤더링 없음), M3로 당김 | §6, M3 | D-55 (D-31 대체) |
+| G-M3 닫힘 — 라우터 추천 11종 확정, `prd`·`architecture` deferred, Codex 지원 표기 정정 | §6, §6.1, M3, §10 #13b | D-77 (D-55 의 Codex 표기 정정) |
 | OpenWiki 라벨 정정("원칙만 참고" → `install`) | §6 | D-56 |
 | ui-ux-pro-max "제외(보류)" → 라이선스 확인 트랙 | §6, M6 | D-57 |
 | `install`·`verbatim`은 v1 안에서 허용, 동등성은 부품이 켜진 상태에서 판정 | §0, M2 다음 조건, `v1-scope.md` | D-58 |
@@ -730,7 +731,7 @@ docs/planning/open-questions.md를 읽고, 정본과 이 지시가 충돌하면 
 
 **바꾸지 않은 것:** Thin Policy-Compiled Planning Spine, unit/mode/facet, 3분할, 상태 계약(§3.5), 핵심 동등성 게이트·v1 릴리스 게이트의 존재, Codex 리뷰 반영(§11) 전부. 개정 3은 척추가 무엇을 라우팅하는지(부품)를 보탠 것이지 척추를 바꾼 것이 아니다.
 
-**미검증:** A-11(vendored 스킬의 양 런타임 discovery), A-12(BMAD의 Codex 지원). 둘 다 G-M2·G-M3에서 실측한다.
+**미검증:** A-11(vendored 스킬의 양 런타임 discovery). ~~A-12(BMAD의 Codex 지원)~~ → **해소(D-77)**: 지원한다 — `platform-codes.yaml` 에서 preferred, 타깃 `.agents/skills`. 다만 **설치 선언을 읽은 것이고 Codex 런타임에서 실제로 도는 것을 본 것은 아니다** — 그 실행은 §6.1 5단계(K-68)에서 관측한다.
 
 ## 13. 개정 4 반영 기록 (2026-08-29) — M2 완료 정의
 

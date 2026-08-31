@@ -39,10 +39,17 @@
 
 | 후보 id | 상태 | 게이트 |
 | --- | --- | --- |
+| `bmad-architecture` | deferred | G-M3 |
+| `bmad-brownfield-analysis` | deferred | G-M3 |
+| `bmad-prd` | deferred | G-M3 |
+| `bmad-ux` | deferred | G-M3 |
 | `sp-dispatching-parallel-agents` | deferred | G-M2 |
 | `sp-executing-plans` | deferred | G-M2 |
 | `sp-subagent-driven-development` | deferred | G-M2 |
 | `sp-writing-plans` | deferred | G-M2 |
+| `bmad-core-router-overlap` | rejected | G-M3 |
+| `bmad-implementation-suite` | rejected | G-M3 |
+| `bmad-persona-agents` | rejected | G-M3 |
 | `sp-brainstorming` | rejected | G-M2 |
 | `sp-using-superpowers` | rejected | G-M2 |
 | `sp-writing-skills` | rejected | G-M2 |

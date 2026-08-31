@@ -392,3 +392,222 @@ imports:
     local_path: null
     reason: 스킬 제작용. Romeo 의 대상은 작업이지 스킬이 아니다. 제외 확정된 using-superpowers 를 참조하기도 한다
     archive_ref: archive/obra-superpowers/03-components/skills.ko.md
+
+  # ── G-M3 (2026-08-31 닫힘) ─────────────────────────────────────────────
+  # BMAD 는 `install` 이다 — 파일을 가져오지 않는다. 확정한 것은 "라우터가
+  # discovery/T2 에서 추천할 스킬" 이고, 설치되지 않은 프로젝트에서는 프로브가 꺼진다.
+  # 46개 SKILL(Core 13 + BMM 33) + CIS 10 이 아래 항목에 빠짐없이 분류돼 있다.
+  - id: bmad-core-bmm
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_ref: v6.10.0
+    source_path: [src/core-skills/, src/bmm-skills/1-analysis/]
+    license: MIT
+    license_note: >-
+      root code·package 는 MIT 다. 단 TRADEMARK.md 가 BMad·BMad Method·BMad Core 의
+      이름·로고·tagline 은 MIT 로 license 되지 않는다고 명시한다 — 하네스 문서에
+      BMad 를 제품·기능 이름이나 도메인·로고로 쓰지 않는다(호환성 서술은 가능)
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: accepted
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    router_recommends:
+      # discovery 기본·반증
+      - bmad-product-brief      # {planning_artifacts}/briefs/brief-{name}-{date}/brief.md
+      - bmad-prfaq              # {planning_artifacts}/prfaq-{name}.md · -H headless 있음
+      - bmad-brainstorming      # core · {output_folder}/brainstorming/brainstorm-{topic}-{date}/
+      - bmad-forge-idea         # core · {output_folder}/forge/{forge-report.html,forged-idea.md}
+      # 근거 부족일 때
+      - bmad-domain-research    # {planning_artifacts}/research/domain-{slug}-research-{date}.md
+      - bmad-market-research    # {planning_artifacts}/research/market-{slug}-research-{date}.md
+      - bmad-technical-research # {planning_artifacts}/research/technical-{slug}-research-{date}.md
+    reason: >-
+      Romeo 에 실재하는 빈칸을 채운다 — core/templates/sections/discovery-plan.md 의
+      「조사 방법·기간: NEEDS_INPUT」 이 그 자리다. Romeo 는 조사를 어떻게 할지 적는 칸만
+      갖고 조사 자체는 하지 않는다. 산출물은 K-62 에 따라 inputs: 링크로만 붙는다(복사 아님)
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/04-components-table.md
+
+  - id: bmad-cis
+    source_repo: bmad-code-org/bmad-module-creative-intelligence-suite
+    source_sha: 0e4ff9233a792db1a1cd00f22a482f338168cdc3
+    source_ref: v0.2.1
+    source_path: [src/skills/bmad-cis-design-thinking/, src/skills/bmad-cis-innovation-strategy/, src/skills/bmad-cis-problem-solving/, src/skills/bmad-cis-storytelling/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: accepted
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    router_recommends:
+      - bmad-cis-design-thinking      # {output_folder}/design-thinking-{date}.md
+      - bmad-cis-innovation-strategy  # {output_folder}/innovation-strategy-{date}.md
+      - bmad-cis-problem-solving      # {output_folder}/problem-solution-{date}.md · experiment-design.md 와 짝
+      - bmad-cis-storytelling         # {output_folder}/story-{date}.md
+    reason: >-
+      brainstorming 이후의 구조화된 방법론이다. CIS 에는 brainstorming 이 없다 —
+      Carson agent 가 core 의 bmad-brainstorming 을 dispatch 할 뿐이고(agents.ko.md:90,
+      module-help.csv) 그 skill 은 이 저장소에 없다. 그래서 core 채택이 CIS 의 선행이다
+    depends_on: [bmad-core-bmm]
+    unverified: >-
+      agent 없이 workflow SKILL 을 직접 호출하는 경로는 원문 activation 계약으로만 확인했다
+      (workflows.ko.md 15~17: workflow 가 스스로 config.yaml 해석·persistent_facts 로드·시작).
+      실행하지 않았다 — §6.1 4·5단계(부착·검증)에서 실측한다
+    archive_ref: archive/bmad-code-org-bmad-module-creative-intelligence-suite/04-components-table.md
+
+  - id: bmad-prd
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/2-plan-workflows/bmad-prd/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: deferred
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    reason: >-
+      K-61 기획 원본 단일. prd.md 가 답하는 「무엇을·왜·요구사항」 은 Tech Spec 의
+      ## 확인란(무엇을·왜 지금·기대 결과·수용 기준 AC-n)이 이미 차지한다. BMAD 문서가
+      스스로 밝히듯 bmad-product-brief → bmad-prd 는 한 줄기인데, Romeo 에서 그 줄기는
+      brief → 확인란이다. PRD 를 끼우면 같은 요구가 세 곳에 적히고 승인은 확인란만 읽는다(D-27).
+      validate intent(체크리스트 비평 → findings)는 reviewer 역할·romeo close 와도 겹친다.
+      재검토 시점 — M3 에서 core/templates/charter.md 를 만들어 T2 경로를 실제로 돌린 뒤.
+      Charter 가 담지 못하는 층이 실측되면 M4 에서 켠다(정책표 한 줄)
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/01-docs/docs-reference-workflow-map.ko.md
+
+  - id: bmad-architecture
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/3-solutioning/bmad-architecture/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: deferred
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    reason: >-
+      ARCHITECTURE-SPINE.md 가 담는 technical decision 은 docs/decisions/decision-register.md
+      (D-xx·K-xx)와 Tech Spec ## 변경 범위가, 모듈 간 계약은 구현 단위 표의
+      「인터페이스 (소비 → 생산)」 열(D-69)이 이미 갖는다. bmad-prd 와 같은 시점에 재검토한다
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/01-docs/docs-reference-workflow-map.ko.md
+
+  - id: bmad-brownfield-analysis
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/1-analysis/bmad-document-project/, src/bmm-skills/3-solutioning/bmad-generate-project-context/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: deferred
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    reason: >-
+      K-62 실제 충돌. bmm 의 project_knowledge 기본값이 docs 라 bmad-document-project 가
+      우리 docs/** 에 직접 쓴다(project-scan-report.json + 문서). 켜려면 경로 override 가 먼저다.
+      계획이 산출물을 _bmad-output/** 로 고정하려던 전제가 이 지점에서 틀렸다. M4 재검토
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/04-components-table.md
+
+  - id: bmad-ux
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/2-plan-workflows/bmad-ux/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: install
+    status: deferred
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    reason: >-
+      DESIGN.md·EXPERIENCE.md 를 만든다 — 디자인 계약은 G-M6 이 확정하는 대상이고
+      계획 §6.2 가 DESIGN.md 스키마를 그 게이트에 걸어 두었다. G-M3 가 아니라 G-M6 로 이관한다
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/01-docs/docs-reference-workflow-map.ko.md
+
+  - id: bmad-persona-agents
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/*/bmad-agent-*/, src/skills/bmad-cis-agent-*/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    covers: >-
+      BMM 6(analyst Mary · tech-writer Paige · pm John · ux-designer Sally ·
+      architect Winston · dev Amelia) + CIS 6(Carson · Maya · Victor · Dr. Quinn ·
+      Sophia · Caravaggio) = 12
+    reason: >-
+      K-60 기획 진입점 단일(D-72). agent 는 메뉴 안내원이고 workflow 가 실제 작업인데,
+      agent 원문에 「사용자가 persona 를 해제할 때까지 character 를 깨지 않는다.
+      skill 을 호출해도 이 persona 는 이어진다」 가 있다 — 한 번 켜지면 세션을 점거해
+      Romeo 라우터로 돌아오는 경로가 프롬프트 수준에서 막힌다. 「무엇을 할까」 는 라우터가 계산한다.
+      제외는 설치에서 뺀다는 뜻이 아니다 — 모듈을 설치하면 함께 깔리고 사용자가 직접 부르면 쓴다.
+      라우터가 추천하지 않을 뿐이다
+    archive_ref: archive/bmad-code-org-bmad-module-creative-intelligence-suite/03-components/agents.ko.md
+
+  - id: bmad-implementation-suite
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/bmm-skills/4-implementation/, src/bmm-skills/3-solutioning/bmad-create-epics-and-stories/, src/bmm-skills/3-solutioning/bmad-check-implementation-readiness/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    covers: >-
+      implementation 11(checkpoint-preview · code-review · correct-course · create-story ·
+      dev-auto · dev-story · qa-generate-e2e-tests · quick-dev · retrospective ·
+      sprint-planning · sprint-status) + create-epics-and-stories + check-implementation-readiness = 13
+    reason: >-
+      K-63 상태 소유권 + K-66 권한 상한 + Superpowers 중복. sprint-status.yaml 이 3번째
+      상태 원본이 된다(상태 원본은 docs/work/<id>/ + evidence 단독). 겹치는 짝 —
+      code-review·review-adversarial ↔ sp-requesting-code-review + reviewer 역할,
+      dev-story·dev-auto·quick-dev ↔ sp-test-driven-development + implementer 역할,
+      qa-generate-e2e-tests ↔ sp-test-driven-development,
+      checkpoint-preview ↔ sp-verification-before-completion,
+      create-epics-and-stories ↔ Tech Spec ## 구현 단위 표,
+      check-implementation-readiness ↔ romeo close 종료 검사.
+      K-66: dev-auto 는 무인 iteration, quick-dev 의 present step 은 로컬 commit 을 만든다
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/04-components-table.md
+
+  - id: bmad-core-router-overlap
+    source_repo: bmad-code-org/BMAD-METHOD
+    source_sha: 081e64ee5aab2316b912883f7bee528ee143ce36
+    source_path: [src/core-skills/, src/bmm-skills/2-plan-workflows/bmad-*-prd/, src/bmm-skills/3-solutioning/bmad-create-architecture/]
+    license: MIT
+    license_verified_at: 2026-08-31
+    adoption: excluded
+    status: rejected
+    decided_at: 2026-08-31
+    decided_by: user
+    gate: G-M3
+    local_path: null
+    covers: >-
+      core 11(advanced-elicitation · customize · editorial-review-prose ·
+      editorial-review-structure · help · index-docs · party-mode ·
+      review-adversarial-general · review-edge-case-hunter · shard-doc · spec) +
+      deprecated forwarder 4(create-prd · edit-prd · validate-prd · create-architecture) = 15
+    reason: >-
+      bmad-spec 은 {output_folder}/specs/spec-{slug}/SPEC.md 를 만들어 Tech Spec 과 정면으로
+      겹친다(K-61) · bmad-help 는 「다음에 무엇을」 을 라우팅해 /plan 을 대체한다(K-60) ·
+      bmad-shard-doc 은 원본 delete/move 선택이 있다(K-66) · bmad-party-mode 는 Claude Code
+      전용이라 두 런타임 동등성을 깬다 · review 4종은 reviewer 역할과 겹친다 ·
+      forwarder 4종은 독자 output 이 없고 target 이 deferred 다
+    archive_ref: archive/bmad-code-org-BMAD-METHOD/04-components-table.md
