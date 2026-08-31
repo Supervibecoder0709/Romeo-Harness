@@ -171,10 +171,37 @@ parts:
     status: pending_gate
     adoption: verbatim
   bmad-cis:
-    role: 기획 구체화 facilitation — CIS 4종(design-thinking·innovation-strategy·problem-solving·storytelling) 우선, BMAD PRD 양식은 후순위(사용자 실사용 평가 2026-08-27)
+    role: 기획 구체화 facilitation — discovery 의 「조사 방법·기간」 빈칸을 채우는 방법론 세트
     gate: G-M3
-    status: pending_gate
+    # accepted — 채택 게이트가 닫혔다(D-77, 2026-08-31). 붙일 것과 붙이지 않을 것이 정해졌다는 뜻이지
+    # 이 저장소에 설치돼 있다는 뜻이 아니다. 설치 여부는 정책표가 아니라 capabilities.yaml 의
+    # discovery.bmad 프로브가 말한다 — 둘을 섞으면 없는 도구를 있는 것처럼 추천하게 된다(K-51).
+    status: accepted
+    decided: '2026-08-31'
     adoption: install
+    capability: discovery.bmad
+    # 라우터가 discovery·T2 에서 추천할 스킬. D-77 이 확정한 11종이고 순서는 쓰이는 순서다.
+    # deferred 5종(bmad-prd·bmad-architecture·bmad-document-project·bmad-generate-project-context·bmad-ux)과
+    # excluded 40종은 여기 없다 — 설치되면 함께 깔리지만 라우터는 부르지 않는다(K-60·K-61).
+    recommends:
+      # discovery 기본·반증
+      - bmad-product-brief
+      - bmad-prfaq
+      - bmad-brainstorming
+      - bmad-forge-idea
+      # 근거가 부족할 때
+      - bmad-domain-research
+      - bmad-market-research
+      - bmad-technical-research
+      # brainstorming 이후의 구조화된 방법론 (CIS)
+      - bmad-cis-design-thinking
+      - bmad-cis-innovation-strategy
+      - bmad-cis-problem-solving
+      - bmad-cis-storytelling
+    # 산출물을 작업 단위로 복사하지 않는다. 부품이 어디에 쓰든 그 경로를 문서 머리의
+    # inputs: 로만 가리킨다 — 경로를 본문에 적으면 원본이 옮겨졌을 때 링크가 조용히 썩는다(K-62).
+    output_binding: inputs-link
+    output_note: '산출물은 복사하지 않고 문서 frontmatter 의 inputs: 링크로만 붙인다(K-62)'
   design-ui:
     role: 제품 UI 감사·상태 규칙(WIG·impeccable·ui-ux-pro-max)
     gate: G-M6

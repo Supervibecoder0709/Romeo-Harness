@@ -1,0 +1,28 @@
+# Romeo 능력 프로브 정책표 — "이 저장소에 그 도구가 실제로 있는가"를 묻는 방법을 선언한다.
+# 여기 적히는 것은 **확인 대상과 결과 라벨**뿐이다. 프로브를 실행하는 것은 `romeo doctor` 이고,
+# 결과를 쓰는 것은 라우터의 분류 카드다 — 정책표는 판정하지 않는다.
+#
+# 왜 필요한가: 부품을 추천하는 쪽과 부품이 설치된 쪽이 다르면, 라우터는 없는 도구를 있는 것처럼
+# 추천하게 된다. 추천은 정책표가 하고 존재 여부는 프로브가 말한다 — 둘을 한 자리에서 섞지 않는다.
+# 근거: constraints K-51(관측하지 않은 것을 완료로 세지 않는다) · K-62 · 경고 CAPABILITY_CHECK_REQUIRED.
+policy_version: "0.1.0"
+updated: "2026-08-31"
+
+capabilities:
+  discovery:
+    bmad:
+      title: BMAD 기획 구체화 스킬 세트
+      # install_trace — 설치가 남긴 자국을 본다. 도구를 실행하지 않는다.
+      kind: install_trace
+      marker: _bmad/_config/manifest.yaml
+      # marker 가 있을 때 그 안에서 읽을 것. 없으면 읽지 않는다.
+      reads: [modules, platform_codes]
+      result_labels: [present, absent]
+      honesty: 설치 흔적일 뿐 실행 증거가 아니다
+      absent_is_problem: false
+      absent_note: 설치 흔적 없음 — 이 저장소에는 BMAD 가 붙어 있지 않다. 결함이 아니다.
+      note: |
+        marker 는 BMAD installer 가 만드는 파일이다. 이 프로브는 그 파일의 존재와 거기 적힌
+        module·platform code 만 읽고 끝낸다 — 스킬을 로드하지도, installer 를 부르지도 않는다.
+        그래서 result_labels 에는 실행을 뜻하는 값(ran·verified·working 따위)이 없다:
+        설치되어 있다는 것과 동작한다는 것은 다른 주장이고, 이 프로브는 앞의 것만 말할 수 있다.
