@@ -1,0 +1,83 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260831-bmad-install-observe-a3bm",
+  "role": "implementer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260831-bmad-install-observe-a3bm/spec.md",
+    "sha256": "c1d9e69a36090ddae6ea52688d1e579ec977535a5b7dae33ae5c09db8df88320"
+  },
+  "base_sha": "767721c5d9d11650a447f9cc207f46a1e66bd920",
+  "allowed_paths": [
+    "docs/work/feat-20260831-bmad-install-observe-a3bm/",
+    "core/policy/capabilities.yaml",
+    "provenance/imports.yaml",
+    ".harness/observations.yaml",
+    ".gitignore",
+    "_bmad/",
+    "_bmad-output/",
+    ".claude/skills/",
+    ".agents/skills/"
+  ],
+  "guards": [
+    {
+      "id": "production-deploy",
+      "name": "운영 배포"
+    },
+    {
+      "id": "deletion",
+      "name": "삭제"
+    }
+  ],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests"
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo validate"
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo compile --check"
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo doctor --strict --scope repository"
+    },
+    {
+      "id": "check-5",
+      "command": "shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256"
+    },
+    {
+      "id": "check-6",
+      "command": "test -f _bmad/_config/manifest.yaml"
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor 2>&1 | grep -q 'discovery.bmad: present'"
+    },
+    {
+      "id": "check-8",
+      "command": "find \"$HOME/.codex/skills\" \"$HOME/.claude/skills\" -type f -not -path \"*/.system/*\" 2>/dev/null | sed \"s|^$HOME|~|\" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt"
+    },
+    {
+      "id": "check-9",
+      "command": "git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe"
+    },
+    {
+      "id": "check-10",
+      "command": "! git status --porcelain --untracked-files=all | grep -qE '^\\?\\? (_bmad|\\.claude/skills/bmad-|\\.agents/skills/bmad-)'"
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -q '흉내 낸 테스트로만 확인했다' core/policy/capabilities.yaml"
+    },
+    {
+      "id": "check-12",
+      "command": "python3 -c \"import yaml; d=yaml.safe_load(open('.harness/observations.yaml')); assert 'bmad_install' in d\""
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

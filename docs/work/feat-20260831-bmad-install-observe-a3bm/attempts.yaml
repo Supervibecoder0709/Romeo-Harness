@@ -53,6 +53,14 @@ attempts:
     baseline 파일을 그 안에 리다이렉트로 만들어 내용이 원시 로그에 남지 않았다(stdout_tail 3건 전부 빈 문자열, 실측). '설치 직전 상태' 라는 주장에 앵커가
     없다. 고칠 자리는 spec 두 곳이다 — 확인란의 설치 순서 문장과, baseline 을 tee 로 만들어 원시 로그에 봉인하는 구현 단위.
   settled_at: '2026-08-31T21:16:08+09:00'
+- n: 6
+  run: run_4d3ee0b42e5a
+  base_sha: 767721c5d9d11650a447f9cc207f46a1e66bd920
+  started_at: '2026-08-31T21:38:01+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다. 근거 셋. ① 2회차(run_6165c4796868)에서 required_checks 12건이 전부 exit 0 으로 실행됐다 —
@@ -62,3 +70,15 @@ reviews:
     — 같은 자리를 반복해서 도는 패턴이 아니다. 목표를 바꾸지 않는다. 3회차는 검토자까지 돌려 close 를 시도한다.
   by: Supervibecoder0709
   at: '2026-08-31T20:19:36+09:00'
+- after_attempt: 5
+  conclusion: 완료 정의는 여전히 달성 가능하다. 근거 셋. ① 3회차(run_923ba2a01bb4)에서 구현자 쪽은 완전히 통과했다 — required_checks 12/12
+    exit 0, close 의 기록·재실행 대조 12/12 PASS, 봉투 앵커 양쪽 5/5, 방어 검사 유효(before/after log_sha256 동일 1b0f9cab081e).
+    close 의 유일한 FAIL 은 REVIEW_VERDICT 였다. 즉 산출물은 이미 요구를 충족했다. ② 검토자 findings 3건은 전부 산출물이 아니라 승인된 spec
+    문장을 겨눴고, 그 두 자리를 이번 정비에서 닫았다 — 확인란이 방법(「한 번에 하나씩」)을 못박아 AC-5 를 달성 불가능하게 만든 것은 방법을 구현 단위 4행으로 옮기고 --tools
+    가 더하기가 아니라 교체라는 실측과 --action update 필요를 명시해서(Q-24), baseline 이 원시 로그에 봉인되지 않은 것은 2행을 tee 로 바꾸고 stdout_tail
+    확인을 조건에 넣어서(Q-23). 767721c 로 재승인했다. ③ 세 회차의 실패 원인이 모두 달랐다 — 1회차는 하네스 테스트의 환경 단언, 2회차는 시크릿 마스킹 오탐,
+    3회차는 spec 문장 둘. 전부 실제 결함이었고 전부 고쳐졌다(c7c1b53 · 54dd04d · 07c3bdf · 767721c). 같은 자리를 반복해서 도는 패턴이 아니라
+    매 회차가 새 결함을 하나씩 드러내고 닫는 패턴이며, 남은 결함이 spec 안에 더 있다고 볼 근거가 지금은 없다. 관측 자체는 세 번 다 성공했고 결론(BMAD 는 이 하네스와
+    공존한다)도 세 번 같았다 — 목표 쪽에 원인이 있다는 신호가 아니다. 목표를 바꾸지 않는다. 4회차는 고친 spec 으로 구현자와 검토자를 다시 돌려 close 를 시도한다.
+  by: Supervibecoder0709
+  at: '2026-08-31T21:38:01+09:00'
