@@ -80,25 +80,39 @@ def change_scope_paths(body):
     쓰기 상한을 역할 계약의 `must_include` 만으로 두면 작업 공간 전체(`.`)가 열린다 — 그러면
     검토 항목 '변경이 allowed_paths 안인가' 가 아무것도 걸러내지 못한다(2026-08-29 검토자 3명이 같은 자리를 지적했다).
     상한의 출처는 사람이 승인한 문장이어야 하므로, 승인된 spec 이 스스로 선언한 범위를 그대로 옮긴다.
-    저장소 밖을 가리키는 값은 버린다 — 계약은 작업 공간 안에서만 유효하다(K-66)."""
+    저장소 밖을 가리키는 값은 버린다 — 계약은 작업 공간 안에서만 유효하다(K-66).
+
+    선언이 **한 줄을 넘겨도 전부 읽는다**(Q-18). 라벨 줄에서 곧바로 `return` 하면 뒤 줄의 경로가
+    `allowed_paths` 에서 조용히 빠지는데, 빈 경우와 달리 부분 읽기는 아무 경고도 내지 않아
+    계약은 정상으로 보이고 구현자가 쓰려는 순간에야 막힌다(2026-08-31 `feat-20260831-bmad-attach-probe-tgnb`
+    1회차가 이것으로 실패했다 — 선언한 9개 중 2개만 실렸다).
+    이어 읽기는 **다음 항목을 삼키지 않는다**: 다음 목록 항목(`- `)·다음 제목(`#`)·빈 줄에서 멈춘다.
+    「영향을 받는 부분」 은 승인이 *쓰기 상한*으로 정한 것이 아니므로 상한에 들어가면 안 된다(K-66)."""
     inside = False
-    for line in (body or "").split("\n"):
+    lines = (body or "").split("\n")
+    for i, line in enumerate(lines):
         if line.startswith("## "):
             inside = line.strip() == CHANGE_SCOPE_HEADING
             continue
         if inside and CHANGE_SCOPE_LABEL in line:
+            declared = [line.split(CHANGE_SCOPE_LABEL, 1)[1]]
+            for nxt in lines[i + 1:]:
+                if nxt.startswith("#") or nxt.startswith("- ") or not nxt.strip():
+                    break
+                declared.append(nxt)
             out = []
             # 항목은 `·` 로 나뉘고 **각 항목의 첫 백틱이 그 항목의 경로**다. 뒤따르는 백틱은 설명이다
             # (예: `scripts/generate-archive-index.py`(`collect` 에 …) — collect 는 함수 이름이지 경로가 아니다).
-            for chunk in line.split(CHANGE_SCOPE_LABEL, 1)[1].split(CHANGE_SCOPE_SEP):
-                found = re.search(r"`([^`]+)`", chunk)
-                if not found:
-                    continue
-                text = found.group(1).strip().replace("\\", "/")
-                if not text or text.startswith("/") or text.startswith("~") or ".." in text.split("/"):
-                    continue
-                if text not in out:
-                    out.append(text)
+            for raw in declared:
+                for chunk in raw.split(CHANGE_SCOPE_SEP):
+                    found = re.search(r"`([^`]+)`", chunk)
+                    if not found:
+                        continue
+                    text = found.group(1).strip().replace("\\", "/")
+                    if not text or text.startswith("/") or text.startswith("~") or ".." in text.split("/"):
+                        continue
+                    if text not in out:
+                        out.append(text)
             return out
     return []
 

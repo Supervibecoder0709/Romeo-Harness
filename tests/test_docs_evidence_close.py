@@ -9,13 +9,13 @@ import unittest
 from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 
-from romeo import frontmatter
+from romeo import HARNESS_ROOT, frontmatter
 from romeo.cli import main
 from romeo.close import close_unit, format_close
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
-from romeo.evidence import (add_approval, parse_log_exit_code, record_review_envelope, run_command,
-                            run_required_checks)
+from romeo.evidence import (add_approval, command_log_state, parse_log_exit_code,
+                            record_review_envelope, run_command, run_required_checks)
 from romeo.policy import route
 from romeo.util import dump_yaml, load_yaml, sha256_file
 from romeo.validate import validate_doc
@@ -1383,6 +1383,324 @@ class TestCloseRequiresFailReasonsOnFail(unittest.TestCase):
         """검사가 인쇄되지 않는 것과 통과한 것은 다르다 — 없는 검사는 사람이 통과로 읽는다."""
         self._write_review("run-test-reviewer.json", self._envelope("PASS"))
         self.assertIn(self.CID, {c["id"] for c in self._close()["checks"]})
+
+
+class TestMultilineCommandAnchor(unittest.TestCase):
+    """개행을 담은 명령이 원시 로그 앵커 대조를 통과하는가 (AC-9 · Q-25 다음의 다섯 번째 결함).
+
+    `command_log_state` 는 로그의 **첫 물리 줄**만 기록된 명령과 비교했다. 그런데 로그는 명령 전체를
+    `$ {command}` 로 한 번에 쓰므로, 명령이 개행을 담으면 첫 줄은 그 명령의 **첫 조각**일 뿐이고
+    비교는 언제나 다르다 — 여러 줄 명령은 **어떤 구현으로도** `EVIDENCE_ANCHORED` 를 통과할 수 없었다.
+    2026-08-31 이 단위의 2회차 관통이 정확히 여기서 막혔다(검사 14건이 전부 exit 0 인데도
+    `close` 가 `EVIDENCE_LOG`·`EVIDENCE_ANCHORED` 두 항목을 FAIL 로 냈다).
+
+    고치는 방향은 대조를 **약하게 만드는 것이 아니라 올바른 자리와 비교하는 것**이다 —
+    `$ ` 뒤부터 `--- stdout ---` 표지 앞까지가 로그가 적은 명령 헤더다. 그래서 이 클래스는 짝으로 고정한다:
+
+      ① 여러 줄 명령이 통과한다
+      ② 로그를 손으로 고치면 **여전히 거부된다** — 봉인(`log_sha256`)까지 다시 맞춰 놓아도 명령 헤더에서 걸린다
+
+    ② 가 없으면 ① 은 "대조를 지웠다" 와 구별되지 않는다."""
+
+    MULTILINE = "python3 -c \"import sys\nfor i in (1, 2):\n    print(i)\n\""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "여러 줄 명령 T0", "multiline-t0", "개행을 담은 검사 명령",
+                          project_root=self.root, date="20260901")
+        self.unit = res["id"]
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _record(self, command):
+        """명령을 실제로 실행해 기록을 남기고 (기록, 로그 경로) 를 준다."""
+        r = run_command(self.unit, command, run_name="run-a", project_root=self.root)
+        rec = r["command"]
+        return rec, self.root / rec["log"]
+
+    def _reseal(self, log, rec, text):
+        """로그를 고치고 **봉인까지 다시 맞춘다** — 위조 중 가장 성실한 것이다.
+
+        여기까지 맞춘 위조를 잡는 것은 명령 헤더 대조뿐이므로, 이 도우미가 있어야 ② 가 성립한다."""
+        log.write_text(text, encoding="utf-8")
+        rec = dict(rec)
+        rec["log_sha256"] = sha256_file(log)
+        return rec
+
+    # ── ① 여러 줄 명령이 통과한다 ───────────────────────────────────────────
+    def test_a_multiline_command_passes_the_anchor(self):
+        rec, log = self._record(self.MULTILINE)
+        self.assertIn("\n", rec["command"], "표본이 개행을 담고 있어야 이 테스트가 의미가 있다")
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, True, why)
+
+    def test_a_single_line_command_still_passes(self):
+        rec, _log = self._record("echo hello")
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, True, why)
+
+    def test_the_first_marker_ends_the_header_not_a_later_one(self):
+        """명령의 **출력**이 표지와 같은 줄을 뱉어도 헤더가 늘어나지 않는다.
+
+        종료 코드는 마지막 줄이 이기지만(기록자가 마지막에 쓴다) 헤더는 **첫** 표지에서 끝난다 —
+        기록자가 그 줄을 먼저 쓰기 때문이다. 방향을 반대로 잡으면 출력이 헤더를 오염시킨다."""
+        rec, _log = self._record("echo '--- stdout ---'")
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, True, why)
+
+    # ── ② 손으로 고친 로그는 여전히 거부된다 ────────────────────────────────
+    def test_editing_the_log_breaks_the_seal(self):
+        rec, log = self._record(self.MULTILINE)
+        log.write_text(log.read_text(encoding="utf-8").replace("print(i)", "print(0)"), encoding="utf-8")
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, False, why)
+        self.assertIn("log_sha256", why)
+
+    def test_a_resealed_edit_of_the_command_header_is_still_refused(self):
+        """봉인까지 맞춰도 거부된다 — 이 자리가 느슨해지면 위조가 통과한다."""
+        rec, log = self._record(self.MULTILINE)
+        rec = self._reseal(log, rec, log.read_text(encoding="utf-8").replace("print(i)", "print(0)"))
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, False, why)
+        self.assertIn("손으로 고쳐졌다", why)
+
+    def test_a_resealed_drop_of_a_header_line_is_still_refused(self):
+        """헤더의 한 줄을 통째로 지운 것도 잡는다 — '첫 줄만 같으면 통과' 로 돌아가지 않는다."""
+        rec, log = self._record(self.MULTILINE)
+        lines = log.read_text(encoding="utf-8").split("\n")
+        del lines[1]
+        rec = self._reseal(log, rec, "\n".join(lines))
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, False, why)
+        self.assertIn("손으로 고쳐졌다", why)
+
+    def test_a_resealed_edit_of_the_first_line_is_still_refused(self):
+        """종전 구현이 유일하게 잡던 자리 — 고친 뒤에도 그대로 잡혀야 한다(회귀)."""
+        rec, log = self._record(self.MULTILINE)
+        lines = log.read_text(encoding="utf-8").split("\n")
+        lines[0] = "$ python3 -c \"import os"
+        rec = self._reseal(log, rec, "\n".join(lines))
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, False, why)
+        self.assertIn("손으로 고쳐졌다", why)
+
+    def test_a_resealed_exit_code_edit_is_still_refused(self):
+        """다른 겹이 살아 있는지 — 명령 헤더만 보게 되지 않았는지 확인한다."""
+        rec, log = self._record(self.MULTILINE)
+        rec = self._reseal(log, rec, log.read_text(encoding="utf-8").replace("--- exit 0 ---", "--- exit 1 ---"))
+        state, why = command_log_state(self.root, rec)
+        self.assertIs(state, False, why)
+        self.assertIn("종료 코드", why)
+
+    def test_a_resealed_log_without_the_stdout_marker_is_not_a_pass(self):
+        """표지 줄을 **지우고** 명령을 바꾼 뒤 봉인까지 맞춘 로그 — 대조를 건너뛰면 이것이 통과한다(2026-09-01 검토 F2).
+
+        헤더의 경계는 `--- stdout ---` 표지다. 그 표지가 없으면 헤더를 읽을 수 없는데, 종전에는 그때
+        명령 대조를 **조용히 건너뛰고** 나머지 겹(종료 코드·봉인)만 봤다. 종료 코드 줄은 그대로 두고
+        표지만 지운 뒤 `$ ` 줄에 다른 명령을 적고 `log_sha256` 을 다시 계산하면, 위조된 명령이 `True` 를 받았다.
+        같은 우회는 이 단위가 만든 것이 아니다 — 첫 줄만 비교하던 옛 구현에서도 `$ ` 접두만 지우면 통과했다.
+
+        고친 뒤의 판정은 `False` 가 아니라 **`None`(미검증)** 이다: 이 로그가 위조라는 것을 이 겹은 말할 수 없고,
+        말할 수 있는 것은 '대조가 성립하지 않았다' 뿐이기 때문이다. 종료 코드 줄이 없을 때와 같은 처리이고,
+        종료 검사는 미검증을 통과로 세지 않으므로(K-51) 그 로그는 더 이상 조용히 넘어가지 않는다."""
+        rec, log = self._record(self.MULTILINE)
+        forged = [ln for ln in log.read_text(encoding="utf-8").split("\n") if ln != "--- stdout ---"]
+        forged[0] = "$ python3 -c \"print('pwned')\""
+        rec = self._reseal(log, rec, "\n".join(forged))
+        state, why = command_log_state(self.root, rec)
+        self.assertIsNot(state, True, why)
+        self.assertIsNone(state, why)
+        self.assertIn("명령 헤더가 없다", why)
+
+
+class TestTemplateBlankGuidanceToken(unittest.TestCase):
+    """spec 템플릿의 「빈칸 금지」 안내가 **남아 있으면서** 자기 검사에 걸리지 않는가 (AC-3 · Q-20).
+
+    종전 템플릿의 안내 줄은 종료 검사의 미완료 토큰을 **글자 그대로** 인용했다. 그래서 그 템플릿으로
+    만든 문서는 작성자가 빈칸을 다 채워도 안내 줄 하나 때문에 `NO_OPEN_LOOP` 에 걸렸고, 닫힌 단위들은
+    전부 그 줄을 손으로 지워서 넘겼다 — 지워야 통과하는 안내문이었다.
+
+    고치는 방향은 검사를 무르게 하는 것이 아니라 **안내문이 토큰을 인용하지 않게 쓰는 것**이다.
+    그래서 세 방향을 함께 고정한다:
+
+      ① 안내 줄이 템플릿에 그대로 하나 있고, 그 줄이 토큰을 글자 그대로 담지 않는다
+      ② 그 템플릿으로 만든 문서에서 **작성자가 채우는 빈칸만** 채우면 `NO_OPEN_LOOP` 가 통과한다
+      ③ 안내 줄에 토큰을 되돌려 놓으면 `NO_OPEN_LOOP` 가 **다시 걸린다**(음성 방향)
+
+    ③ 이 없으면 ①·② 는 "검사 쪽을 지웠다" 와 구별되지 않는다. 그리고 ② 를 채울 때 안내 줄까지 함께
+    치환하면(사람이 손으로 하던 바로 그 일이다) 템플릿을 되돌려도 통과하므로, 채우는 도우미는 그 줄을 건드리지 않는다."""
+
+    GUIDE = "빈칸 금지"
+    TOKEN = "NEEDS_INPUT"
+    TEMPLATE = HARNESS_ROOT / "core/templates/tech-spec.md"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        # 제목·설명에 안내 줄의 글자를 쓰지 않는다 — 표본 자신이 그 줄을 늘리면 ② 가 무엇을 셌는지 알 수 없다.
+        res = create_unit(out, "안내문 토큰 T0", "blank-guide-t0", "안내 문구가 자기 검사에 걸리던 자리",
+                          project_root=self.root, date="20260901")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _guidance(self, text):
+        return [ln for ln in text.split("\n") if self.GUIDE in ln]
+
+    def _fill_but_keep_the_guidance(self):
+        """작성자가 채우는 빈칸만 채운다 — **안내 줄은 건드리지 않는다.**"""
+        fm, body = frontmatter.read(self.spec)
+        kept = [ln if self.GUIDE in ln else ln.replace(self.TOKEN, "채움") for ln in body.split("\n")]
+        body = "\n".join(kept).replace(SCOPE_TODO, SCOPE_PATHS)
+        body = body.replace('command: "채움"', 'command: "true"').replace("- [ ] AC-1", "- [x] AC-1")
+        frontmatter.write(self.spec, fm, body)
+
+    def _prepare(self):
+        """승인 → 구현 → 증거까지 만든다. `NO_OPEN_LOOP` 는 evidence 가 있어야 인쇄되기 때문이다."""
+        self._fill_but_keep_the_guidance()
+        approve_unit(self.unit, "tester", project_root=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "impl", cwd=self.root)
+        run_command(self.unit, "true", run_name="run-test", label="check-1", project_root=self.root)
+
+    def _open_loop_row(self):
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        return next(c for c in r["checks"] if c["id"] == "NO_OPEN_LOOP")
+
+    # ── ① 안내는 남고, 토큰은 인용하지 않는다 ────────────────────────────────
+    def test_the_template_keeps_the_guidance_without_quoting_the_token(self):
+        lines = self._guidance(self.TEMPLATE.read_text(encoding="utf-8"))
+        self.assertEqual(len(lines), 1, lines)
+        self.assertNotIn(self.TOKEN, lines[0], lines[0])
+
+    def test_a_created_document_still_carries_the_guidance(self):
+        """안내를 지워서 통과시키는 것은 AC-3 을 만족하지 않는다 — 문서에 그 줄이 실제로 실린다."""
+        self.assertEqual(len(self._guidance(frontmatter.read(self.spec)[1])), 1)
+
+    # ── ② 빈칸만 채우면 종료 검사를 통과한다 ────────────────────────────────
+    def test_filling_only_the_authors_blanks_passes_the_open_loop_check(self):
+        self._prepare()
+        row = self._open_loop_row()
+        self.assertTrue(row["ok"], row)
+        self.assertIn(self.GUIDE, frontmatter.read(self.spec)[1], "안내 줄을 지우고 통과한 것이 아니어야 한다")
+
+    # ── ③ 토큰을 되돌리면 다시 걸린다 ───────────────────────────────────────
+    def test_putting_the_token_back_into_the_guidance_fails_again(self):
+        """종전 템플릿으로 되돌린 모양 — 검사 쪽을 무르게 만들어 통과시킨 것이 아님을 고정한다."""
+        self._prepare()
+        self.assertTrue(self._open_loop_row()["ok"])
+        fm, body = frontmatter.read(self.spec)
+        lines = body.split("\n")
+        i = next(n for n, ln in enumerate(lines) if self.GUIDE in ln)
+        lines[i] = f"**{self.GUIDE}** — 채우지 않은 칸은 `{self.TOKEN}` 과 똑같이 취급한다."
+        frontmatter.write(self.spec, fm, "\n".join(lines))
+        row = self._open_loop_row()
+        self.assertFalse(row["ok"], row)
+        self.assertIn("1곳", row["detail"])
+
+
+class TestValidateDirectoryTarget(unittest.TestCase):
+    """`romeo validate` 에 **폴더**를 줄 수 있는가, 그리고 경계에서 크래시하지 않는가 (AC-4 · Q-22).
+
+    종전에는 폴더를 주면 `IsADirectoryError` 트레이스백이 그대로 올라왔다 — 사용법 안내가 아니라 크래시였고,
+    작업 단위 하나만 검사하려는 자연스러운 사용이 막혀 있었다.
+
+    '트레이스백이 아니다' 만 보면 **아무것도 검사하지 않는 구현**도 통과한다. 그래서 폴더를 준 실행이
+    그 폴더 안 문서를 실제로 판정했다는 것(망가뜨리면 FAIL 과 종료 코드 1 이 된다)까지 함께 본다.
+    경계도 같이 고정한다: 파일 인자 · 없는 경로 · 문서가 없는 폴더 — 셋 다 트레이스백 없이 답해야 하고,
+    특히 마지막은 **저장소 전체로 번지지 않아야** 한다(사용자가 지목하지 않은 문서의 판정이 종료 코드에 섞인다)."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "폴더 인자 T0", "validate-dir-t0", "폴더를 주면 트레이스백이 올라오던 자리",
+                          project_root=self.root, date="20260901")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+        self.udir = self.spec.parent
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _validate(self, *paths):
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            rc = main(["validate", *[str(p) for p in paths]])
+        text = out.getvalue() + err.getvalue()
+        self.assertNotIn("Traceback", text, text)
+        return rc, text
+
+    def test_a_unit_folder_is_expanded_and_checked(self):
+        rc, text = self._validate(self.udir)
+        self.assertEqual(rc, 0, text)
+        self.assertIn(str(self.spec), text)
+        self.assertIn("[PASS]", text)
+
+    def test_the_folder_run_actually_judges_the_document(self):
+        """폴더를 펴기만 하고 판정하지 않는 구현과 구별한다 — 망가진 문서는 FAIL 과 종료 코드 1 이다."""
+        self.spec.write_text("frontmatter 가 없는 문서\n", encoding="utf-8")
+        rc, text = self._validate(self.udir)
+        self.assertEqual(rc, 1, text)
+        self.assertIn("[FAIL]", text)
+
+    def test_a_file_argument_still_works(self):
+        """폴더를 받게 하면서 파일 인자가 깨지지 않았는지 — 종전의 유일한 사용법이다(회귀)."""
+        rc, text = self._validate(self.spec)
+        self.assertEqual(rc, 0, text)
+        self.assertIn(str(self.spec), text)
+
+    def test_only_document_files_are_picked_up(self):
+        """작업 단위 폴더에는 계약·증거·결과가 함께 산다 — 문서 이름인 것만 검사 대상이다."""
+        (self.udir / "notes.md").write_text("frontmatter 가 없는 메모\n", encoding="utf-8")
+        (self.udir / "task").mkdir(exist_ok=True)
+        (self.udir / "task" / "run-a.json").write_text("{}\n", encoding="utf-8")
+        rc, text = self._validate(self.udir)
+        self.assertEqual(rc, 0, text)
+        self.assertNotIn("notes.md", text)
+        self.assertNotIn("run-a.json", text)
+
+    def test_a_missing_path_is_reported_not_a_traceback(self):
+        rc, text = self._validate(self.root / "없는-경로")
+        self.assertEqual(rc, 1, text)
+        self.assertIn("NOT_A_FILE", text)
+
+    def test_a_folder_without_documents_does_not_spread_to_the_repository(self):
+        """빈 폴더를 준 실행이 저장소 전체 검사로 번지면, 사용자가 지목하지 않은 문서가 종료 코드를 만든다."""
+        empty = self.root / "빈폴더"
+        empty.mkdir()
+        rc, text = self._validate(empty)
+        self.assertEqual(rc, 0, text)
+        self.assertIn("검사할 문서가 없다", text)
+        self.assertNotIn(str(self.spec), text)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,568 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_e3a4af18582c
+task_id: task_76074bc9c84b
+dispatch_id: ctx_b4708ead0c3d
+unit_id: feat-20260831-park-defects-actm
+spec_ref:
+  path: docs/work/feat-20260831-park-defects-actm/spec.md
+  sha256: 302f6073cec5dffd52cecd678e46e79532ae4f13e5c9f9b98671ea0e4dd64855
+base_sha: 120aa96ef80a46d9161f18795b84d55ca8f14542
+head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260831-park-defects-actm
+started_at: '2026-09-01T02:38:08+09:00'
+finished_at: '2026-09-01T02:50:35+09:00'
+commands:
+- id: ac6-template
+  command: python3 -m unittest tests.test_docs_evidence_close.TestTemplateBlankGuidanceToken -v
+  exit_code: 0
+  started_at: '2026-09-01T02:38:08+09:00'
+  finished_at: '2026-09-01T02:38:09+09:00'
+  seconds: 1.011
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/01-ac6-template.log
+  log_sha256: 57f4c563b795c75b539fdc5002365b90dfe026487e4aca7a2df4ac57c59c8fed
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: ac6-validate
+  command: python3 -m unittest tests.test_docs_evidence_close.TestValidateDirectoryTarget -v
+  exit_code: 0
+  started_at: '2026-09-01T02:38:12+09:00'
+  finished_at: '2026-09-01T02:38:12+09:00'
+  seconds: 0.386
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/02-ac6-validate.log
+  log_sha256: ba1964c5c6b98a063bfa38a2e77442ab3244f486e7e72f41dcf3923fb5902467
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-1
+  command: 'python3 -c "from romeo.envelope import change_scope_paths as f; b=''## \ubcc0\uacbd \ubc94\uc704\n\n-
+    \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060 \u00b7 \u0060a/y.py\u0060\n  \u00b7
+    \u0060a/z.py\u0060 \u00b7 \u0060b/w.md\u0060\n''; got=f(b); assert got==[''a/x.py'',''a/y.py'',''a/z.py'',''b/w.md''],
+    got"'
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:15+09:00'
+  seconds: 0.036
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/03-check-1.log
+  log_sha256: 0111c52a1bfda0ca97ff9c2c4e532ff6412c1a79bbe02d9d4c6b324e2a428ab9
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-2
+  command: 'python3 -c "from romeo.envelope import change_scope_paths as f; b=''## \ubcc0\uacbd \ubc94\uc704\n\n-
+    \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060\n- \uc601\ud5a5\uc744 \ubc1b\ub294
+    \ubd80\ubd84: \u0060c/other.py\u0060\n''; got=f(b); assert got==[''a/x.py''], got"'
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:15+09:00'
+  seconds: 0.036
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/04-check-2.log
+  log_sha256: 49d110f9b6679647a4bcd886d03f65be6efbd3962adcba585a51959e2b1b5d5d
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-3
+  command: python3 -c "t=open('core/templates/tech-spec.md',encoding='utf-8').read().split(chr(10)); g=[l
+    for l in t if '\ube48\uce78 \uae08\uc9c0' in l]; assert len(g)==1, g; assert 'NEEDS_'+'INPUT' not
+    in g[0], g[0]"
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:15+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/05-check-3.log
+  log_sha256: 9f39592f5dee503a5f33166a5e5d564a73b30d0bf411b2f7c3386ffad3aa99e4
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-4
+  command: bin/romeo validate docs/work/feat-20260831-park-defects-actm
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:15+09:00'
+  seconds: 0.076
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/06-check-4.log
+  log_sha256: c9e2608a72c8ad4d2a31b0900b9823b8efb9c2a6ed5a295a7bdbb292e35f7d78
+  stdout_tail: "[PASS] docs/work/feat-20260831-park-defects-actm/brief.md lines=59 needs_input=0 unchecked_ac=0\n\
+    [PASS] docs/work/feat-20260831-park-defects-actm/spec.md lines=156 needs_input=0 unchecked_ac=9\n\
+    \    WARN  BUDGET_EXCEEDED 156 > 150\n    WARN  UNCHECKED_AC 9개"
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-5
+  command: '! bin/romeo validate docs/work/feat-20260831-park-defects-actm 2>&1 | grep -q Traceback'
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:15+09:00'
+  seconds: 0.07
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/07-check-5.log
+  log_sha256: afe0dfa4760045ba633680650a4c20dac342a0f9d3ad1c27009dad94ea79f4fd
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-6
+  command: python3 -m unittest tests.test_run_unit.TestReviewOnlyRecord -v
+  exit_code: 0
+  started_at: '2026-09-01T02:38:15+09:00'
+  finished_at: '2026-09-01T02:38:17+09:00'
+  seconds: 1.788
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/08-check-6.log
+  log_sha256: 38a092d3a183960602c03bf537751522c4f662b9f4f77e754411b787f22ad781
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-7
+  command: python3 -m unittest tests.test_envelope.TestChangeScopeMultiline -v
+  exit_code: 0
+  started_at: '2026-09-01T02:38:17+09:00'
+  finished_at: '2026-09-01T02:38:17+09:00'
+  seconds: 0.05
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/09-check-7.log
+  log_sha256: a96aa037c8f76e436d134b3dc4b8fcff9d2e80dfea14e70e104e182040e0ba37
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-8
+  command: python3 -m unittest tests.test_run_unit tests.test_envelope -v
+  exit_code: 0
+  started_at: '2026-09-01T02:38:17+09:00'
+  finished_at: '2026-09-01T02:38:28+09:00'
+  seconds: 10.897
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/10-check-8.log
+  log_sha256: 7d2a7900263ff46758e0b8714413cd94fb7ea53f69b6ab54b16be5303392bbe0
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-9
+  command: "python3 -c \"t=open('docs/planning/open-questions.md',encoding='utf-8').read().split(chr(10));\n\
+    import sys\nfor q in ('Q-18','Q-20','Q-21','Q-22','Q-25'):\n    r=[l for l in t if l.startswith('|\
+    \ '+q+' ')]\n    assert len(r)==1, (q,len(r))\n    assert ('\\ud574\\uc18c' in r[0]) or ('\\ub2f5\\\
+    ubcc0\\ub428' in r[0]), q\""
+  exit_code: 0
+  started_at: '2026-09-01T02:38:28+09:00'
+  finished_at: '2026-09-01T02:38:28+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/11-check-9.log
+  log_sha256: 71cc3a40532606c9fe01aa9fc100959438138a9c7e37a4b5124cb750fc248e81
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-10
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T02:38:28+09:00'
+  finished_at: '2026-09-01T02:40:07+09:00'
+  seconds: 98.882
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/12-check-10.log
+  log_sha256: cef7a3b5cb78b7e5de2b3014484fec3221d3b3ceb34669f87b750579d22a4f74
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-11
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-01T02:40:07+09:00'
+  finished_at: '2026-09-01T02:40:08+09:00'
+  seconds: 0.192
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/13-check-11.log
+  log_sha256: aca5a5f18a123b490dd8cb03e95294ac22d53c534d539fb9fb8713c57446e306
+  stdout_tail: compile 검사 PASS
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-12
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-01T02:40:08+09:00'
+  finished_at: '2026-09-01T02:40:08+09:00'
+  seconds: 0.107
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/14-check-12.log
+  log_sha256: dbd95a7a3a79e14b34dde9c8b1aeaf4b72ee0f8277011247c565815c1d9ef3e5
+  stdout_tail: "> 150\n    WARN  UNCHECKED_AC 9개\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260831-park-defects-actm/docs/work/feat-20260831-repeat-brake-82zv/brief.md\
+    \ lines=61 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260831-park-defects-actm/docs/work/feat-20260831-repeat-brake-82zv/spec.md\
+    \ lines=147 needs_input=0 unchecked_ac=0"
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-13
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-01T02:40:08+09:00'
+  finished_at: '2026-09-01T02:40:08+09:00'
+  seconds: 0.536
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/15-check-13.log
+  log_sha256: b3b5421b9401dc12f39792c7faf151a46bf0ce4d89ef794024f76b58826732c5
+  stdout_tail: "x-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자\
+    \ 고지: 일치\n\n## 능력 프로브 (설치 흔적만 본다)\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-14
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-09-01T02:40:08+09:00'
+  finished_at: '2026-09-01T02:40:09+09:00'
+  seconds: 0.924
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/16-check-14.log
+  log_sha256: 04059ff4edf26ffcbe3ec56a88a365b3f2ba5ee8e9b21ae477827b3ca704a337
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-15
+  command: python3 -m unittest tests.test_docs_evidence_close.TestMultilineCommandAnchor -v
+  exit_code: 0
+  started_at: '2026-09-01T02:40:09+09:00'
+  finished_at: '2026-09-01T02:40:11+09:00'
+  seconds: 1.385
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/17-check-15.log
+  log_sha256: 69a40bd11941adddea2689e649e942d0d198cadf5b0574f654523c3b3e3dd7f1
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: check-16
+  command: python3 -c "import glob,pathlib,yaml; from romeo.evidence import command_log_state; rs=[(f,c)
+    for f in sorted(glob.glob('docs/work/feat-20260831-park-defects-actm/evidence/*.yaml')) for c in (yaml.safe_load(open(f,encoding='utf-8'))
+    or {}).get('commands',[]) if c.get('id')=='check-9']; assert rs, 'check-9 \uae30\ub85d\uc774 \uc5c6\ub2e4';
+    bad=[(f,command_log_state(pathlib.Path('.'),c)[1]) for f,c in rs if command_log_state(pathlib.Path('.'),c)[0]
+    is not True]; assert not bad, bad"
+  exit_code: 0
+  started_at: '2026-09-01T02:40:11+09:00'
+  finished_at: '2026-09-01T02:40:11+09:00'
+  seconds: 0.051
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/18-check-16.log
+  log_sha256: 667d27fe2b53d870a03827a36ab15ff84fec0acdc41fc667079ee3cae532e71a
+  stdout_tail: ''
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-park-defects-actm'
+  exit_code: 0
+  started_at: '2026-09-01T02:45:02+09:00'
+  finished_at: '2026-09-01T02:45:02+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/19-review-tree-before.log
+  log_sha256: 1b7a3364afac2957c3fd99dc244e6bc0371330c6d69660d02624e02b79604312
+  stdout_tail: "M core/templates/tech-spec.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M\
+    \ romeo/envelope.py\n M romeo/evidence.py\n M romeo/run_unit.py\n M romeo/validate.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py\n M tests/test_run_unit.py"
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260831-park-defects-actm/.harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-01T02:45:02+09:00'
+  finished_at: '2026-09-01T02:45:02+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/20-reviewer-brief.log
+  log_sha256: ee8dca17c80cf148d8e8af5b62b69666ed158e33c97bd6021fe9abc62dc197d8
+  stdout_tail: bdd14fff9bc332f3f1ab91f13fcfe7e8ef628d9c02847a91dfaf0c4fdfb8814a  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260831-park-defects-actm/.harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/reviewer-brief.md
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260831-park-defects-actm'
+  exit_code: 0
+  started_at: '2026-09-01T02:50:26+09:00'
+  finished_at: '2026-09-01T02:50:26+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/21-review-tree-after.log
+  log_sha256: 1b7a3364afac2957c3fd99dc244e6bc0371330c6d69660d02624e02b79604312
+  stdout_tail: "M core/templates/tech-spec.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M\
+    \ romeo/envelope.py\n M romeo/evidence.py\n M romeo/run_unit.py\n M romeo/validate.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py\n M tests/test_run_unit.py"
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260831-park-defects-actm/review/run_e3a4af18582c-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-01T02:50:35+09:00'
+  finished_at: '2026-09-01T02:50:35+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260831-park-defects-actm/run_e3a4af18582c/22-review-record.log
+  log_sha256: ddd52e48d8e5507e6eb9c254da5f2621c0aa03c4928c048941f87b57f9bdd5c2
+  stdout_tail: 32cde2cfa0aaf5691217deeec726ad0a236d4920612ffd20b3a609666b07c1a1  docs/work/feat-20260831-park-defects-actm/review/run_e3a4af18582c-reviewer.json
+  head_sha: 21869c341bf7f197265ef0bb8b4e4096f57eca88
+  dirty_tree_hash: 3a5ba01c58ff172fd91b69bec44aee3bf7dc1eb69340dfdc3f93a0fd68178374
+changed_files:
+- core/templates/tech-spec.md
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/envelope.py
+- romeo/evidence.py
+- romeo/run_unit.py
+- romeo/validate.py
+- tests/test_docs_evidence_close.py
+- tests/test_envelope.py
+- tests/test_run_unit.py
+artifact_hash: 5c1863a5b3c785454ee044e36bb1facbab6d8534a8082b247f7f056ca1eae1e2
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-01T02:54:36+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 156 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-01T02:32:31+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_e3a4af18582c — 검증 계획 16건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 21869c341bf7 vs 현재 21869c341bf7
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 3a5ba01c58ff vs 현재 3a5ba01c58ff (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -c "from romeo.envelope import change_scope_paths as f; b=''##
+      \ubcc0\uacbd \ubc94\uc704\n\n- \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060
+      \u00b7 \u0060a/y.py\u0060\n  \u00b7 \u0060a/z.py\u0060 \u00b7 \u0060b/w.md\u0060\n''; got=f(b);
+      assert got==[''a/x.py'',''a/y.py'',''a/z.py'',''b/w.md''], got"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -c "from romeo.envelope import change_scope_paths as f; b=''##
+      \ubcc0\uacbd \ubc94\uc704\n\n- \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060\n-
+      \uc601\ud5a5\uc744 \ubc1b\ub294 \ubd80\ubd84: \u0060c/other.py\u0060\n''; got=f(b); assert got==[''a/x.py''],
+      got"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -c "t=open(''core/templates/tech-spec.md'',encoding=''utf-8'').read().split(chr(10));
+      g=[l for l in t if ''\ube48\uce78 \uae08\uc9c0'' in l]; assert len(g)==1, g; assert ''NEEDS_''+''INPUT''
+      not in g[0], g[0]"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo validate docs/work/feat-20260831-park-defects-actm'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — ! bin/romeo validate docs/work/feat-20260831-park-defects-actm 2>&1 | grep
+      -q Traceback'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_run_unit.TestReviewOnlyRecord -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest tests.test_envelope.TestChangeScopeMultiline -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest tests.test_run_unit tests.test_envelope -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: "check-9: exit 0 — python3 -c \"t=open('docs/planning/open-questions.md',encoding='utf-8').read().split(chr(10));\n\
+      import sys\nfor q in ('Q-18','Q-20','Q-21','Q-22','Q-25'):\n    r=[l for l in t if l.startswith('|\
+      \ '+q+' ')]\n    assert len(r)==1, (q,len(r))\n    assert ('\\ud574\\uc18c' in r[0]) or ('\\ub2f5\\\
+      ubcc0\\ub428' in r[0]), q\""
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-14: exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-15: exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestMultilineCommandAnchor
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-16: exit 0 — python3 -c "import glob,pathlib,yaml; from romeo.evidence import command_log_state;
+      rs=[(f,c) for f in sorted(glob.glob(''docs/work/feat-20260831-park-defects-actm/evidence/*.yaml''))
+      for c in (yaml.safe_load(open(f,encoding=''utf-8'')) or {}).get(''commands'',[]) if c.get(''id'')==''check-9''];
+      assert rs, ''check-9 \uae30\ub85d\uc774 \uc5c6\ub2e4''; bad=[(f,command_log_state(pathlib.Path(''.''),c)[1])
+      for f,c in rs if command_log_state(pathlib.Path(''.''),c)[0] is not True]; assert not bad, bad"'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 22건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 16건이 승인 커밋 120aa96ef80a 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -c "from romeo.envelope import change_scope_paths as f; b=''##
+      \ubcc0\uacbd \ubc94\uc704\n\n- \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060
+      \u00b7 \u0060a/y.py\u0060\n  \u00b7 \u0060a/z.py\u0060 \u00b7 \u0060b/w.md\u0060\n''; got=f(b);
+      assert got==[''a/x.py'',''a/y.py'',''a/z.py'',''b/w.md''], got"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -c "from romeo.envelope import change_scope_paths as f; b=''##
+      \ubcc0\uacbd \ubc94\uc704\n\n- \ubc14\ub00c\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8: \u0060a/x.py\u0060\n-
+      \uc601\ud5a5\uc744 \ubc1b\ub294 \ubd80\ubd84: \u0060c/other.py\u0060\n''; got=f(b); assert got==[''a/x.py''],
+      got"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -c "t=open(''core/templates/tech-spec.md'',encoding=''utf-8'').read().split(chr(10));
+      g=[l for l in t if ''\ube48\uce78 \uae08\uc9c0'' in l]; assert len(g)==1, g; assert ''NEEDS_''+''INPUT''
+      not in g[0], g[0]"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo validate docs/work/feat-20260831-park-defects-actm'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — ! bin/romeo validate docs/work/feat-20260831-park-defects-actm 2>&1
+      | grep -q Traceback'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.TestReviewOnlyRecord -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest tests.test_envelope.TestChangeScopeMultiline -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit tests.test_envelope -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: "check-9: 재실행도 exit 0 — python3 -c \"t=open('docs/planning/open-questions.md',encoding='utf-8').read().split(chr(10));\n\
+      import sys\nfor q in ('Q-18','Q-20','Q-21','Q-22','Q-25'):\n    r=[l for l in t if l.startswith('|\
+      \ '+q+' ')]\n    assert len(r)==1, (q,len(r))\n    assert ('\\ud574\\uc18c' in r[0]) or ('\\ub2f5\\\
+      ubcc0\\ub428' in r[0]), q\""
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-14: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-15: 재실행도 exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestMultilineCommandAnchor
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-16: 재실행도 exit 0 — python3 -c "import glob,pathlib,yaml; from romeo.evidence import
+      command_log_state; rs=[(f,c) for f in sorted(glob.glob(''docs/work/feat-20260831-park-defects-actm/evidence/*.yaml''))
+      for c in (yaml.safe_load(open(f,encoding=''utf-8'')) or {}).get(''commands'',[]) if c.get(''id'')==''check-9''];
+      assert rs, ''check-9 \uae30\ub85d\uc774 \uc5c6\ub2e4''; bad=[(f,command_log_state(pathlib.Path(''.''),c)[1])
+      for f,c in rs if command_log_state(pathlib.Path(''.''),c)[0] is not True]; assert not bad, bad"'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 120aa96ef80a 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['core/templates/tech-spec.md', 'docs/planning/open-questions.md', 'romeo/cli.py',
+      'romeo/envelope.py', 'romeo/evidence.py', 'romeo/run_unit.py', 'romeo/validate.py', 'tests/test_docs_evidence_close.py',
+      'tests/test_envelope.py', 'tests/test_run_unit.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_e3a4af18582c-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'
