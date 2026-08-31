@@ -229,6 +229,73 @@ class TestConflictFixtures(unittest.TestCase):
         findings, _ = check_conflicts(self.root)
         self.assertTrue(any("plan/SKILL.md" in f[1] for f in findings))
 
+    # ── c5: 부품 설치 경로 충돌 (K-64) ─────────────────────────────────
+    def _outputs(self, mutate):
+        import yaml
+        p = self.root / ".harness/compiled.yaml"
+        data = yaml.safe_load(p.read_text(encoding="utf-8"))
+        data["outputs"] = mutate(list(data["outputs"]))
+        p.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+
+    def test_c5_flags_install_dir_owned_by_compile(self):
+        # 설치 디렉터리 자체가 산출물이면 다음 compile 의 prune 이 남의 설치물을 지운다.
+        self._outputs(lambda o: o + [".agents/skills"])
+        findings, _ = check_conflicts(self.root)
+        self.assertTrue(any(f[0] == "c5-bmad-install-path" and ".agents/skills" in f[1]
+                            for f in findings), "설치 디렉터리를 통째로 소유하는데 통과했다")
+
+    def test_c5_flags_name_collision_with_recommended_skill(self):
+        # 추천하는 부품 스킬과 같은 이름을 컴파일이 쓰면 어느 쪽이 로드될지 알 수 없다.
+        self._outputs(lambda o: o + [".agents/skills/bmad-product-brief"])
+        findings, _ = check_conflicts(self.root)
+        self.assertTrue(any(f[0] == "c5-bmad-install-path" and "bmad-product-brief" in f[1]
+                            for f in findings))
+
+    def test_c5_passes_on_named_subpaths(self):
+        findings, _ = check_conflicts(self.root)
+        self.assertEqual([f for f in findings if f[0] == "c5-bmad-install-path"], [])
+
+    # ── c6: 두 번째 기획 원본 (K-61) ───────────────────────────────────
+    def _recommends(self, mutate):
+        import yaml
+        p = self.root / "core/policy/packages.yaml"
+        data = yaml.safe_load(p.read_text(encoding="utf-8"))
+        part = data["parts"]["bmad-cis"]
+        part["recommends"] = mutate(list(part["recommends"]))
+        p.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+
+    def test_c6_flags_deferred_part_in_recommends(self):
+        # 보류 판정을 받은 bmad-prd 가 추천에 들어오면 요구가 두 곳에서 만들어진다.
+        self._recommends(lambda r: r + ["bmad-prd"])
+        findings, _ = check_conflicts(self.root)
+        self.assertTrue(any(f[0] == "c6-no-second-plan-origin" and "bmad-prd" in f[2]
+                            for f in findings), "deferred 부품이 추천에 실렸는데 통과했다")
+
+    def test_c6_flags_recommend_without_provenance(self):
+        # 출처(provenance)에 없는 id 는 어디서 왔는지 말할 수 없다.
+        self._recommends(lambda r: r + ["bmad-made-up-skill"])
+        findings, _ = check_conflicts(self.root)
+        self.assertTrue(any(f[0] == "c6-no-second-plan-origin" and "bmad-made-up-skill" in f[2]
+                            for f in findings))
+
+    def test_c6_passes_on_the_accepted_eleven(self):
+        findings, _ = check_conflicts(self.root)
+        self.assertEqual([f for f in findings if f[0] == "c6-no-second-plan-origin"], [])
+
+    # ── c7: 부품 기본 출력 경로 하드코딩 (K-62) ─────────────────────────
+    def test_c7_flags_hardcoded_output_path_in_core(self):
+        p = self.root / "core/policy/packages.yaml"
+        p.write_text(p.read_text(encoding="utf-8") + "\n# 산출물은 _bmad-output/ 에 둔다\n",
+                     encoding="utf-8")
+        findings, _ = check_conflicts(self.root)
+        self.assertTrue(any(f[0] == "c7-no-output-path-hardcode" for f in findings),
+                        "코어에 부품 기본 출력 경로가 박혔는데 통과했다")
+
+    def test_c7_ignores_the_same_string_outside_core(self):
+        # fixtures/conflicts 는 그 문자열을 검사 대상으로 적어 둔 곳이다 — 자기 자신을 잡으면 안 된다.
+        findings, _ = check_conflicts(self.root)
+        self.assertEqual([f for f in findings if f[0] == "c7-no-output-path-hardcode"], [])
+
     # ── c2: 자동 트리거 ────────────────────────────────────────────────
     def test_c2_flags_repo_hook_file(self):
         (self.root / ".claude").mkdir(exist_ok=True)

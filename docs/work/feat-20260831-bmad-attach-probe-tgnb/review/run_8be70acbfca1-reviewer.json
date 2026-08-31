@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260831-bmad-attach-probe-tgnb",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260831-bmad-attach-probe-tgnb/task/run_8be70acbfca1-reviewer.json",
+    "sha256": "845b16f56cc3b1d3a2926aeaf7b5fa286b88bc9f36521a44c4284cbfb6521238"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260831-bmad-attach-probe-tgnb/evidence/run_8be70acbfca1.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. required_checks는 승인된 검증 계획과 일치하며, 원시 로그와 exit 0 기록은 AC-1~AC-7을 뒷받침한다. changed_files와 현재 작업 트리의 구현 변경은 implementer allowed_paths 안에 있고 guards는 비어 있다."
+}

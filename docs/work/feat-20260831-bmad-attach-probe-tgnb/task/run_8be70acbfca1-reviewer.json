@@ -1,0 +1,60 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260831-bmad-attach-probe-tgnb",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260831-bmad-attach-probe-tgnb/spec.md",
+    "sha256": "60061bac1976ba085479fccca4c36888f19946d53eb148bae53a0879a8831d3b"
+  },
+  "base_sha": "3f3f6992daa5d5cbd8cf9dfad00825e5d762bee7",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests"
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo validate"
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo compile --check"
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check"
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo doctor"
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -c \"import yaml;c=yaml.safe_load(open('core/policy/capabilities.yaml'))['capabilities']['discovery']['bmad'];assert c['marker']=='_bmad/_config/manifest.yaml';assert sorted(c['result_labels'])==['absent','present']\""
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor | grep -q '설치 흔적 없음'"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -c \"import yaml;p=yaml.safe_load(open('core/policy/packages.yaml'))['parts']['bmad-cis'];assert p['status']=='accepted';assert len(p['recommends'])==11;assert not ({'bmad-prd','bmad-architecture','bmad-brownfield-analysis','bmad-ux'} & set(p['recommends']))\""
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card | grep -q 'bmad-product-brief'"
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card | grep -q 'inputs:'"
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -rq '_bmad-output' core/"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

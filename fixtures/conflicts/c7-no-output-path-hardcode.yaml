@@ -1,0 +1,22 @@
+# K-68 충돌 fixture ⑦ — 부품 기본 출력 경로가 코어에 박히지 않는다 (K-62)
+#
+# 산출물은 라우터가 만든 docs/work/<id>/ 안에 두거나 frontmatter 의 inputs:/evidence: 로
+# 등록한다. 부품의 **기본 출력 경로**를 코어가 알고 있으면, 그 경로에 생긴 고아 산출물이
+# 정당해 보이기 시작한다 — 종료 검사는 그것을 인정하지 않는데도.
+#
+# c1 은 부품 원문(투영된 스킬)에 그 경로가 나올 때 흡수 override 를 요구한다. 원문은 고칠 수
+# 없으니 흡수가 답이다. 코어는 다르다 — **우리가 쓰는 곳이므로 아예 없어야 한다.**
+---
+id: c7-no-output-path-hardcode
+title: 코어에 부품 기본 출력 경로가 없다
+constraints: [K-62]
+kind: no_hardcoded_output_path
+scope_dirs: [core]
+patterns:
+  - "_bmad-output"
+  - "docs/superpowers/"
+  - ".superpowers/"
+why: >-
+  BMM 의 project_knowledge 기본값은 `docs` 이고 output_folder 는 설정으로 바뀐다.
+  코어가 특정 경로를 알고 있으면 설정이 바뀐 프로젝트에서 조용히 어긋난다.
+  경로를 아는 곳은 부품 설정과 그 작업 단위의 inputs: 링크뿐이다.

@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-08-31T15:34:56+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-08-31T16:51:03+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_8be70acbfca1.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -50,15 +50,15 @@ approval_history:
 - **기대 결과:** discovery/T2 요청 하나를 `/plan` 에 넣으면 카드에 11종 추천과 `inputs:` 요구가 인쇄되고,
   같은 카드가 "BMAD 미설치" 를 함께 알린다. `romeo doctor` 에 능력 프로브 절이 생긴다.
 - **수용 기준:**
-  - [ ] AC-1 `core/policy/capabilities.yaml` 이 생기고 `discovery.bmad` 프로브가 `_bmad/_config/manifest.yaml` 존재와
+  - [x] AC-1 `core/policy/capabilities.yaml` 이 생기고 `discovery.bmad` 프로브가 `_bmad/_config/manifest.yaml` 존재와
         거기 기록된 module·platform code 를 확인 대상으로 선언한다. 결과 라벨에 실행을 뜻하는 값이 없다.
-  - [ ] AC-2 `romeo doctor` 가 그 프로브를 실행해 결과를 인쇄한다. 미설치는 **결함이 아니다** — doctor 종료 코드를 바꾸지 않는다.
-  - [ ] AC-3 `packages.yaml` 의 `parts.bmad-cis` 가 `status: accepted`(G-M3) 로 바뀌고 D-77 의 11종을 `recommends` 로 열거한다.
+  - [x] AC-2 `romeo doctor` 가 그 프로브를 실행해 결과를 인쇄한다. 미설치는 **결함이 아니다** — doctor 종료 코드를 바꾸지 않는다.
+  - [x] AC-3 `packages.yaml` 의 `parts.bmad-cis` 가 `status: accepted`(G-M3) 로 바뀌고 D-77 의 11종을 `recommends` 로 열거한다.
         deferred 5종·excluded 40종은 그 목록에 없다.
-  - [ ] AC-4 discovery 또는 T2 로 분류된 제안의 카드에 11종 추천과 `inputs:` 링크 요구가 인쇄된다.
-  - [ ] AC-5 `core/` 어디에도 `_bmad-output` 경로가 하드코딩돼 있지 않다(K-62 · bmm 의 `project_knowledge` 기본값이 `docs` 다).
-  - [ ] AC-6 K-68 충돌 fixture 가 3종 늘고 `romeo doctor` 의 충돌 검사가 전부 통과한다.
-  - [ ] AC-7 기존 검사 6종(unittest · validate · vendor · notices --check · compile --check · fixtures check)이 그대로 exit 0 이다.
+  - [x] AC-4 discovery 또는 T2 로 분류된 제안의 카드에 11종 추천과 `inputs:` 링크 요구가 인쇄된다.
+  - [x] AC-5 `core/` 어디에도 `_bmad-output` 경로가 하드코딩돼 있지 않다(K-62 · bmm 의 `project_knowledge` 기본값이 `docs` 다).
+  - [x] AC-6 K-68 충돌 fixture 가 3종 늘고 `romeo doctor` 의 충돌 검사가 전부 통과한다.
+  - [x] AC-7 기존 검사 6종(unittest · validate · vendor · notices --check · compile --check · fixtures check)이 그대로 exit 0 이다.
 - **위험과 되돌리기:** 정책·문서·fixture 변경뿐이다. BMAD installer 는 **실행하지 않는다** — `.agents/skills/` 는 건드리지 않는다.
   잘못되면 `git revert <커밋>` 하나로 전부 돌아간다. 새 파일만 지우려면 `rm core/policy/capabilities.yaml` 로 충분하다.
 - **결정 필요:** 없음 (범위는 2026-08-31 사용자 확정 — "부착 정의까지, 실제 설치는 다음 단위").
@@ -127,6 +127,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-08-31T16:51:03+09:00 · HEAD 3f3f6992daa5 · 검사 기록 run_8be70acbfca1
 
-- (없음)
+- [evidence/run_8be70acbfca1.yaml](evidence/run_8be70acbfca1.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
