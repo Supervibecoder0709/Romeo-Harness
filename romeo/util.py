@@ -64,7 +64,14 @@ def project_root(start=None):
 
 _SECRET_PATTERNS = [
     (re.compile(r"(?i)(api[_-]?key|token|secret|password|passwd|bearer|authorization)\s*[=:]\s*\S+"), r"\1=<masked>"),
-    (re.compile(r"\b(sk|ghp|gho|ghu|ghs|xoxb|xoxp|AKIA)[A-Za-z0-9_\-]{10,}\b"), "<masked-token>"),
+    # 접두사 뒤에 **구분자**를 요구한다. 실제 토큰은 전부 그 형태다 — `sk-…` · `ghp_…` · `xoxb-…`.
+    # 구분자를 요구하지 않으면 `skills-before` 같은 평범한 파일명이 토큰으로 잡힌다. 그것이 왜 문제냐면
+    # 마스킹된 문자열이 증거의 `command` 로 저장되는데(evidence.py), 종료 검사는 검증 계획의 **원문**으로
+    # 정확 조회하므로(close.py) 실제로 exit 0 인 검사가 "evidence 에 명령 없음" 으로 떨어진다.
+    # 2026-08-31 run_6165c4796868 이 이것으로 막혔다 — 오탐은 조용하지 않고 완료를 막는다.
+    (re.compile(r"\b(sk|ghp|gho|ghu|ghs|xoxb|xoxp)[-_][A-Za-z0-9_\-]{10,}\b"), "<masked-token>"),
+    # AWS 액세스 키만 구분자가 없다. 대문자·숫자로만 이뤄진 고정 길이라 따로 둔다.
+    (re.compile(r"\bAKIA[0-9A-Z]{12,}\b"), "<masked-token>"),
 ]
 
 
