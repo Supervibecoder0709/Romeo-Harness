@@ -65,6 +65,15 @@ updated: "{{today}}"
 
 required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대조한다.
 
+**페이로드 단위의 검사는 그 단위의 산출물만 대상으로 한다.** 부착 대상 프로젝트의 작업 단위에는
+**하네스 자신의 테스트나 자기 검사를 넣지 않는다** — 하네스 테스트 스위트(`python3 -m unittest discover -s tests`),
+`romeo compile --check` · `romeo doctor` · `romeo fixtures ...` · `romeo vendor` · `romeo notices --check` 가 그것이다.
+이것들이 실패하면 페이로드 단위가 **자기 산출물과 무관한 이유로** 닫히지 못한다 — 하네스가 깨진 동안 페이로드가 인질이 된다
+(근거: `feat-20260829-license-field-46an` 의 check-5). 페이로드의 검사는 그 프로젝트의 테스트·빌드·린트여야 한다.
+
+**예외는 하네스 저장소 자신이 대상인 단위뿐이다.** 그때는 하네스 테스트가 정당한 검사이므로,
+검증 계획에 그 사실을 한 줄로 적어 둔다(예: "이 단위는 하네스 저장소 자신이 대상이므로 하네스 테스트가 정당한 검사다").
+
 ```yaml
 required_checks:
   - id: check-1

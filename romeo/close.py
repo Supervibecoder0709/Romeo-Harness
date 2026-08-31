@@ -38,6 +38,45 @@ def required_checks(body):
     return data.get("required_checks") or []
 
 
+# 페이로드 단위의 검증 계획에서 하네스 자신을 검사하는 명령들(`core/templates/tech-spec.md` 「검증 계획」).
+# 페이로드가 자기 산출물과 무관한 이유로 닫히지 못하는 자리다 — feat-20260829-license-field-46an 의 check-5.
+HARNESS_SELF_CHECKS = (
+    "unittest discover -s tests",
+    "unittest tests.",
+    "pytest tests/",
+    "romeo compile",
+    "romeo doctor",
+    "romeo fixtures",
+    "romeo vendor",
+    "romeo notices",
+)
+
+HARNESS_UNIT_MARKER = "하네스 저장소 자신"
+
+
+def harness_self_checks(plan):
+    """검증 계획에서 **하네스 자신**을 검사하는 항목의 id 들.
+
+    페이로드(부착 대상) 작업 단위의 검사는 그 단위의 산출물만 대상으로 한다. 하네스 테스트가 실패하면
+    페이로드 단위가 자기 산출물과 무관한 이유로 닫히지 못하기 때문이다. 하네스 저장소 자신이 대상인
+    단위에서는 같은 명령이 정당한 검사이므로, 판정은 이 함수가 아니라 `payload_check_violations` 가 한다."""
+    out = []
+    for rc in plan or []:
+        command = str((rc or {}).get("command") or "")
+        if any(marker in command for marker in HARNESS_SELF_CHECKS):
+            out.append(str((rc or {}).get("id")))
+    return out
+
+
+def payload_check_violations(body):
+    """페이로드 spec 이 하네스 자신의 검사를 검증 계획에 넣었으면 그 check id 들을 낸다.
+
+    본문이 「하네스 저장소 자신이 대상」이라고 선언했으면 예외다 — 그 선언이 템플릿이 요구하는 한 줄이다."""
+    if HARNESS_UNIT_MARKER in (body or ""):
+        return []
+    return harness_self_checks(required_checks(body))
+
+
 def _plan_key(plan):
     """검증 계획을 대조용 형태로 줄인다 — 무엇을 어떤 기대로 실행하기로 했는가."""
     return [(str((rc or {}).get("id")), str((rc or {}).get("command")), str((rc or {}).get("expect")))

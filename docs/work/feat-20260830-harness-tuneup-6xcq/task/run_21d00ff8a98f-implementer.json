@@ -1,0 +1,78 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260830-harness-tuneup-6xcq",
+  "role": "implementer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260830-harness-tuneup-6xcq/spec.md",
+    "sha256": "7dedcf3609cd941cdf8d0969e21f39a3a0f088656830ce20a43991788e2004f0"
+  },
+  "base_sha": "aace4dcf4f573ebd3c6efc51cbeaf915ab5504c2",
+  "allowed_paths": [
+    "docs/work/feat-20260830-harness-tuneup-6xcq/",
+    "core/principles/AGENTS.core.md",
+    "core/workflows/review/SKILL.md",
+    "core/templates/tech-spec.md",
+    "docs/requirements/constraints.md",
+    "docs/planning/progress.md",
+    "docs/planning/archive/",
+    "romeo/run_unit.py",
+    "romeo/cli.py",
+    "romeo/envelope.py",
+    "romeo/close.py",
+    "tests/",
+    "CLAUDE.md",
+    "AGENTS.md",
+    ".claude/",
+    "adapters/"
+  ],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "./bin/romeo compile --check",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "./bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "./bin/romeo doctor",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-5",
+      "command": "./bin/romeo fixtures parity --report",
+      "expect": "exit 0 (관측 케이스의 계약 바이트가 이 정비로 바뀌지 않았음을 확인하는 회귀 검사다)"
+    },
+    {
+      "id": "check-6",
+      "command": "test \"$(wc -c < docs/planning/progress.md | tr -d ' ')\" -le 20480",
+      "expect": "exit 0 (AC-6 의 수치를 대조하는 유일한 검사)"
+    },
+    {
+      "id": "check-7",
+      "command": "./bin/romeo run-unit --help",
+      "expect": "exit 0 (AC-1 의 명령이 실재하는지)"
+    },
+    {
+      "id": "check-8",
+      "command": "cd docs/planning && miss=0; for l in $(grep -oE '\\]\\([^)#]+\\)' progress.md | sed -E 's/^\\]\\(//;s/\\)$//' | grep -v '^http'); do [ -e \"$l\" ] || { echo \"MISSING $l\"; miss=1; }; done; test $miss -eq 0",
+      "expect": "exit 0 (다이어트 뒤 progress.md 의 상대 링크가 전부 실재하는지)"
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_run_unit",
+      "expect": "exit 0 (AC-8 을 대조하는 유일한 검사 — 반례 4건 · 연속 2회 실패 뒤 3회차 거부 · --after-review 해제 · 성공 시 카운터 0 · base_sha 변경으로는 리셋되지 않음)"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}
