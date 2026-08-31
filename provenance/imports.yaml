@@ -453,10 +453,24 @@ imports:
       Carson agent 가 core 의 bmad-brainstorming 을 dispatch 할 뿐이고(agents.ko.md:90,
       module-help.csv) 그 skill 은 이 저장소에 없다. 그래서 core 채택이 CIS 의 선행이다
     depends_on: [bmad-core-bmm]
-    unverified: >-
-      agent 없이 workflow SKILL 을 직접 호출하는 경로는 원문 activation 계약으로만 확인했다
-      (workflows.ko.md 15~17: workflow 가 스스로 config.yaml 해석·persistent_facts 로드·시작).
-      실행하지 않았다 — §6.1 4·5단계(부착·검증)에서 실측한다
+    # 2026-08-31 실측으로 대체됐다(feat-20260831-bmad-install-observe-a3bm · run_4d3ee0b42e5a).
+    # 원문 기록: .harness/observations.yaml 의 bmad_install.workflow_direct_call
+    verified: >-
+      agent 없이 workflow SKILL 을 직접 호출하는 경로는 **성립한다**. 실제 설치본에서
+      bmad-cis-design-thinking 을 agent 를 거치지 않고 Skill 도구로 직접 호출했고 SKILL 이 로드됐다.
+      원문 activation 계약(workflows.ko.md 15~17)이 서술한 대로 workflow 가 스스로 시작하며,
+      첫 지시는 워크플로 Step 1 이 아니라 활성화 Step 1 —
+      `uv run {project-root}/_bmad/scripts/resolve_customization.py … --key workflow` 명령 실행이다.
+      SKILL.md 본문은 도구 결과가 아니라 그다음 user 메시지로 주입되고, template.md ·
+      design-methods.csv · customize.toml 은 경로로만 걸려 지연 로드된다.
+      설치본이 실제로 담은 것은 v0.2.1 이 아니라 **v0.3.2**(sha 97298b22fee1c7e482710d3a8414adb5cfccccd9,
+      npmPackage bmad-creative-intelligence-suite)였다 — 위 source_sha·source_ref 는 아카이브 조사 시점의
+      값이고, 이 관측이 그것을 갱신하지는 않는다(설치본을 저장소에 두지 않기 때문이다).
+    still_unverified: >-
+      **완주시키지 않았다** — 첫 단계가 시작되는 지점에서 멈췄고 산출물 품질은 보지 않았다.
+      부착할 때 override 로 다뤄야 할 자리 셋을 관측에 남겼다: 활성화 Step 1 의 fallback 이 설정 병합을
+      LLM 에게 넘기는 경로, Step 3 의 `persistent_facts` file: glob 이 조용히 사실을 적재하는 경로(K-63),
+      기본 출력 경로 `{output_folder}/design-thinking-{date}.md` 가 K-62 와 다르다는 것.
     archive_ref: archive/bmad-code-org-bmad-module-creative-intelligence-suite/04-components-table.md
 
   - id: bmad-prd

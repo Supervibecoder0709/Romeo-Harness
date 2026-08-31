@@ -10,7 +10,7 @@
 # 기록을 지우지 않고 이어 붙인다. 관찰 시점의 개수가 지금 개수와 다르면 그 사실을 note 에 적는다.
 ---
 schema_version: 1
-updated: 2026-08-29
+updated: 2026-08-31
 
 runtime_load:
   claude:
@@ -298,3 +298,153 @@ m2_close:
   what_this_does_not_say: >-
     검토 판정이 왜 흔들리는지(Q-10) · 기본 구현자(claude)의 권한 강제(여전히 미관측) · impl6 교체 실행이 현 base 에서 성공하는지 ·
     원격 CI(push 전이라 미실행).
+
+
+# BMAD 를 실제로 설치하고 두 런타임의 discovery 를 관측한 기록 — 2026-08-31 G-M3 5단계 후반.
+# doctor 는 이 블록을 읽지 않는다(runtime_load 만 읽는다). 사람과 검토자가 읽는 기록이다.
+#
+# 왜 적나: 라우터는 이미 BMAD 스킬 11종을 추천하고 있는데 그 스킬들이 설치했을 때 실제로 쓸 수 있는지는
+# 아무도 확인한 적이 없었다. capabilities.yaml 의 present 분기도 marker 파일을 흉내 낸 테스트로만 확인됐다.
+# 이 블록이 그 두 자리를 실측으로 바꾼다(K-51).
+#
+# **설치본은 이 저장소에 없다.** 관측은 버리는 워크트리에서 했고 산출물은 .gitignore 로 막혀 커밋되지 않았다 —
+# 여기 남는 것은 관측 기록뿐이다. 다른 체크아웃에서 doctor 를 돌리면 discovery.bmad 는 absent 로 인쇄된다.
+bmad_install:
+  observed_at: '2026-08-31'
+  unit_id: feat-20260831-bmad-install-observe-a3bm
+  run_id: run_4d3ee0b42e5a
+  task_id: task_549f11b68a6f
+  dispatch_id: ctx_8fce603b1cd9
+  base_sha: 1ae907dda5b820cb4e92c86a73cb8be930cdef50
+  evidence: docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/run_4d3ee0b42e5a.yaml
+  worktree: 버리는 워크트리(impl4-feat-20260831-bmad-install-observe-a3bm) — 메인 체크아웃은 손대지 않았다
+  guard_approvals: [production-deploy, deletion]   # 승인 시점 commands: [] — 승인 전 상태 변경 0건
+
+  # 무엇을 실행했나. 두 번에 나눈 이유는 첫 설치 직후의 대조가 설치기 '자신의' 쓰기를 잡기 때문이다.
+  install:
+    - step: codex 단독
+      command: npx bmad-method install --directory . --modules core,bmm,cis --tools codex --yes
+      exit_code: 0
+      seconds: 3.164
+      result: codex 59 skills → .agents/skills
+    - step: 두 런타임 결합(update)
+      command: npx bmad-method install --directory . --modules core,bmm,cis --tools codex,claude-code --action update --yes
+      exit_code: 0
+      seconds: 2.037
+      result: codex 59 skills → .agents/skills · claude-code 59 skills → .claude/skills
+      why_combined: >-
+        `--tools` 는 더하기가 아니라 **교체**다. `--tools claude-code` 만 주면 앞 단계가 깐
+        `.agents/skills/bmad-*` 가 제거되고 두 런타임 동시 관측이 성립하지 않는다. 그리고 기존 설치본에
+        `--yes` 만 주면 quick-update 로 빠져 `--tools` 를 읽지 않고 exit 0 으로 끝난다 —
+        `--action update` 를 함께 줘야 tool 선택이 반영된다. 두 성질 모두 1~4회차에서 실측했다(Q-24).
+  installed_versions:                    # _bmad/_config/manifest.yaml 실물에서 읽은 값
+    core: 6.11.0 (built-in)
+    bmm: 6.11.0 (built-in)
+    cis: v0.3.2 (external · npmPackage bmad-creative-intelligence-suite · sha 97298b22fee1c7e482710d3a8414adb5cfccccd9)
+    platform_codes: [codex, claude-code]
+
+  # 관측 ① romeo 스킬이 살아남았는가 — 설치 대상이 romeo 스킬이 사는 바로 그 두 디렉터리다
+  romeo_skills_intact:
+    baseline: docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256   # 설치 직전 38개 파일
+    checks: 설치 직전 1회 · codex 설치 직후 1회 · 결합 설치 직후 1회 — shasum -a 256 -c 세 번 다 exit 0
+    result: 38/38 무손상. 설치기는 기존 파일을 하나도 건드리지 않고 bmad-* 만 더했다
+
+  # 관측 ② 저장소 밖(홈 전역 스킬 디렉터리)에 흔적이 남았는가 — 워크트리 격리로 막히지 않는 위험이었다
+  home_dirs_untouched:
+    baseline_full: docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before-full.txt   # 63개 파일 · 제외 없음
+    baseline_filtered: docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt    # 4개 파일 · */.system/* 제외
+    checks: 설치 직후마다 전체 목록(제외 없음)으로 diff — 두 번 다 exit 0
+    result: >-
+      변화 0. 아카이브 [E09] 가 codex 설치 경로에 적은 전역 `~/.codex/skills` 는 이 버전의 설치기가 쓰지 않는다 —
+      `--directory .` 를 주면 저장소 안에만 쓴다. 중단 조건은 발동하지 않았다.
+    caveat: >-
+      required_checks 의 상시 대조(check-8)는 `*/.system/*` 을 뺀다. codex 런타임을 띄우는 것 자체가
+      `~/.codex/skills/.system/` 을 다시 쓰기 때문이고(1회차 관측 · 설치기가 한 일이 아니다),
+      이 단위는 codex 를 반드시 띄운다. 설치기 자신의 쓰기는 위의 '설치 직후 제외 없는 대조' 가 잡는다.
+
+  # 관측 ③ 프로브의 present 분기 — 실제 설치본에서 처음 돌았다
+  probe:
+    command: "bin/romeo doctor 2>&1 | grep -q 'discovery.bmad: present'"
+    exit_code: 0
+    printed: '· discovery.bmad: present — 설치 흔적 확인 (_bmad/_config/manifest.yaml)'
+    reads_resolved: >-
+      capabilities.yaml 의 `reads: [modules, platform_codes]` 두 키가 실물 manifest 에 **둘 다 있었다**.
+      키 이름은 아카이브 [E05] 서술에서 왔고 그때까지 실물 대조를 하지 않았는데, 이 실행이 그것을 확인했다.
+    known_rough_edge: >-
+      `modules` 는 dict 리스트라 doctor 가 파이썬 repr 그대로 인쇄한다(datetime 객체 포함). 읽을 수는 있으나
+      보기 좋지 않다. 이 단위의 범위가 아니라 고치지 않았고, 관측으로만 남긴다.
+
+  # 관측 ④ 두 런타임이 실제로 bmad-* 를 로드하는가 (AC-5)
+  runtime_discovery:
+    method: 각 런타임을 이 워크트리에서 띄워 "런타임이 제공한 스킬 목록" 을 인쇄시켰다. 파일 목록(ls)이 아니라 세션의 목록이다
+    claude:
+      command: claude -p --max-turns 1 --tools "Skill" --allowedTools "Skill" --strict-mcp-config <목록 요청>
+      exit_code: 0
+      listed_total: 150
+      bmad_prefixed: 59
+      romeo_skills_present: 11/11   # plan · plan-close · implement · review · systematic-debugging · test-driven-development · verification-before-completion · requesting-code-review · receiving-code-review · using-git-worktrees · finishing-a-development-branch
+      verdict: 나타났다 — bmad-* 59종이 romeo 스킬 11종과 **함께** 목록에 있었다
+      negative_control: >-
+        같은 런타임을 검토자 강제 형태(--tools "Read" "Grep" "Glob")로 띄웠을 때는 Skill 도구 자체가 없어
+        목록이 비었다("이 세션에는 Skill 도구가 제공되지 않았습니다"). 스킬 목록 관측에는 Skill 도구가 켜져 있어야 한다 —
+        이 실행도 증거에 남겼다(cmd runtime-load-claude).
+    codex:
+      command: codex exec -s read-only --skip-git-repo-check -C <이 워크트리> <목록 요청> < /dev/null
+      exit_code: 0
+      listed_total: 98
+      bmad_prefixed: 59
+      romeo_skills_present: 12/12   # 위 11종 + repo-archive
+      verdict: 나타났다 — bmad-* 59종이 romeo 스킬 12종과 **함께** 목록에 있었다
+    not_recorded_in_runtime_load: >-
+      이 관측에서 codex 목록에 `implement` · `review` 가 실제로 있었다. 위 `runtime_load.codex` 블록은
+      2026-08-28 기준 10종만 담고 있어 doctor 가 그 런타임을 '부분 관찰' 로 인쇄한다. **그 블록은 고치지 않았다** —
+      이 작업 단위의 변경 범위가 아니고, 목록을 늘리는 것은 그 자체를 겨눈 단위에서 한다.
+
+  # 관측 ⑤ agent 없이 workflow SKILL 을 직접 호출하는 경로 (imports.yaml bmad-cis.unverified 가 겨눈 자리)
+  workflow_direct_call:
+    skill: bmad-cis-design-thinking
+    command: claude -p --max-turns 6 --tools "Skill" "Read" "Glob" --allowedTools "Skill" "Read" "Glob" --strict-mcp-config <직접 호출 요청>
+    exit_code: 0
+    completed: false            # 완주시키지 않았다 — 첫 단계가 시작되는지까지만 본다
+    loaded: true
+    how_it_loads: >-
+      Skill 도구는 `Launching skill: bmad-cis-design-thinking` 한 줄만 반환하고 SKILL.md 본문 전체는
+      그다음 user 역할 메시지로 주입된다. 참조 파일(template.md · design-methods.csv · customize.toml)은
+      본문에 없고 경로로만 걸린다 — 지연 로드다. base directory 는 `.claude/skills/bmad-cis-design-thinking`
+    first_instruction: >-
+      워크플로 Step 1 이 아니라 그 앞의 **활성화 Step 1** 이 먼저다:
+      `uv run {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --project-root {project-root} --key workflow`.
+      즉 첫 지시가 **명령 실행**이다 — 인사도 질문도 문서 읽기도 아니다.
+    verdict: >-
+      agent 를 거치지 않고 workflow SKILL 을 직접 호출하는 경로는 **성립한다**. 원문 activation 계약
+      (workflows.ko.md 15~17)이 서술한 대로 SKILL 이 스스로 시작한다. 이제 서술이 아니라 실행으로 확인됐다.
+    flags_for_integration:      # 채택·부착을 실제로 할 때 override 로 다뤄야 할 자리. 이 단위에서는 고치지 않는다
+      - 활성화 Step 1 의 fallback 이 스크립트 실패 시 TOML 3종(customize.toml · _bmad/custom/{skill}.toml · .user.toml)을
+        모델이 직접 읽어 병합 규칙을 손으로 적용하라고 지시한다 — 설정 해석의 주인이 스크립트에서 LLM 으로 넘어간다
+      - 활성화 Step 3 의 `persistent_facts` 가 `file:` glob 을 사실로 적재하고 매칭이 없으면 조용히 건너뛴다 — K-63(부품 자체 상태를 완료 판정에 쓰지 않는다)과 부딪칠 수 있다
+      - 기본 출력 경로가 `{output_folder}/design-thinking-{date}.md` 다 — K-62(산출물은 docs/work/<id>/ 안에)와 다르다.
+        지금 CLAUDE.md 의 output_paths override 는 `sp-requesting-code-review` 만 대상으로 해서 bmad 계열을 덮지 않는다
+
+  # 관측 ⑥ 설치 뒤에도 하네스 자신이 성립하는가 (AC-4) · 산출물이 git 에 새지 않는가 (AC-7)
+  harness_after_install:
+    'python3 -m unittest discover -s tests': exit 0 (522 tests OK)
+    'bin/romeo validate': exit 0
+    'bin/romeo compile --check': exit 0
+    'bin/romeo doctor --strict --scope repository': exit 0 (저장소 PASS · 이 머신의 런타임 PASS · 충돌 fixture 0)
+    git_leakage: >-
+      0건. `.gitignore` 4줄(_bmad/ · _bmad-output/ · .claude/skills/bmad-* · .agents/skills/bmad-*)로 막았고
+      `git status --porcelain --untracked-files=all` 에 설치 산출물이 한 건도 뜨지 않는다. 118종(59×2)의 스킬
+      디렉터리가 워킹 트리에 있는 상태에서 dirty_tree_hash 가 설치 전후로 같다(5ed1409cd80c)
+
+  conclusion: >-
+    **BMAD 는 이 하네스와 공존한다.** 같은 두 디렉터리에 설치되지만 romeo 스킬을 지우지 않고(38/38 무손상),
+    두 런타임 모두 bmad-* 59종과 romeo 스킬을 **함께** 로드하며, 설치 뒤에도 하네스의 자기 검사 4종이 전부 통과한다.
+    프로브의 present 분기는 실물에서 처음 확인됐고 그 `reads` 키 두 개도 실물에 있었다. agent 없이 workflow SKILL 을
+    직접 호출하는 경로도 성립한다. 저장소 밖에는 흔적이 남지 않았다.
+  what_this_does_not_say: >-
+    **workflow 를 완주시키면 무엇이 나오는지는 보지 않았다** — 첫 단계가 시작되는 것까지만 봤고 산출물 품질은 범위 밖이다.
+    라우터가 추천하는 11종 중 실제로 호출해 본 것은 1종(bmad-cis-design-thinking)뿐이다. 나머지 58종은 목록에 이름이
+    나타난 것까지만 확인했다 — 이름이 목록에 있다는 것과 그 스킬이 동작한다는 것은 다르다(A-11).
+    설치가 **다른 머신·다른 npm 캐시**에서도 같은 결과를 내는지, 두 런타임이 한 세션에서 romeo 스킬과 bmad 스킬을
+    섞어 쓸 때 라우터의 단일 진입점(K-60)이 유지되는지도 이 관측이 답하지 않는다.
+    설치본은 커밋되지 않았으므로 **이 저장소를 새로 체크아웃하면 discovery.bmad 는 absent 다.**

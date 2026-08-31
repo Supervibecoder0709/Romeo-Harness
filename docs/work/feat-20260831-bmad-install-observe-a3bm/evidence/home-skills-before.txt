@@ -1,0 +1,4 @@
+~/.claude/skills/explain/assets/explain-template.html
+~/.claude/skills/explain/references/pm-translation-rules.md
+~/.claude/skills/explain/references/visual-components.md
+~/.claude/skills/explain/SKILL.md
