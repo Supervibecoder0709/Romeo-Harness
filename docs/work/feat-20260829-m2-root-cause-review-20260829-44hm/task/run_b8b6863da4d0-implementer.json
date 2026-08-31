@@ -1,0 +1,40 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260829-m2-root-cause-review-20260829-44hm",
+  "role": "implementer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md",
+    "sha256": "30f783da222795f9c8111a18513006cc5b53ed15bc667230559ee3f16ef3b94b"
+  },
+  "base_sha": "12f56ecf0ab1a4502273e4ed1903914cf62aee0f",
+  "allowed_paths": [
+    "docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/",
+    "brief.md",
+    "spec.md"
+  ],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "test -f docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md && rg -n '^## (사용자 스토리|현재 관찰|근본 원인|권고|다음 확인)' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-2",
+      "command": "rg -n '사실|추론|미확인|SHA|근거' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-3",
+      "command": "git diff --check && bin/romeo validate",
+      "expect": "exit 0"
+    },
+    {
+      "id": "check-4",
+      "command": "git diff --name-only HEAD -- core romeo adapters fixtures tests docs/planning docs/decisions docs/work/feat-20260829-license-field-46an | test ! -s /dev/stdin",
+      "expect": "exit 0"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

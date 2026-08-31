@@ -1,0 +1,388 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_3589e602e8e0
+task_id: task_7a4615906774
+dispatch_id: ctx_d15deb955498
+unit_id: feat-20260829-m2-root-cause-review-20260829-44hm
+spec_ref:
+  path: docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md
+  sha256: eaa8336960357b10583cbcb706c7d34248b7775f0d8ccef3824bfef19b20d85b
+base_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/m2-root-cause-review-current-20260829
+started_at: '2026-08-29T18:44:35+09:00'
+finished_at: '2026-08-29T18:55:41+09:00'
+commands:
+- id: current-head
+  command: git rev-parse HEAD
+  exit_code: 0
+  started_at: '2026-08-29T18:44:35+09:00'
+  finished_at: '2026-08-29T18:44:35+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/01-current-head.log
+  log_sha256: 64dac7a5caed01969e3e604a4896dd7e7ec6d5cb6db129d2c4e335ed22bf2cc0
+  stdout_tail: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: current-status
+  command: git status --short
+  exit_code: 0
+  started_at: '2026-08-29T18:44:35+09:00'
+  finished_at: '2026-08-29T18:44:35+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/02-current-status.log
+  log_sha256: b19688ec4c7a674de6e0d0875d6de12ecc7510db65f4ba4351d1369a6cc33cd3
+  stdout_tail: '?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/evidence/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/task/'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: progress-drift-commits
+  command: git log --oneline ecb4819..HEAD
+  exit_code: 0
+  started_at: '2026-08-29T18:44:35+09:00'
+  finished_at: '2026-08-29T18:44:35+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/03-progress-drift-commits.log
+  log_sha256: fc3e41daf096cbfa984defa8efc3ca0ad9c11578b51969a0dbababab9b3f4f6e
+  stdout_tail: '57a2628 plan: reapprove M2 review output scope
+
+    12f56ec plan: approve M2 root cause review
+
+    3639e69 progress: 상태 블록의 기준 SHA 를 ecb4819 로 (3차 관통 기준 실행 커밋)'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: current-ci-lookup
+  command: gh run list --limit 1 --json databaseId,headSha,status,conclusion,workflowName,createdAt,updatedAt,url
+  exit_code: 1
+  started_at: '2026-08-29T18:44:36+09:00'
+  finished_at: '2026-08-29T18:44:36+09:00'
+  seconds: 0.044
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/04-current-ci-lookup.log
+  log_sha256: 8cf94240a529a6af125a0aaef5fc83cc863f98a822b46fea243a348e3070764e
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: orca-runtime-status
+  command: orca status --json
+  exit_code: 0
+  started_at: '2026-08-29T18:44:36+09:00'
+  finished_at: '2026-08-29T18:44:36+09:00'
+  seconds: 0.087
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/05-orca-runtime-status.log
+  log_sha256: f6625c341f94ce4188d57b7a9d82e882e8facde7346b2050cbe9c1b35328d86e
+  stdout_tail: "{\n  \"id\": \"local-status\",\n  \"ok\": true,\n  \"result\": {\n    \"target\": {\n\
+    \      \"kind\": \"local\"\n    },\n    \"app\": {\n      \"running\": false,\n      \"pid\": null\n\
+    \    },\n    \"runtime\": {\n      \"state\": \"stale_bootstrap\",\n      \"reachable\": false,\n\
+    \      \"runtimeId\": null\n    },\n    \"graph\": {\n      \"state\": \"not_running\"\n    }\n  },\n\
+    \  \"_meta\": {\n    \"runtimeId\": \"none\"\n  }\n}"
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: current-parity
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-08-29T18:44:36+09:00'
+  finished_at: '2026-08-29T18:44:37+09:00'
+  seconds: 0.771
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/06-current-parity.log
+  log_sha256: 91fabff7effab2c858cd117cbf4b0ea482993239652671b1839e89b2e443ef6d
+  stdout_tail: ': PRODUCT_DIFFERS reviewer 산출물 c237ea9+ae2611588d7a≠c237ea9+c5f1f8d0cc0c — 비교 불가: 다른 산출물에
+    대한 판정 차이는 런타임의 차이를 말하지 않는다. **이 판정은 비교한 면으로만 섰다** — 뺀 역할의 동등성은 이 관측으로 증명되지 않았고, 같은 산출물을 그 역할의 두 런타임에게
+    보인 관측이 있어야 판정된다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: m2-commit-count
+  command: git rev-list --count 0f10bfa^..ecb4819
+  exit_code: 0
+  started_at: '2026-08-29T18:44:37+09:00'
+  finished_at: '2026-08-29T18:44:37+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/07-m2-commit-count.log
+  log_sha256: 6d051bf7df5770ee65c50c72648c81ab68755ab4a4f698f5c280654984ad32f4
+  stdout_tail: '44'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: impl5-status
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260829-license-field-46an
+    status --short
+  exit_code: 0
+  started_at: '2026-08-29T18:44:37+09:00'
+  finished_at: '2026-08-29T18:44:37+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/08-impl5-status.log
+  log_sha256: 30d8f59eaa5f9cb756664932ce8c2550afaea824f1cec3e8eeef38b07030b54d
+  stdout_tail: 'ce/run_42710f6ac93b.yaml
+
+    ?? docs/work/feat-20260829-license-field-46an/result/run_42710f6ac93b-implementer.json
+
+    ?? docs/work/feat-20260829-license-field-46an/review/run_42710f6ac93b-reviewer.json
+
+    ?? docs/work/feat-20260829-license-field-46an/task/run_42710f6ac93b-implementer.json
+
+    ?? docs/work/feat-20260829-license-field-46an/task/run_42710f6ac93b-reviewer.json
+
+    ?? scripts/check-archive-licenses.py'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: impl6-status
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/impl6-feat-20260829-license-field-46an
+    status --short
+  exit_code: 0
+  started_at: '2026-08-29T18:44:37+09:00'
+  finished_at: '2026-08-29T18:44:37+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/09-impl6-status.log
+  log_sha256: a18f4434914693558f4d713372b97533b07301fe514dbc36686eb4f99c00d69c
+  stdout_tail: '?? docs/work/feat-20260829-license-field-46an/task/run_e82929ee03da-implementer.json
+
+    ?? docs/work/feat-20260829-license-field-46an/task/run_e82929ee03da-reviewer.json'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: baseline-artifact-location
+  command: sh -c test ! -f docs/work/feat-20260829-license-field-46an/evidence/run_42710f6ac93b.yaml &&
+    test -f /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260829-license-field-46an/docs/work/feat-20260829-license-field-46an/evidence/run_42710f6ac93b.yaml
+    && printf "%s\n" "current:missing impl5:present"
+  exit_code: 1
+  started_at: '2026-08-29T18:44:37+09:00'
+  finished_at: '2026-08-29T18:44:37+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/10-baseline-artifact-location.log
+  log_sha256: 20ea6fb41b1502ee0910bba6a5dc723aa09a73809d6f3407d1f1261f8bd2848e
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: current-baseline-missing
+  command: test ! -f docs/work/feat-20260829-license-field-46an/evidence/run_42710f6ac93b.yaml
+  exit_code: 0
+  started_at: '2026-08-29T18:45:13+09:00'
+  finished_at: '2026-08-29T18:45:13+09:00'
+  seconds: 0.003
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/11-current-baseline-missing.log
+  log_sha256: 75d8f200e1013320e522e100dc5902520d2962a94025d80710509c2770228979
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: impl5-baseline-present
+  command: test -f /Users/julliettelee/orca/workspaces/Romeo-Harness/impl5-feat-20260829-license-field-46an/docs/work/feat-20260829-license-field-46an/evidence/run_42710f6ac93b.yaml
+  exit_code: 0
+  started_at: '2026-08-29T18:45:13+09:00'
+  finished_at: '2026-08-29T18:45:13+09:00'
+  seconds: 0.003
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/12-impl5-baseline-present.log
+  log_sha256: e8fa44212e6489335d306ffda20272a3b2782902a1d4cf5e4cd8bca78a9a8ea5
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-1
+  command: test -f docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md && rg -n '^## (사용자
+    스토리|현재 관찰|근본 원인|권고|다음 확인)' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md
+  exit_code: 0
+  started_at: '2026-08-29T18:51:33+09:00'
+  finished_at: '2026-08-29T18:51:33+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/13-check-1.log
+  log_sha256: 6df12d20071b895baa6d7a7fbc556267f2c2fdead05d03ac24de3eec14764392
+  stdout_tail: '47:## 사용자 스토리
+
+    69:## 현재 관찰
+
+    116:## 근본 원인
+
+    160:## 권고
+
+    192:## 다음 확인'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-2
+  command: rg -n '사실|추론|미확인|SHA|근거' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md
+  exit_code: 0
+  started_at: '2026-08-29T18:51:33+09:00'
+  finished_at: '2026-08-29T18:51:33+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/14-check-2.log
+  log_sha256: 53b3788d528b8ec1f2c69a28fae62eaf7db06f6b28e350618572d7b82283279d
+  stdout_tail: 'ame-only <마지막 원격 SHA>..HEAD` 제시 | 사용자가 대상 SHA·변경 범위를 보고 승인 | 승인 전 `git push` 금지 | **명시적
+    승인 필수** |
+
+    204:| 7 | 승인 후 원격 CI 최신 1건 확인 | push한 정확한 SHA의 workflow success | 과거 `b53f08c` 성공이나 다른 SHA 성공을 현재
+    증거로 쓰지 않는다 | push 승인 뒤 |
+
+    208:## 근거 색인과 한계
+
+    214:| `current-head` | `git rev-parse HEAD` | 조사 기준 SHA `57a2628…` |
+
+    226:다음은 **미확인**으로 남긴다.
+
+    233:- 독립 reviewer의 이 보고서 근거 링크·과장 여부 판정. 이 항목은 구현자가 스스로 완료로 선언하지 않는다.'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-3
+  command: git diff --check && bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-29T18:51:33+09:00'
+  finished_at: '2026-08-29T18:51:34+09:00'
+  seconds: 0.083
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/15-check-3.log
+  log_sha256: e9084d6527eb339ba5c406b2d555c6c9eb112a1706f94dbd731c1724bedf5b95
+  stdout_tail: "rca/workspaces/Romeo-Harness/m2-root-cause-review-current-20260829/docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/brief.md\
+    \ lines=75 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/m2-root-cause-review-current-20260829/docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md\
+    \ lines=102 needs_input=0 unchecked_ac=5\n    WARN  UNCHECKED_AC 5개"
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-4
+  command: git diff --name-only HEAD -- core romeo adapters fixtures tests docs/planning docs/decisions
+    docs/work/feat-20260829-license-field-46an | test ! -s /dev/stdin
+  exit_code: 0
+  started_at: '2026-08-29T18:51:34+09:00'
+  finished_at: '2026-08-29T18:51:34+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/16-check-4.log
+  log_sha256: 4449dee50f0c65e6081509b7718bc17c591ddc99ed8c8ea2f496e29a8e8fe76f
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: result-envelope
+  command: bin/romeo envelope check --unit feat-20260829-m2-root-cause-review-20260829-44hm --role implementer
+    docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/result/run_3589e602e8e0-implementer.json
+  exit_code: 0
+  started_at: '2026-08-29T18:52:41+09:00'
+  finished_at: '2026-08-29T18:52:42+09:00'
+  seconds: 0.119
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/17-result-envelope.log
+  log_sha256: 181473a6c45a84e447f987ecf3d6aebde7ce5c10ac1956feecccd6fae860def4
+  stdout_tail: "romeo envelope check docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/result/run_3589e602e8e0-implementer.json\
+    \ → PASS (unit feat-20260829-m2-root-cause-review-20260829-44hm · role implementer)\n  [PASS] ENVELOPE_VALID\n\
+    \  [PASS] TASK_ANCHORED\n  [PASS] BASE_SHA\n  [PASS] EVIDENCE_ANCHORED\n  [PASS] ROLE_CONTRACT"
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-1
+  command: test -f docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md && rg -n '^## (사용자
+    스토리|현재 관찰|근본 원인|권고|다음 확인)' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md
+  exit_code: 0
+  started_at: '2026-08-29T18:52:42+09:00'
+  finished_at: '2026-08-29T18:52:42+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/18-check-1.log
+  log_sha256: 6df12d20071b895baa6d7a7fbc556267f2c2fdead05d03ac24de3eec14764392
+  stdout_tail: '47:## 사용자 스토리
+
+    69:## 현재 관찰
+
+    116:## 근본 원인
+
+    160:## 권고
+
+    192:## 다음 확인'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-2
+  command: rg -n '사실|추론|미확인|SHA|근거' docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md
+  exit_code: 0
+  started_at: '2026-08-29T18:52:42+09:00'
+  finished_at: '2026-08-29T18:52:42+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/19-check-2.log
+  log_sha256: 53b3788d528b8ec1f2c69a28fae62eaf7db06f6b28e350618572d7b82283279d
+  stdout_tail: 'ame-only <마지막 원격 SHA>..HEAD` 제시 | 사용자가 대상 SHA·변경 범위를 보고 승인 | 승인 전 `git push` 금지 | **명시적
+    승인 필수** |
+
+    204:| 7 | 승인 후 원격 CI 최신 1건 확인 | push한 정확한 SHA의 workflow success | 과거 `b53f08c` 성공이나 다른 SHA 성공을 현재
+    증거로 쓰지 않는다 | push 승인 뒤 |
+
+    208:## 근거 색인과 한계
+
+    214:| `current-head` | `git rev-parse HEAD` | 조사 기준 SHA `57a2628…` |
+
+    226:다음은 **미확인**으로 남긴다.
+
+    233:- 독립 reviewer의 이 보고서 근거 링크·과장 여부 판정. 이 항목은 구현자가 스스로 완료로 선언하지 않는다.'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-3
+  command: git diff --check && bin/romeo validate
+  exit_code: 0
+  started_at: '2026-08-29T18:52:42+09:00'
+  finished_at: '2026-08-29T18:52:42+09:00'
+  seconds: 0.083
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/20-check-3.log
+  log_sha256: b770531c972592460dbe4fa341f8ecc92e73fae498267767b9db38d7128d4f99
+  stdout_tail: "rca/workspaces/Romeo-Harness/m2-root-cause-review-current-20260829/docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/brief.md\
+    \ lines=75 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/m2-root-cause-review-current-20260829/docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md\
+    \ lines=102 needs_input=0 unchecked_ac=1\n    WARN  UNCHECKED_AC 1개"
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: check-4
+  command: git diff --name-only HEAD -- core romeo adapters fixtures tests docs/planning docs/decisions
+    docs/work/feat-20260829-license-field-46an | test ! -s /dev/stdin
+  exit_code: 0
+  started_at: '2026-08-29T18:52:42+09:00'
+  finished_at: '2026-08-29T18:52:42+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/21-check-4.log
+  log_sha256: 4449dee50f0c65e6081509b7718bc17c591ddc99ed8c8ea2f496e29a8e8fe76f
+  stdout_tail: ''
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: reviewer-brief
+  command: shasum -a 256 .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-08-29T18:54:57+09:00'
+  finished_at: '2026-08-29T18:54:57+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/22-reviewer-brief.log
+  log_sha256: ac7e3f9f49a8f65ea85266b0b0aa419c0214d90692f840b9544dc024e7f099f2
+  stdout_tail: de0b883c637c927bc593e96d1e0d36f6daa4eb847331e7d0a37ec8eaafb61012  .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/reviewer-brief.md
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: review-tree-before
+  command: git status --porcelain
+  exit_code: 0
+  started_at: '2026-08-29T18:54:57+09:00'
+  finished_at: '2026-08-29T18:54:57+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/23-review-tree-before.log
+  log_sha256: 3525a46b29db116ef1d31921625a1ab5ce2ffa162922aa1f9538a473121d1640
+  stdout_tail: 'M docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md
+
+    ?? docs/reviews/2026-08-29-m2-root-cause-review/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/evidence/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/result/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/task/'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+- id: review-tree-after-capacity-block
+  command: git status --porcelain
+  exit_code: 0
+  started_at: '2026-08-29T18:55:41+09:00'
+  finished_at: '2026-08-29T18:55:41+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260829-m2-root-cause-review-20260829-44hm/run_3589e602e8e0/24-review-tree-after-capacity-block.log
+  log_sha256: 3525a46b29db116ef1d31921625a1ab5ce2ffa162922aa1f9538a473121d1640
+  stdout_tail: 'M docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/spec.md
+
+    ?? docs/reviews/2026-08-29-m2-root-cause-review/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/evidence/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/result/
+
+    ?? docs/work/feat-20260829-m2-root-cause-review-20260829-44hm/task/'
+  head_sha: 57a2628a78ab318fd5eb8abae41dde7f1ad2c849
+  dirty_tree_hash: 687628a9700a0b1f65c5c0c06cbadc7f8dfec02f58b5c0b4508676149201ee3a
+changed_files:
+- docs/reviews/2026-08-29-m2-root-cause-review/REVIEW_FINDINGS.md
+artifact_hash: 68e19f08dbe0e3ca636c0586d1d9af02a4df0def632c81db40b2133195c82270
+reviewer: null
+verdict: null
+approvals: []
