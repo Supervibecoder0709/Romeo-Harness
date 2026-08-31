@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-08-31T18:14:41+09:00'
+approved_at: '2026-08-31T19:44:03+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -26,6 +26,13 @@ routing:
   history: []
 created: '2026-08-31'
 updated: '2026-08-31'
+approval_history:
+- {approved_at: '2026-08-31T18:14:41+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T19:44:03+09:00',
+  reason: '1회차 관통(run_67c238a254e1)이 검증 계획의 결함 2건을 드러내 재승인한다. check-4 는 bin/romeo doctor 였는데 --strict
+    없이는 저장소 결함이 있어도 항상 exit 0 이라 빈 검사였다 — --strict --scope repository 로 바꿨다(그 결과 1회차가 남긴 K-62 위반 c7 을
+    실제로 잡는다). check-8 은 전역 비교 대상에 codex CLI 가 소유한 ~/.codex/skills/.system/ 이 들어 있었는데, codex 런타임을 띄우는 것
+    자체가 그 디렉터리를 다시 쓰고 이 단위는 codex 를 반드시 띄우므로 설계상 통과할 수 없는 검사였다 — 비교에서 */.system/* 을 빼고, 대신 설치 직후마다는 제외
+    없이 전체로 대조하도록 했다. AC-2·AC-4 문장에 그 근거를 드러냈다. 하네스 테스트 4건의 환경 단언은 관통 사이 정비(c7c1b53)로 이미 걷어냈다.'}
 ---
 
 # G-M3 검증 — BMAD 실제 설치와 두 런타임 discovery 관측
@@ -42,9 +49,9 @@ updated: '2026-08-31'
 - **기대 결과:** ① romeo 스킬(claude 11종·codex 12종)이 설치 뒤에도 그대로다 ② 프로브가 실제 설치본에서 처음으로 `present` 를 낸다 ③ 두 런타임의 스킬 목록에 `bmad-*` 가 나타났는지가 실행 출력으로 기록된다 ④ `capabilities.yaml` 의 "테스트로만 확인했다" 가 실측 기록으로 바뀐다. **공존이 불가능하다는 결과도 유효한 결과다** — 그때는 되돌리고 멈춘 뒤 사람에게 돌아온다.
 - **수용 기준:**
   - [ ] AC-1 설치 **직전**에 두 스킬 디렉터리의 sha256 목록을 파일로 고정하고, 설치 후 그 대조가 전부 통과한다 — romeo 스킬이 하나도 바뀌지 않았다.
-  - [ ] AC-2 저장소 밖(홈의 전역 스킬 디렉터리)에 변화가 없다. 설치 직전에 뜬 목록과 설치 후 목록이 같다.
+  - [ ] AC-2 저장소 밖(홈의 전역 스킬 디렉터리)에 변화가 없다. 설치 직전에 뜬 목록과 설치 후 목록이 같다. **비교에서 `*/.system/*` 은 뺀다** — 1회차에서 codex 런타임을 띄우는 것 자체가 `~/.codex/skills/.system/` 을 통째로 다시 쓴다는 것이 관측됐고(설치기가 한 일이 아니다), 이 단위는 codex 를 반드시 띄우므로 그것을 넣은 채로는 통과할 수 없는 검사가 된다. 그 대신 설치 **직후마다** 대조해 설치기 자신의 쓰기를 잡는다.
   - [ ] AC-3 `_bmad/_config/manifest.yaml` 이 생기고 `romeo doctor` 의 능력 프로브가 `discovery.bmad: present` 를 인쇄한다.
-  - [ ] AC-4 설치 뒤에도 `romeo compile --check` · `romeo doctor` · `romeo validate` · 하네스 테스트가 전부 통과한다.
+  - [ ] AC-4 설치 뒤에도 `romeo compile --check` · `romeo doctor --strict --scope repository` · `romeo validate` · 하네스 테스트가 전부 통과한다. **`--strict` 가 붙어야 판정이 된다** — 1회차에서 `bin/romeo doctor` 만으로는 저장소 결함이 있어도 exit 0 이라 빈 검사였다(Q-21).
   - [ ] AC-5 두 런타임 각각의 스킬 목록에 `bmad-*` 가 나타났는지, CIS workflow 1종을 agent 없이 직접 호출했을 때 시작되는지가 실행 출력과 함께 `.harness/observations.yaml` 에 기록된다. **"나타나지 않았다" 도 유효한 기록**이며 그렇게 적는다.
   - [ ] AC-6 `core/policy/capabilities.yaml` 에서 "marker 파일을 흉내 낸 테스트로만 확인했다" 문장이 사라지고 실측 기록으로 대체된다. `provenance/imports.yaml` 의 `bmad-cis.unverified` 도 같은 시점에 갱신된다.
   - [ ] AC-7 설치 산출물이 git 에 들어가지 않는다 — `_bmad/` · `_bmad-output/` · 두 스킬 디렉터리의 `bmad-*` 가 무시되고, 추적 트리에 untracked 로 남지 않는다.
@@ -66,8 +73,8 @@ updated: '2026-08-31'
 | # | 목표 | 변경 | 인터페이스 (소비 → 생산) | 확인 방법 | 복구 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | 설치 산출물이 git 에 새지 않게 막는다 | `.gitignore` 에 `_bmad/` · `_bmad-output/` · `.claude/skills/bmad-*` · `.agents/skills/bmad-*` 4줄을 더한다 | 소비: 없음 → 생산: 무시 규칙 4줄 | `git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe` 가 exit 0 | `git checkout -- .gitignore` |
-| 2 | 설치 직전 상태를 되돌릴 수 있게 고정한다 | `docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256`(두 스킬 디렉터리 전 파일) 과 `evidence/home-skills-before.txt`(전역 목록, `$HOME` 을 `~` 로 치환) 를 만든다 | 소비: 없음 → 생산: `evidence/skills-before.sha256` · `evidence/home-skills-before.txt` | 두 파일이 존재하고 `shasum -a 256 -c evidence/skills-before.sha256` 이 설치 전에 exit 0 | 파일 삭제 후 재생성. 저장소 상태를 바꾸지 않는다 |
-| 3 | codex 대상 설치를 관측한다 | `npx bmad-method install --directory . --modules core,bmm,cis --tools codex --yes` 를 실행하고 즉시 baseline 2건을 대조한다 | 소비: 2행의 baseline 2건 → 생산: `_bmad/_config/manifest.yaml`, `.agents/skills/bmad-*`, 설치 로그 | `shasum -a 256 -c` 가 exit 0 이고 전역 목록 `diff` 가 exit 0. 하나라도 실패하면 **중단 조건 발동** — 되돌리고 4행을 실행하지 않는다. `cis` 는 external official module 이라 비대화형 설치로 resolve 되지 않을 수 있다 — 그때는 `--modules core,bmm` 으로 한 번만 다시 시도하고, 그래도 안 되면 **그 사실을 관측으로 기록**하고 넘어간다(재시도 반복 금지) | `git checkout -- .agents/skills` · `rm -rf _bmad` · 워크트리 폐기 |
+| 2 | 설치 직전 상태를 되돌릴 수 있게 고정한다 | `docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256`(두 스킬 디렉터리 전 파일) 과 `evidence/home-skills-before.txt`(전역 목록, `*/.system/*` 제외 · `$HOME` 을 `~` 로 치환 — check-8 과 **같은 제외**로 떠야 대조가 성립한다) 를 만든다 | 소비: 없음 → 생산: `evidence/skills-before.sha256` · `evidence/home-skills-before.txt` | 두 파일이 존재하고 `shasum -a 256 -c evidence/skills-before.sha256` 이 설치 전에 exit 0 | 파일 삭제 후 재생성. 저장소 상태를 바꾸지 않는다 |
+| 3 | codex 대상 설치를 관측한다 | `npx bmad-method install --directory . --modules core,bmm,cis --tools codex --yes` 를 실행하고 즉시 baseline 2건을 대조한다 | 소비: 2행의 baseline 2건 → 생산: `_bmad/_config/manifest.yaml`, `.agents/skills/bmad-*`, 설치 로그 | `shasum -a 256 -c` 가 exit 0 이고 전역 목록 `diff` 가 exit 0. **설치 직후 대조는 `.system/` 을 빼지 않고 전체로 한다** — 그 순간에는 codex 가 개입하지 않으므로 설치기 자신의 쓰기를 그대로 잡는다. 하나라도 실패하면 **중단 조건 발동** — 되돌리고 4행을 실행하지 않는다. `cis` 는 external official module 이라 비대화형 설치로 resolve 되지 않을 수 있다 — 그때는 `--modules core,bmm` 으로 한 번만 다시 시도하고, 그래도 안 되면 **그 사실을 관측으로 기록**하고 넘어간다(재시도 반복 금지) | `git checkout -- .agents/skills` · `rm -rf _bmad` · 워크트리 폐기 |
 | 4 | claude-code 대상 설치를 관측한다 | 3행이 통과했을 때만. `--tools claude-code` 로 같은 절차를 반복하고 같은 2건을 대조한다 | 소비: 3행 통과 → 생산: `.claude/skills/bmad-*` | 3행과 같은 대조가 exit 0 | `git checkout -- .claude/skills` |
 | 5 | 프로브와 하네스 자기 검사가 설치 뒤에도 성립하는지 본다 | 없음(읽기 실행) | 소비: 3·4행의 설치 → 생산: `doctor` · `compile --check` · `validate` · 테스트 출력 | `bin/romeo doctor 2>&1 \| grep -q "discovery.bmad: present"` 가 exit 0 이고, `compile --check` · `validate` · 하네스 테스트가 exit 0 | 되돌릴 것 없음. 실패는 그대로 기록한다 |
 | 6 | 두 런타임이 `bmad-*` 를 실제로 로드하는지 관측한다 | 없음(각 런타임을 그 워크트리에서 띄워 스킬 목록을 받는다) | 소비: 3·4행의 설치 → 생산: 각 런타임의 스킬 목록 원문 | 받은 목록에 `bmad-` 로 시작하는 이름이 있는지 없는지가 출력에 그대로 남는다. **없다는 결과도 기록한다** | 되돌릴 것 없음 |
@@ -91,7 +98,7 @@ required_checks:
   - id: check-3
     command: "bin/romeo compile --check"
   - id: check-4
-    command: "bin/romeo doctor"
+    command: "bin/romeo doctor --strict --scope repository"
   - id: check-5
     command: "shasum -a 256 -c docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256"
   - id: check-6
@@ -99,7 +106,7 @@ required_checks:
   - id: check-7
     command: "bin/romeo doctor 2>&1 | grep -q 'discovery.bmad: present'"
   - id: check-8
-    command: "find \"$HOME/.codex/skills\" \"$HOME/.claude/skills\" -type f 2>/dev/null | sed \"s|^$HOME|~|\" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt"
+    command: "find \"$HOME/.codex/skills\" \"$HOME/.claude/skills\" -type f -not -path \"*/.system/*\" 2>/dev/null | sed \"s|^$HOME|~|\" | sort | diff - docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/home-skills-before.txt"
   - id: check-9
     command: "git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe"
   - id: check-10

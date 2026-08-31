@@ -1,0 +1,15 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260831-bmad-install-observe-a3bm
+attempts:
+- n: 1
+  run: run_67c238a254e1
+  base_sha: 40b074ba6634ae6b1d4a8aeca61129ab170d4181
+  started_at: '2026-08-31T18:17:05+09:00'
+  result: fail
+  failure_class: harness
+  note: 설치·공존·discovery·workflow 호출 관측은 전부 성공했다(check 12중 10 통과, romeo 스킬 38/38 무손상, 두 런타임이 bmad-* 59종을
+    romeo 스킬과 함께 로드). 실패 2건은 둘 다 산출물 밖 원인이다 — check-1 은 tests/test_capabilities.py 4건이 '이 저장소에 BMAD 미설치'
+    라는 환경 사실을 단언해 깨졌고(하네스 결함, tests/ 는 allowed_paths 밖 + §10 동결), check-8 은 codex 를 띄우는 것 자체가 ~/.codex/skills/.system/
+    을 다시 쓰기 때문에 이 단위에서 설계상 통과할 수 없는 검사다(검증 계획 결함). 정비는 관통 사이에 한다.
+  settled_at: '2026-08-31T18:45:20+09:00'
+reviews: []
