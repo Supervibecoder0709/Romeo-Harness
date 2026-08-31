@@ -1,0 +1,17 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260831-park-defects-actm
+attempts:
+- n: 1
+  run: run_6e8ac2710600
+  base_sha: b996d71383e8e995c1f738954ebe1f838da877b1
+  started_at: '2026-08-31T23:06:26+09:00'
+  result: fail
+  failure_class: harness
+  note: '구현자는 사실상 통과했다 — required_checks 14건 중 12건 exit 0 이고, 실패한 check-1·check-2 는 산출물 때문이 아니라 승인된 검증
+    계획의 한 글자 오타(라벨 「바뀌는」을 다른 글자로 적음) 때문에 어떤 구현으로도 통과할 수 없는 검사였다. 구현자가 result 봉투에 그 원인을 정확히 진단하고 gate_verdict
+    FAIL 을 냈다. 실측 확인: 오타를 고친 check-1·check-2 를 위임 워크트리(impl-feat-20260831-park-defects-actm)의 작업 트리에서
+    돌리면 각각 [''a/x.py'',''a/y.py'',''a/z.py'',''b/w.md''] 와 [''a/x.py''] 가 나와 둘 다 통과하고, 같은 검사를 승인 커밋 b996d71
+    리비전에서 돌리면 [''a/x.py'',''a/y.py''] 로 떨어진다 — 고친 검사는 실제로 판별력이 있고 구현자의 변경이 그 조건을 이미 만족한다. 재승인(23:45)으로
+    base 가 바뀌므로 이 Run 은 중단하고 새 base 로 다시 시작한다(RUNBOOK §3.4.1 · AGENTS.core §10).'
+  settled_at: '2026-08-31T23:56:18+09:00'
+reviews: []

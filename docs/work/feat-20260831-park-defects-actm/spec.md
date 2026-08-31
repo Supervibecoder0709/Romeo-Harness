@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-08-31T23:05:01+09:00'
+approved_at: '2026-08-31T23:45:04+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,9 @@ routing:
   history: []
 created: '2026-08-31'
 updated: '2026-08-31'
+approval_history:
+- {approved_at: '2026-08-31T23:05:01+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T23:45:04+09:00',
+  reason: 'check-1\u00b7check-2 \uc758 \uba85\ub839 \ubb38\uc790\uc5f4\uc774 \ub77c\ubca8 \u300c\ubc14\uafc0\ub294 \ud30c\uc77c\u00b7\ubaa8\ub4c8\u300d\uc758 ''\uafc0'' \ub97c \ub610 \ub2e4\ub978 \uae00\uc790\ub85c \uc801\uc5b4 \uc874\uc7ac\ud558\uc9c0 \uc54a\ub294 \ub77c\ubca8\uc744 \ucc3e\uac8c \ud588\ub2e4 \u2014 \uc5b4\ub5a4 \uad6c\ud604\uc73c\ub85c\ub3c4 \ud1b5\uacfc\ud560 \uc218 \uc5c6\ub294 \uac80\uc0ac\uc600\ub2e4. \ud55c \uae00\uc790\ub97c \ubc14\ub85c\uc7a1\ub294\ub2e4. \uac80\uc0ac\uac00 \ubb3b\ub294 \uc870\uac74(\uc5ec\ub7ec \uc904\uc744 \uc804\ubd80 \uc77d\ub294\ub2e4 \u00b7 \ub2e4\uc74c \ud56d\ubaa9\uc744 \uc0bc\ud0a4\uc9c0 \uc54a\ub294\ub2e4)\uc740 \uadf8\ub300\ub85c\uc774\uace0 \uac80\uc0ac\ub97c \uc57d\ud558\uac8c \ub9cc\ub4e4\uc9c0 \uc54a\ub294\ub2e4. \uadfc\uac70: \uace0\uce5c check-1 \uc744 \uc2b9\uc778 \ucee4\ubc0b b996d71 \uc758 \ub9ac\ube44\uc804(\uc774 \uccb4\ud06c\uc544\uc6c3)\uc5d0\uc11c \ub3cc\ub9ac\uba74 [''a/x.py'', ''a/y.py''] \ub9cc \ub098\uc640 AssertionError \ub85c \ub5a8\uc5b4\uc9c4\ub2e4 \u2014 \ub77c\ubca8\uc744 \ucc3e\uc544 \uccab \uc904\ub9cc \uc77d\uc740 \uac83\uc774\ubbc0\ub85c \uac80\uc0ac\uac00 \uc2e4\uc81c\ub85c \ub3d9\uc791\ud55c\ub2e4. \ud655\uc778\ub780\uacfc \uc218\uc6a9 \uae30\uc900\uc740 \ubb34\ubcc0\uacbd'}
 ---
 
 # park 된 하네스 결함 4건 정비 — 계약 경로 잘림·안내문 토큰·디렉터리 크래시·유령 시도
@@ -83,9 +86,9 @@ required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대�
 ```yaml
 required_checks:
   - id: check-1
-    command: "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub01c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060 \\u00b7 \\u0060a/y.py\\u0060\\n  \\u00b7 \\u0060a/z.py\\u0060 \\u00b7 \\u0060b/w.md\\u0060\\n'; got=f(b); assert got==['a/x.py','a/y.py','a/z.py','b/w.md'], got\""
+    command: "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub00c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060 \\u00b7 \\u0060a/y.py\\u0060\\n  \\u00b7 \\u0060a/z.py\\u0060 \\u00b7 \\u0060b/w.md\\u0060\\n'; got=f(b); assert got==['a/x.py','a/y.py','a/z.py','b/w.md'], got\""
   - id: check-2
-    command: "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub01c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060\\n- \\uc601\\ud5a5\\uc744 \\ubc1b\\ub294 \\ubd80\\ubd84: \\u0060c/other.py\\u0060\\n'; got=f(b); assert got==['a/x.py'], got\""
+    command: "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub00c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060\\n- \\uc601\\ud5a5\\uc744 \\ubc1b\\ub294 \\ubd80\\ubd84: \\u0060c/other.py\\u0060\\n'; got=f(b); assert got==['a/x.py'], got\""
   - id: check-3
     command: "python3 -c \"t=open('core/templates/tech-spec.md',encoding='utf-8').read().split(chr(10)); g=[l for l in t if '\\ube48\\uce78 \\uae08\\uc9c0' in l]; assert len(g)==1, g; assert 'NEEDS_'+'INPUT' not in g[0], g[0]\""
   - id: check-4

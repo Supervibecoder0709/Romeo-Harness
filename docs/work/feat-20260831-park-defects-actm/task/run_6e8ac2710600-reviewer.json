@@ -1,0 +1,72 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260831-park-defects-actm",
+  "role": "reviewer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260831-park-defects-actm/spec.md",
+    "sha256": "d8895d136bf0bcdf014eb7b8bc6985daa2801ddcddbf6df16cc39e4d5f864527"
+  },
+  "base_sha": "b996d71383e8e995c1f738954ebe1f838da877b1",
+  "allowed_paths": [],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub01c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060 \\u00b7 \\u0060a/y.py\\u0060\\n  \\u00b7 \\u0060a/z.py\\u0060 \\u00b7 \\u0060b/w.md\\u0060\\n'; got=f(b); assert got==['a/x.py','a/y.py','a/z.py','b/w.md'], got\""
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -c \"from romeo.envelope import change_scope_paths as f; b='## \\ubcc0\\uacbd \\ubc94\\uc704\\n\\n- \\ubc14\\ub01c\\ub294 \\ud30c\\uc77c\\u00b7\\ubaa8\\ub4c8: \\u0060a/x.py\\u0060\\n- \\uc601\\ud5a5\\uc744 \\ubc1b\\ub294 \\ubd80\\ubd84: \\u0060c/other.py\\u0060\\n'; got=f(b); assert got==['a/x.py'], got\""
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -c \"t=open('core/templates/tech-spec.md',encoding='utf-8').read().split(chr(10)); g=[l for l in t if '\\ube48\\uce78 \\uae08\\uc9c0' in l]; assert len(g)==1, g; assert 'NEEDS_'+'INPUT' not in g[0], g[0]\""
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate docs/work/feat-20260831-park-defects-actm"
+    },
+    {
+      "id": "check-5",
+      "command": "! bin/romeo validate docs/work/feat-20260831-park-defects-actm 2>&1 | grep -q Traceback"
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_run_unit.TestReviewOnlyRecord -v"
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest tests.test_envelope.TestChangeScopeMultiline -v"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest tests.test_run_unit tests.test_envelope -v"
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -c \"t=open('docs/planning/open-questions.md',encoding='utf-8').read().split(chr(10));\nimport sys\nfor q in ('Q-18','Q-20','Q-21','Q-22','Q-25'):\n    r=[l for l in t if l.startswith('| '+q+' ')]\n    assert len(r)==1, (q,len(r))\n    assert ('\\ud574\\uc18c' in r[0]) or ('\\ub2f5\\ubcc0\\ub428' in r[0]), q\""
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests"
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo compile --check"
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo validate"
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor --strict --scope repository"
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo fixtures parity --report"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}
