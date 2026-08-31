@@ -58,10 +58,15 @@ attempts:
   run: run_e3a4af18582c
   base_sha: 120aa96ef80a46d9161f18795b84d55ca8f14542
   started_at: '2026-09-01T02:33:09+09:00'
-  result: started
+  result: pass
   failure_class: null
-  note: null
-  settled_at: null
+  note: '5회차 pass — close 통과. 120aa96 이 고친 check-16(모든 check-9 기록 대조)이 실제로 작동했다: 증거 파일이 하나뿐인 이 run 에서
+    파일 순서 의존이 사라졌고 검사는 옳은 이유로 exit 0 이다. required_checks 16/16 exit 0 · AC-6 단독 실행 2건(ac6-template·ac6-validate)
+    exit 0 · 원시 로그 대조 22건 · 재실행 대조 16/16 · 봉투 앵커 양쪽 5/5 · 방어 검사 유효(before/after log_sha256 동일 1b7a3364afac)
+    · 검토자(codex gpt-5.6-sol read-only) PASS · findings 0. close 는 REVIEW_SAMPLE WARN 하나만 남기고 전부 PASS 이며
+    그 WARN 은 D-75 (b) 가 이미 1건으로 닫기로 확정한 것이다. 산출물 트리 3a5ba01c58ff 는 4회차와 바이트로 같다 — 이 회차는 코드를 새로 만들지 않고
+    검증 계획만 교체했다는 뜻이다. 통합 커밋 대상은 dc3fa40.'
+  settled_at: '2026-09-01T02:55:30+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다. 근거 셋. ① 2회차(run_e5c7c10f80aa)에서 required_checks 14건이 전부 exit 0 이었고 gate_verdict
