@@ -17,56 +17,47 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `91ac38b` · 2026-08-31)
+## 지금 상태 (기준 `a9e7af1` · 2026-08-31)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline 91ac38b..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline a9e7af1..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
-- **마일스톤:** M2 완료(2026-08-29 · D-76). **M3 진행 중.** G-M3 는 §6.1 의 1~4단계가 닫혔고
-  **5단계는 관측이 끝났으나 작업 단위가 아직 닫히지 않았다.** `feat-20260831-bmad-install-observe-a3bm` 은
-  **관통 3회 전부 fail** 이다 — 다만 실패한 것은 매번 **하네스와 검증 계획**이었고 관측 자체는 세 번 다 성공했다.
-- **답은 나왔다 — BMAD 는 이 하네스와 공존한다.** 세 번의 관통이 같은 결론을 냈고 그 근거는 실행 출력이다.
-  BMAD `6.11.0`(core·bmm) + CIS `v0.3.2` 를 버리는 워크트리에 설치했을 때 **romeo 스킬 38파일이 sha256 38/38 무손상**이었고,
-  **두 런타임이 `bmad-*` 59종을 romeo 스킬과 함께 로드**했다(codex 98개 중 romeo 12/12 · claude 150개 중 11/11 · MISSING 없음).
-  D-77 이 아카이브만 보고 고른 **추천 11종이 두 디렉터리에 전부 실재**했고, agent 없이 `bmad-cis-storytelling` 을 직접 부르자
-  두 런타임 다 첫 단계를 시작했다(A-12 잔여 2건 관측됨). 설치기는 `--directory` 안에만 썼다 —
-  아카이브 [E09] 가 걱정한 **전역 `~/.codex/skills` 쓰기는 관측되지 않았다.** 프로브의 `present` 분기가 실제 설치본에서 처음 확인됐다.
-- **예상 밖 발견 셋.** ① **`--tools` 는 더하기가 아니라 교체다** — claude-code 로 다시 깔면 `.agents/skills` 의 `bmad-*` 가 제거된다.
-  두 런타임에 동시에 두려면 `--tools codex,claude-code` 를 준다. ② 기존 설치본에 `--yes` 만 주면 **quick-update 로 빠져 `--tools` 를 읽지 않는다**
-  (exit 0 인데 반영 안 됨) — `--action update` 가 필요하다. ③ **codex 런타임을 띄우는 것 자체가 전역 `~/.codex/skills/.system/` 을 다시 쓴다.**
-  설치기가 한 일이 아니다.
-- **이번 세션이 잡은 것 — 하네스 결함 3건과 검증 계획 결함 2건. 전부 관통이 드러냈다.**
-  | 무엇 | 성격 | 처리 |
-  | --- | --- | --- |
-  | 테스트 4건이 「이 저장소에 BMAD 미설치」를 단언 — 로드맵이 성공하면 깨지는 테스트 | 하네스 | 고침 `c7c1b53` |
-  | `bin/romeo doctor` 가 `--strict` 없이는 항상 exit 0 — **빈 검사**였다 | 검증 계획 | 고침 `54dd04d` |
-  | check-8 이 codex 소유 `.system/` 을 비교해 **통과 불가능**했다 | 검증 계획 | 고침 `54dd04d` |
-  | 시크릿 패턴이 파일명 `skills-before` 를 토큰으로 오탐 → close 의 명령 대조가 깨짐 | 하네스 | 고침 `07c3bdf` + 회귀 테스트 |
-  | 충돌 fixture 위반을 CI 가 전혀 잡지 않는다 | 하네스 | park `Q-21` |
-- **3회차는 기계적으로 거의 다 닿았다.** 구현자 `required_checks` **12/12 exit 0**, `close` 의 **기록·재실행 대조 12/12 PASS**,
-  봉투 앵커 **양쪽 5/5**, 방어 검사 **유효**(before/after `log_sha256` 동일 `1b0f9cab081e`). `close` 의 유일한 FAIL 은 `REVIEW_VERDICT` 였다.
-- **검토자(codex read-only)가 FAIL 을 냈고 findings 3건은 전부 정당하다 — 반박하지 않았다.**
-  ① `UNAPPROVED_ACTION` — 확인란이 설치를 「한 번에 하나씩」 으로 못박았는데 `--tools` 가 교체라 **AC-5 를 달성할 유일한 방법이 결합 설치**였다.
-  확인란이 자기 수용 기준을 금지한 것이므로 **spec 결함**이다(park `Q-24`).
-  ② ③ **증거 결속** — `docs/work/<id>/` 는 `dirty_tree_hash`·`changed_files`·`artifact_hash` 에서 제외되는데(`romeo/evidence.py:37`)
-  baseline 파일을 그 안에 리다이렉트로 만들어 내용이 원시 로그에 남지 않았다(baseline 3건의 `stdout_tail` 이 전부 빈 문자열, 실측).
-  「설치 직전 상태」라는 주장에 앵커가 없다(park `Q-23`).
-- **반복 중단 브레이크가 두 번 걸렸고 두 번 다 제 역할을 했다.** 2회 연속 실패 뒤 사람이 「완료 정의는 달성 가능하다」를
-  `attempts.yaml` 의 `reviews` 에 기록하고서야 3회차가 돌았다. 지금은 **연속 3회** 상태다 — 4회차는 다시 재검토 기록이 있어야 돈다.
-  배운 것 하나: **재검토 기록도 커밋해야 워크트리가 본다**(D-a). 커밋 전 기동은 워크트리 안 `envelope build` 가 브레이크로 거부했다.
-- **다음 세션이 이어갈 자리 — 4회차 전에 spec 두 곳을 고쳐 재승인한다.**
-  1. 확인란의 설치 순서 문장. 방법(「한 번에 하나씩」)을 확인란에서 빼고 구현 단위 표로 옮긴다 — 확인란에는 결과와 이유만 둔다(`Q-24`).
-  2. baseline 을 `> 파일` 대신 `tee 파일` 로 만들어 내용을 원시 로그에 봉인한다(`Q-23`). 그 뒤 `--after-review` 로 브레이크를 풀고 4회차를 돈다.
-  3. 그 다음이 `core/templates/charter.md`(T2)와 M3 의 나머지(MCP·브라우저 3모드 프로브, packages.yaml 의 T2·gate 행, `gate-create` 승인 흐름, 시나리오 3·8·9).
-- **park 이 4건 늘었다 — `Q-21`~`Q-24`.** Q-21 충돌 fixture 를 CI 가 안 잡는다 · Q-22 `romeo validate <디렉터리>` 가 죽는다 ·
-  Q-23 작업 단위 폴더 안 산출물이 증거에 앵커되지 않는다 · Q-24 확인란이 자기 수용 기준을 금지할 수 있다. 기존 park 은 Q-12~Q-20 그대로다.
-- **CI:** `8d5af4f` 까지 푸시돼 있고 그 시점 실행 success. **`40b074b`~`91ac38b`(및 이후)는 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
-- **워크트리 9개 — 이번 세션에 3개 늘었다.** 기존 6개(`impl-…-w3qu` · `…-938r` · `…-biae` · `…-82zv` · `impl-…-tgnb` · `impl2-…-tgnb`)에
-  **`impl-feat-20260831-bmad-install-observe-a3bm`(1회차 `9d4669f`)** · **`impl2-…`(2회차 `bdaf240`)** · **`impl3-…`(3회차 `e36a3bc`)** 가 더해졌다.
-  세 개 다 커밋돼 있어 지워도 브랜치는 남는다. 정리는 승인 대상이다(K-66).
+- **마일스톤:** M2 완료(2026-08-29 · D-76). **M3 진행 중.** **G-M3 가 §6.1 1~5단계 전부 닫혔다** —
+  `feat-20260831-bmad-install-observe-a3bm` 이 **4회차(`run_4d3ee0b42e5a`)에서 close 를 통과**했고(`status: done`),
+  통합 커밋은 `a9e7af1` 이다. 남은 M3 는 charter(T2)·MCP/브라우저 프로브·gate·시나리오 3·8·9 다.
+- **답은 실행 출력로 확정됐다 — BMAD 는 이 하네스와 공존한다.** BMAD `6.11.0`(core·bmm) + CIS `v0.3.2` 를 설치했을 때
+  **romeo 스킬 38파일이 sha256 38/38 무손상**이었고 **전역 스킬 디렉터리 변화는 0**이었다(설치 직후마다 `.system` 제외 없이 전체 대조 exit 0 —
+  아카이브 [E09] 가 걱정한 전역 `~/.codex/skills` 쓰기를 **설치기는 하지 않는다**). 프로브가 실물 설치본에서 처음으로 `discovery.bmad: present` 를 냈고
+  `reads` 두 키가 실제 manifest 에 **둘 다** 있었다. **두 런타임이 `bmad-*` 59종을 romeo 스킬과 한 목록에 로드**했다(claude romeo 11/11 · codex 12/12).
+  D-77 이 아카이브만 보고 고른 **추천 11종이 두 디렉터리에 전부 실재**했고, agent 없이 `bmad-cis-design-thinking` 을 직접 부르자 활성화 Step 1 에서 시작했다.
+- **설치기에 대해 알아낸 것 셋 — 다음에 설치할 때 그대로 쓴다.** ① **`--tools` 는 더하기가 아니라 교체다** —
+  `claude-code` 로 다시 깔면 `.agents/skills` 의 `bmad-*` 가 제거된다. 두 런타임에 동시에 두려면 `--tools codex,claude-code` 를 준다.
+  ② 기존 설치본에 `--yes` 만 주면 **quick-update 로 빠져 `--tools` 를 읽지 않는다**(exit 0 인데 반영 안 됨) — `--action update` 가 필요하다.
+  ③ **codex 런타임을 띄우는 것 자체가** 전역 `~/.codex/skills/.system/` 을 다시 쓴다. 설치기가 한 일이 아니다.
+- **4회차가 통과한 근거.** required_checks **12/12 exit 0** · close 의 **재실행 대조 12/12 PASS** · 봉투 앵커 **양쪽 5/5** ·
+  방어 검사 **유효**(review-tree before/after `log_sha256` 동일 `31cd041d6ec6`) · 검토자(codex read-only) **PASS · findings 0**.
+  유일한 WARN 은 `REVIEW_SAMPLE` 이고 **D-75 (b) 가 이미 1건으로 닫기로 확정한 것**이다.
+- **네 회차가 결함을 하나씩 드러내고 닫았다 — 관측은 네 번 다 성공했고 결론도 네 번 같았다.**
+  | 회차 | 막은 것 | 성격 | 처리 |
+  | --- | --- | --- | --- |
+  | 1 | 테스트 4건이 「이 저장소에 BMAD 미설치」를 단언 | 하네스 | 고침 `c7c1b53` |
+  | 1 | `bin/romeo doctor` 가 `--strict` 없이는 항상 exit 0 — **빈 검사** | 검증 계획 | 고침 `54dd04d` |
+  | 1 | check-8 이 codex 소유 `.system/` 을 비교해 **통과 불가능** | 검증 계획 | 고침 `54dd04d` |
+  | 2 | 시크릿 패턴이 파일명 `skills-before` 를 토큰으로 오탐 | 하네스 | 고침 `07c3bdf` + 회귀 테스트 |
+  | 3 | 확인란이 방법을 못박아 **AC-5 를 달성 불가능**하게 만들었다 | spec | 고침 `767721c` (park `Q-24`) |
+  | 3 | baseline 을 `> 파일` 로 만들어 **원시 로그에 봉인 안 됨** | spec | 고침 `767721c` (park `Q-23`) |
+- **두 수정이 실제로 작동한 것을 실측했다.** baseline 3건의 `stdout_tail` 이 **399/204/399자**로 찼고(3회차엔 **전부 빈 문자열**),
+  결합 설치가 구현 단위 4행이 지정한 방법이 되어 `UNAPPROVED_ACTION` 이 사라졌다.
+- **반복 중단 브레이크는 세 번 걸렸고 세 번 다 제 역할을 했다.** 4회차도 재검토 결론을 `attempts.yaml` 의 `reviews` 에 남기고서야 돌았다.
+  성공한 관통이 **연속 실패 카운터를 0 으로 리셋**했다 — 지금은 0 이다.
+- **park 이 1건 늘었다 — `Q-25`.** 재검토 기록 창구(`run-unit --after-review`)가 attempt 도 함께 시작해 **유령 `started` 항목**을 남기고,
+  그 기록을 커밋하면 HEAD 가 밀려 **계약을 base_sha 로 두 번 만들어야** 한다. 기존 park 은 `Q-12`~`Q-24` 그대로다 —
+  `Q-23`·`Q-24` 는 **우회가 실제로 작동함을 이번에 관측했지만** 근본 원인(제외 규칙 · 확인란 모순을 잡는 자리 없음)은 그대로여서 닫지 않는다.
+- **CI:** `8d5af4f` 까지 푸시돼 있고 그 시점 실행 success. **`40b074b`~`a9e7af1` 은 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
+- **워크트리 10개 — 이번 세션에 1개 늘었다.** 기존 9개에 **`impl4-feat-20260831-bmad-install-observe-a3bm`(`cf1f506`)** 가 더해졌다.
+  전부 커밋돼 있어 지워도 브랜치는 남는다. 정리는 승인 대상이다(K-66).
 - **문서 지연:** 「미검증·남은 위험」은 맨 위 소절(M2 close 이후)만 최신이다.
-
 
 ## 마일스톤
 
@@ -75,7 +66,7 @@ authority: derived
 | M0 정책표·fixture·분류 카드 | **완료** | [원문](archive/milestones.md) |
 | M1 T0 최소 관통 (Claude 단독, 현재 작업 공간) | **완료** | [원문](archive/milestones.md) |
 | M2 어댑터·역할·Orca 위임·T1 교차 관통 | **완료 (2026-08-29 · D-76)** | [원문](archive/milestones.md) |
-| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~4단계 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb`). **5단계는 관측이 끝났고 결론은 「공존한다」다** — 설치 3회 재현, romeo 스킬 38/38 무손상, 두 런타임이 `bmad-*` 59종을 함께 로드, 추천 11종 실재, agent 없이 workflow 시작. 그러나 **작업 단위는 아직 닫히지 않았다** — 관통 3회 전부 fail 이고 실패한 것은 매번 하네스·검증 계획이었다. 4회차 전에 spec 두 곳(확인란의 설치 순서 · baseline 봉인)을 고쳐 재승인한다. M3 의 나머지(charter·MCP/브라우저 프로브·gate·시나리오 3·8·9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/attempts.yaml`, 브랜치 `impl3-…`(`e36a3bc`) |
+| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」이고 4회차(`run_4d3ee0b42e5a`)가 close 를 통과했다** — romeo 스킬 38/38 무손상, 전역 디렉터리 변화 0, 프로브가 실물에서 `present`, 두 런타임이 `bmad-*` 59종을 romeo 스킬과 함께 로드, agent 없이 workflow 시작. required_checks 12/12 · 재실행 대조 12/12 · 앵커 양쪽 5/5 · 검토자 PASS. M3 의 나머지(charter·MCP/브라우저 프로브·gate·시나리오 3·8·9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done), 통합 `a9e7af1` |
 | M4 ~ M7 | 미착수 | [원문](archive/milestones.md) |
 
 ## §10 체크리스트
