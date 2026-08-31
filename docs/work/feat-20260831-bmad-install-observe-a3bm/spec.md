@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-08-31T19:44:03+09:00'
+approved_at: '2026-08-31T21:35:37+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -33,6 +33,14 @@ approval_history:
     실제로 잡는다). check-8 은 전역 비교 대상에 codex CLI 가 소유한 ~/.codex/skills/.system/ 이 들어 있었는데, codex 런타임을 띄우는 것
     자체가 그 디렉터리를 다시 쓰고 이 단위는 codex 를 반드시 띄우므로 설계상 통과할 수 없는 검사였다 — 비교에서 */.system/* 을 빼고, 대신 설치 직후마다는 제외
     없이 전체로 대조하도록 했다. AC-2·AC-4 문장에 그 근거를 드러냈다. 하네스 테스트 4건의 환경 단언은 관통 사이 정비(c7c1b53)로 이미 걷어냈다.'}
+- {approved_at: '2026-08-31T19:44:03+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T21:35:37+09:00',
+  reason: '3회차 관통(run_923ba2a01bb4)의 검토자 findings 3건이 전부 산출물이 아니라 spec 문장을 겨눠 그 두 자리를 고치고 다시 승인한다. ① 확인란이
+    설치 방법(「한 번에 하나씩(codex 먼저)」)을 못박았는데 BMAD 의 --tools 가 더하기가 아니라 교체라서 그 방법으로는 AC-5(두 런타임 각각에서 bmad-* 로드
+    관측)를 달성할 수 없었다 — 확인란이 자기 수용 기준을 금지한 것이므로 방법을 확인란에서 빼 구현 단위 4행으로 옮기고, 그 행에 결합 설치(--tools codex,claude-code)와
+    --action update 가 필요한 이유를 실측 근거와 함께 적었다(Q-24). ② ③ baseline 2건을 docs/work/<id>/ 안에 리다이렉트로 만들어 내용이
+    어디에도 봉인되지 않았다 — romeo/evidence.py:37 의 exclusions() 가 그 폴더를 dirty_tree_hash·changed_files·artifact_hash
+    에서 전부 빼기 때문이다(3회차 실측: stdout_tail 3건 전부 빈 문자열). 구현 단위 2행을 tee 로 바꾸고 stdout_tail 이 비어 있지 않은지를 확인 조건에
+    넣었다(Q-23). 수용 기준 문장과 검증 계획 12건은 바꾸지 않았다 — 고친 것은 방법과 봉인 경로뿐이다.'}
 ---
 
 # G-M3 검증 — BMAD 실제 설치와 두 런타임 discovery 관측
@@ -56,7 +64,7 @@ approval_history:
   - [ ] AC-6 `core/policy/capabilities.yaml` 에서 "marker 파일을 흉내 낸 테스트로만 확인했다" 문장이 사라지고 실측 기록으로 대체된다. `provenance/imports.yaml` 의 `bmad-cis.unverified` 도 같은 시점에 갱신된다.
   - [ ] AC-7 설치 산출물이 git 에 들어가지 않는다 — `_bmad/` · `_bmad-output/` · 두 스킬 디렉터리의 `bmad-*` 가 무시되고, 추적 트리에 untracked 로 남지 않는다.
 - **위험과 되돌리기:** 위험은 셋이다. ① `npx` 가 **외부 Node 코드를 받아 실행**한다 — 무엇을 쓰는지 사전에 알 수 없다. ② 설치 대상이 romeo 스킬이 사는 바로 그 두 디렉터리다 — 지워지면 `/plan` 자체가 안 돈다. ③ 아카이브 [E09] 는 codex 설치 경로에 **전역 `~/.codex/skills`** 를 적고 있다 — 저장소 밖이라 워크트리 격리로 막히지 않는다. 되돌리기: 저장소 안은 두 디렉터리가 git 추적이고 트리가 clean 이므로 `git checkout -- .claude/skills .agents/skills` 로 복원되고, `romeo compile` 로도 재생성된다. 작업 자체가 **버리는 워크트리**에서 일어나므로 메인 체크아웃은 처음부터 손대지 않는다. 저장소 밖은 되돌리지 않고 **먼저 관측해 멈춘다** — 설치 직전에 전역 목록을 떠 두고, 변화가 보이면 그 자리에서 중단하고 보고한다.
-- **결정 필요:** 없음 — 설치 승인 자체가 이 확인란의 승인이다. 설치 대상 런타임은 **한 번에 하나씩(codex 먼저)** 으로 정했다. 두 디렉터리가 동시에 바뀌면 무엇이 원인인지 말할 수 없기 때문이다.
+- **결정 필요:** 없음 — 설치 승인 자체가 이 확인란의 승인이다. **설치를 몇 번에 나눠 어떤 순서로 실행할지는 방법이므로 구현 단위 표가 정한다** — 확인란은 결과와 그 이유만 담는다. 3회차에서 확인란이 방법(「한 번에 하나씩」)을 못박는 바람에 그 방법으로는 AC-5 를 달성할 수 없다는 것이 실행 중에 드러났고, 구현자는 관측을 위해 결합 설치를 했으며 검토자는 그것을 승인되지 않은 행위로 정확히 잡았다 — 둘 다 옳았고 결함은 승인된 문장에 있었다(Q-24).
 
 ## 변경 범위
 
@@ -73,9 +81,9 @@ approval_history:
 | # | 목표 | 변경 | 인터페이스 (소비 → 생산) | 확인 방법 | 복구 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | 설치 산출물이 git 에 새지 않게 막는다 | `.gitignore` 에 `_bmad/` · `_bmad-output/` · `.claude/skills/bmad-*` · `.agents/skills/bmad-*` 4줄을 더한다 | 소비: 없음 → 생산: 무시 규칙 4줄 | `git check-ignore -q _bmad && git check-ignore -q _bmad-output && git check-ignore -q .claude/skills/bmad-probe && git check-ignore -q .agents/skills/bmad-probe` 가 exit 0 | `git checkout -- .gitignore` |
-| 2 | 설치 직전 상태를 되돌릴 수 있게 고정한다 | `docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256`(두 스킬 디렉터리 전 파일) 과 `evidence/home-skills-before.txt`(전역 목록, `*/.system/*` 제외 · `$HOME` 을 `~` 로 치환 — check-8 과 **같은 제외**로 떠야 대조가 성립한다) 를 만든다 | 소비: 없음 → 생산: `evidence/skills-before.sha256` · `evidence/home-skills-before.txt` | 두 파일이 존재하고 `shasum -a 256 -c evidence/skills-before.sha256` 이 설치 전에 exit 0 | 파일 삭제 후 재생성. 저장소 상태를 바꾸지 않는다 |
+| 2 | 설치 직전 상태를 **원시 로그에 봉인해** 고정한다 | `docs/work/feat-20260831-bmad-install-observe-a3bm/evidence/skills-before.sha256`(두 스킬 디렉터리 전 파일) 과 `evidence/home-skills-before.txt`(전역 목록, `*/.system/*` 제외 · `$HOME` 을 `~` 로 치환 — check-8 과 **같은 제외**로 떠야 대조가 성립한다) 를 만든다. **두 파일 다 `> 파일` 이 아니라 `\| tee 파일` 로 만들고, 그 명령을 `bin/romeo evidence run` 으로 실행한다** — `romeo/evidence.py:37` 의 `exclusions()` 가 `docs/work/<unit_id>/` 를 `dirty_tree_hash`·`changed_files`·`artifact_hash` 에서 전부 빼므로, 그 폴더 안에 리다이렉트로 만든 기준 파일은 **언제 어떤 내용이었는지 아무 데도 봉인되지 않는다**(3회차 실측: baseline 3건의 `stdout_tail` 이 전부 빈 문자열이었고 검토자가 이것을 findings 2건으로 잡았다, Q-23). `tee` 는 같은 내용을 stdout 에도 남기므로 원시 로그와 `log_sha256` 이 그 시점의 내용을 봉인한다 | 소비: 없음 → 생산: `evidence/skills-before.sha256` · `evidence/home-skills-before.txt` · **그 두 파일의 내용이 실린 원시 로그** | 두 파일이 존재하고 `shasum -a 256 -c evidence/skills-before.sha256` 이 설치 전에 exit 0. **그리고 그 두 생성 명령의 `stdout_tail` 이 비어 있지 않다** — 비어 있으면 `tee` 를 쓰지 않은 것이므로 다시 만든다 | 파일 삭제 후 재생성. 저장소 상태를 바꾸지 않는다 |
 | 3 | codex 대상 설치를 관측한다 | `npx bmad-method install --directory . --modules core,bmm,cis --tools codex --yes` 를 실행하고 즉시 baseline 2건을 대조한다 | 소비: 2행의 baseline 2건 → 생산: `_bmad/_config/manifest.yaml`, `.agents/skills/bmad-*`, 설치 로그 | `shasum -a 256 -c` 가 exit 0 이고 전역 목록 `diff` 가 exit 0. **설치 직후 대조는 `.system/` 을 빼지 않고 전체로 한다** — 그 순간에는 codex 가 개입하지 않으므로 설치기 자신의 쓰기를 그대로 잡는다. 하나라도 실패하면 **중단 조건 발동** — 되돌리고 4행을 실행하지 않는다. `cis` 는 external official module 이라 비대화형 설치로 resolve 되지 않을 수 있다 — 그때는 `--modules core,bmm` 으로 한 번만 다시 시도하고, 그래도 안 되면 **그 사실을 관측으로 기록**하고 넘어간다(재시도 반복 금지) | `git checkout -- .agents/skills` · `rm -rf _bmad` · 워크트리 폐기 |
-| 4 | claude-code 대상 설치를 관측한다 | 3행이 통과했을 때만. `--tools claude-code` 로 같은 절차를 반복하고 같은 2건을 대조한다 | 소비: 3행 통과 → 생산: `.claude/skills/bmad-*` | 3행과 같은 대조가 exit 0 | `git checkout -- .claude/skills` |
+| 4 | 설치 대상을 **두 런타임으로 확장**해 관측한다 | 3행이 통과했을 때만. `npx bmad-method install --directory . --modules core,bmm,cis --tools codex,claude-code --action update --yes` 를 실행하고 같은 2건을 대조한다. **`--tools claude-code` 만 주지 않는다** — `--tools` 는 더하기가 아니라 **교체**라서 3행이 깐 `.agents/skills/bmad-*` 가 제거된다(1~3회차 실측). AC-5 는 두 런타임 **각각**에서 로드를 관측하라고 요구하므로 두 값을 함께 주는 것이 그 기준을 달성하는 유일한 경로다. **`--action update` 를 빼지 않는다** — 기존 설치본에 `--yes` 만 주면 quick-update 로 빠져 `--tools` 를 읽지 않고 exit 0 으로 끝난다(같은 실측). 3행을 단독으로 먼저 돌리는 이유는 그대로다: 그 순간의 대조가 설치기 **자신의** 쓰기를 잡는다 | 소비: 3행 통과 → 생산: `.claude/skills/bmad-*` · `.agents/skills/bmad-*`(유지됨) | 3행과 같은 대조가 exit 0 이고, **대조 뒤 두 디렉터리에 `bmad-*` 가 동시에 존재한다**(`ls .claude/skills/bmad-* .agents/skills/bmad-*` 가 exit 0) | `git checkout -- .claude/skills .agents/skills` |
 | 5 | 프로브와 하네스 자기 검사가 설치 뒤에도 성립하는지 본다 | 없음(읽기 실행) | 소비: 3·4행의 설치 → 생산: `doctor` · `compile --check` · `validate` · 테스트 출력 | `bin/romeo doctor 2>&1 \| grep -q "discovery.bmad: present"` 가 exit 0 이고, `compile --check` · `validate` · 하네스 테스트가 exit 0 | 되돌릴 것 없음. 실패는 그대로 기록한다 |
 | 6 | 두 런타임이 `bmad-*` 를 실제로 로드하는지 관측한다 | 없음(각 런타임을 그 워크트리에서 띄워 스킬 목록을 받는다) | 소비: 3·4행의 설치 → 생산: 각 런타임의 스킬 목록 원문 | 받은 목록에 `bmad-` 로 시작하는 이름이 있는지 없는지가 출력에 그대로 남는다. **없다는 결과도 기록한다** | 되돌릴 것 없음 |
 | 7 | agent 없이 workflow SKILL 을 직접 호출하는 경로를 관측한다 | 없음(CIS workflow 1종을 한 번 호출한다. **완주시키지 않는다** — 첫 단계가 시작되는지까지만) | 소비: 4행의 설치 → 생산: 호출 출력 | 런타임이 그 SKILL 을 로드해 시작했는지 여부가 출력에 남는다 | `rm -rf _bmad-output` (무시 대상이라 저장소에 영향 없음) |
