@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-08-31T15:24:55+09:00'
+approved_at: '2026-08-31T15:34:56+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,11 @@ routing:
   history: []
 created: '2026-08-31'
 updated: '2026-08-31'
+approval_history:
+- {approved_at: '2026-08-31T15:24:55+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-08-31T15:34:56+09:00',
+  reason: '1회차 관통이 계약 결함으로 실패했다 — 「바뀌는 파일·모듈」 선언이 3줄이라 envelope.py 의 change_scope_paths 가 앞 2개만 읽었고 romeo/doctor.py·core/templates/·fixtures/
+    가 allowed_paths 에서 빠졌다. 선언을 한 줄로 합치고, recommends 11종을 provenance 의 정식 id 로 바꾸고, check-8 의 deferred
+    집합에 bmad-brownfield-analysis 를 더했다. 확인란 문장은 바꾸지 않았다.'}
 ---
 
 # G-M3 부착 — discovery.bmad 프로브와 /plan 추천·inputs 링크 요구
@@ -60,9 +65,11 @@ updated: '2026-08-31'
 
 ## 변경 범위
 
-- 바뀌는 파일·모듈: `core/policy/capabilities.yaml`(신규) · `core/policy/packages.yaml`(`parts.bmad-cis`) ·
-  `romeo/doctor.py`(능력 프로브 절) · `romeo/card.py` 또는 `romeo/policy.py`(추천·요구 인쇄) ·
-  `core/templates/sections/discovery-plan.md` · `fixtures/conflicts/c5~c7` · `fixtures/proposals/`(discovery 제안 1건) · `tests/`
+- 바뀌는 파일·모듈: `core/policy/capabilities.yaml` · `core/policy/packages.yaml` · `romeo/doctor.py` · `romeo/card.py` · `romeo/policy.py` · `core/templates/sections/discovery-plan.md` · `fixtures/conflicts/` · `fixtures/proposals/` · `tests/`
+  <!-- 이 선언은 한 줄이어야 한다 — envelope.py 의 change_scope_paths 가 이 라벨이 있는 첫 줄에서 멈추고, 줄을 넘긴 경로는 조용히 빠진다(2026-08-31 1회차 관통이 이것으로 실패했다). -->
+- 각 경로가 무엇을 받는가: `capabilities.yaml` 신규 · `packages.yaml` 은 `parts.bmad-cis` · `doctor.py` 는 능력 프로브 절 ·
+  `card.py`/`policy.py` 는 추천·요구 인쇄 · `discovery-plan.md` 는 inputs 링크 규칙 · `fixtures/conflicts/` 는 c5~c7 ·
+  `fixtures/proposals/` 는 discovery 제안 1건 · `tests/` 는 위 동작의 테스트
 - 영향을 받는 부분: 앞으로 discovery/T2 로 분류되는 모든 요청의 분류 카드. `romeo doctor` 출력 형식.
 - 바꾸지 않는 것(비범위): BMAD 실제 설치 · `.agents/skills/**` · `vendor/**` · BMAD 템플릿 재작성 ·
   `capabilities.yaml` 의 MCP·브라우저 3모드 프로브(M3 의 다른 조각) · deferred 5종의 보류 판정 · `charter.md` 템플릿.
@@ -77,7 +84,7 @@ updated: '2026-08-31'
 | --- | --- | --- | --- | --- | --- |
 | 1 | 능력 프로브 정책표를 만든다 | `core/policy/capabilities.yaml` 신규. 최상위 `policy_version`·`capabilities:` 맵. 항목 `discovery.bmad` 는 `kind: install_trace`, `marker: _bmad/_config/manifest.yaml`, `reads: [modules, platform_codes]`, `result_labels: [present, absent]`, `honesty: 설치 흔적일 뿐 실행 증거가 아니다` 를 갖는다 | 소비: 없음 → 생산: 파일 `core/policy/capabilities.yaml`, 프로브 id `discovery.bmad`, 라벨 `present`·`absent` | `python3 -c "import yaml;d=yaml.safe_load(open('core/policy/capabilities.yaml'));c=d['capabilities']['discovery']['bmad'];assert c['marker']=='_bmad/_config/manifest.yaml';assert set(c['result_labels'])=={'present','absent'}"` exit 0 | `rm core/policy/capabilities.yaml` |
 | 2 | doctor 가 그 프로브를 돌려 정직하게 인쇄한다 | `romeo/doctor.py` 에 `probe_capabilities(root)` 추가 — marker 파일이 있으면 `present` 와 함께 거기 적힌 module·platform code 를 읽어 인쇄하고, 없으면 `absent` 로 "설치 흔적 없음" 을 인쇄한다. `format_report` 에 「## 능력 프로브」 절 추가. **`absent` 는 problem 으로 세지 않는다** — `doctor_problem_count` 를 바꾸지 않는다 | 소비: 단위1 의 `discovery.bmad`·라벨 → 생산: 함수 `probe_capabilities`, 리포트 키 `capabilities`, 출력 절 제목 `## 능력 프로브` | `bin/romeo doctor` exit 0 이고 출력에 `설치 흔적 없음` 이 있다 | `git checkout romeo/doctor.py` |
-| 3 | 라우터가 11종을 추천하고 `inputs:` 를 요구한다 | `core/policy/packages.yaml` 의 `parts.bmad-cis` 를 `status: accepted` · `gate: G-M3` · `decided: '2026-08-31'` 로 바꾸고 `recommends:` 에 D-77 의 11종(`bmad-product-brief`·`bmad-prfaq`·`domain-research`·`market-research`·`technical-research`·`bmad-brainstorming`·`bmad-forge-idea`·CIS `design-thinking`·`innovation-strategy`·`problem-solving`·`storytelling`)을 열거한다. `output_binding: inputs-link` 를 둔다. `romeo/card.py` 가 parts 를 인쇄할 때 `recommends` 와 "산출물은 frontmatter `inputs:` 로만" 한 줄, 그리고 단위2 의 프로브 결과를 함께 인쇄한다 | 소비: 단위2 의 `probe_capabilities` → 생산: `parts.bmad-cis.recommends`(11개), `output_binding`, 카드 부품 절 | `bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card` 출력에 `bmad-product-brief` 와 `inputs:` 가 둘 다 있다 | `git checkout core/policy/packages.yaml romeo/card.py` |
+| 3 | 라우터가 11종을 추천하고 `inputs:` 를 요구한다 | `core/policy/packages.yaml` 의 `parts.bmad-cis` 를 `status: accepted` · `gate: G-M3` · `decided: '2026-08-31'` 로 바꾸고 `recommends:` 에 D-77 의 11종을 `provenance/imports.yaml` 의 `router_recommends` 에 적힌 **정식 id 그대로** 열거한다 — `bmad-product-brief`·`bmad-prfaq`·`bmad-brainstorming`·`bmad-forge-idea`·`bmad-domain-research`·`bmad-market-research`·`bmad-technical-research`·`bmad-cis-design-thinking`·`bmad-cis-innovation-strategy`·`bmad-cis-problem-solving`·`bmad-cis-storytelling`. `output_binding: inputs-link` 를 둔다. `romeo/card.py` 가 parts 를 인쇄할 때 `recommends` 와 "산출물은 frontmatter `inputs:` 로만" 한 줄, 그리고 단위2 의 프로브 결과를 함께 인쇄한다 | 소비: 단위2 의 `probe_capabilities` → 생산: `parts.bmad-cis.recommends`(11개), `output_binding`, 카드 부품 절 | `bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card` 출력에 `bmad-product-brief` 와 `inputs:` 가 둘 다 있다 | `git checkout core/policy/packages.yaml romeo/card.py` |
 | 4 | 빈칸에 규칙을 적고 충돌을 fixture 로 고정한다 | `core/templates/sections/discovery-plan.md` 의 「조사 방법·기간」 아래에 "부품 산출물은 경로를 본문에 적지 않고 frontmatter `inputs:` 로만 붙인다(K-62)" 를 넣는다. `fixtures/conflicts/` 에 3종 추가 — `c5-bmad-install-path`(설치 경로 `.agents/skills` 가 `.harness/compiled.yaml` 의 prune 대상과 겹치지 않는다, K-64) · `c6-no-second-plan-origin`(deferred 5종이 `recommends` 에 없다, K-61) · `c7-no-output-path-hardcode`(`core/` 에 `_bmad-output` 문자열 0, K-62). `romeo/doctor.py` 의 `check_conflicts` 가 셋을 실행한다. `fixtures/proposals/fx-bmad-discovery-recommend.yaml`(단위3 이 쓰는 discovery 제안)도 여기서 만든다 | 소비: 단위3 의 `recommends`·`output_binding` → 생산: fixture id `c5-bmad-install-path`·`c6-no-second-plan-origin`·`c7-no-output-path-hardcode`, 제안 fixture 경로 | `bin/romeo doctor` 출력의 충돌 fixture 개수가 7종이고 `충돌 0` | `git checkout core/templates/sections/discovery-plan.md romeo/doctor.py && rm fixtures/conflicts/c5-*.yaml fixtures/conflicts/c6-*.yaml fixtures/conflicts/c7-*.yaml fixtures/proposals/fx-bmad-discovery-recommend.yaml` |
 
 ## 검증 계획
@@ -108,7 +115,7 @@ required_checks:
   - id: check-7
     command: "bin/romeo doctor | grep -q '설치 흔적 없음'"
   - id: check-8
-    command: "python3 -c \"import yaml;p=yaml.safe_load(open('core/policy/packages.yaml'))['parts']['bmad-cis'];assert p['status']=='accepted';assert len(p['recommends'])==11;assert not ({'bmad-prd','bmad-architecture','bmad-ux'} & set(p['recommends']))\""
+    command: "python3 -c \"import yaml;p=yaml.safe_load(open('core/policy/packages.yaml'))['parts']['bmad-cis'];assert p['status']=='accepted';assert len(p['recommends'])==11;assert not ({'bmad-prd','bmad-architecture','bmad-brownfield-analysis','bmad-ux'} & set(p['recommends']))\""
   - id: check-9
     command: "bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card | grep -q 'bmad-product-brief'"
   - id: check-10

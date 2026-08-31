@@ -1,0 +1,22 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260831-bmad-attach-probe-tgnb
+attempts:
+- n: 1
+  run: run_d7edd4884a83
+  base_sha: fe6be591ee5ea4857e67b8e07892fa1257b26c8f
+  started_at: '2026-08-31T15:26:18+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+- n: 2
+  run: run_d7edd4884a83
+  base_sha: fe6be591ee5ea4857e67b8e07892fa1257b26c8f
+  started_at: '2026-08-31T15:27:11+09:00'
+  result: fail
+  failure_class: harness
+  note: envelope.py:77 change_scope_paths 가 「바뀌는 파일·모듈:」 라벨이 있는 첫 줄에서 return 한다. spec 의 선언이 3줄에 걸쳐 있어
+    앞 2개 경로만 allowed_paths 에 실렸고, romeo/doctor.py·core/templates/·fixtures/ 가 빠져 구현 단위 2·4 를 수행할 수 없었다.
+    빈 경우엔 명확히 거부하지만 부분 읽기는 조용히 통과한다. §10 동결로 하네스를 고치지 않고 spec 을 한 줄로 고쳐 재승인한다.
+  settled_at: '2026-08-31T15:33:37+09:00'
+reviews: []
