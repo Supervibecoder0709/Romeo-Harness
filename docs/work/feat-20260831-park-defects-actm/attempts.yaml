@@ -37,6 +37,23 @@ attempts:
   failure_class: null
   note: null
   settled_at: null
+- n: 4
+  run: run_8d29cf346816
+  base_sha: 8284f8982ef95167f0f2ded901a539e85b485b83
+  started_at: '2026-09-01T00:39:28+09:00'
+  result: fail
+  failure_class: harness
+  note: '구현자는 두 번 다 통과했다 — 1차 16/16 exit 0(gate PASS), 검토 findings 2건을 닫은 뒤 재기록한 run_43a8b64c0d69 도 16/16
+    exit 0 · gate PASS · 앵커 5/5. close --dry-run 은 REVIEW_VERDICT 하나만 FAIL 이고 나머지 전부 PASS 다(EVIDENCE_LOG
+    23건 · 재실행 대조 16/16 · AC_ALL_CHECKED · AC_TEXT_UNCHANGED · FRESH_HEAD/TREE · 검토 봉투 앵커 5/5 · 방어 검사 유효
+    9b137dd26d7b). 막은 것은 코디네이터가 쓴 check-16 의 결함이다 — sorted(glob(evidence/*.yaml)) 뒤 rs[-1] 을 고르므로 증거 파일이
+    둘이 되면 파일명 사전순으로 뒤인 옛 run(run_8d29cf346816)의 기록을 대조한다(실측: 파일 순서 [run_43a8b64c0d69, run_8d29cf346816],
+    고른 기록은 옛 run 의 01:33 것). check-9 기록 3건이 전부 True 라 AC-9 자체는 충족돼 있지만 검사가 옳은 이유로 통과하지 않는다 — 이 단위가 고치는
+    ''빈 검사'' 부류다. 검토자(codex gpt-5.6-sol · read-only) 판정 FAIL · findings 1건, 정당하다. 코디네이터 실책 3건이 이 회차에 겹쳤다:
+    ① 승인 전 check-16 을 증거 파일 1개 상황에서만 시험했다 ② findings 수정을 같은 run 에 두 번째 위임으로 붙여 _stamp_ids 가드에 걸렸다 ③ run-create
+    가 코디네이터 터미널을 최신 run 에 재바인딩해 옛 run 의 답장 도달을 확인하지 못했다(워커가 답을 못 읽고 자기 추천안대로 진행했다). 재승인으로 check-16 을 ''모든
+    check-9 기록이 통과'' 로 바꾼다 — 파일 순서에 의존하지 않고 기존보다 엄격하다.'
+  settled_at: '2026-09-01T02:32:01+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다. 근거 셋. ① 2회차(run_e5c7c10f80aa)에서 required_checks 14건이 전부 exit 0 이었고 gate_verdict

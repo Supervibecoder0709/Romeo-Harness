@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-09-01T00:34:17+09:00'
+approved_at: '2026-09-01T02:32:31+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -47,6 +47,12 @@ approval_history:
     check-16(이 관통 자신의 증거 대조) 추가. AC-9 의 달성 가능성은 승인 전에 실측했다 — ''$ '' 뒤부터 ''--- stdout ---'' 앞까지를 명령 헤더로
     보면 check-9 이 통과하고(True) 로그를 한 글자 고치면 여전히 거부된다(True). check-15·check-16 은 미수정 코드에서 실제로 실패하는 것을 확인했다
     — 빈 검사가 아니다. AC-1~AC-8 과 구현 단위 1~6 은 무변경.'}
+- {approved_at: '2026-09-01T00:34:17+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T02:32:31+09:00',
+  reason: '4회차 검토자가 check-16 의 결함을 잡았다 — sorted(glob(''evidence/*.yaml'')) 뒤 rs[-1] 하나만 대조하므로 증거 파일이 둘이
+    되면 파일명 사전순으로 뒤인 옛 run 의 기록을 검사한다(실측: 파일 순서 [run_43a8b64c0d69, run_8d29cf346816] → 고른 기록은 옛 run 의 것).
+    종료 코드 0 이 AC-9 이 요구한 ''이 관통 자신의 check-9'' 통과를 뒷받침하지 못한다 — 이 단위가 고치는 ''빈 검사'' 부류다. check-16 을 ''모든
+    check-9 기록이 통과'' 로 바꾼다: 파일 순서에 의존하지 않고, 기존보다 엄격하며, 옳은 이유로만 통과한다. 지금 산출물에서 check-9 기록 3건 전부 True 로
+    exit 0 인 것을 승인 전에 실측했다. 확인란·수용 기준·구현 단위·나머지 15개 검사는 무변경이고 코드도 바뀌지 않는다 — 바뀌는 것은 check-16 명령 문자열 한 줄뿐이다.'}
 ---
 
 # park 된 하네스 결함 4건 정비 — 계약 경로 잘림·안내문 토큰·디렉터리 크래시·유령 시도
@@ -138,7 +144,7 @@ required_checks:
   - id: check-15
     command: "python3 -m unittest tests.test_docs_evidence_close.TestMultilineCommandAnchor -v"
   - id: check-16
-    command: "python3 -c \"import glob,pathlib,yaml; from romeo.evidence import command_log_state; rs=[c for f in sorted(glob.glob('docs/work/feat-20260831-park-defects-actm/evidence/*.yaml')) for c in (yaml.safe_load(open(f,encoding='utf-8')) or {}).get('commands',[]) if c.get('id')=='check-9']; assert rs, 'check-9 \\uae30\\ub85d\\uc774 \\uc5c6\\ub2e4'; st,why=command_log_state(pathlib.Path('.'), rs[-1]); assert st is True, why\""
+    command: "python3 -c \"import glob,pathlib,yaml; from romeo.evidence import command_log_state; rs=[(f,c) for f in sorted(glob.glob('docs/work/feat-20260831-park-defects-actm/evidence/*.yaml')) for c in (yaml.safe_load(open(f,encoding='utf-8')) or {}).get('commands',[]) if c.get('id')=='check-9']; assert rs, 'check-9 \\uae30\\ub85d\\uc774 \\uc5c6\\ub2e4'; bad=[(f,command_log_state(pathlib.Path('.'),c)[1]) for f,c in rs if command_log_state(pathlib.Path('.'),c)[0] is not True]; assert not bad, bad\""
 ```
 
 
