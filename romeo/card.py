@@ -1,4 +1,5 @@
 """제안 카드 렌더링(≤ 30줄). 깊이와 이유를 먼저, 단위·모드·영역은 한 줄로. 사람이 1클릭으로 확정하는 화면."""
+from .doctor import probe_capabilities
 from .policy import load_policy, profile_reasons
 
 GATE_SHORT = {
@@ -23,7 +24,50 @@ def _list(items, n, prefix="  - "):
     return [prefix + _clip(x, 100) for x in items]
 
 
-def render_card(proposal, route_out, policy=None):
+def _wrap(prefix, items, width=88, sep=" · ", indent="      "):
+    """목록을 잘라내지 않고 여러 줄로 접는다.
+
+    추천 11종을 `_clip` 으로 자르면 사람이 본 목록과 정책표가 달라진다 — 카드가 결정을
+    보여 주는 화면이므로 여기서는 줄 수를 늘리고 내용을 지키는 쪽을 고른다."""
+    lines, cur = [], prefix
+    for i, item in enumerate(items):
+        piece = (sep if i else "") + str(item)
+        if len(cur) + len(piece) > width and cur.strip() != prefix.strip():
+            lines.append(cur)
+            cur = indent + str(item)
+        else:
+            cur += piece
+    lines.append(cur)
+    return lines
+
+
+def _parts_detail(parts, root=None):
+    """부품 절의 아래 줄 — 추천 목록 · 산출물 결합 규칙 · 설치 프로브 결과.
+
+    추천을 인쇄하면서 설치 여부를 말하지 않으면 사람은 지금 쓸 수 있는 것으로 읽는다.
+    그래서 셋을 한 자리에 둔다: 무엇을 권하는가 · 그 산출물을 어떻게 붙이는가 · 지금 있는가(K-51).
+    """
+    lines = []
+    probes = None
+    for p in parts:
+        rec = p.get("recommends") or []
+        if not rec:
+            continue
+        lines += _wrap(f"  {p['id']} 추천 {len(rec)}종: ", rec)
+        if p.get("output_binding") == "inputs-link":
+            lines.append("  산출물은 복사하지 않는다 — 문서 frontmatter 의 inputs: 링크로만 붙인다(K-62)")
+        cap_id = p.get("capability")
+        if not cap_id:
+            continue
+        if probes is None:
+            probes = {c["id"]: c for c in probe_capabilities(root)}
+        c = probes.get(cap_id)
+        lines.append(f"  설치: {cap_id} {c['label']} — {c['detail']}" if c
+                     else f"  설치: {cap_id} 프로브 없음 — 확인되지 않았다")
+    return lines
+
+
+def render_card(proposal, route_out, policy=None, root=None):
     pol = policy or load_policy()
     pk = pol["packages"]
     cand = proposal["candidate"]
@@ -64,6 +108,7 @@ def render_card(proposal, route_out, policy=None):
     lines.append(f"실행: {REVIEWER_KO[route_out['reviewer']]} · {ISOLATION_KO[route_out['isolation']]} · 차단 {', '.join(route_out['blocks']) or '없음'} · 가드 {guards}")
     if route_out["parts"]:
         lines.append("부품: " + " · ".join(f"{p['id']}({p['gate']} {'활성' if p['status']=='active' else '대기'})" for p in route_out["parts"]))
+        lines.extend(_parts_detail(route_out["parts"], root))
     warns = [w for w in route_out["warnings"] if w["id"] not in ("PART_PENDING_GATE",)]
     if warns:
         lines.append("경고:")

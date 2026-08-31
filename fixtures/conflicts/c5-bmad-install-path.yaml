@@ -1,0 +1,23 @@
+# K-68 충돌 fixture ⑤ — 부품 설치 경로와 컴파일 산출물의 충돌 (K-64)
+#
+# 부품 설치기는 런타임의 스킬 디렉터리에 쓴다. `romeo compile` 은 `.harness/compiled.yaml` 에
+# 적힌 산출물만 prune 하므로, 그 목록에 **설치 디렉터리 자체**가 들어가면 다음 compile 이
+# 남의 설치물을 통째로 지운다. 이름이 겹치면 어느 쪽이 로드될지도 알 수 없다.
+#
+# c3 은 이미 만들어진 파일들 사이의 이름 충돌을 본다. 이 fixture 는 그보다 앞이다 —
+# **아직 설치하지 않은 부품**이 들어올 자리를 코어가 미리 점유하고 있는지 본다.
+---
+id: c5-bmad-install-path
+title: 부품이 설치될 자리를 컴파일 산출물이 점유하지 않는다
+constraints: [K-64]
+kind: install_path_collision
+state_file: .harness/compiled.yaml
+# 부품 설치기가 쓰는 디렉터리. 컴파일 산출물은 이 안의 **이름 붙은 하위 경로**만 소유할 수 있다.
+install_dirs:
+  - .agents/skills
+  - .claude/skills
+# 정책표의 recommends 에 적힌 id 가 위 디렉터리에서 차지할 이름이다.
+packages_file: core/policy/packages.yaml
+why: >-
+  설치는 아직 하지 않았다(G-M3 은 채택까지다). 설치하는 순간 깨질 자리를 지금 고정해 둔다 —
+  깨진 뒤에 발견하면 지워진 것은 되돌릴 수 없다.

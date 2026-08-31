@@ -1,0 +1,70 @@
+# discovery 로 분류되는 요청 1건. G-M3 부착의 관찰 대상이다 —
+# 이 제안의 카드에 D-77 이 고른 11종 추천과 inputs: 링크 요구, 그리고 설치 프로브 결과가
+# 함께 인쇄되는지를 본다(AC-4). 제안 fixture 는 정책표 일치율(fixtures/requests)과 달리
+# 카드 렌더링을 보는 자리다.
+request:
+  text: '온보딩 이탈이 큰데 원인을 모르겠어. 어디서 왜 빠지는지부터 알아보고, 뭘 만들지는 그 다음에 정하고 싶어. 지금은 만들 것보다 알아낼 것이 먼저야.'
+  project: romeo-harness
+  context: 만들 것이 정해지지 않았다. 조사 먼저 — discovery.
+facts:
+- 온보딩 이탈률이 문제로 제기됐다
+- 무엇을 만들지는 아직 정해지지 않았다
+assumptions:
+- 이탈 지점을 특정할 수 있는 사용 기록이 남아 있다
+unknowns:
+- 이탈이 특정 단계에 몰리는지 전 구간에 퍼져 있는지
+- 원인이 흐름 설계인지 성능인지
+candidate:
+  unit: T1
+  mode: discovery
+  intent: write
+  facets:
+  - tooling
+  gates: []
+  blast_radius: medium
+  uncertainty: high
+  slug: onboarding-dropoff-discovery
+  title: 온보딩 이탈 원인 조사
+factors:
+  scope:
+    level: medium
+    note: 온보딩 전 구간
+  uncertainty:
+    level: high
+    note: 원인 가설이 없다
+  impact:
+    level: high
+    note: 신규 사용자 전체
+  reversibility:
+    level: low
+    note: 조사는 되돌릴 것이 없다
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

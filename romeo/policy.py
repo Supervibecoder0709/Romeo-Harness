@@ -278,7 +278,12 @@ def route(classification, policy=None, project_state=None):
     for pid in parts:
         meta = pk["parts"].get(pid, {})
         status = "active" if modules.get(pid) == "active" else meta.get("status", "pending_gate")
-        parts_out.append({"id": pid, "gate": meta.get("gate"), "status": status, "role": meta.get("role")})
+        # 추천 목록·산출물 결합·능력 프로브는 부품 레지스트리가 소유한다. 라우터는 그대로 실어 나른다 —
+        # 카드가 정책표를 다시 읽지 않게 하려는 것이고, `route --json` 을 읽는 쪽도 같은 것을 본다.
+        parts_out.append({"id": pid, "gate": meta.get("gate"), "status": status, "role": meta.get("role"),
+                          "recommends": list(meta.get("recommends") or []),
+                          "output_binding": meta.get("output_binding"),
+                          "capability": meta.get("capability")})
         if status != "active":
             pending.append(pid)
     if pending:

@@ -1,0 +1,23 @@
+# K-68 충돌 fixture ⑥ — 두 번째 기획 원본 (K-61)
+#
+# 기획 원본은 승인된 Tech Spec 하나다. 라우터가 추천하는 부품 스킬은 그 원본을 **채우는 재료**이지
+# 원본이 아니다. 그래서 추천 목록에는 두 조건이 붙는다:
+#   ① provenance 가 accepted 로 판정한 부품의 router_recommends 안에 있을 것 (출처가 있을 것)
+#   ② deferred·rejected 판정을 받은 부품이 아닐 것
+# 판정은 provenance 가 소유하고 추천은 정책표가 소유한다 — 둘이 어긋나는 순간을 여기서 잡는다.
+---
+id: c6-no-second-plan-origin
+title: 보류·기각된 부품이 라우터 추천에 실리지 않는다
+constraints: [K-61]
+kind: no_second_plan_origin
+packages_file: core/policy/packages.yaml
+imports_file: provenance/imports.yaml
+# 이 판정을 받은 id 는 추천에 있으면 안 된다.
+forbidden_statuses: [deferred, rejected]
+# 추천으로 허용되는 id 의 출처. accepted 판정을 받은 항목의 이 키만 인정한다.
+allowed_from: router_recommends
+allowed_status: accepted
+why: >-
+  bmad-prd 는 D-77 이 보류했다 — prd.md 가 답하는 「무엇을·왜·요구사항」 을 Tech Spec 의
+  ## 확인란이 이미 차지하기 때문이다. 그것이 추천에 다시 들어오면 같은 요구가 두 곳에서
+  만들어지고, 승인은 확인란만 읽는다(D-27). 사람이 목록을 손으로 늘릴 때 걸리는 검사다.

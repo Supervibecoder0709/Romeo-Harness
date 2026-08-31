@@ -1,0 +1,81 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260831-bmad-attach-probe-tgnb",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260831-bmad-attach-probe-tgnb/task/run_8be70acbfca1-implementer.json",
+    "sha256": "e9b6c7d286ef366e85492b2d9a0af0a6b813add302bee18f3a7fa82fe5e952f3"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo doctor",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -c \"import yaml;c=yaml.safe_load(open('core/policy/capabilities.yaml'))['capabilities']['discovery']['bmad'];assert c['marker']=='_bmad/_config/manifest.yaml';assert sorted(c['result_labels'])==['absent','present']\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor | grep -q '설치 흔적 없음'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -c \"import yaml;p=yaml.safe_load(open('core/policy/packages.yaml'))['parts']['bmad-cis'];assert p['status']=='accepted';assert len(p['recommends'])==11;assert not ({'bmad-prd','bmad-architecture','bmad-brownfield-analysis','bmad-ux'} & set(p['recommends']))\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card | grep -q 'bmad-product-brief'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo route --proposal fixtures/proposals/fx-bmad-discovery-recommend.yaml --card | grep -q 'inputs:'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -rq '_bmad-output' core/",
+      "exit_code": 0
+    },
+    {
+      "id": "ac7-vendor",
+      "command": "bin/romeo vendor",
+      "exit_code": 0
+    },
+    {
+      "id": "ac7-notices",
+      "command": "bin/romeo notices --check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260831-bmad-attach-probe-tgnb/evidence/run_8be70acbfca1.yaml",
+  "notes": "이 실행은 부품을 **채택 결정에 연결**했을 뿐 설치하지 않았다. 그래서 라우터의 부품 상태는 여전히 `대기` 이고 프로브는 `absent` 다 — 그것이 지금의 정답이다(Tech Spec 확인란). 카드는 추천 11종과 함께 `설치: discovery.bmad absent — 설치 흔적 없음` 을 인쇄한다(run_8be70acbfca1 의 check-9·check-10). \n\n관찰한 불일치 1건(기획 변경은 하지 않았다, K-61): 확인란 AC-3 은 'deferred 5종·excluded 40종은 그 목록에 없다' 고 적었으나 provenance/imports.yaml 이 기록한 판정은 deferred 8건(sp- 4 · bmad- 4) · rejected 6건이고 `excluded` 상태는 존재하지 않는다. 구현은 문장이 아니라 조건을 구현했다 — c6-no-second-plan-origin 이 deferred·rejected 전체를 추천에서 배제하고, 추천 11종이 accepted 항목의 router_recommends 와 정확히 같은지도 대조한다(run_8be70acbfca1 의 check-5 · tests/test_doctor.py 의 c6 3건). 숫자 표현을 고칠지는 사람이 정한다.\n\nAC-7 이 이름한 6종 중 `bin/romeo vendor` 와 `bin/romeo notices --check` 는 required_checks 에 없다. 검증 계획을 바꾸지 않고(§7 동결) 같은 run 에 라벨 `ac7-vendor`·`ac7-notices` 로 증거를 남겼다 — 둘 다 exit 0 이다.\n\npresent 분기(설치본이 있을 때 modules·platform_codes 를 읽어 인쇄)는 실제 BMAD 설치본이 아니라 marker 파일을 흉내 낸 테스트로만 확인했다(tests/test_capabilities.py 의 TestProbe 3건). capabilities.yaml 의 `unverified:` 에 같은 사실을 적었다."
+}
