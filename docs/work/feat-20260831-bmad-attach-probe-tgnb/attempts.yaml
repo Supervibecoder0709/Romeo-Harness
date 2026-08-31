@@ -19,4 +19,12 @@ attempts:
     앞 2개 경로만 allowed_paths 에 실렸고, romeo/doctor.py·core/templates/·fixtures/ 가 빠져 구현 단위 2·4 를 수행할 수 없었다.
     빈 경우엔 명확히 거부하지만 부분 읽기는 조용히 통과한다. §10 동결로 하네스를 고치지 않고 spec 을 한 줄로 고쳐 재승인한다.
   settled_at: '2026-08-31T15:33:37+09:00'
+- n: 3
+  run: run_8be70acbfca1
+  base_sha: 3f3f6992daa5d5cbd8cf9dfad00825e5d762bee7
+  started_at: '2026-08-31T15:36:26+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
 reviews: []
