@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260831-park-defects-actm",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260831-park-defects-actm/task/run_e3a4af18582c-reviewer.json",
+    "sha256": "d3d25da58638d1a7f517f6762f3e1e7887a5fc67dbd879951488fc5c27519276"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260831-park-defects-actm/evidence/run_e3a4af18582c.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. 승인 base 이후 spec 변경은 AC 체크 표시뿐이며 required_checks 문장은 유지됐다. 증거의 required_checks 16건과 AC-6 추가 단독 회귀 테스트 2건은 모두 종료 코드 0이고, check-9 원시 로그와 check-15·check-16이 AC-9를 뒷받침한다. changed_files 10개는 모두 구현자 allowed_paths 안이며 현재 작업 트리의 단위 폴더 밖 변경 목록과 일치한다. guards는 비어 있고 증거의 head_sha는 현재 HEAD와 일치한다."
+}

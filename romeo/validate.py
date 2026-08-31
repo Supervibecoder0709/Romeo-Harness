@@ -12,11 +12,33 @@ UNCHECKED_RE = re.compile(r"^\s*- \[ \]", re.M)
 CHECKED_RE = re.compile(r"^\s*- \[[xX]\]", re.M)
 
 
+#: 검사 대상이 되는 문서 파일 이름. 작업 단위 폴더에는 이것 말고도 계약·증거·결과가 함께 산다.
+DOC_NAMES = ("spec.md", "brief.md", "charter.md")
+
+
 def find_docs(project_root):
     base = Path(project_root) / "docs" / "work"
     if not base.is_dir():
         return []
-    return sorted(p for p in base.glob("*/*.md") if p.name in ("spec.md", "brief.md", "charter.md"))
+    return sorted(p for p in base.glob("*/*.md") if p.name in DOC_NAMES)
+
+
+def expand_targets(paths):
+    """사용자가 준 경로를 검사 대상 문서 목록으로 편다.
+
+    **디렉터리를 주면 그 아래 문서를 찾는다**(Q-22). 작업 단위 폴더를 그대로 넘기는 것은 자연스러운
+    사용인데(단위 하나만 검사한다) 종전에는 그 자리에서 `IsADirectoryError` 트레이스백이 그대로 올라왔다 —
+    사용법 안내가 아니라 크래시였다. 없는 경로는 여기서 걸러내지 않고 그대로 넘긴다:
+    무엇이 없는지 말하는 것은 인쇄하는 쪽의 일이다."""
+    out, seen = [], set()
+    for raw in paths:
+        p = Path(raw)
+        found = sorted(q for q in p.rglob("*.md") if q.name in DOC_NAMES) if p.is_dir() else [p]
+        for q in found:
+            if str(q) not in seen:
+                seen.add(str(q))
+                out.append(q)
+    return out
 
 
 def section_lines(body, title):

@@ -93,13 +93,26 @@ def cmd_new(args):
 
 
 def cmd_validate(args):
-    from .validate import find_docs, validate_doc
-    paths = [Path(p) for p in args.paths] or find_docs(_root(args))
-    if not paths:
-        print("검사할 문서가 없다")
-        return 0
+    from .validate import DOC_NAMES, expand_targets, find_docs, validate_doc
+    # 인자를 준 경우와 생략한 경우를 섞지 않는다 — 준 폴더가 비었다고 저장소 전체로 번지면
+    # 사용자가 지목하지 않은 문서의 판정이 종료 코드에 섞인다.
+    if args.paths:
+        paths = expand_targets(args.paths)
+        if not paths:
+            print(f"검사할 문서가 없다 — 준 경로 아래에 {' · '.join(DOC_NAMES)} 가 없다")
+            return 0
+    else:
+        paths = find_docs(_root(args))
+        if not paths:
+            print("검사할 문서가 없다")
+            return 0
     rc = 0
     for p in paths:
+        if not p.is_file():
+            print(f"[FAIL] {p}")
+            print("    ERROR NOT_A_FILE 읽을 수 있는 문서가 아니다")
+            rc = 1
+            continue
         r = validate_doc(p)
         status = "PASS" if not r["errors"] else "FAIL"
         if r["errors"]:
@@ -240,7 +253,22 @@ def cmd_close(args):
 
 
 def cmd_run_unit(args):
-    from .run_unit import format_record, format_run, record_result, run_unit
+    from .run_unit import (format_record, format_review, format_run, record_result,
+                           record_review, run_unit)
+    if args.action == "review":
+        # 재검토를 **기록만** 한다(Q-25). 시도를 시작하지 않으므로 --run 도 요구하지 않는다 —
+        # 기록은 run 에 묶이지 않고 '몇 회차까지를 사람이 봤는가' 에 묶인다.
+        if not args.after_review:
+            print("run-unit review 는 --after-review \"<결론>\" 이 필요하다 — 기록할 재검토 결론이 없으면 남길 것이 없다",
+                  file=sys.stderr)
+            return 2
+        res = record_review(args.unit, args.after_review, project_root=_root(args), by=args.by)
+        print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_review(res))
+        return 0
+    if not args.run:
+        print(f"run-unit {args.action} 은 --run 이 필요하다 — 계약·증거·결과 봉투가 그 값 하나로 묶인다(RUNBOOK §3.3)",
+              file=sys.stderr)
+        return 2
     if args.action == "record":
         res = record_result(args.unit, args.run, args.result, project_root=_root(args),
                             failure_class=args.failure_class, note=args.note)
@@ -470,16 +498,19 @@ def build_parser():
 
     s = sub.add_parser("run-unit", help="관통 1회를 5단계로 엮는다 (계약 → 위임 명령 → 회수·앵커 → 증거 → 관측). "
                                         "기동은 기본이 dry-run 이고 --spawn 을 명시해야 실제로 띄운다")
-    s.add_argument("action", nargs="?", default="start", choices=["start", "record"],
-                   help="start(기본) 관통 1회를 돌린다 · record 그 회차의 판정을 attempts.yaml 에 남긴다")
+    s.add_argument("action", nargs="?", default="start", choices=["start", "record", "review"],
+                   help="start(기본) 관통 1회를 돌린다 · record 그 회차의 판정을 attempts.yaml 에 남긴다 · "
+                        "review 재검토 결론만 남긴다(시도를 시작하지 않는다, Q-25)")
     s.add_argument("--unit", required=True)
-    s.add_argument("--run", required=True, help="계약·증거·결과 봉투를 묶는 run id — RUNBOOK §3.2 의 Run id 를 그대로 쓴다")
+    s.add_argument("--run", help="계약·증거·결과 봉투를 묶는 run id — RUNBOOK §3.2 의 Run id 를 그대로 쓴다. "
+                                 "start·record 에는 필수이고 review 에는 쓰지 않는다")
     s.add_argument("--base-sha", dest="base_sha",
                    help="승인된 spec.md 가 들어 있는 커밋. 생략하면 이력에서 승인 커밋을 찾는다(D-a)")
     s.add_argument("--spawn", action="store_true",
                    help="위임 명령을 실제로 실행한다. 없으면 인쇄만 한다 — 기동은 비용이 드는 실행이다(K-66)")
     s.add_argument("--after-review", dest="after_review",
-                   help="연속 실패 뒤 사람이 완료 정의를 재검토한 결론. 주면 기록하고 진행한다(AGENTS.core §10)")
+                   help="연속 실패 뒤 사람이 완료 정의를 재검토한 결론. start 에 주면 기록하고 진행하고, "
+                        "review 에 주면 기록만 한다(AGENTS.core §10)")
     s.add_argument("--by", help="(--after-review) 재검토한 사람")
     s.add_argument("--result", choices=["pass", "fail"], help="(record) 이 회차의 판정")
     s.add_argument("--failure-class", dest="failure_class", choices=["outputs", "harness", "goal"],

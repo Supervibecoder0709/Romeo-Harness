@@ -25,6 +25,10 @@ EXIT_LINE = "--- exit {code} ---"
 EXIT_LINE_RE = re.compile(r"^--- exit (-?\d+) ---$")
 # 명령이 끝난 시점의 산출물 식별도 같은 로그에 적어 `log_sha256` 이 봉인하게 한다(4차 리뷰 구멍 B 의 한 겹).
 # evidence yaml 의 head_sha·dirty_tree_hash 만 손으로 고치면 로그의 이 줄과 어긋난다.
+# 원시 로그의 구획 표지. 기록자가 쓰는 자리와 대조가 읽는 자리를 같은 상수로 묶는다 —
+# 한쪽만 바뀌면 여러 줄 명령의 헤더 경계가 어긋나고, 그 어긋남은 위조와 구별되지 않는다.
+STDOUT_MARK = "--- stdout ---"
+STDERR_MARK = "--- stderr ---"
 HEAD_LINE = "--- head {sha} ---"
 TREE_LINE = "--- tree {hash} ---"
 HEAD_LINE_RE = re.compile(r"^--- head ([0-9a-f]{40}) ---$")
@@ -186,7 +190,7 @@ def run_command(unit_id, command, run_name=None, label=None, project_root=".", t
     elapsed = round(time.time() - t0, 3)
     # 명령이 끝난 직후의 산출물 식별. 원시 로그(.harness)는 트리 해시에서 빠지므로 로그를 쓰기 전에 재도 값이 같다.
     state = tree_state(project_root, unit_id, base_sha)
-    log_text = mask_secrets(f"$ {command}\n--- stdout ---\n{proc.stdout}\n--- stderr ---\n{proc.stderr}\n"
+    log_text = mask_secrets(f"$ {command}\n{STDOUT_MARK}\n{proc.stdout}\n{STDERR_MARK}\n{proc.stderr}\n"
                             + EXIT_LINE.format(code=proc.returncode) + "\n"
                             + HEAD_LINE.format(sha=state["head_sha"]) + "\n"
                             + TREE_LINE.format(hash=state["dirty_tree_hash"]) + "\n")
@@ -355,6 +359,29 @@ def parse_log_exit_code(text):
     return None
 
 
+def log_command_header(lines):
+    """원시 로그가 적은 **명령 전체**를 돌려준다. 로그 모양이 아니면 `None`(헤더를 읽지 못했다).
+
+    로그는 명령을 `$ {command}` 로 한 번에 쓴다 — 명령이 개행을 담으면 그 헤더도 여러 줄이 된다.
+    첫 물리 줄만 기록된 명령과 비교하면 여러 줄 명령은 **어떤 구현으로도** 통과하지 못한다
+    (2026-08-31 `feat-20260831-park-defects-actm` 2회차: 검사 14건이 전부 exit 0 인데 close 가 FAIL).
+    그래서 경계는 `$ ` 뒤부터 **첫 `--- stdout ---` 표지 앞**까지다.
+
+    첫 표지인 이유: 그 줄은 기록자가 명령 출력보다 **먼저** 쓴다. 명령의 stdout 이 같은 모양의 줄을
+    뱉어도 헤더는 늘어나지 않는다(종료 코드는 반대로 마지막 줄이 이긴다 — 그것도 기록자가 마지막에 쓰기 때문이다).
+    표지가 없으면 이 로그는 기록자가 쓴 형식이 아니므로 헤더를 짐작하지 않고 `None` 을 준다 —
+    짐작한 값으로 대조하면 통과도 거부도 근거가 없다. **부르는 쪽은 그때 대조를 건너뛰지 않고 미검증으로 돌린다**:
+    건너뛰면 표지 줄을 지우고 봉인만 다시 맞춘 로그가 조용히 통과한다(2026-09-01 검토 F2 실측).
+
+    대조를 **약하게 만들지 않는다**: 헤더 안을 한 글자만 고쳐도, 한 줄을 지워도 결과가 달라진다."""
+    for i, line in enumerate(lines):
+        if line == STDOUT_MARK:
+            if i == 0 or not lines[0].startswith("$ "):
+                return None
+            return "\n".join(lines[:i])[2:]
+    return None
+
+
 def command_log_state(project_root, cmd_rec):
     """기록된 명령 하나를 **원시 로그와 대조한다**. 돌려주는 것은 (상태, 이유)이고 상태는 True·False·None 이다.
 
@@ -386,9 +413,14 @@ def command_log_state(project_root, cmd_rec):
                        f"(log_sha256 {want[:12]} vs 실제 {got[:12]})")
     text = data.decode("utf-8", "replace")
     lines = text.splitlines()
-    if lines and lines[0].startswith("$ ") and lines[0][2:] != cmd_rec.get("command"):
+    logged_command = log_command_header(lines)
+    if logged_command is None:
+        # 표지 줄이 없으면 대조할 값이 없다. **건너뛰지 않는다** — 건너뛰면 표지를 지우고 봉인만 다시 맞춘
+        # 로그가 명령 대조를 통과한다(종료 코드 줄이 없을 때와 같은 처리다). close 는 미검증을 통과로 세지 않는다(K-51).
+        return None, f"{cmd_rec.get('id')}: 원시 로그에 명령 헤더가 없다 — 대조할 값이 없다"
+    if logged_command != cmd_rec.get("command"):
         return False, (f"{cmd_rec.get('id')}: 기록된 명령 {cmd_rec.get('command')!r} 가 "
-                       f"원시 로그가 실행한 {lines[0][2:]!r} 와 다르다 — 증거 파일이 손으로 고쳐졌다")
+                       f"원시 로그가 실행한 {logged_command!r} 와 다르다 — 증거 파일이 손으로 고쳐졌다")
     logged = parse_log_exit_code(text)
     if logged is None:
         return None, f"{cmd_rec.get('id')}: 원시 로그에 종료 코드 줄이 없다 — 대조할 값이 없다"

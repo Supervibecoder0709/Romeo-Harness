@@ -22,7 +22,8 @@ from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
 from romeo.policy import route
 from romeo.run_unit import (CONSECUTIVE_FAILURE_LIMIT, STAGES, consecutive_failures, gate,
-                            load_attempts, record_result, run_unit, save_attempts, start_attempt)
+                            load_attempts, record_result, record_review, run_unit,
+                            save_attempts, start_attempt)
 from romeo.util import load_yaml
 
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
@@ -357,6 +358,107 @@ class RepeatGate(_UnitRepo, unittest.TestCase):
         self.assertEqual(res["verdict"], "OK")
         self.assertTrue(res["released_by_review"])
         self.assertTrue(self._task("run_c").is_file())
+
+
+class TestReviewOnlyRecord(_UnitRepo, unittest.TestCase):
+    """재검토를 **기록만** 하는 경로 (Q-25).
+
+    종전에는 반복 중단을 푸는 창구가 `run-unit start --after-review` 하나뿐이라, 재검토를 남기는 일이
+    언제나 attempt 를 하나 함께 만들었다. 그 기록은 커밋돼야 워크트리 안의 계약 생성이 보고(D-a),
+    커밋하면 HEAD 가 밀려 계약을 새 SHA 로 다시 만들어야 하므로 attempt 가 또 하나 생긴다 —
+    2026-08-31 실측으로 `started` 유령이 세 개 남았다.
+
+    이 클래스가 고정하는 것은 둘이다.
+      ① 기록 전용 경로는 **시도 항목 수를 늘리지 않는다**
+      ② 그 경로가 **브레이크를 우회하지 않는다** — 카운터는 그대로고, 실패가 하나 더 쌓이면 다시 막힌다
+    """
+
+    def _fail_twice(self):
+        for run in ("run_a", "run_b"):
+            self._run(run=run)
+            record_result(self.unit, run, "fail", project_root=self.root)
+        return load_attempts(self.root, self.unit)
+
+    # ── ① 시도를 시작하지 않는다 ─────────────────────────────────────────────
+    def test_review_only_record_does_not_start_an_attempt(self):
+        before = self._fail_twice()
+        self.assertEqual(len(before["attempts"]), 2)
+        res = record_review(self.unit, "완료 정의를 좁혔다", project_root=self.root, by="사람")
+        after = load_attempts(self.root, self.unit)
+        self.assertEqual(len(after["attempts"]), 2, "기록 전용 경로가 시도를 늘렸다")
+        self.assertEqual(res["attempts"], 2)
+        self.assertEqual([a["result"] for a in after["attempts"]], ["fail", "fail"])
+
+    def test_the_conclusion_is_recorded_with_who_and_how_far(self):
+        self._fail_twice()
+        record_review(self.unit, "완료 정의를 좁혔다", project_root=self.root, by="사람")
+        rv = load_attempts(self.root, self.unit)["reviews"][-1]
+        self.assertEqual(rv["conclusion"], "완료 정의를 좁혔다")
+        self.assertEqual(rv["by"], "사람")
+        self.assertEqual(rv["after_attempt"], 2)
+        self.assertTrue(rv["at"])
+
+    def test_it_works_on_a_unit_with_no_attempts_yet(self):
+        res = record_review(self.unit, "먼저 재검토했다", project_root=self.root, by="사람")
+        self.assertEqual(res["attempts"], 0)
+        self.assertEqual(load_attempts(self.root, self.unit)["attempts"], [])
+
+    # ── ② 브레이크를 우회하지 않는다 ─────────────────────────────────────────
+    def test_it_releases_the_gate_but_does_not_reset_the_counter(self):
+        self._fail_twice()
+        self.assertFalse(gate(load_attempts(self.root, self.unit))[0])
+        res = record_review(self.unit, "완료 정의를 좁혔다", project_root=self.root, by="사람")
+        data = load_attempts(self.root, self.unit)
+        self.assertTrue(res["released"])
+        self.assertTrue(gate(data)[0])
+        self.assertEqual(consecutive_failures(data), 2, "재검토는 실패를 지우지 않는다")
+        self.assertEqual(res["consecutive_failures"], 2)
+
+    def test_one_more_failure_blocks_again(self):
+        """한 번의 재검토는 그 시점까지의 면제다 — 자동 해제 장치가 아니다."""
+        self._fail_twice()
+        record_review(self.unit, "완료 정의를 좁혔다", project_root=self.root, by="사람")
+        self._run(run="run_c")
+        record_result(self.unit, "run_c", "fail", project_root=self.root)
+        data = load_attempts(self.root, self.unit)
+        self.assertEqual(consecutive_failures(data), 3)
+        allowed, _n, why = gate(data)
+        self.assertFalse(allowed, "재검토 뒤 실패 1회로 다시 막혀야 한다")
+        self.assertIn("재검토", why)
+
+    def test_the_released_gate_lets_the_next_start_run(self):
+        """기록만 한 뒤에 기동하면 그 회차가 정상으로 돈다 — 계약 생성도 같은 게이트를 지난다."""
+        self._fail_twice()
+        record_review(self.unit, "완료 정의를 좁혔다", project_root=self.root, by="사람")
+        res = self._run(run="run_c")
+        self.assertEqual(res["verdict"], "OK")
+        self.assertFalse(res["released_by_review"], "해제는 이미 디스크의 기록이 했다")
+        self.assertEqual(len(load_attempts(self.root, self.unit)["attempts"]), 3)
+
+    # ── CLI ──────────────────────────────────────────────────────────────────
+    def test_cli_review_needs_no_run_and_adds_no_attempt(self):
+        self._fail_twice()
+        code, out = self._cli("run-unit", "review", "--unit", self.unit,
+                              "--after-review", "완료 정의를 좁혔다", "--by", "사람",
+                              "--root", str(self.root))
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(load_attempts(self.root, self.unit)["attempts"]), 2, out)
+        self.assertEqual(load_attempts(self.root, self.unit)["reviews"][-1]["by"], "사람")
+
+    def test_cli_review_without_a_conclusion_is_refused(self):
+        code, out = self._cli("run-unit", "review", "--unit", self.unit, "--root", str(self.root))
+        self.assertEqual(code, 2, out)
+        self.assertEqual(load_attempts(self.root, self.unit)["reviews"], [])
+
+    def test_cli_start_still_requires_a_run(self):
+        """--run 을 옵션으로 바꾼 것이 start·record 의 요구를 풀지 않는다."""
+        code, out = self._cli("run-unit", "--unit", self.unit, "--base-sha", self.base,
+                              "--root", str(self.root))
+        self.assertEqual(code, 2, out)
+        self.assertIn("--run", out)
+        code, out = self._cli("run-unit", "record", "--unit", self.unit, "--result", "fail",
+                              "--root", str(self.root))
+        self.assertEqual(code, 2, out)
 
 
 if __name__ == "__main__":

@@ -112,10 +112,11 @@ def gate(data):
     unit = data.get("unit_id") or "<단위>"
     return False, n, (
         f"같은 작업 단위에서 관통이 연속 {n}회 실패했다 — {n + 1}회차를 돌기 전에 완료 정의가 달성 가능한지 "
-        f"사람이 재검토한다(AGENTS.core §10). 재검토 결론을 "
+        f"사람이 재검토한다(AGENTS.core §10). 재검토 결론만 남기려면 "
+        f"bin/romeo run-unit review --unit {unit} --after-review \"<결론>\" --by <사람> — "
+        f"기록하고 끝난다(시도를 시작하지 않는다). 기록과 기동을 한 번에 하려면 "
         f"bin/romeo run-unit --unit {unit} --run <run> --base-sha <승인 커밋> "
-        f"--after-review \"<결론>\" --by <사람> 으로 주면 그 결론을 기록하고 진행한다 — "
-        f"기록 창구는 이 하나다. 실패 원인 분류는 기록만 하고 이 판정에 쓰지 않는다.")
+        f"--after-review \"<결론>\" --by <사람>. 실패 원인 분류는 기록만 하고 이 판정에 쓰지 않는다.")
 
 
 def add_review(data, conclusion, by=None):
@@ -379,6 +380,31 @@ def run_unit(unit_id, project_root=".", harness_root=None, run=None, base_sha=No
             "attempts_path": str(attempts_path(project_root, unit_id)), "stages": stages}
 
 
+def record_review(unit_id, conclusion, project_root=".", by=None):
+    """재검토 결론을 **기록만** 한다 — 시도를 시작하지 않는다(Q-25).
+
+    반복 중단을 푸는 창구가 `run-unit start --after-review` 하나뿐이면, 재검토를 남기는 일이 언제나
+    attempt 하나를 함께 만든다. 그런데 그 재검토 기록은 **커밋돼야** 워크트리 안의 계약 생성이 본다(D-a).
+    커밋하면 HEAD 가 밀리고, 워크트리는 브랜치 tip 을 체크아웃하므로 계약의 `base_sha` 와 워크트리 head 가
+    어긋나 계약을 새 SHA 로 다시 만들어야 한다 — 그때 attempt 가 또 하나 생긴다. 2026-08-31 실측으로
+    `started` 로 남은 유령이 세 개였다. 이 경로는 그 둘을 나눈다.
+
+    **브레이크를 우회하지 않는다.** 해제 판정은 그대로 `gate()` 가 하고, 연속 실패 카운터를 되돌리는 것은
+    성공뿐이다(AGENTS.core §10). 여기서 바뀌는 것은 재검토를 남기는 **방법**이지 남긴 뒤의 판정이 아니다."""
+    project_root = Path(project_root).resolve()
+    data = load_attempts(project_root, unit_id)
+    before = len(data.get("attempts") or [])
+    add_review(data, conclusion, by=by)
+    path = save_attempts(project_root, unit_id, data)
+    after = len(data.get("attempts") or [])
+    if after != before:
+        raise AssertionError(f"기록 전용 경로가 시도를 늘렸다: {before} → {after}")
+    allowed, failures, _why = gate(data)
+    return {"unit_id": unit_id, "review": data["reviews"][-1], "attempts": after,
+            "consecutive_failures": failures, "released": allowed,
+            "attempts_path": str(path)}
+
+
 def record_result(unit_id, run, result, project_root=".", failure_class=None, note=None):
     """관통 1회의 판정을 attempts.yaml 에 남긴다. 이것이 다음 회차의 중단 기준 입력이다."""
     project_root = Path(project_root).resolve()
@@ -409,6 +435,16 @@ def format_run(res):
             lines.append(f"        {k}: {v}")
     lines.append(f"  기록: {res['attempts_path']}")
     return "\n".join(lines)
+
+
+def format_review(res):
+    rv = res["review"]
+    return (f"romeo run-unit review {res['unit_id']} → 기록됨 (시도 {rv['after_attempt']}회차까지 · {rv['by'] or '작성자 미기재'})\n"
+            f"  결론: {rv['conclusion']}\n"
+            f"  시도 항목 {res['attempts']}건 — 늘지 않았다(기록 전용 경로)\n"
+            f"  연속 실패 {res['consecutive_failures']}회 · 다음 기동 "
+            + ("허용" if res["released"] else "여전히 거부") + "\n"
+            f"  기록: {res['attempts_path']}")
 
 
 def format_record(res):

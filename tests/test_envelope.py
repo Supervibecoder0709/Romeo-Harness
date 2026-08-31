@@ -14,7 +14,7 @@ from pathlib import Path
 from romeo import HARNESS_ROOT, frontmatter
 from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
-from romeo.envelope import build_envelope, envelope_text, write_envelope
+from romeo.envelope import build_envelope, change_scope_paths, envelope_text, write_envelope
 from romeo.evidence import run_command
 from romeo.policy import route
 from romeo.schema import validate
@@ -586,3 +586,68 @@ class TestSmallDefectsFromTheDiffReview(_ApprovalRepo):
         run_command(self.unit, "true", run_name="run-a-second", project_root=self.root)
         names = [r["run_id"] for r in list_runs(self.root, self.unit)]
         self.assertEqual(names[-1], "run-a-second", names)
+
+
+class TestChangeScopeMultiline(unittest.TestCase):
+    """「바뀌는 파일·모듈」 선언이 **줄을 넘겨도 전부** 쓰기 상한에 실리는가 (Q-18).
+
+    라벨 줄에서 곧바로 `return` 하던 종전 동작은 뒤 줄의 경로를 조용히 버렸다 — 빈 경우와 달리
+    부분 읽기는 아무 경고도 내지 않아 계약이 정상으로 보였고, 구현자가 쓰려는 순간에야 막혔다
+    (2026-08-31 `feat-20260831-bmad-attach-probe-tgnb` 1회차: 선언한 9개 중 2개만 실렸다).
+
+    반례가 짝을 이룬다: 이어 읽되 **다음 항목은 삼키지 않는다.** 「영향을 받는 부분」 은 승인이
+    쓰기 상한으로 정한 것이 아니므로 상한에 들어가면 K-66 위반이다."""
+
+    HEAD = "## 변경 범위\n\n"
+
+    def test_a_declaration_that_wraps_is_read_whole(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py` · `a/y.py`\n  · `a/z.py` · `b/w.md`\n")
+        self.assertEqual(got, ["a/x.py", "a/y.py", "a/z.py", "b/w.md"])
+
+    def test_wrapping_over_three_lines_is_read_whole(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n  · `a/y.py`\n  · `a/z.py`\n")
+        self.assertEqual(got, ["a/x.py", "a/y.py", "a/z.py"])
+
+    def test_nested_bullets_are_read_too(self):
+        """구분자 없이 하위 목록으로 적어도 버리지 않는다 — 조용히 잘리는 것이 이 결함의 본체다."""
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈:\n  - `a/x.py`\n  - `a/y.py`\n")
+        self.assertEqual(got, ["a/x.py", "a/y.py"])
+
+    # ── 반례: 이어 읽기가 다음 항목을 삼키지 않는다 (K-66) ────────────────────
+    def test_the_next_list_item_is_not_swallowed(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n- 영향을 받는 부분: `c/other.py`\n")
+        self.assertEqual(got, ["a/x.py"])
+
+    def test_a_blank_line_ends_the_declaration(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n\n  · `c/other.py`\n")
+        self.assertEqual(got, ["a/x.py"])
+
+    def test_the_next_section_is_not_swallowed(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n## 구현 단위\n\n`c/other.py`\n")
+        self.assertEqual(got, ["a/x.py"])
+
+    # ── 종전 동작이 그대로인가 ───────────────────────────────────────────────
+    def test_single_line_declaration_is_unchanged(self):
+        got = change_scope_paths(self.HEAD + "- 바뀌는 파일·모듈: `a/x.py` · `a/y.py`\n")
+        self.assertEqual(got, ["a/x.py", "a/y.py"])
+
+    def test_paths_outside_the_workspace_are_still_dropped(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n  · `/etc/passwd` · `~/.ssh/config` · `../out.py` · `a/x.py`\n")
+        self.assertEqual(got, ["a/x.py"])
+
+    def test_only_the_first_backtick_of_each_item_is_the_path(self):
+        """이어 읽는 줄에서도 항목당 첫 백틱만 경로다 — 뒤따르는 백틱은 설명이다."""
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`\n  · `b/y.py`(`collect` 에 들어 있는 함수)\n")
+        self.assertEqual(got, ["a/x.py", "b/y.py"])
+
+    def test_a_label_outside_the_section_is_still_ignored(self):
+        got = change_scope_paths("## 다른 절\n\n- 바뀌는 파일·모듈: `a/x.py`\n  · `a/y.py`\n")
+        self.assertEqual(got, [])
