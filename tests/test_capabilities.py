@@ -54,9 +54,14 @@ class TestCapabilityPolicy(unittest.TestCase):
 
 
 class TestProbe(unittest.TestCase):
-    def test_absent_on_this_repo(self):
-        # 이 저장소에는 BMAD 가 설치돼 있지 않다. 그것이 지금의 정답이다.
-        probes = {p["id"]: p for p in probe_capabilities(REPO)}
+    def test_absent_when_no_marker(self):
+        # 판정 근거는 **marker 의 부재**이지 이 저장소의 설치 상태가 아니다.
+        # 실제 저장소를 보게 하면 누가 BMAD 를 설치하는 순간 깨진다 — 그리고 그 설치는
+        # 이 하네스의 로드맵이 하려던 일이었다(2026-08-31 run_67c238a254e1 실측).
+        with tempfile.TemporaryDirectory() as tmp:
+            (Path(tmp) / "core/policy").mkdir(parents=True)
+            shutil.copy(REPO / CAPABILITIES_PATH, Path(tmp) / CAPABILITIES_PATH)
+            probes = {p["id"]: p for p in probe_capabilities(tmp)}
         self.assertIn("discovery.bmad", probes)
         self.assertEqual(probes["discovery.bmad"]["label"], "absent")
         self.assertIn("설치 흔적 없음", probes["discovery.bmad"]["detail"])
@@ -101,17 +106,36 @@ class TestProbe(unittest.TestCase):
 
 
 class TestDoctorReport(unittest.TestCase):
-    def test_absent_is_not_a_problem(self):
-        # AC-2. 미설치는 결함이 아니다 — 종료 코드를 바꾸지 않는다.
+    def test_probe_label_never_changes_the_problem_count(self):
+        # AC-2. 미설치는 결함이 아니다 — 종료 코드를 바꾸지 않는다. 설치돼 **있어도** 마찬가지다.
+        # 라벨을 양쪽 극단으로 돌려도 결함 수가 같아야 이 절이 판정에 끼어들지 않는다는 뜻이다.
+        # 결함 수가 지금 몇이든 상관없다 — 여기서 보는 것은 값이 아니라 **불변**이다.
         rep = doctor(REPO)
-        self.assertTrue(any(p["label"] == "absent" for p in rep["capabilities"]))
-        self.assertEqual(doctor_problem_count(rep, "repository"), 0, format_report(rep))
+        self.assertTrue(rep["capabilities"], "프로브가 하나도 없으면 이 검사는 아무것도 확인하지 않는다")
+        base = doctor_problem_count(rep, "repository")
+        for label, detail in (("absent", "설치 흔적 없음"), ("present", "설치 흔적 확인")):
+            rep["capabilities"] = [dict(p, label=label, detail=detail) for p in rep["capabilities"]]
+            self.assertEqual(doctor_problem_count(rep, "repository"), base, format_report(rep))
 
-    def test_report_has_capability_section_and_says_not_installed(self):
+    def test_this_repo_has_no_doctor_problems(self):
+        # `romeo doctor --strict --scope repository` 와 같은 판정이다. 이것을 여기 두는 이유는
+        # CI(.github/workflows/harness.yml)가 그 명령을 돌지 않기 때문이다 — `fixtures check` 는
+        # 충돌 fixture 위반을 잡지 못한다(2026-08-31 실측: c7 위반이 있는 트리에서 exit 0).
+        # 위 불변 검사와 분리해 둔다. 섞어 두면 저장소에 결함이 생겼을 때 엉뚱한 이름으로 깨진다.
+        self.assertEqual(doctor_problem_count(doctor(REPO), "repository"), 0,
+                         format_report(doctor(REPO)))
+
+    def test_report_has_capability_section(self):
+        self.assertIn("## 능력 프로브", format_report(doctor(REPO)))
+
+    def test_report_says_not_installed_when_absent(self):
+        # 문구를 정하는 것은 라벨이지 이 머신의 설치 상태가 아니다 —
+        # 아래 present 쪽 검사와 같은 방식으로 라벨을 고정해서 본다.
         rep = doctor(REPO)
-        text = format_report(rep)
-        self.assertIn("## 능력 프로브", text)
-        self.assertIn("설치 흔적 없음", text)
+        self.assertTrue(rep["capabilities"], "프로브가 하나도 없으면 이 검사는 아무것도 확인하지 않는다")
+        rep["capabilities"] = [dict(p, label="absent", detail="설치 흔적 없음")
+                               for p in rep["capabilities"]]
+        self.assertIn("설치 흔적 없음", format_report(rep))
 
     def test_report_never_calls_an_install_trace_an_execution(self):
         rep = doctor(REPO)
@@ -175,8 +199,11 @@ class TestCard(unittest.TestCase):
         self.assertIn("inputs:", self.text)
 
     def test_card_prints_the_probe_result(self):
+        # 카드가 인쇄해야 하는 것은 "absent" 라는 특정 값이 아니라 **프로브가 실제로 낸 값**이다.
+        # 값을 못 박으면 이 머신에 BMAD 를 설치하는 순간 깨진다.
+        probes = {p["id"]: p for p in probe_capabilities(REPO)}
         self.assertIn("discovery.bmad", self.text)
-        self.assertIn("absent", self.text)
+        self.assertIn(probes["discovery.bmad"]["label"], self.text)
 
     def test_card_stays_within_budget(self):
         limit = load_policy()["packages"]["budgets"]["card_max_lines"]
