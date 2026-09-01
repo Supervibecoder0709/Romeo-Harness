@@ -25,4 +25,21 @@ attempts:
   failure_class: goal
   note: null
   settled_at: '2026-09-01T22:55:52+09:00'
-reviews: []
+- n: 4
+  run: run_de465802c277
+  base_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  started_at: '2026-09-01T23:00:52+09:00'
+  result: fail
+  failure_class: outputs
+  note: null
+  settled_at: '2026-09-01T23:16:48+09:00'
+reviews:
+- after_attempt: 4
+  conclusion: '완료 정의는 달성 가능하다. 두 실패의 원인이 서로 달랐다 — 3회차는 목표(AC-10 문장이 이 단위의 산출물을 승인 전에 실행하라고 요구해 D-27 과
+    충돌했다)였고 재승인으로 닫혔다. 4회차는 산출물(코드 결함 2건)이다: ① romeo/policy.py 가 add_capabilities 에 package 조건을 걸어 unit:none
+    요청에서 능력 목록이 비었다 — 차단은 문서를 읽으므로 package 가 필요하지만 능력은 카드가 인쇄하므로 무관하다 ② romeo/cli.py 의 cmd_card 가 --root
+    를 render_card 에 넘기지 않아 부착 프로젝트에서 엉뚱한 저장소를 프로브한다. 둘 다 좁은 수정이고, check-1 이 T1 분기만 보아 이 두 경로를 놓친 검사 빈틈도
+    같은 회차에서 메운다. 나머지 AC 8개는 이미 증거로 뒷받침된다(검토자 notes: 승인된 required_checks 10건이 변경되지 않았고 증거·원시 로그에 모두 exit
+    0). 같은 반복이 끝나지 않는 상황이 아니므로 5회차를 돌린다. AC 문장은 바꾸지 않는다 — 요구를 좁혀 결함을 범위 밖으로 밀어내지 않는다.'
+  by: Supervibecoder0709
+  at: '2026-09-01T23:28:38+09:00'
