@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-01T22:28:19+09:00'
+approved_at: '2026-09-01T23:00:08+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -30,6 +30,11 @@ approval_history:
     하드코딩한 기존 검사 25건과 fixture 기대값 3건이 따라와야 하고, 차단 판정에 라우터 컨텍스트를 넘기려면 docs.py·close.py 의 호출부 배선이 필요하다. 함께
     check-3 을 고친다: 종전 명령은 fixture 불일치 3건에도 exit 0 이라 아무것도 판정하지 않는 빈 검사였다(실측). 새 명령은 불일치 행이 있으면 실패한다 —
     구현 전 트리 exit 0, 현재 구현 트리 exit 1 로 양쪽을 확인했다.'}
+- {approved_at: '2026-09-01T22:28:19+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T23:00:08+09:00',
+  reason: 'AC-10 이 달성 불가능했다 — 이 단위의 산출물인 tests/test_scenario_8.py 에 대해 ''고친 뒤 성공하는 것을 승인 전에 보인다'' 를 요구했는데,
+    그러려면 승인 전에 구현해야 하고 그것은 D-27 위반이다. 검토자가 3회차에서 AC_UNMET 으로 잡았다(ac10-before-state 가 승인 22:28:19 뒤인 22:46:05
+    에 돌았다 — 사실관계는 정확하다). 문장을 실행 가능한 것으로 고친다: 고치기 전 실패는 base 리비전 트리에 그 테스트만 얹어 재현해 증거로 남기고, 고친 뒤 성공은 check-1
+    이 보인다. §11 이 요구하는 양쪽 보이기의 목적(빈 검사·통과 불가능한 검사를 승인하지 않는다)은 그대로 지킨다. 구현본과 증거는 바꾸지 않는다.'}
 ---
 
 # 없는 능력을 있는 것처럼 쓰는 것을 막는다 — 능력 프로브·부재 카드·시나리오 8
@@ -65,8 +70,10 @@ approval_history:
   - [ ] AC-8 프로브는 파일을 읽기만 한다 — 실행 뒤에도 흔적 파일이 생기지 않는다(자동 설치 금지).
   - [ ] AC-9 런북 `scenarios/8-capability-absent.md` 가 `scenarios/README.md` 목록에 등재되고,
         구현자가 `BLOCKED_CAPABILITY` 로 끝내야 하는 자리를 명시한다. 통과만 보이지 않는다 — 반례를 담는다.
-  - [ ] AC-10 `tests/test_scenario_8.py` 가 런북의 단계를 그대로 실행한다. 이 검사는 **고치기 전 상태에서
-        실패하고 고친 뒤 성공하는 것**을 승인 전에 양쪽으로 보인다(§11).
+  - [ ] AC-10 `tests/test_scenario_8.py` 가 런북의 단계를 그대로 실행하고, **고치기 전 상태에서 실패하는
+        것**을 증거로 남긴다 — base 리비전 트리에 이 테스트만 얹어 재현한다. 고친 뒤 성공은 check-1 이
+        보인다. 두 기록이 §11 의 양쪽이다 — 통과만 보인 검사는 빈 검사이고, 실패만 보인 검사는 통과
+        불가능한 검사다. **이 단위의 산출물인 검사를 승인 전에 실행할 수는 없다**(D-27).
 - **위험과 되돌리기:** 저장소 안의 문서·정책표·코드만 바뀐다. 외부 상태를 바꾸지 않는다.
   되돌리기: 통합 커밋을 `git revert` 한다. 정책표 로드가 깨지면 `bin/romeo route` 가 즉시 실패하므로
   같은 커밋 안에서 드러난다(`catalog_defects`·`section_defects` 가 로드 시점에 대조한다).
