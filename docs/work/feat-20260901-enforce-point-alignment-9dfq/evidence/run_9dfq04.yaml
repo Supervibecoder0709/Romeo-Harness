@@ -1,0 +1,442 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_9dfq04
+task_id: null
+dispatch_id: null
+unit_id: feat-20260901-enforce-point-alignment-9dfq
+spec_ref:
+  path: docs/work/feat-20260901-enforce-point-alignment-9dfq/spec.md
+  sha256: ebc58767067a60db281a8ac29dd55bade758c6113942d012425c838905787d05
+base_sha: 9ed9b2fb84b89b09fb36bcd7be0aafef7b732a38
+head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
+started_at: '2026-09-01T19:10:36+09:00'
+finished_at: '2026-09-01T19:19:26+09:00'
+commands:
+- id: check-1
+  command: python3 -c "from romeo.blocks import ENFORCE_POINTS as P; assert 'dispatch' in P, P"
+  exit_code: 0
+  started_at: '2026-09-01T19:10:36+09:00'
+  finished_at: '2026-09-01T19:10:36+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/01-check-1.log
+  log_sha256: d06462b0577c68a119409bdd32d501b8d8ab549bda0023c3b5480856683232e0
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-2
+  command: python3 -c "import yaml; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks']; [ (_
+    for _ in ()).throw(AssertionError(k)) for k,v in b.items() if len(v.get('enforced_at') or [])!=1 or
+    not v.get('reads') ]"
+  exit_code: 0
+  started_at: '2026-09-01T19:10:36+09:00'
+  finished_at: '2026-09-01T19:10:36+09:00'
+  seconds: 0.037
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/02-check-2.log
+  log_sha256: f520606cf8fa00b8e4b00547226d722bdab57599ce18165535df9a3d1223e131
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-3
+  command: python3 -m unittest tests.test_enforce_points.TestDispatchPoint tests.test_enforce_points.TestDiscoveryResultReadsRealPath
+  exit_code: 0
+  started_at: '2026-09-01T19:10:36+09:00'
+  finished_at: '2026-09-01T19:10:37+09:00'
+  seconds: 1.148
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/03-check-3.log
+  log_sha256: ef401cf0b0c315010ef1b42702517770b2e39b23a7437e6c7ff37174c93e29d1
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-4
+  command: '! grep -rn ''approval-gate'' core/ romeo/ tests/ fixtures/'
+  exit_code: 0
+  started_at: '2026-09-01T19:10:37+09:00'
+  finished_at: '2026-09-01T19:10:37+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/04-check-4.log
+  log_sha256: d83809fe2c8ff21d48c0c6e6429229e8e797b507d7675e748b236c3c1f812e0b
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-5
+  command: python3 -c "import yaml; from romeo.blocks import BLOCK_CHECKS; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks'];
+    assert 'risk-plan-ready' in b and 'risk-plan-ready' in BLOCK_CHECKS; assert 'guards' in (b['risk-plan-ready'].get('note')
+    or '')"
+  exit_code: 0
+  started_at: '2026-09-01T19:10:37+09:00'
+  finished_at: '2026-09-01T19:10:38+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/05-check-5.log
+  log_sha256: 40bd8dac44df8b3ffa963c6fd593e748c22da74503b1b6d3c2001e5f857a72b1
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-6
+  command: python3 -m unittest tests.test_enforce_points.TestOpenLoopCoversPackage
+  exit_code: 0
+  started_at: '2026-09-01T19:10:38+09:00'
+  finished_at: '2026-09-01T19:10:39+09:00'
+  seconds: 0.945
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/06-check-6.log
+  log_sha256: 45e29b705a2b54e60b82f0fd79c43f54b918926cafc4dd8241a3dbf05bff4220
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-7
+  command: python3 -c "import yaml; s=yaml.safe_load(open('core/policy/packages.yaml'))['sections']; [
+    (_ for _ in ()).throw(AssertionError(k)) for k,v in s.items() if not v.get('enforcement') ]" && python3
+    -m unittest tests.test_enforce_points.TestSectionEnforcementReconciliation
+  exit_code: 0
+  started_at: '2026-09-01T19:10:39+09:00'
+  finished_at: '2026-09-01T19:10:39+09:00'
+  seconds: 0.312
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/07-check-7.log
+  log_sha256: c37efe44cda65e3df6961c68e06717cba3b1ff9a71e0da1fe3ad9a78fce82a0e
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-8
+  command: python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt
+  exit_code: 0
+  started_at: '2026-09-01T19:10:39+09:00'
+  finished_at: '2026-09-01T19:10:40+09:00'
+  seconds: 0.709
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/08-check-8.log
+  log_sha256: c3cfefa9718b065f4c9350d184bf2c9a0b81f7c01043b16c9edcf26adbbc4e03
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-9
+  command: python3 -c "import pathlib; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert
+    '## 11. 요구하는 자리와 보는 자리를 같게 둔다' in a; assert '회차는 세는 자리가 아니라 나는 자리에서 만든다' in a; d=[l for l in pathlib.Path('docs/decisions/decision-register.md').read_text().split(chr(10))
+    if l.startswith(('| D-78 |','| D-79 |'))]; assert len(d)==2 and all('| accepted |' in l for l in d),
+    d" && python3 -m unittest tests.test_enforce_points.TestClosureMatchesCode
+  exit_code: 0
+  started_at: '2026-09-01T19:10:40+09:00'
+  finished_at: '2026-09-01T19:10:40+09:00'
+  seconds: 0.092
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/09-check-9.log
+  log_sha256: b6c225fadd2e4be13c7fb3c8fa6c5c993d56931145723ec0512d7e1835f900bb
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-10
+  command: python3 -c "import unittest; n=unittest.defaultTestLoader.loadTestsFromName('tests.test_enforce_points').countTestCases();
+    assert n>=20, n" && python3 -c "import pathlib; t=pathlib.Path('tests/test_enforce_points.py').read_text();
+    [ (_ for _ in ()).throw(AssertionError(p)) for p in ('ㅁㄴㅇㄹ','docs/research/없는파일.md','spike 없이') if
+    p not in t ]"
+  exit_code: 0
+  started_at: '2026-09-01T19:10:40+09:00'
+  finished_at: '2026-09-01T19:10:40+09:00'
+  seconds: 0.062
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/10-check-10.log
+  log_sha256: f6592bbbaca159b54365941e7c727d6f3910a441b75f79d00c5c314a77a1c7bf
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-11
+  command: grep -q 'enforced_at' scenarios/3-discovery-block.md && grep -q 'dispatch' tests/test_scenario_3.py
+    && python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T19:10:40+09:00'
+  finished_at: '2026-09-01T19:12:26+09:00'
+  seconds: 105.788
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/11-check-11.log
+  log_sha256: 69e321181c4f203a81e63087085aab9cc42c30b73ad45c7a3af8559c2cf0b968
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-12
+  command: python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied
+  exit_code: 0
+  started_at: '2026-09-01T19:12:26+09:00'
+  finished_at: '2026-09-01T19:12:27+09:00'
+  seconds: 0.977
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/12-check-12.log
+  log_sha256: 8359a1bfb0437f778a8a3271142f41ac8f9df2d0ae167c75e2671b3bda8f0498
+  stdout_tail: ''
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-tree-before
+  command: git status --porcelain
+  exit_code: 0
+  started_at: '2026-09-01T19:12:45+09:00'
+  finished_at: '2026-09-01T19:12:45+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/13-review-tree-before.log
+  log_sha256: 8815de5c625f3910a6b9192ab9d677ee0b7fa7e3e7e20647f9965455075a1613
+  stdout_tail: 'M docs/work/feat-20260901-enforce-point-alignment-9dfq/attempts.yaml
+
+    ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/evidence/run_9dfq04.yaml
+
+    ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/result/run_9dfq04-implementer.json'
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260901-enforce-point-alignment-9dfq/review/run_9dfq04-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-01T19:17:17+09:00'
+  finished_at: '2026-09-01T19:17:17+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/14-review-record.log
+  log_sha256: a9a0ce2e099059c22a2258b55f218b9c89f2344bf783a5070ea86dbf00b4cdcd
+  stdout_tail: 28effeba5110be5c1f8c7d5fd822d198e2664c88f3559c98f9d94c1a900197b7  docs/work/feat-20260901-enforce-point-alignment-9dfq/review/run_9dfq04-reviewer.json
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-tree-after
+  command: git status --porcelain
+  exit_code: 0
+  started_at: '2026-09-01T19:19:26+09:00'
+  finished_at: '2026-09-01T19:19:26+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq04/15-review-tree-after.log
+  log_sha256: b97eb55c5df36da12f893509808bc8f6e0cfd614435735e3a56999d9af7cc69b
+  stdout_tail: 'M docs/work/feat-20260901-enforce-point-alignment-9dfq/attempts.yaml
+
+    ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/evidence/run_9dfq04.yaml
+
+    ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/result/run_9dfq04-implementer.json
+
+    ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/review/run_9dfq04-reviewer.json'
+  head_sha: a7b35e5b0ae6368485e4b176b33aeb767272e111
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+changed_files:
+- docs/planning/open-questions.md
+- romeo/blocks.py
+- tests/test_enforce_points.py
+artifact_hash: 51a6996befb7f0ffb4838ca80c7cf38c747f3c1e1c9179c772c8e33579233dea
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-01T19:24:38+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 194 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-01T18:58:11+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_9dfq04 — 검증 계획 12건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/4건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence a7b35e5b0ae6 vs 현재 a7b35e5b0ae6
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 682e4deea426 vs 현재 682e4deea426 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -c "from romeo.blocks import ENFORCE_POINTS as P; assert ''dispatch''
+      in P, P"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -c "import yaml; b=yaml.safe_load(open(''core/policy/packages.yaml''))[''blocks''];
+      [ (_ for _ in ()).throw(AssertionError(k)) for k,v in b.items() if len(v.get(''enforced_at'') or
+      [])!=1 or not v.get(''reads'') ]"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_enforce_points.TestDispatchPoint tests.test_enforce_points.TestDiscoveryResultReadsRealPath'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — ! grep -rn ''approval-gate'' core/ romeo/ tests/ fixtures/'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -c "import yaml; from romeo.blocks import BLOCK_CHECKS; b=yaml.safe_load(open(''core/policy/packages.yaml''))[''blocks''];
+      assert ''risk-plan-ready'' in b and ''risk-plan-ready'' in BLOCK_CHECKS; assert ''guards'' in (b[''risk-plan-ready''].get(''note'')
+      or '''')"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_enforce_points.TestOpenLoopCoversPackage'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -c "import yaml; s=yaml.safe_load(open(''core/policy/packages.yaml''))[''sections''];
+      [ (_ for _ in ()).throw(AssertionError(k)) for k,v in s.items() if not v.get(''enforcement'') ]"
+      && python3 -m unittest tests.test_enforce_points.TestSectionEnforcementReconciliation'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — python3 -c "import pathlib; a=pathlib.Path(''core/principles/AGENTS.core.md'').read_text();
+      assert ''## 11. 요구하는 자리와 보는 자리를 같게 둔다'' in a; assert ''회차는 세는 자리가 아니라 나는 자리에서 만든다'' in a; d=[l for
+      l in pathlib.Path(''docs/decisions/decision-register.md'').read_text().split(chr(10)) if l.startswith((''|
+      D-78 |'',''| D-79 |''))]; assert len(d)==2 and all(''| accepted |'' in l for l in d), d" && python3
+      -m unittest tests.test_enforce_points.TestClosureMatchesCode'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -c "import unittest; n=unittest.defaultTestLoader.loadTestsFromName(''tests.test_enforce_points'').countTestCases();
+      assert n>=20, n" && python3 -c "import pathlib; t=pathlib.Path(''tests/test_enforce_points.py'').read_text();
+      [ (_ for _ in ()).throw(AssertionError(p)) for p in (''ㅁㄴㅇㄹ'',''docs/research/없는파일.md'',''spike
+      없이'') if p not in t ]"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — grep -q ''enforced_at'' scenarios/3-discovery-block.md && grep -q ''dispatch''
+      tests/test_scenario_3.py && python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 15건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 10건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 12건이 승인 커밋 9ed9b2fb84b8 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -c "from romeo.blocks import ENFORCE_POINTS as P; assert ''dispatch''
+      in P, P"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -c "import yaml; b=yaml.safe_load(open(''core/policy/packages.yaml''))[''blocks''];
+      [ (_ for _ in ()).throw(AssertionError(k)) for k,v in b.items() if len(v.get(''enforced_at'') or
+      [])!=1 or not v.get(''reads'') ]"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_enforce_points.TestDispatchPoint tests.test_enforce_points.TestDiscoveryResultReadsRealPath'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — ! grep -rn ''approval-gate'' core/ romeo/ tests/ fixtures/'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -c "import yaml; from romeo.blocks import BLOCK_CHECKS; b=yaml.safe_load(open(''core/policy/packages.yaml''))[''blocks''];
+      assert ''risk-plan-ready'' in b and ''risk-plan-ready'' in BLOCK_CHECKS; assert ''guards'' in (b[''risk-plan-ready''].get(''note'')
+      or '''')"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_enforce_points.TestOpenLoopCoversPackage'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -c "import yaml; s=yaml.safe_load(open(''core/policy/packages.yaml''))[''sections''];
+      [ (_ for _ in ()).throw(AssertionError(k)) for k,v in s.items() if not v.get(''enforcement'') ]"
+      && python3 -m unittest tests.test_enforce_points.TestSectionEnforcementReconciliation'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — python3 -c "import pathlib; a=pathlib.Path(''core/principles/AGENTS.core.md'').read_text();
+      assert ''## 11. 요구하는 자리와 보는 자리를 같게 둔다'' in a; assert ''회차는 세는 자리가 아니라 나는 자리에서 만든다'' in a; d=[l for
+      l in pathlib.Path(''docs/decisions/decision-register.md'').read_text().split(chr(10)) if l.startswith((''|
+      D-78 |'',''| D-79 |''))]; assert len(d)==2 and all(''| accepted |'' in l for l in d), d" && python3
+      -m unittest tests.test_enforce_points.TestClosureMatchesCode'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -c "import unittest; n=unittest.defaultTestLoader.loadTestsFromName(''tests.test_enforce_points'').countTestCases();
+      assert n>=20, n" && python3 -c "import pathlib; t=pathlib.Path(''tests/test_enforce_points.py'').read_text();
+      [ (_ for _ in ()).throw(AssertionError(p)) for p in (''ㅁㄴㅇㄹ'',''docs/research/없는파일.md'',''spike
+      없이'') if p not in t ]"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — grep -q ''enforced_at'' scenarios/3-discovery-block.md && grep -q
+      ''dispatch'' tests/test_scenario_3.py && python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 9ed9b2fb84b8 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['docs/planning/open-questions.md', 'romeo/blocks.py', 'tests/test_enforce_points.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_9dfq04-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

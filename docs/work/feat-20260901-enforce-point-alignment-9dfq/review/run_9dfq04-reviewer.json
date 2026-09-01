@@ -1,0 +1,27 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-enforce-point-alignment-9dfq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-enforce-point-alignment-9dfq/task/run_9dfq04-reviewer.json",
+    "sha256": "c2cbe0a4b1c298c276ee162c3365eba529626c846d1e8da951afa0b245f11045"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [
+    {
+      "summary": "모듈 설명은 집행 지점이 approve·close 두 개라고 남아 있어, dispatch를 포함한 실제 선언과 어긋난다. 동작과 수용 기준 충족에는 영향을 주지 않는 설명 신선도 문제다.",
+      "file": "romeo/blocks.py",
+      "line": 4
+    },
+    {
+      "summary": "Q-29 해소문은 TestDiscoveryResultReadsRealPath를 6건이라고 적지만 현재 클래스에는 추가 반례가 포함돼 수치가 낡았다. 닫힘 상태와 코드 동작에는 영향을 주지 않는다.",
+      "file": "docs/planning/open-questions.md",
+      "line": 90
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260901-enforce-point-alignment-9dfq/evidence/run_9dfq04.yaml",
+  "notes": "두 계약의 base_sha가 일치한다. 승인된 required_checks와 작업 계약·증거의 12개 명령이 같고 모두 exit 0이며 원시 로그가 존재한다. 현재 HEAD는 증거의 head_sha와 같고 작업 트리 목록은 review-tree-before 기록과 일치한다. 변경 경로는 구현자 allowed_paths 안이고 guards는 비어 있다. 판정 근거는 현재 저장소와 기록된 증거뿐이다."
+}

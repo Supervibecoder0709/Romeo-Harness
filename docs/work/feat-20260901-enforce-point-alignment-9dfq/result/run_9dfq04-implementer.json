@@ -1,0 +1,77 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-enforce-point-alignment-9dfq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-enforce-point-alignment-9dfq/task/run_9dfq04-implementer.json",
+    "sha256": "7c0383753c65009171321949b41cedc43ef2783360396e642876847fdbff74ba"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -c \"from romeo.blocks import ENFORCE_POINTS as P; assert 'dispatch' in P, P\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -c \"import yaml; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks']; [ (_ for _ in ()).throw(AssertionError(k)) for k,v in b.items() if len(v.get('enforced_at') or [])!=1 or not v.get('reads') ]\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_enforce_points.TestDispatchPoint tests.test_enforce_points.TestDiscoveryResultReadsRealPath",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "! grep -rn 'approval-gate' core/ romeo/ tests/ fixtures/",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -c \"import yaml; from romeo.blocks import BLOCK_CHECKS; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks']; assert 'risk-plan-ready' in b and 'risk-plan-ready' in BLOCK_CHECKS; assert 'guards' in (b['risk-plan-ready'].get('note') or '')\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_enforce_points.TestOpenLoopCoversPackage",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -c \"import yaml; s=yaml.safe_load(open('core/policy/packages.yaml'))['sections']; [ (_ for _ in ()).throw(AssertionError(k)) for k,v in s.items() if not v.get('enforcement') ]\" && python3 -m unittest tests.test_enforce_points.TestSectionEnforcementReconciliation",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -c \"import pathlib; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert '## 11. 요구하는 자리와 보는 자리를 같게 둔다' in a; assert '회차는 세는 자리가 아니라 나는 자리에서 만든다' in a; d=[l for l in pathlib.Path('docs/decisions/decision-register.md').read_text().split(chr(10)) if l.startswith(('| D-78 |','| D-79 |'))]; assert len(d)==2 and all('| accepted |' in l for l in d), d\" && python3 -m unittest tests.test_enforce_points.TestClosureMatchesCode",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -c \"import unittest; n=unittest.defaultTestLoader.loadTestsFromName('tests.test_enforce_points').countTestCases(); assert n>=20, n\" && python3 -c \"import pathlib; t=pathlib.Path('tests/test_enforce_points.py').read_text(); [ (_ for _ in ()).throw(AssertionError(p)) for p in ('ㅁㄴㅇㄹ','docs/research/없는파일.md','spike 없이') if p not in t ]\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "grep -q 'enforced_at' scenarios/3-discovery-block.md && grep -q 'dispatch' tests/test_scenario_3.py && python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260901-enforce-point-alignment-9dfq/evidence/run_9dfq04.yaml",
+  "notes": "4회차. 3회차 검토자 finding(앵커만 있는 링크가 작업 단위 폴더 자신을 가리켜 통과)을 고쳤다 — _points_at_a_file() 이 스킴·빈 경로·디렉터리를 막고 is_file() 로 판정한다. 반례 7종을 테스트에 고정했다. AC·검사 문안은 바뀌지 않아 재승인하지 않았다(base_sha 9ed9b2fb 그대로). required_checks 12/12 exit 0, 하네스 테스트 666건 통과, changed_files 3건 전부 allowed_paths 안. **구현은 위임 워크트리가 아니라 현재 체크아웃에서 했다** — RUNBOOK §3 의 기본 경로를 벗어난 것이고 그 결과가 Q-34 다. 1~3회차 검토자 findings 8건을 전부 반영했고 그 이력은 attempts.yaml 에 있다."
+}

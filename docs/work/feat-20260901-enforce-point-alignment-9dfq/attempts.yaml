@@ -39,6 +39,15 @@ attempts:
     겨눴고 「경로가 아닌 것이 경로처럼 풀리는 것」을 안 겨눴다. 이번 실패는 예고한 중단 기준(AC-8 계열 문서 상태 검사)이 아니라 산출물 자체의 결함이고, 검토자가 잡아야
     할 것을 잡았다.'
   settled_at: '2026-09-01T19:07:33+09:00'
+- n: 4
+  run: run_9dfq04
+  base_sha: 9ed9b2fb84b89b09fb36bcd7be0aafef7b732a38
+  started_at: '2026-09-01T19:10:36+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS. findings 2건은 비차단 설명 신선도다 — blocks.py 모듈 설명이 아직 집행 지점을 둘이라 적고, Q-29 해소문이 반례 개수를 낡은 수로
+    적는다. 둘 다 맞고 close 뒤 후속 커밋으로 고친다. 1~3회차 findings 8건은 전부 반영됐다.
+  settled_at: '2026-09-01T19:17:25+09:00'
 reviews:
 - after_attempt: 2
   conclusion: '완료 정의는 달성 가능하다 — 3회차를 돌린다. 근거: 두 회차 모두 **산출물(집행 변경)은 통과했다.** 1회차·2회차 다 계약 base_sha 일치,

@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-01T18:58:11+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-01T19:24:38+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_9dfq01.yaml, evidence/run_9dfq02.yaml, evidence/run_9dfq03.yaml, evidence/run_9dfq04.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -188,6 +188,9 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-01T19:24:38+09:00 · HEAD a7b35e5b0ae6 · 검사 기록 run_9dfq04
 
-- (없음)
+- [evidence/run_9dfq01.yaml](evidence/run_9dfq01.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_9dfq02.yaml](evidence/run_9dfq02.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_9dfq03.yaml](evidence/run_9dfq03.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_9dfq04.yaml](evidence/run_9dfq04.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
