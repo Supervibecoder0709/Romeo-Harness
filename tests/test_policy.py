@@ -34,7 +34,7 @@ class TestRoute(unittest.TestCase):
         out = route(cls(facets=["copy", "legal"], gates=["legal"]))
         self.assertEqual(out["profile"], "standard")
         self.assertIn("risk-backup-recovery", out["sections"]["spec"])
-        self.assertIn("approval-gate", out["blocks"])
+        self.assertIn("risk-plan-ready", out["blocks"])
         self.assertEqual(out["reviewer"], "opposite-runtime-readonly")
         self.assertIn("overlay:gate.any", out["fired_rules"])
 

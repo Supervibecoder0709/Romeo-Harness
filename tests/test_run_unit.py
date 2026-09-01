@@ -114,6 +114,13 @@ class _UnitRepo:
         body = (body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
                     .replace('command: "채움"', 'command: "true"'))
         frontmatter.write(spec, fm, body)
+        # 문서 패키지 **전체**를 채운다 — 위임 게이트가 spec 하나가 아니라 brief 까지 본다.
+        # 이 helper 가 spec 만 채우던 것이 고치려는 결함과 같은 모양이었다(brief 를 아무도 읽지 않았다).
+        for other in Path(res["dir"]).glob("*.md"):
+            if other.name == "spec.md":
+                continue
+            ofm, obody = frontmatter.read(other)
+            frontmatter.write(other, ofm, obody.replace("NEEDS_INPUT", "채움"))
         approve_unit(self.unit, "tester", project_root=self.root)
         git("add", ".", cwd=self.root)
         git("commit", "-q", "-m", "approve", cwd=self.root)

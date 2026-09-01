@@ -48,7 +48,7 @@ expected:
   - environment-plan
   blocks:
   - spec-ready
-  - approval-gate
+  - risk-plan-ready
   guards:
   - production-deploy
   warnings:

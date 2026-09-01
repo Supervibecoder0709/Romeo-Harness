@@ -35,7 +35,7 @@ expected:
   - capability-check
   blocks:
   - spec-ready
-  - approval-gate
+  - risk-plan-ready
   guards:
   - production-deploy
   - ops-data-change

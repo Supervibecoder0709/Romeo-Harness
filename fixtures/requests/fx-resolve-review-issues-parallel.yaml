@@ -27,7 +27,7 @@ expected:
   - risk-backup-recovery
   blocks:
   - spec-ready
-  - approval-gate
+  - risk-plan-ready
   parts:
   - superpowers
   guards: []

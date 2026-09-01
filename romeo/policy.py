@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 
 from . import HARNESS_ROOT
-from .blocks import catalog_defects
+from .blocks import catalog_defects, section_defects
 from .schema import validate as _validate
 from .util import load_json, load_yaml
 from .util import project_root as _cwd_project_root
@@ -43,6 +43,12 @@ def load_policy(harness_root=None):
         defects = catalog_defects(pol["packages"])
         if defects:
             raise PolicyError([f"정책표의 차단 카탈로그가 성립하지 않는다 ({root}):"] + defects)
+        # 절도 같은 대조를 받는다. 라우터는 오버레이로 절을 **요구**할 수 있는데 집행은 자기가 읽는 문서만 본다 —
+        # 그래서 차단에서 닫은 결함(적어 놓고 집행을 잊는 것)이 절로 자리만 옮겨 앉아 있었다.
+        # 요구하는 집합과 집행하는 집합을 여기서 맞춰 본다.
+        defects = section_defects(pol["packages"])
+        if defects:
+            raise PolicyError([f"정책표의 절 집행 선언이 성립하지 않는다 ({root}):"] + defects)
         _CACHE[key] = pol
     return _CACHE[key]
 

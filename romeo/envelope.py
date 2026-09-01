@@ -285,7 +285,40 @@ def repeat_gate(project_root, unit_id):
     return n
 
 
-def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, run_name=None):
+def dispatch_gate(project_root, unit_id, harness_root=None):
+    """구현 위임 직전의 집행. 차단이면 예외를 던져 계약을 만들지 못하게 한다.
+
+    두 가지를 본다.
+
+    **`dispatch` 에 걸린 차단.** `discovery-result` 가 여기 있다 — 조사 단위는 승인까지는 되고
+    **구현으로 넘어가는 자리**에서 막힌다. 승인에서 막던 동안 그 단위는 조사를 시작할 창구가 없었다.
+
+    **문서 패키지 전체의 미완료 토큰.** spec 하나가 아니라 charter·brief·spec 을 다 본다.
+    라우터가 요구한 절이 brief 로 가면 승인도 종료도 그것을 읽지 않았고, 「첫 마일스톤(spike)」가
+    빈 채로 구현이 나갔다(2026-09-01 실측). 승인 창구는 확인란 하나라는 규칙(D-60)은 그대로 두고,
+    **워커에게 넘기기 전에** 패키지가 채워졌는지를 여기서 본다 — 워커가 읽을 문서이기 때문이다."""
+    from .blocks import unit_docs
+    from .docs import unmet_blocks
+    udir = find_unit_dir(project_root, unit_id)
+    fm, body = frontmatter.read(udir / "spec.md")
+    unmet = unmet_blocks(unit_id, fm, body, udir, project_root=project_root, point="dispatch",
+                         policy=load_policy(harness_root))
+    if unmet:
+        raise ValueError(f"{unit_id}: 차단이 충족되지 않아 작업 계약을 만들지 않는다 — "
+                         + "; ".join(f"{b}: {why}" for b, why in unmet))
+    open_loops = []
+    for name, path in unit_docs(udir):
+        n = path.read_text(encoding="utf-8").count("NEEDS_INPUT")
+        if n:
+            open_loops.append(f"{path.name} {n}곳")
+    if open_loops:
+        raise ValueError(f"{unit_id}: 문서 패키지에 미완료가 남아 있어 작업 계약을 만들지 않는다 — "
+                         + " · ".join(open_loops)
+                         + ". 워커는 이 문서를 읽고 구현한다 — 빈칸을 넘기면 워커가 그것을 추측한다")
+
+
+def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, run_name=None,
+                   record_attempt=True):
     """계약을 작업 단위 폴더 안(`docs/work/<id>/task/`)에 쓴다 — 등록되지 않은 산출물은 종료 검사가 인정하지 않는다(K-62).
 
     **반복 중단 게이트가 여기서 걸린다**(`repeat_gate`). 계약을 계산하는 `build_envelope` 가 아니라 **쓰는** 자리에
@@ -293,6 +326,7 @@ def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     거기서 막으면 차단된 단위는 지난 관통의 판정조차 대조하지 못한다. 막아야 할 것은 **새 관통의 시작**이다."""
     project_root = Path(project_root).resolve()
     repeat_gate(project_root, unit_id)
+    dispatch_gate(project_root, unit_id, harness_root=harness_root)
     if role == "reviewer" and not run_name:
         # 검토 봉투는 계약 경로의 <run> 으로 자기 run 의 증거(방어 검사)에 묶인다 — run 없는 자리(task/reviewer.json)의 계약으로 낸
         # 판정은 종료 검사가 세지 않는다. 만들 수 있는 자리를 두면 함정이므로 여기서 거부한다.
@@ -303,4 +337,23 @@ def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     path = tdir / (f"{run_name}-{role}.json" if run_name else f"{role}.json")
     text = envelope_text(env)
     path.write_text(text, encoding="utf-8")
-    return {"path": str(path), "envelope": env, "sha256": sha256_bytes(text.encode("utf-8"))}
+    started = record_start(project_root, unit_id, run_name, env["base_sha"]) if (run_name and record_attempt) else None
+    return {"path": str(path), "envelope": env, "sha256": sha256_bytes(text.encode("utf-8")),
+            "attempt": started}
+
+
+def record_start(project_root, unit_id, run, base_sha):
+    """이 run 의 기동을 `attempts.yaml` 에 남긴다 — 이미 있으면 그대로 둔다(두 역할분 계약이 한 회차다).
+
+    회차를 만드는 창구가 `run-unit` 의 시작 경로뿐이던 동안, RUNBOOK §3 을 손으로 밟은 관통은
+    성공하든 실패하든 **회차가 하나도 남지 않았다**(Q-27). 그래서 §10 의 연속 2회 실패 차단이
+    그 경로에서 한 번도 세지 않았다 — 규칙은 문서에 있고 집행은 다른 경로에만 있었다.
+    반복 중단 게이트가 이 자리에 있는 것과 같은 이유로 회차 기록도 여기 둔다: **어느 경로로 돌리든 지난다.**"""
+    from .run_unit import load_attempts, save_attempts, start_attempt  # 순환 import 를 피해 여기서 부른다
+    data = load_attempts(project_root, unit_id)
+    for att in data.get("attempts") or []:
+        if att.get("run") == run:
+            return att
+    entry = start_attempt(data, run, base_sha)
+    save_attempts(project_root, unit_id, data)
+    return entry

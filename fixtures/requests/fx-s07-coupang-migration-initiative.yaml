@@ -32,7 +32,7 @@ expected:
   blocks:
   - spec-ready
   - milestone-plan
-  - approval-gate
+  - risk-plan-ready
   guards:
   - production-deploy
   - ops-data-change

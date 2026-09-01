@@ -191,12 +191,16 @@ def _spec_body(project_root, unit_id):
     return body or ""
 
 
-def _stage_contract(project_root, unit_id, run, base_sha, harness_root):
-    """① 작업 계약 생성. 두 역할분을 만든다 — 같은 입력이면 바이트까지 같은 계약이다."""
+def _stage_contract(project_root, unit_id, run, base_sha, harness_root, record=True):
+    """① 작업 계약 생성. 두 역할분을 만든다 — 같은 입력이면 바이트까지 같은 계약이다.
+
+    **회차 기록도 여기서 난다**(`envelope.record_start`). 이 함수가 부르는 `write_envelope` 가
+    그것을 소유하므로 `run_unit` 은 따로 시작하지 않는다 — 상태의 주인은 하나다(K-63).
+    두 역할분을 만들어도 회차는 하나다(같은 run 이면 기존 기록을 그대로 쓴다)."""
     built = []
     for role in ("implementer", "reviewer"):
         res = write_envelope(unit_id, role, project_root=project_root, harness_root=harness_root,
-                             base_sha=base_sha, run_name=run)
+                             base_sha=base_sha, run_name=run, record_attempt=record)
         built.append({"role": role, "path": res["path"], "sha256": res["sha256"],
                       "base_sha": res["envelope"]["base_sha"]})
     detail = " · ".join(f"{b['role']} {Path(b['path']).name} sha256 {b['sha256'][:12]}" for b in built)
@@ -361,12 +365,11 @@ def run_unit(unit_id, project_root=".", harness_root=None, run=None, base_sha=No
 
     # 계약을 만들기 전에 base_sha 를 확정한다 — 시도 기록에 남는 값과 계약의 값이 같아야 한다.
     stages = []
-    contract = _stage_contract(project_root, unit_id, run, base_sha, harness_root)
+    contract = _stage_contract(project_root, unit_id, run, base_sha, harness_root, record=record)
     resolved_base = contract["built"][0]["base_sha"]
     workspace = "worktree"
-    if record:
-        start_attempt(data, run, resolved_base)
-        save_attempts(project_root, unit_id, data)
+    # 회차는 계약 생성이 이미 남겼다(K-63) — 여기서 다시 쓰면 그 기록을 낡은 사본으로 덮는다.
+    data = load_attempts(project_root, unit_id)
 
     stages.append(contract)
     stages.append(_stage_delegate(unit_id, run, resolved_base, workspace, spawn, cwd=project_root))

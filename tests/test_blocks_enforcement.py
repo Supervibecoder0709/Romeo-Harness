@@ -3,6 +3,7 @@
 라우터가 계산해 카드에 인쇄까지 하던 차단이 아무것도 막지 않던 결함(2026-09-01 실측)을 고정한다.
 **막아야 할 입력이 실제로 막히는가**를 반례로 본다 — 통과만 보는 검사는 빈 검사다."""
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -13,6 +14,7 @@ from romeo import HARNESS_ROOT, frontmatter
 from romeo import blocks
 from romeo.close import close_unit
 from romeo.docs import approve_unit, create_unit
+from romeo.envelope import write_envelope
 from romeo.evidence import run_command
 from romeo.policy import PolicyError, load_policy, route
 from romeo.util import dump_yaml, load_yaml
@@ -70,10 +72,31 @@ class _Repo(unittest.TestCase):
         fm, body = frontmatter.read(path)
         frontmatter.write(path, fm, body.replace("NEEDS_INPUT", "채움"))
 
-    def set_inputs(self, spec, items):
-        fm, body = frontmatter.read(spec)
+    def set_inputs(self, doc, items, create=True):
+        """`inputs:` 를 그 문서에 붙인다. `create` 면 가리키는 경로도 실제로 만든다 —
+        차단이 경로 실재를 보므로, 없는 경로를 붙이는 것은 붙이지 않은 것과 같다."""
+        fm, body = frontmatter.read(doc)
         fm["inputs"] = list(items)
-        frontmatter.write(spec, fm, body)
+        frontmatter.write(doc, fm, body)
+        if create:
+            for it in items:
+                it = str(it).strip()
+                if not it or it.startswith(("http://", "https://")):
+                    continue
+                target = (Path(doc).parent / it.split("#")[0]).resolve()
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if not target.exists():
+                    target.write_text("조사 결과(테스트)\n", encoding="utf-8")
+
+    def research_doc(self, files):
+        """조사 결과가 붙는 정본 문서 — brief 가 있으면 brief, 없으면 charter(카탈로그의 reads)."""
+        return files.get("brief.md") or files.get("charter.md")
+
+    def fill_package(self, files):
+        """spec 밖의 패키지 문서를 채운다 — 미완료 검사가 패키지 전체를 본다."""
+        for name, path in files.items():
+            if name != "spec.md":
+                self.fill_doc(path)
 
     def unblank_section(self, path, title, marker="채움"):
         """채워 둔 절 하나를 다시 미완료로 되돌린다 — 그 차단 하나만 어긋난 반례를 만든다."""
@@ -96,7 +119,7 @@ class TestBlockCatalog(_Repo):
 
     def test_catalog_exists_with_the_four_blocks(self):
         cat = blocks.catalog(self.pk)
-        self.assertEqual(sorted(cat), ["approval-gate", "discovery-result", "milestone-plan", "spec-ready"])
+        self.assertEqual(sorted(cat), ["discovery-result", "milestone-plan", "risk-plan-ready", "spec-ready"])
         for bid, meta in cat.items():
             self.assertTrue(meta.get("title"), bid)
             self.assertTrue(meta.get("requires"), bid)
@@ -104,7 +127,7 @@ class TestBlockCatalog(_Repo):
 
     def test_every_used_block_is_in_catalog_and_in_enforcement(self):
         used = blocks.used_blocks(self.pk)
-        self.assertEqual(sorted(used), ["approval-gate", "discovery-result", "milestone-plan", "spec-ready"])
+        self.assertEqual(sorted(used), ["discovery-result", "milestone-plan", "risk-plan-ready", "spec-ready"])
         for bid in used:
             self.assertIn(bid, blocks.catalog(self.pk))
             self.assertIn(bid, blocks.BLOCK_CHECKS)
@@ -119,7 +142,7 @@ class TestBlockCatalog(_Repo):
         self.assertEqual(route(cls())["blocks"], ["spec-ready"])
         self.assertEqual(route(cls(unit="T2"))["blocks"], ["spec-ready", "milestone-plan"])
         self.assertIn("discovery-result", route(cls(unit="T1", mode="discovery"))["blocks"])
-        self.assertIn("approval-gate", route(cls(facets=["copy", "legal"], gates=["legal"]))["blocks"])
+        self.assertIn("risk-plan-ready", route(cls(facets=["copy", "legal"], gates=["legal"]))["blocks"])
 
     def test_unknown_block_id_is_not_silently_satisfied(self):
         with self.assertRaises(KeyError):
@@ -169,10 +192,26 @@ class TestCatalogMappingMismatch(unittest.TestCase):
 
     def test_unknown_enforcement_point_fails_the_load(self):
         def bad_point(data):
-            data["blocks"]["spec-ready"]["enforced_at"] = ["dispatch"]
+            data["blocks"]["spec-ready"]["enforced_at"] = ["merge"]
         with self.assertRaises(PolicyError) as ctx:
             load_policy(self._harness(bad_point))
-        self.assertIn("dispatch", "\n".join(ctx.exception.args[0]))
+        self.assertIn("merge", "\n".join(ctx.exception.args[0]))
+
+    def test_two_enforcement_points_fail_the_load(self):
+        """막기 시작하는 사건은 하나다 — 일괄 배치는 이름과 실제를 갈라 놓는다."""
+        def blanket(data):
+            data["blocks"]["spec-ready"]["enforced_at"] = ["approve", "close"]
+        with self.assertRaises(PolicyError) as ctx:
+            load_policy(self._harness(blanket))
+        self.assertIn("하나", "\n".join(ctx.exception.args[0]))
+
+    def test_missing_reads_fails_the_load(self):
+        """정본 입력 문서를 적지 않으면 무엇을 읽을지 정해지지 않는다."""
+        def no_reads(data):
+            data["blocks"]["spec-ready"].pop("reads")
+        with self.assertRaises(PolicyError) as ctx:
+            load_policy(self._harness(no_reads))
+        self.assertIn("reads", "\n".join(ctx.exception.args[0]))
 
 
 class TestApproveRejectsUnsatisfied(_Repo):
@@ -186,7 +225,7 @@ class TestApproveRejectsUnsatisfied(_Repo):
         with self.assertRaises(ValueError) as ctx:
             approve_unit(unit, "tester", project_root=self.root)
         msg = str(ctx.exception)
-        self.assertIn("approval-gate", msg)
+        self.assertIn("risk-plan-ready", msg)
         self.assertIn("위험·백업·복구", msg)
         self.fill_doc(spec)
         self.assertEqual(approve_unit(unit, "tester", project_root=self.root)["status"], "active")
@@ -222,11 +261,17 @@ class TestApproveRejectsUnsatisfied(_Repo):
         unit, files = self.make(cls(unit="T2", mode="discovery"), "many")
         spec = files["spec.md"]
         self.fill_spec(spec)
+        # spec-ready 도 함께 미충족으로 만든다 — 확인란은 채워져 있는데 수용 기준이 없는 모양이다
+        # (NEEDS_INPUT 을 되돌리면 approve 가 차단 판정 **전에** 거부해 메시지가 하나만 나온다).
+        fm, body = frontmatter.read(spec)
+        frontmatter.write(spec, fm, re.sub(r"^\s*- \[[ xX]\] AC-1.*$", "  - (없음)", body, flags=re.M))
         with self.assertRaises(ValueError) as ctx:
             approve_unit(unit, "tester", project_root=self.root)
         msg = str(ctx.exception)
         self.assertIn("milestone-plan", msg)
-        self.assertIn("discovery-result", msg)
+        self.assertIn("spec-ready", msg)
+        # discovery-result 는 승인이 아니라 위임에서 막는다 — 승인 메시지에 나오면 순환이다.
+        self.assertNotIn("discovery-result", msg)
 
 
 class TestDiscoveryResultNeedsInputs(_Repo):
@@ -238,26 +283,57 @@ class TestDiscoveryResultNeedsInputs(_Repo):
         self.spec = self.files["spec.md"]
         self.fill_spec(self.spec)
 
-    def test_empty_inputs_blocks_approval(self):
+    def test_empty_inputs_does_not_block_approval(self):
+        """조사 단위는 조사 결과 없이도 **승인은 된다** — 승인에서 막으면 조사를 시작할 창구가 없다."""
+        fm = approve_unit(self.unit, "tester", project_root=self.root)
+        self.assertEqual(fm["status"], "active")
+
+    def test_empty_inputs_blocks_dispatch(self):
+        approve_unit(self.unit, "tester", project_root=self.root)
+        self.fill_package(self.files)
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "approve", cwd=self.root)
         with self.assertRaises(ValueError) as ctx:
-            approve_unit(self.unit, "tester", project_root=self.root)
+            write_envelope(self.unit, "implementer", project_root=self.root, run_name="run-d")
         msg = str(ctx.exception)
         self.assertIn("discovery-result", msg)
         self.assertIn("inputs:", msg)
         self.assertIn("K-62", msg)
-        self.assertEqual(frontmatter.read(self.spec)[0]["status"], "draft")
+        self.assertFalse((Path(self.spec).parent / "task").exists(), "막혔는데 계약이 쓰였다")
 
     def test_blank_entries_do_not_count_as_inputs(self):
-        self.set_inputs(self.spec, ["   ", ""])
-        with self.assertRaises(ValueError) as ctx:
-            approve_unit(self.unit, "tester", project_root=self.root)
-        self.assertIn("discovery-result", str(ctx.exception))
+        self.set_inputs(self.research_doc(self.files), ["   ", ""])
+        ok, why = blocks.satisfied("discovery-result", Path(self.spec).parent, {}, "",
+                                   {"reads": "brief|charter"})
+        self.assertFalse(ok)
+        self.assertIn("inputs:", why)
 
-    def test_linked_research_unblocks_approval(self):
-        self.set_inputs(self.spec, ["../../research/2026-09-01-discord-computer-use.md"])
-        fm = approve_unit(self.unit, "tester", project_root=self.root)
-        self.assertEqual(fm["status"], "active")
-        self.assertIsNotNone(fm["approved_at"])
+    def test_a_link_to_a_path_that_does_not_exist_does_not_count(self):
+        """그럴듯한 거짓 값 — 경로 모양이지만 없는 파일. 빈 값만 막는 검사는 이것을 통과시킨다."""
+        self.set_inputs(self.research_doc(self.files), ["../../research/없는파일.md"], create=False)
+        ok, why = blocks.satisfied("discovery-result", Path(self.spec).parent, {}, "",
+                                   {"reads": "brief|charter"})
+        self.assertFalse(ok)
+        self.assertIn("없는파일", why)
+
+    def test_a_string_that_is_not_a_path_does_not_count(self):
+        self.set_inputs(self.research_doc(self.files), ["ㅁㄴㅇㄹ"], create=False)
+        ok, why = blocks.satisfied("discovery-result", Path(self.spec).parent, {}, "",
+                                   {"reads": "brief|charter"})
+        self.assertFalse(ok)
+
+    def test_a_link_on_the_spec_does_not_count(self):
+        """정본은 조사 계획이 사는 문서다 — spec 에 붙인 링크로는 충족되지 않는다."""
+        self.set_inputs(self.spec, ["../../research/x.md"])
+        ok, _why = blocks.satisfied("discovery-result", Path(self.spec).parent, {}, "",
+                                    {"reads": "brief|charter"})
+        self.assertFalse(ok)
+
+    def test_a_real_link_on_the_research_doc_counts(self):
+        self.set_inputs(self.research_doc(self.files), ["../../research/2026-09-01-discord.md"])
+        ok, why = blocks.satisfied("discovery-result", Path(self.spec).parent, {}, "",
+                                   {"reads": "brief|charter"})
+        self.assertTrue(ok, why)
 
     def test_delivery_unit_is_not_touched_by_this_block(self):
         unit, files = self.make(cls(unit="T1"), "delivery")
@@ -311,6 +387,7 @@ class _Closable(_Repo):
         unit, files = self.make(classification, slug)
         spec = files["spec.md"]
         self.fill_spec(spec)
+        self.fill_package(files)
         if before_approve:
             before_approve(spec, files)
         approve_unit(unit, "tester", project_root=self.root)
@@ -338,8 +415,8 @@ class TestCloseReportsBlockSatisfied(_Closable):
         self.assertEqual(res["verdict"], "PASS", [c for c in res["checks"] if not c["ok"]])
 
     def test_every_block_on_the_unit_gets_a_row(self):
-        def link(spec, _files):
-            self.set_inputs(spec, ["../../research/x.md"])
+        def link(_spec, files):
+            self.set_inputs(self.research_doc(files), ["../../research/x.md"])
         unit, _spec, _files = self.prepare(cls(unit="T1", mode="discovery"), "t1-close", before_approve=link)
         res = close_unit(unit, project_root=self.root, dry_run=True, rerun=False)
         got = sorted(r["detail"].split(":")[0] for r in self.rows(res))
@@ -347,10 +424,10 @@ class TestCloseReportsBlockSatisfied(_Closable):
         self.assertTrue(all(r["ok"] for r in self.rows(res)), self.rows(res))
 
     def test_close_fails_when_a_block_breaks_after_approval(self):
-        def link(spec, _files):
-            self.set_inputs(spec, ["../../research/x.md"])
-        unit, spec, _files = self.prepare(cls(unit="T1", mode="discovery"), "t1-break", before_approve=link)
-        self.set_inputs(spec, [])
+        def link(_spec, files):
+            self.set_inputs(self.research_doc(files), ["../../research/x.md"])
+        unit, spec, files = self.prepare(cls(unit="T1", mode="discovery"), "t1-break", before_approve=link)
+        self.set_inputs(self.research_doc(files), [])
         res = close_unit(unit, project_root=self.root, dry_run=True, rerun=False)
         broken = [r for r in self.rows(res) if not r["ok"]]
         self.assertEqual(len(broken), 1, self.rows(res))

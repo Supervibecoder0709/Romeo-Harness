@@ -12,6 +12,7 @@ from romeo import HARNESS_ROOT, frontmatter
 from romeo import blocks
 from romeo.close import close_unit
 from romeo.docs import approve_unit, create_unit
+from romeo.envelope import write_envelope
 from romeo.evidence import run_command
 from romeo.policy import load_policy, load_project_state, route
 from romeo.util import load_yaml
@@ -23,6 +24,9 @@ T2_FX = HARNESS_ROOT / "fixtures/requests/fx-s16-edu-webapp-new.yaml"
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
 SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
 RESEARCH_LINK = "../../research/2026-09-01-discord-computer-use.md"
+#: 그럴듯한 거짓 값 — 경로 모양이지만 저장소에 없는 파일. 빈 값만 막는 검사는 이것을 통과시킨다.
+#: 이 런북의 이전 판이 실제로 그랬다: 여기 적힌 경로는 한 번도 존재한 적이 없는데 승인이 통과했다.
+MISSING_LINK = "../../research/없는파일.md"
 
 
 def git(*args, cwd):
@@ -67,10 +71,20 @@ class TestScenario3(unittest.TestCase):
         fm, body = frontmatter.read(path)
         frontmatter.write(path, fm, body.replace("NEEDS_INPUT", "채움"))
 
-    def set_inputs(self, spec, items):
-        fm, body = frontmatter.read(spec)
+    def set_inputs(self, doc, items, create=True):
+        """`inputs:` 를 붙이고, `create` 면 가리키는 경로도 실제로 만든다."""
+        fm, body = frontmatter.read(doc)
         fm["inputs"] = list(items)
-        frontmatter.write(spec, fm, body)
+        frontmatter.write(doc, fm, body)
+        if create:
+            for it in items:
+                target = (Path(doc).parent / str(it).split("#")[0]).resolve()
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("조사 결과(테스트)\n", encoding="utf-8")
+
+    def commit(self, msg="c"):
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", msg, cwd=self.root)
 
     # ── 런북 자체 ────────────────────────────────────────────────────────────
     def test_runbook_files_exist_with_the_five_sections(self):
@@ -98,24 +112,71 @@ class TestScenario3(unittest.TestCase):
         self.assertEqual(sorted(files), ["brief.md", "spec.md"])
         self.assertIn("## 조사·가설·검증 계획", files["brief.md"].read_text(encoding="utf-8"))
 
-    # ── 단계 3~4: 조사 없이 승인되지 않는다 ──────────────────────────────────
-    def test_step3_approval_is_refused_without_research_inputs(self):
-        unit, files = self.create(self.discovery, "discovery-block")
+    # ── 단계 3~4: 조사는 승인까지 열리고 구현 위임에서 막힌다 ────────────────
+    def _approved_discovery(self, slug="discovery-block"):
+        unit, files = self.create(self.discovery, slug)
         self.fill_spec(files["spec.md"])
+        self.fill_doc(files["brief.md"])
+        return unit, files
+
+    def test_step3a_approval_is_not_refused_without_research(self):
+        """조사 단위는 조사 결과 없이도 **승인은 된다** — 승인에서 막으면 조사를 시작할 창구가 없다.
+        차단이 `[approve, close]` 로 일괄 배치돼 있던 동안 이 자리가 순환이었다."""
+        unit, files = self._approved_discovery()
+        fm = approve_unit(unit, "tester", project_root=self.root)
+        self.assertEqual(fm["status"], "active")
+
+    def test_step3b_dispatch_is_refused_without_research_inputs(self):
+        """**막는 것이 판정이다.** 조사 결과 없이 작업 계약이 만들어지면 이 시나리오는 실패다."""
+        unit, files = self._approved_discovery()
+        approve_unit(unit, "tester", project_root=self.root)
+        self.commit("approve")
         with self.assertRaises(ValueError) as ctx:
-            approve_unit(unit, "tester", project_root=self.root)
+            write_envelope(unit, "implementer", project_root=self.root, run_name="run-s3")
         msg = str(ctx.exception)
         self.assertIn("discovery-result", msg)
         self.assertIn("inputs:", msg)
-        self.assertEqual(frontmatter.read(files["spec.md"])[0]["status"], "draft")
+        self.assertFalse((files["spec.md"].parent / "task").exists(), "막혔는데 계약이 쓰였다")
 
-    def test_step4_linking_the_research_output_unblocks_approval(self):
+    def test_step3c_a_link_to_a_missing_path_is_still_refused(self):
+        """그럴듯한 거짓 값 — 경로 모양이지만 없는 파일. 빈 값만 막는 검사는 여기서 통과한다."""
+        unit, files = self._approved_discovery()
+        self.set_inputs(files["brief.md"], [MISSING_LINK], create=False)
+        approve_unit(unit, "tester", project_root=self.root)
+        self.commit("approve")
+        with self.assertRaises(ValueError) as ctx:
+            write_envelope(unit, "implementer", project_root=self.root, run_name="run-s3")
+        self.assertIn("없는파일", str(ctx.exception))
+
+    def test_step3d_a_link_on_the_spec_is_still_refused(self):
+        """정본은 조사 계획이 사는 문서(brief)다 — spec 에 붙인 링크로는 열리지 않는다."""
+        unit, files = self._approved_discovery()
+        self.set_inputs(files["spec.md"], [RESEARCH_LINK])
+        approve_unit(unit, "tester", project_root=self.root)
+        self.commit("approve")
+        with self.assertRaises(ValueError):
+            write_envelope(unit, "implementer", project_root=self.root, run_name="run-s3")
+
+    def test_step4_linking_the_research_output_unblocks_dispatch(self):
+        unit, files = self._approved_discovery()
+        self.set_inputs(files["brief.md"], [RESEARCH_LINK])
+        approve_unit(unit, "tester", project_root=self.root)
+        self.commit("approve")
+        res = write_envelope(unit, "implementer", project_root=self.root, run_name="run-s3")
+        self.assertTrue(Path(res["path"]).is_file())
+        # 회차도 함께 남는다 — 손으로 §3 을 밟은 관통이 기록되지 않던 자리다(Q-27).
+        self.assertEqual(res["attempt"]["run"], "run-s3")
+
+    def test_step4b_an_unfilled_brief_still_blocks_dispatch(self):
+        """라우터가 요구한 절(첫 마일스톤 spike)이 brief 에 빈 채로 남아 있으면 위임하지 않는다."""
         unit, files = self.create(self.discovery, "discovery-block")
         self.fill_spec(files["spec.md"])
-        self.set_inputs(files["spec.md"], [RESEARCH_LINK])
-        fm = approve_unit(unit, "tester", project_root=self.root)
-        self.assertEqual(fm["status"], "active")
-        self.assertEqual(fm["inputs"], [RESEARCH_LINK])
+        self.set_inputs(files["brief.md"], [RESEARCH_LINK])
+        approve_unit(unit, "tester", project_root=self.root)
+        self.commit("approve")
+        with self.assertRaises(ValueError) as ctx:
+            write_envelope(unit, "implementer", project_root=self.root, run_name="run-s3")
+        self.assertIn("brief.md", str(ctx.exception))
 
     # ── 단계 5~7: T2 는 마일스톤 계획 없이 열리지 않는다 ─────────────────────
     def test_step5_t2_package_starts_with_a_charter(self):
@@ -140,7 +201,8 @@ class TestScenario3(unittest.TestCase):
     def _closable_discovery(self):
         unit, files = self.create(self.discovery, "discovery-block")
         self.fill_spec(files["spec.md"])
-        self.set_inputs(files["spec.md"], [RESEARCH_LINK])
+        self.fill_doc(files["brief.md"])
+        self.set_inputs(files["brief.md"], [RESEARCH_LINK])
         approve_unit(unit, "tester", project_root=self.root)
         (self.root / "impl.txt").write_text("impl\n", encoding="utf-8")
         git("add", ".", cwd=self.root)
@@ -149,11 +211,20 @@ class TestScenario3(unittest.TestCase):
         return unit, files
 
     def test_step8_close_reports_one_block_satisfied_row_per_block(self):
+        """**종료는 backstop 이다** — 막기 시작하는 사건은 차단마다 하나지만, 걸린 차단은 전부 다시 본다."""
         unit, _files = self._closable_discovery()
         res = close_unit(unit, project_root=self.root, dry_run=True, rerun=False)
         rows = [c for c in res["checks"] if c["id"] == "BLOCK_SATISFIED"]
         self.assertEqual(sorted(r["detail"].split(":")[0] for r in rows), ["discovery-result", "spec-ready"])
         self.assertTrue(all(r["ok"] for r in rows), rows)
+
+    def test_step8b_close_catches_a_block_that_broke_after_dispatch(self):
+        """위임에서 막는 차단도 종료에서 다시 본다 — 링크를 지우면 close 가 잡는다."""
+        unit, files = self._closable_discovery()
+        self.set_inputs(files["brief.md"], [], create=False)
+        res = close_unit(unit, project_root=self.root, dry_run=True, rerun=False)
+        bad = [c for c in res["checks"] if c["id"] == "BLOCK_SATISFIED" and not c["ok"]]
+        self.assertTrue(any("discovery-result" in c["detail"] for c in bad), res["checks"])
 
     def test_step9_a_done_unit_is_not_re_judged(self):
         # T1 은 검토자가 붙어 close 가 PASS 하지 않으므로, 소급 금지는 done 을 만들 수 있는 T0 로 본다.

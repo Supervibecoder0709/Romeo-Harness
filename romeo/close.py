@@ -328,8 +328,9 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     # 승인되지 않은 가드가 걸린 단위에서 그것을 먼저 돌리면 K-66(승인 없이 실행하지 않는다)을 어긴다.
     # dry-run 도 마찬가지다 — 읽기만 한다고 알려진 명령이 부작용을 내면 안 된다.
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
-    # 차단(blocks) — 라우터가 이 단위에 건 차단마다 충족 여부를 판정한다. 승인에서 한 번 보고 여기서 다시 보는 이유는
-    # 승인 뒤에 조건이 무너질 수 있기 때문이다(조사 링크를 지우거나 마일스톤 절을 비우는 것).
+    # 차단(blocks) — **종료는 backstop 이다.** 차단마다 막기 시작하는 사건은 하나지만(approve 또는 dispatch),
+    # 여기서는 걸린 차단을 **전부** 다시 본다. 승인이나 위임 뒤에 조건이 무너지는 것(조사 링크를 지우거나
+    # 마일스톤 절을 비우는 것)을 잡을 자리가 이것 하나뿐이기 때문이다.
     # **이미 done 인 단위에는 소급하지 않는다** — 그 단위는 닫힐 때의 규칙으로 이미 닫혔고, 지금 다시 막을 것이 없다.
     if fm.get("status") != "done":
         for bid, ok, why in evaluate_blocks(pol["packages"], out["blocks"], "close", udir, fm, body):
@@ -365,7 +366,13 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     for w in approval_chain_warnings(project_root, unit_id):
         # 차단이 아니라 경고다 — 옛 방식의 재승인도 같은 모양이고, 승인 사건을 기계가 확인할 형태는 사용자 결정이다(체크리스트 45).
         check("APPROVAL_CHAIN", False, w, level="warning")
-    check("NO_OPEN_LOOP", "NEEDS_INPUT" not in body, f"NEEDS_INPUT {body.count('NEEDS_INPUT')}곳")
+    # 미완료는 spec 하나가 아니라 **문서 패키지 전체**를 본다. brief 를 아무 집행도 읽지 않던 동안
+    # 라우터가 필수라고 판정한 절(조사 계획의 첫 마일스톤·UI 상태표·실험 설계)이 그리로 가
+    # 빈 채로 승인되고 빈 채로 닫혔다(2026-09-01 실측).
+    from .blocks import unit_docs
+    loops = [(pp.name, pp.read_text(encoding="utf-8").count("NEEDS_INPUT")) for _n, pp in unit_docs(udir)]
+    loops = [(n, c) for n, c in loops if c]
+    check("NO_OPEN_LOOP", not loops, " · ".join(f"{n} NEEDS_INPUT {c}곳" for n, c in loops))
     check("HAS_CHANGE", bool(ev.get("changed_files")), f"changed_files {ev.get('changed_files')}" if ev.get("changed_files") else "changed_files 가 비어 있다 — 아무것도 바뀌지 않았다면 done 이 아니다")
     spec_sha = sha256_file(spec)
     spec_same = (ev.get("spec_ref") or {}).get("sha256") == spec_sha
