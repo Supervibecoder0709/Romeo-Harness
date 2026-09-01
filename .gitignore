@@ -14,3 +14,11 @@ _bmad/
 _bmad-output/
 .claude/skills/bmad-*
 .agents/skills/bmad-*
+
+# 작업 계약(task envelope) — 커밋하지 않는다.
+# 계약은 승인된 spec.md 에서 **재계산되는 파생물**이라 이력에 없어도 앵커가 선다:
+# romeo/close.py 의 _task_anchor 는 작업 트리의 계약을 읽고 base_sha 커밋의 승인 원본에서
+# 다시 만들어 바이트로 대조한다(커밋 조회가 아니다). 반대로 커밋하면, 위임한 쪽(RUNBOOK §3.3)과
+# 워커 워크트리(§3.5.1)가 같은 경로에 각각 만들어 통합할 때 git merge --ff-only 가 거부된다(Q-14).
+# 이미 커밋된 계약은 그대로 추적된다 — 이 규칙은 소급하지 않고, 이력을 다시 쓰지 않는다.
+docs/work/*/task/

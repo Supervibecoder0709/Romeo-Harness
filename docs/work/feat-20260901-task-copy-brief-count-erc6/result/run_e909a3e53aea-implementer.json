@@ -1,0 +1,86 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-task-copy-brief-count-erc6",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-task-copy-brief-count-erc6/task/run_e909a3e53aea-implementer.json",
+    "sha256": "13a35751d96f32c0a541e39f6e302a7e13a1b46734d649e1f98b26be7e950de2"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "git check-ignore -q docs/work/feat-20260901-task-copy-brief-count-erc6/task/run_probe-implementer.json",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "git check-ignore -q docs/work/feat-00000000-any-unit-zzzz/task/run_x-reviewer.json",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "test -n \"$(ls docs/work/feat-20260901-task-copy-brief-count-erc6/task 2>/dev/null)\" && test -z \"$(git ls-files docs/work/feat-20260901-task-copy-brief-count-erc6/task/)\" && test -z \"$(git status --porcelain --untracked-files=all docs/work/feat-20260901-task-copy-brief-count-erc6/task/)\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "git ls-files --error-unmatch docs/work/feat-20260829-license-field-46an/task/run_31e175742892-implementer.json",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "! grep -qE '[0-9]+건' adapters/orca/prompts/implementer-brief.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -q 'required_checks' adapters/orca/prompts/implementer-brief.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest tests.test_task_artifact_policy",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep '^| Q-14 |' docs/planning/open-questions.md | grep -q 해소",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo fixtures parity --report",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260901-task-copy-brief-count-erc6/evidence/run_e909a3e53aea.yaml",
+  "notes": "required_checks 14건 전부 exit 0 — 근거는 run_e909a3e53aea 의 check-1~check-14 기록이다. 구현은 네 곳이다: (1) .gitignore 에 `docs/work/*/task/` 규칙과 이유 주석, (2) tests/test_task_artifact_policy.py 신규(TestTaskEnvelopeNotTracked · TestImplementerBriefNoCheckCount · TestRunbookTaskCopyNotCommitted, 12건), (3) adapters/orca/prompts/implementer-brief.md 12행에서 검사 개수(「6건」) 제거 — required_checks 를 가리키는 문장은 유지, (4) adapters/orca/RUNBOOK.md §3.3 에 사본 비커밋 문단, docs/planning/open-questions.md 의 Q-14 해소 갱신. AC-3(이미 커밋된 계약은 추적에서 빠지지 않는다)의 근거는 check-4 와 `git ls-files 'docs/work/*/task/*' | wc -l` = 67 이다 — git rm --cached 를 쓰지 않았고 이력을 다시 쓰지 않았다. AC-2 의 근거는 check-7 안의 test_task_anchor_passes_while_the_contract_is_untracked 로, romeo/close.py 의 _task_anchor 가 추적되지 않는 계약으로도 통과한다는 것을 임시 저장소에서 실행해 확인한다. 이 run 의 계약 사본(task/)은 이제 제외 규칙에 걸려 git status 에 나오지 않는다 — check-3 가 그것을 판정한다. 실패한 검사는 없다."
+}

@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-01T14:03:00+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-01T14:21:47+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_e909a3e53aea.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -39,12 +39,12 @@ updated: '2026-09-01'
 - **왜 지금:** 둘 다 **다음 관통에서 또 걸린다.** ①은 직전 관통에서 실제로 걸려 재승인 커밋을 `amend` 로 다시 만들었고(`f53d096` → `82a8191`), ②는 이번 검사가 15건이라 `sed` 로 문장을 고쳐 넘겼다. 코어 규칙 §10 은 관통 **중에는** 하네스를 못 고치게 하므로, 고칠 수 있는 구간은 관통과 관통 사이인 지금뿐이다. M3 는 앞으로 관통을 더 돈다.
 - **기대 결과:** 위임한 쪽과 워커 쪽이 같은 경로에 계약을 각각 만들어도 통합이 `--ff-only` 로 그대로 지나간다. 구현자 절차 문서를 검사 개수 때문에 고칠 일이 없어진다.
 - **수용 기준:**
-  - [ ] AC-1 **새로 만들어지는 작업 계약은 git 추적 대상이 아니다** — 임의 작업 단위의 `docs/work/<id>/task/<run>-<role>.json` 을 `git check-ignore` 가 제외로 판정하고, 이 단위 폴더에 **실재하는** 계약이 `git status` 의 untracked 목록(`??`)에 나오지 않는다.
-  - [ ] AC-2 **그런데도 종료 검사는 성립한다** — 계약 파일이 추적되지 않는 상태에서도 `romeo close` 의 작업 계약 앵커가 통과한다는 것이 반례 테스트로 고정된다. (앵커는 커밋 조회가 아니라 **승인 원본에서의 재계산**이다 — `romeo/close.py` 의 `_task_anchor`)
-  - [ ] AC-3 **이미 커밋된 계약은 추적에서 빠지지 않는다** — 과거 단위의 계약 파일이 여전히 `git ls-files` 에 있다. 이력을 다시 쓰지 않는다.
-  - [ ] AC-4 `adapters/orca/prompts/implementer-brief.md` 에 **검사 개수를 고정한 표현이 없고**, 계약의 `required_checks` 를 가리키는 문장은 남아 있다 — 개수는 계약이 정하고 절차 문서는 그것을 가리키기만 한다.
-  - [ ] AC-5 `adapters/orca/RUNBOOK.md` §3.3 이 **이 사본을 커밋하지 않는다는 것과 그 이유**(계약은 승인 원본에서 재계산되는 파생물이다)를 적고, `docs/planning/open-questions.md` 의 `Q-14` 가 해소로 갱신된다.
-  - [ ] AC-6 기존 검사가 회귀하지 않는다 — unittest 전체와 `compile --check` · `validate` · `doctor --strict --scope repository` · `fixtures check` · `fixtures parity --report` 가 모두 종료 코드 0.
+  - [x] AC-1 **새로 만들어지는 작업 계약은 git 추적 대상이 아니다** — 임의 작업 단위의 `docs/work/<id>/task/<run>-<role>.json` 을 `git check-ignore` 가 제외로 판정하고, 이 단위 폴더에 **실재하는** 계약이 `git status` 의 untracked 목록(`??`)에 나오지 않는다.
+  - [x] AC-2 **그런데도 종료 검사는 성립한다** — 계약 파일이 추적되지 않는 상태에서도 `romeo close` 의 작업 계약 앵커가 통과한다는 것이 반례 테스트로 고정된다. (앵커는 커밋 조회가 아니라 **승인 원본에서의 재계산**이다 — `romeo/close.py` 의 `_task_anchor`)
+  - [x] AC-3 **이미 커밋된 계약은 추적에서 빠지지 않는다** — 과거 단위의 계약 파일이 여전히 `git ls-files` 에 있다. 이력을 다시 쓰지 않는다.
+  - [x] AC-4 `adapters/orca/prompts/implementer-brief.md` 에 **검사 개수를 고정한 표현이 없고**, 계약의 `required_checks` 를 가리키는 문장은 남아 있다 — 개수는 계약이 정하고 절차 문서는 그것을 가리키기만 한다.
+  - [x] AC-5 `adapters/orca/RUNBOOK.md` §3.3 이 **이 사본을 커밋하지 않는다는 것과 그 이유**(계약은 승인 원본에서 재계산되는 파생물이다)를 적고, `docs/planning/open-questions.md` 의 `Q-14` 가 해소로 갱신된다.
+  - [x] AC-6 기존 검사가 회귀하지 않는다 — unittest 전체와 `compile --check` · `validate` · `doctor --strict --scope repository` · `fixtures check` · `fixtures parity --report` 가 모두 종료 코드 0.
 - **위험과 되돌리기:** 위험은 **AC-2 의 전제가 틀리는 것** 하나다 — 계약을 커밋에서 빼는 것이 종료 검사를 망가뜨리면 완료 판정이 서지 않는다. 그래서 승인 전에 실측했다: `romeo/close.py` 의 `_task_anchor` 는 계약 파일을 **작업 트리에서** 읽고(`is_file()`·`read_bytes()`), 진짜 앵커는 `base_sha` 커밋의 승인된 `spec.md` 로 계약을 **다시 만들어 바이트 대조**하는 것이다 — 계약이 이력에 있을 필요가 없다. 2026-09-01 프로브로 규칙을 임시로 넣어 ①새 계약이 untracked 목록에서 사라지고 ②`check-ignore` 가 제외로 판정하며 ③이미 커밋된 계약은 그대로 추적되는 것을 확인하고 되돌렸다. **이번 관통 자체는 여전히 ①을 밟는다** — 규칙은 구현자가 넣으므로 이 단위의 승인·재승인 커밋에는 아직 없다. 그때는 알려진 우회(위임한 쪽 사본을 `git add` 하지 않는다)를 쓴다. 전부 이 저장소 안의 로컬 변경이고 외부 상태를 바꾸지 않으므로 되돌리기는 `git revert <커밋>` 한 번이다. 워크트리에서 작업하므로 통합 전에는 브랜치가 그대로 남는다.
 - **결정 필요:** 없음 — 강제 수단 후보 셋(승인 커밋 범위 제한 · `.gitignore` · 커밋 전 확인 검사) 중 `.gitignore` 로 확정했다. 근거는 위 「위험과 되돌리기」의 실측이다.
 
@@ -129,6 +129,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-01T14:21:47+09:00 · HEAD dc7b16108ebb · 검사 기록 run_e909a3e53aea
 
-- (없음)
+- [evidence/run_e909a3e53aea.yaml](evidence/run_e909a3e53aea.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
