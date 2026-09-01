@@ -17,13 +17,15 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `045ea08` · 2026-09-01)
+## 지금 상태 (기준 `344fc7e` · 2026-09-01)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline 045ea08..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline 344fc7e..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
 - **마일스톤:** M2 완료(2026-08-29 · D-76). **M3 진행 중** — G-M3 §6.1 1~5단계는 `a9e7af1` 로 닫혔다.
+  **정비 3회를 마친 뒤 M3 본체로 돌아와 시나리오 3 을 세웠다**(`feat-20260901-charter-discovery-block-a3xs` · 승인 `86c17ef` · 통합 `344fc7e` · **관통 1회차 close PASS**).
+  남은 M3 는 charter 를 쓰는 실제 T2 관통·MCP/브라우저 프로브(시나리오 8)·gate 집행(시나리오 9)이다.
   그 뒤 **관통 사이의 하네스 정비를 두 번 마쳤다** — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 통합 `fd7c7b9`),
   2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · **2회차 `run_fc79c4267d1c` 에서 close 통과** · `status: done` · 통합 `c945686`),
   3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차 `run_e909a3e53aea` 에서 close 통과** · `status: done` · 통합 `045ea08`).
@@ -96,11 +98,10 @@ authority: derived
   WARN 은 `REVIEW_SAMPLE` 하나이고 **D-75 (b) 가 1건으로 닫기로 확정한 것**이다.
   **계획 중에 실측이 가정 둘을 뒤집었다** — ②를 「`fill_brief.py` 가 개수를 세도록」 고치려 했으나 그 스크립트는 **검토자 브리프만** 채운다(구현자 브리프는 `sed`),
   ①의 `.gitignore` 안이 「provenance 가 준다」고 보았으나 앵커가 커밋 조회가 아니라 재계산이어서 그 대가가 없다.
-- **park 은 `Q-12`·`Q-13`·`Q-15`~`Q-17`·`Q-19`·`Q-23`·`Q-24`·`Q-26` 이다 — `Q-14` 가 정비 3회로 빠졌다.**
-  `Q-26` 은 위 ③ 이 **실측으로도 닫히지 않은 부분**이다 — 전환 뒤 인박스를 읽을 수 있다는 것까지는 봤지만,
+- **`Q-14` 는 정비 3회로 빠졌고, `Q-26` 은 실측으로도 닫히지 않은 부분이다** — 전환 뒤 인박스를 읽을 수 있다는 것까지는 봤지만,
   그 인박스에 워커가 실제로 보낸 메시지가 있을 때도 읽히는지는 보지 못했다(관측한 Run 은 비어 있었다).
-- **CI:** `b19f753` 까지 푸시돼 있고 그 시점 실행(`33466439591`) success — 정비 2회까지가 원격 CI 를 통과했다. **`dc7b161`~`045ea08`(정비 3회)은 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
-- **워크트리 1개 — 2026-09-01 에 여섯을 전부 정리했다.** 남은 것은 `mvp_planning` 과 원본 체크아웃(`main`) 뿐이다(495MB 회수).
+- **CI:** `de3f758`(정비 3회 + 워크트리 정리 기록)까지 푸시돼 있다 — 2026-09-01 사용자 승인으로 `b19f753..de3f758` 을 밀었다. **`86c17ef`~`344fc7e`(시나리오 3 단위)는 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
+- **워크트리 2개** — 2026-09-01 에 여섯을 정리해 `mvp_planning` 과 원본 체크아웃(`main`) 만 남았고(495MB 회수), 그 뒤 이 단위의 `impl-feat-20260901-charter-discovery-block-a3xs` 가 생겼다(**아직 살아 있다** — 통합은 끝났고 tip `344fc7e` 는 도달 가능하다).
   `impl-`·`impl2-`·`impl4-`·`impl5-feat-20260831-park-defects-actm` · `impl-feat-20260901-coordinator-procedure-gaps-y8fu` ·
   `impl-feat-20260901-task-copy-brief-count-erc6` 이 지워졌다.
   **지우기 전에 두 가지를 본다 — 커밋이 다른 ref 로 도달 가능한가, 그리고 미커밋 산출물이 있는가.** 여섯 중 셋은 tip 이 이미 도달 가능하고
@@ -112,6 +113,43 @@ authority: derived
   이전 세션의 `preserve/bmad-install-observe-a3bm-run1`~`run3` 도 같은 방식이다.
   **`orca worktree rm` 이 브랜치도 지운다는 서술은 조건부다** — 2026-09-01 의 `actm` 계열 셋은 응답에 `preservedBranch` 가 실려 **브랜치가 남았고**,
   같은 날 먼저 지운 셋에는 그 필드가 없었다. 무엇이 그 차이를 만드는지는 **미확인**이다. 그래서 도달 가능성 확인은 그대로 한다.
+- **시나리오 3 을 세우려고 열어 보니 그보다 앞선 결함이 있었다 — 차단이 계산만 되고 아무것도 막지 않았다.**
+  `romeo/policy.py` 가 `blocks`(`spec-ready`·`milestone-plan`·`discovery-result`·`approval-gate`)를 계산하고 `romeo/card.py:108` 이 카드에 인쇄하고
+  `romeo/fixtures.py:48` 이 fixture 와 대조하는데, **`romeo/close.py` 는 `guards` 만 읽고 `blocks` 는 한 번도 읽지 않았다.**
+  정책표와 카드에는 「차단 spec-ready」 라고 찍히는데 그 글자가 막는 것이 없었다. 그래서 이 단위의 중심을 charter 템플릿이 아니라 **집행**으로 잡았다.
+  | 무엇 | 어디 | 어떻게 |
+  | --- | --- | --- |
+  | 차단 카탈로그 | `core/policy/packages.yaml` 의 `blocks:` | 4건 각각 `title`·`enforced_at`·`requires`. 정책표를 읽으면 무엇이 언제 무엇을 요구하는지 한자리에 보인다 |
+  | 집행 매핑 | `romeo/blocks.py` `BLOCK_CHECKS` | 카탈로그·매핑·실사용 **세 집합이 어긋나면 `load_policy` 가 실패한다** — 새 차단을 적고 집행을 잊는 재발이 구조적으로 막힌다 |
+  | 승인 시점 | `romeo/docs.py` `approve_unit` | 미충족 차단을 이유와 함께 거부. 승인이 구현 착수의 유일한 선행 조건이므로(D-27) 여기가 「구현 dispatch 금지」의 정확한 자리다 |
+  | 완료 시점 | `romeo/close.py` | 차단마다 `BLOCK_SATISFIED`. 이미 `done` 인 단위에는 **평가 자체를 건너뛴다**(소급 금지) |
+  | T2 문서 | `core/templates/charter.md` | 「마일스톤 계획」 절이 `milestone-plan` 차단의 대상이다. 이 파일이 없어 그동안 T2 요청은 charter 없이 brief+spec 만 만들어졌다 |
+  | 시나리오 3 | `scenarios/README.md`·`scenarios/3-discovery-block.md` + `tests/test_scenario_3.py` | 런북과 그것을 자동 실행하는 테스트. `scenarios/` 디렉터리가 그동안 없었다 |
+- **구현자가 설계 두 곳을 근거와 함께 되돌렸다 — 둘 다 옳았다.**
+  ① `spec-ready` 에 「`required_checks` 1건 이상」을 넣었다가 뺐다. 그대로 두면 `tests/test_docs_evidence_close.py` 의
+  「검증 계획이 빈 spec 을 승인한 뒤 close 가 `REQUIRED_CHECK` 를 UNVERIFIED 로 인쇄하는지」 보는 검사가 **승인 단계에서** 깨진다 —
+  그 파일은 계약의 `allowed_paths` 밖이고 고쳐서도 안 되는 정당한 검사다. 빈 검증 계획은 close 의 `REQUIRED_CHECK(UNVERIFIED)` 가 계속 판정한다.
+  **같은 사실을 두 이름으로 막지 않는다.**
+  ② spec 의 구현 단위 5번이 「close 는 `done` 에서 맨 앞에서 반환한다」 고 적었는데 **실제 코드는 `NOT_ALREADY_DONE` 을 기록하고 계속 진행한다.**
+  소급 금지를 실제로 성립시키려면 차단 평가 자체를 건너뛰어야 했고 그렇게 구현했다. 계획의 서술이 틀렸던 것이다.
+- **관통 1회차가 통과한 근거.** required_checks **17/17 exit 0** · 재실행 대조 **17/17** · 봉투 앵커 **양쪽 5/5** ·
+  방어 검사 **유효**(before/after `log_sha256` 동일 `bc44db356ddc`) · 검토자(codex, read-only) **PASS · findings 0** · close **PASS**.
+  WARN 은 `REVIEW_SAMPLE` 하나이고 **D-75 (b) 가 1건으로 닫기로 확정한 것**이다.
+  `close` 출력에 **`BLOCK_SATISFIED — spec-ready: 확인란이 채워졌고 수용 기준 8건`** 이 실제로 찍혔다 — 이 단위가 만든 집행이 **자기 자신을 심사했다.**
+  통합 트리 회귀도 확인했다: `python3 -m unittest discover -s tests` **620건 OK**(정비 3회 시점 579건에서 41건 증가) · `doctor --strict --scope repository`·`fixtures check`·`compile --check`·`validate` 전부 exit 0.
+  **정비 3회가 `task/` 를 추적에서 뺀 효과가 두 번째로 확인됐다** — `git merge --ff-only` 가 이번에도 그대로 지나갔다.
+- **검토자 채택은 예상대로 실패했고, 그 실패가 RUNBOOK 의 기록과 같았다(Q-12 재확인).**
+  §3.7 (1) 의 TUI 터미널(`codex -s read-only -C <W> "$(cat 절차; cat 계약)"`)은 만들어졌으나 (2) 의 `worker-start --terminal` 이
+  **`state: failed` · `stage: dispatch_input`** 로 끝났다 — RUNBOOK §3.7 표 3행(프롬프트가 argv 에 있으면 주입이 갈 곳이 없다) 그대로다.
+  그런데 **검토 자체는 돌았다** — TUI 가 프롬프트를 argv 로 이미 받았기 때문이다. 그래서 채택을 포기하고 판정을 버리지 않았다:
+  RUNBOOK 이 적어 둔 대체 회수 경로(`~/.codex/sessions/<날짜>/rollout-*.jsonl` 의 `last_agent_message`)로 결과 계약 JSON 688바이트를 받아
+  `romeo review record` 로 봉인했고, 앵커 5개가 전부 PASS 였다. `worker-stop` 은 `alreadySettled: true` · `processAction: none` 을 냈다(터미널은 external 이라 건드리지 않는다).
+- **회차가 기록되지 않았다 — `Q-27` 로 연다.** close PASS 뒤 `bin/romeo run-unit record --result pass` 가
+  **「run 으로 시작한 시도가 attempts.yaml 에 없다 — 기동 기록 없이 판정만 남기지 않는다」** 로 거부했다(`romeo/run_unit.py:152`).
+  기동 기록을 만드는 창구가 `run-unit` 의 시작 경로뿐이라 **RUNBOOK §3 을 손으로 밟은 관통은 성공해도 회차가 남지 않는다.**
+  직전 단위(`feat-20260901-task-copy-brief-count-erc6`)에도 `attempts.yaml` 이 아예 없다 — 새 결함이 아니라 기존 구멍이다.
+  그래서 `AGENTS.core.md` §10 의 연속 2회 실패 차단은 **손 관통 경로에서 한 번도 세지 않는다.**
+- **park 은 `Q-12`·`Q-13`·`Q-15`~`Q-17`·`Q-19`·`Q-23`·`Q-24`·`Q-26`·`Q-27` 이다.**
 - **문서 지연:** 「미검증·남은 위험」은 맨 위 소절(M2 close 이후)만 최신이다.
 
 
@@ -122,7 +160,7 @@ authority: derived
 | M0 정책표·fixture·분류 카드 | **완료** | [원문](archive/milestones.md) |
 | M1 T0 최소 관통 (Claude 단독, 현재 작업 공간) | **완료** | [원문](archive/milestones.md) |
 | M2 어댑터·역할·Orca 위임·T1 교차 관통 | **완료 (2026-08-29 · D-76)** | [원문](archive/milestones.md) |
-| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 3회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0), 3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차** `run_e909a3e53aea` close · required_checks 14/14 · 재실행 14/14 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). M3 의 나머지(charter·MCP/브라우저 프로브·gate·시나리오 3·8·9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686`, `docs/work/feat-20260901-task-copy-brief-count-erc6/`(status done) 통합 `045ea08` |
+| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 3회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0), 3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차** `run_e909a3e53aea` close · required_checks 14/14 · 재실행 14/14 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **M3 본체로 돌아와 시나리오 3 을 세웠다** — `feat-20260901-charter-discovery-block-a3xs`(계산만 되던 `blocks` 를 승인·종료 두 지점에서 집행 · `core/templates/charter.md`(T2) · `scenarios/` 런북 · **관통 1회차** `run_d947edf2d24a` close PASS · required_checks 17/17 · 재실행 17/17 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). M3 의 나머지(charter 를 쓰는 실제 T2 관통 · MCP/브라우저 프로브=시나리오 8 · gate 집행=시나리오 9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686`, `docs/work/feat-20260901-task-copy-brief-count-erc6/`(status done) 통합 `045ea08`, `docs/work/feat-20260901-charter-discovery-block-a3xs/`(status done) 통합 `344fc7e` |
 | M4 ~ M7 | 미착수 | [원문](archive/milestones.md) |
 
 ## §10 체크리스트
