@@ -1,0 +1,20 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260901-scenario-8-capability-probe-s7ny
+attempts:
+- n: 1
+  run: run_s7ny01
+  base_sha: 10edf56d62842884e80a69d127ccc758e7166232
+  started_at: '2026-09-01T21:43:31+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+- n: 2
+  run: run_d39a49dc8849
+  base_sha: 10edf56d62842884e80a69d127ccc758e7166232
+  started_at: '2026-09-01T21:45:32+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []

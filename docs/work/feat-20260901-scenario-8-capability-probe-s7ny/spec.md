@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-01T21:42:52+09:00'
+approved_at: '2026-09-01T22:28:19+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,12 @@ routing:
   history: []
 created: '2026-09-01'
 updated: '2026-09-01'
+approval_history:
+- {approved_at: '2026-09-01T21:42:52+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T22:28:19+09:00',
+  reason: '변경 범위가 산문이라 allowed_paths 가 담지 못한 파일 8개를 백틱 경로로 명시한다 — 새 차단 capability-probed 를 추가하면 차단 목록을
+    하드코딩한 기존 검사 25건과 fixture 기대값 3건이 따라와야 하고, 차단 판정에 라우터 컨텍스트를 넘기려면 docs.py·close.py 의 호출부 배선이 필요하다. 함께
+    check-3 을 고친다: 종전 명령은 fixture 불일치 3건에도 exit 0 이라 아무것도 판정하지 않는 빈 검사였다(실측). 새 명령은 불일치 행이 있으면 실패한다 —
+    구현 전 트리 exit 0, 현재 구현 트리 exit 1 로 양쪽을 확인했다.'}
 ---
 
 # 없는 능력을 있는 것처럼 쓰는 것을 막는다 — 능력 프로브·부재 카드·시나리오 8
@@ -72,8 +78,13 @@ updated: '2026-09-01'
 - 바뀌는 파일·모듈: `core/policy/capabilities.yaml` · `core/policy/packages.yaml`(절 enforcement ·
   overlay · 차단 카탈로그) · `core/templates/sections/capability-check.md` · `adapters/*/adapter.yaml` ·
   `romeo/doctor.py`(프로브) · `romeo/policy.py`(능력 계산) · `romeo/card.py`(인쇄) ·
-  `romeo/blocks.py`(집행) · `scenarios/8-capability-absent.md` · `scenarios/README.md` ·
-  `tests/test_scenario_8.py` · 기존 테스트 중 이 출력에 걸리는 것.
+  `romeo/blocks.py`(집행) · `romeo/docs.py`(차단에 라우터 컨텍스트를 넘기는 배선) ·
+  `romeo/close.py`(같은 배선의 종료 검사 쪽 호출부) · `scenarios/8-capability-absent.md` ·
+  `scenarios/README.md` · `tests/test_scenario_8.py` · 새 차단이 추가되면 따라와야 하는 기존 검사와 fixture:
+  `tests/test_scenario_3.py` · `tests/test_enforce_points.py` · `tests/test_blocks_enforcement.py` ·
+  `fixtures/requests/fx-discord-computer-use-automation.yaml` ·
+  `fixtures/requests/fx-s07-coupang-migration-initiative.yaml` ·
+  `fixtures/requests/fx-account-migration-continue.yaml`.
 - 영향을 받는 부분: `browser-automation` facet 이 붙는 요청의 카드·spec·승인 판정. 다른 facet 은
   능력 목록이 비므로 차단이 걸리지 않는다.
 - 바꾸지 않는 것(비범위): 구현자·검토자 결과 봉투의 스키마(`BLOCKED_CAPABILITY` 는 이미 있다) ·
@@ -125,7 +136,7 @@ required_checks:
   - id: check-2
     command: "python3 -m unittest discover -s tests"
   - id: check-3
-    command: "bin/romeo route --fixtures fixtures/requests --report"
+    command: "! bin/romeo route --fixtures fixtures/requests --report | grep -q '✗'"
   - id: check-4
     command: "bin/romeo fixtures check"
   - id: check-5
