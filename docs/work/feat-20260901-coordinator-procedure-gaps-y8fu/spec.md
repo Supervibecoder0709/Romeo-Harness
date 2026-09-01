@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-09-01T10:19:36+09:00'
+approved_at: '2026-09-01T12:02:17+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,11 @@ routing:
   history: []
 created: '2026-09-01'
 updated: '2026-09-01'
+approval_history:
+- {approved_at: '2026-09-01T10:19:36+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T12:02:17+09:00',
+  reason: '1회차 검토자 findings 2건을 반영한다 — AC-5 에 관측을 실행에 묶으라는 요구를 더하고, check-8 을 세 결과 키(a_switch_back·b_read_after_switch·c_rejection_shape)
+    대조로 강화하며, probe 실행이 evidence 에 stdout_tail·log_sha256 으로 봉인됐는지 보는 check-15 를 더한다(14→15건). 산출물 범위와
+    나머지 AC 는 그대로다.'}
 ---
 
 # 코디네이터 위임 절차 결함 3건 정비 — 재검토 커밋·재작업 재위임·Run 바인딩
@@ -43,7 +48,7 @@ updated: '2026-09-01'
   - [ ] AC-2 그 확인이 두 경우를 **가른다** — 시도 기록이 아직 없는 단위는 통과시키고, 작업 트리에만 있고 커밋 밖에 있는 재검토는 거부한다. 반례로 고정한다.
   - [ ] AC-3 실행 순서 절에 **승인은 그대로인 채 재작업만 새 위임으로 붙이는 분기**가 있고, 새 Run 이 필요한 이유(한 run 은 한 위임이라는 증거 쪽 방어)와 밟을 순서가 함께 적혀 있다.
   - [ ] AC-4 실행 순서 절에 **Run 바인딩 전환**이 있다 — Run 을 둘 이상 만들었을 때 옛 Run 으로 되돌아가는 명령과, 지금 어디에 붙어 있는지 확인하는 명령.
-  - [ ] AC-5 AC-4 의 전환을 **실행으로 관측**해 그 결과를 관측 기록에 남긴다. 되는 것과 안 되는 것을 구분해 적는다.
+  - [ ] AC-5 AC-4 의 전환을 **실행으로 관측**해 그 결과를 관측 기록에 남긴다. 되는 것과 안 되는 것을 구분해 적고, **그 관측이 어느 실행에서 나왔는지 증거에 묶는다** — 관측 파일과 원시 로그가 모두 증거의 제외 경로라, 파일만으로는 그것이 그 실행에서 나왔다고 말할 수 없다(1회차 검토자 findings 2).
   - [ ] AC-6 세 결함이 「지금 상태」 블록의 임시 메모에서 벗어나 **이 단위의 산출물로 추적된다** — 상태 블록과 열린 질문 원장이 서로 어긋나지 않는다.
 - **위험과 되돌리기:** 바뀌는 것은 이 저장소 안의 문서와 테스트뿐이고 외부 상태를 바꾸지 않는다. 잘못되면 `git revert <커밋>` 한 번으로 돌아간다. AC-5 만 저장소 밖 상태를 하나 만든다 — Orca Run 이다. Run 은 이름공간이자 인박스일 뿐 배치를 하지 않으므로 비용·부작용이 없고, 만들어진 Run 은 이 단위의 관측 증거로 남긴다(지우지 않는다).
 - **결정 필요:** 없음 — 세 가지를 승인 전에 확정했다. ① 은 문서와 반례 테스트로 닫고 `envelope build` 의 동작은 바꾸지 않는다. ③ 은 실행으로 확인한 뒤에 적는다. 셋을 열린 질문 원장에 park 으로 먼저 열지 않는다(지금 고치고 있으므로).
@@ -78,7 +83,7 @@ updated: '2026-09-01'
 | 2 | 그 확인이 두 경우를 실제로 가른다는 것을 반례로 고정한다 | `tests/test_runbook_procedure.py` 신규 — 임시 git 저장소를 만들어 (a) `attempts.yaml` 이 아예 없는 단위 (b) 커밋된 것과 작업 트리의 것이 다른 단위 두 경우에 §3.1 의 명령이 각각 exit 0 · exit≠0 을 내는지 본다. 명령 문자열은 **RUNBOOK 에서 뽑아** 쓴다 — 문서와 테스트가 따로 놀지 않게 한다 | 소비: 1 이 만든 §3.1 명령 문자열 → 생산: `tests/test_runbook_procedure.py` | `python3 -m unittest tests.test_runbook_procedure` (check-3) | 테스트 파일 삭제 |
 | 3 | 재작업을 새 위임으로 붙이는 분기를 실행 순서에 넣는다 | `adapters/orca/RUNBOOK.md` §3 안 — §3.4.1(재승인) 옆에 **승인은 그대로인 채 구현만 다시 붙이는** 경우를 적는다. `romeo/evidence.py` 의 `_stamp_ids` 가 한 run 에 두 위임을 거부한다는 사실, 그래서 새 Run 이 필요하다는 것, 옛 Task 를 닫는 것까지 순서로 적는다 | 소비: 없음 → 생산: §3 안의 새 절 번호 | §3 안에 제목이 `재작업` 을 담은 `### 3.x` 절이 있고, **그 절 본문 안에** `_stamp_ids` 와 `run-create` 가 있는지 본다 (check-4·check-5). `_stamp_ids` 는 §3.8 회수 절에 이미 나오므로 파일 전체 검색은 빈 검사다 | `git revert` |
 | 4 | Run 바인딩 전환을 실행 순서에 넣는다 | `adapters/orca/RUNBOOK.md` §3.2 — Run 을 만들면 코디네이터 터미널이 그 Run 에 붙고, 둘 이상 만들면 뒤엣것이 이긴다는 것. 되돌리는 명령(`run-use --id`, `--run` 이 아니다)과 지금 어디에 붙어 있는지 보는 명령(`run-current --json`), 거부가 종료 코드 0 에 `.ok == false` 로 온다는 것을 적는다 | 소비: 없음 → 생산: §3.2 의 전환 문단 | `awk` 로 §3 전체를 잘라 `run-use --id`·`run-current` 가 그 안에 있는지 본다 (check-6·check-7) | `git revert` |
-| 5 | 전환이 실제로 작동하는지 실행으로 본다 | `.harness/observations.yaml` 에 `coordinator_run_rebinding` 키 추가 — Run 두 개를 만들어 옛 Run 으로 되돌아간 뒤 그 Run 의 상태를 읽을 수 있는지 실행한다. **되는 것과 안 되는 것을 구분해** 적는다(전환이 되는 것과, 전환 뒤 옛 Run 의 메시지를 읽을 수 있는 것은 별개다) | 소비: 4 가 적은 명령 → 생산: `observations.yaml` 의 `coordinator_run_rebinding` | 그 키가 있고 관측 명령·출력이 담겼는지 본다 (check-8) | 키 삭제 |
+| 5 | 전환이 실제로 작동하는지 실행으로 보고, 그 실행을 증거에 봉인한다 | `.harness/observations.yaml` 의 `coordinator_run_rebinding` — Run 두 개를 만들어 옛 Run 으로 되돌아간 뒤 그 Run 의 상태를 읽을 수 있는지 실행한다. 결과는 `a_switch_back`·`b_read_after_switch`·`c_rejection_shape` 세 자리에 각각 `result` 를 담아 적는다. **probe 를 `bin/romeo evidence run --label run-rebinding-probe -- …` 로 돌린다** — 관측 파일도 원시 로그도 `romeo/evidence.py` 의 `exclusions()` 제외 경로라, 증거 명령을 거치지 않으면 stdout 이 어디에도 봉인되지 않는다(Q-23 과 같은 계열). 1회차는 이 자리에서 FAIL 했다 | 소비: 4 가 적은 명령 → 생산: `observations.yaml` 의 세 결과 키 + evidence 의 `run-rebinding-probe` 기록 | 세 결과 키에 `result` 가 있고(check-8), evidence 에 그 라벨의 기록이 있으며 `stdout_tail` 과 `log_sha256` 이 비어 있지 않은지 본다(check-15) | 키 삭제 |
 | 6 | 세 결함을 상태 블록의 메모에서 원장으로 옮긴다 | `docs/planning/progress.md` — 「지금 상태」의 "정비 중에 새로 드러난 것 셋" 을 이 단위 id 로 대체한다. `docs/planning/open-questions.md` — ③ 이 실측으로도 닫히지 않는 부분이 남으면 그때만 새 Q 로 연다(닫히면 열지 않는다) | 소비: 5 의 관측 결과 → 생산: 갱신된 두 문서 | `progress.md` 가 이 단위 id 를 담고, 옛 메모 문구가 사라졌는지 본다 (check-9·check-10) | `git revert` |
 
 ## 검증 계획
@@ -124,7 +129,9 @@ required_checks:
   - id: check-7
     command: "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -q 'run-current'"
   - id: check-8
-    command: "python3 -c \"import yaml,sys; d=yaml.safe_load(open('.harness/observations.yaml')); k=d.get('coordinator_run_rebinding'); sys.exit(0 if k and str(k).strip() else 1)\""
+    command: "python3 -c \"import yaml,sys; k=(yaml.safe_load(open('.harness/observations.yaml')) or {}).get('coordinator_run_rebinding') or {}; need=('a_switch_back','b_read_after_switch','c_rejection_shape'); sys.exit(0 if all(isinstance(k.get(n),dict) and any(str(k[n].get(f,'')).strip() for f in ('result','exit_code')) for n in need) else 1)\""
+  - id: check-15
+    command: "python3 -c \"import glob,yaml,sys; hits=[c for f in glob.glob('docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml') for c in (yaml.safe_load(open(f)) or {}).get('commands',[]) if str(c.get('id','')).startswith('run-rebinding-probe')]; sys.exit(0 if hits and all(str(c.get('stdout_tail','')).strip() and c.get('log_sha256') for c in hits) else 1)\""
   - id: check-9
     command: "grep -q 'feat-20260901-coordinator-procedure-gaps-y8fu' docs/planning/progress.md"
   - id: check-10

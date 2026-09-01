@@ -1,0 +1,18 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260901-coordinator-procedure-gaps-y8fu
+attempts:
+- n: 1
+  run: run_30aed12f8de0
+  base_sha: a1bfeac32d197acd1c7ae1df2c79575f2c58c14a
+  started_at: '2026-09-01T10:54:06+09:00'
+  result: fail
+  failure_class: outputs
+  note: 구현자는 required_checks 14/14 exit 0 · 재실행 14/14 · 앵커 양쪽 5/5 로 통과했고 close 도 REVIEW_VERDICT 하나만 FAIL
+    이다. 검토자(codex read-only, 방어 검사 유효 61d62d47bc0c)가 낸 findings 2건이 정당했다. ① check-8 이 observations.yaml
+    의 coordinator_run_rebinding 키가 존재하고 비어 있지 않은지만 보고, AC-5 가 요구한 '되는 것과 안 되는 것을 구분' 을 대조하지 않는다 — 검증 계획이
+    자기 AC 를 뒷받침하지 못한다. ② AC-5 의 근거 파일 둘(.harness/observations.yaml · docs/work/<id>/observation/run-rebinding-probe.log)이
+    모두 romeo/evidence.py 의 exclusions() 제외 경로이고 probe 실행이 evidence 명령으로 봉인되지 않아, 관측 파일을 그 실행에 묶을 수 없다(Q-23
+    과 같은 계열). 고치려면 probe 를 bin/romeo evidence run 으로 다시 돌려 stdout 을 원시 로그에 봉인하고, check-8 을 관측 내용까지 대조하도록
+    바꿔 재승인해야 한다 — 검증 계획 변경이므로 RUNBOOK §3.4.1 에 따라 이 Run 은 중단하고 새 base 로 다시 시작한다.
+  settled_at: '2026-09-01T10:54:27+09:00'
+reviews: []
