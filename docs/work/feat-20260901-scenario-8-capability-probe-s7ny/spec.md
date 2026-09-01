@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-01T23:00:08+09:00'
+approved_at: '2026-09-02T00:08:52+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -23,7 +23,7 @@ routing:
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
   history: []
 created: '2026-09-01'
-updated: '2026-09-01'
+updated: '2026-09-02'
 approval_history:
 - {approved_at: '2026-09-01T21:42:52+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T22:28:19+09:00',
   reason: '변경 범위가 산문이라 allowed_paths 가 담지 못한 파일 8개를 백틱 경로로 명시한다 — 새 차단 capability-probed 를 추가하면 차단 목록을
@@ -35,6 +35,11 @@ approval_history:
     그러려면 승인 전에 구현해야 하고 그것은 D-27 위반이다. 검토자가 3회차에서 AC_UNMET 으로 잡았다(ac10-before-state 가 승인 22:28:19 뒤인 22:46:05
     에 돌았다 — 사실관계는 정확하다). 문장을 실행 가능한 것으로 고친다: 고치기 전 실패는 base 리비전 트리에 그 테스트만 얹어 재현해 증거로 남기고, 고친 뒤 성공은 check-1
     이 보인다. §11 이 요구하는 양쪽 보이기의 목적(빈 검사·통과 불가능한 검사를 승인하지 않는다)은 그대로 지킨다. 구현본과 증거는 바꾸지 않는다.'}
+- {approved_at: '2026-09-01T23:00:08+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-02T00:08:52+09:00',
+  reason: '4회차 검토자 finding ② 의 수정 자리가 romeo/cli.py 인데 승인된 「변경 범위」에 없어 allowed_paths 밖이었다(K-66). 카드가 프로브할
+    저장소는 --root 가 정하는데 cmd_card 와 cmd_route --card 두 자리 모두 render_card 에 root 를 넘기지 않는다 — 검토자는 cmd_card
+    만 지목했고 구현자가 실측으로 두 자리를 찾았다. 변경 범위에 그 파일과 두 호출부를 명시한다. AC 문장은 바꾸지 않는다 — 요구를 좁히는 것이 아니라 승인된 쓰기 상한이 결함
+    위치를 담지 못한 것이고, 이는 approval_history 첫 항목과 같은 사유(백틱 경로 누락)의 두 번째 발생이다.'}
 ---
 
 # 없는 능력을 있는 것처럼 쓰는 것을 막는다 — 능력 프로브·부재 카드·시나리오 8
@@ -86,7 +91,8 @@ approval_history:
   overlay · 차단 카탈로그) · `core/templates/sections/capability-check.md` · `adapters/*/adapter.yaml` ·
   `romeo/doctor.py`(프로브) · `romeo/policy.py`(능력 계산) · `romeo/card.py`(인쇄) ·
   `romeo/blocks.py`(집행) · `romeo/docs.py`(차단에 라우터 컨텍스트를 넘기는 배선) ·
-  `romeo/close.py`(같은 배선의 종료 검사 쪽 호출부) · `scenarios/8-capability-absent.md` ·
+  `romeo/close.py`(같은 배선의 종료 검사 쪽 호출부) · `romeo/cli.py`(카드 렌더러에 `--root` 를
+  넘기는 호출부 — `cmd_card` 와 `cmd_route --card` 두 자리) · `scenarios/8-capability-absent.md` ·
   `scenarios/README.md` · `tests/test_scenario_8.py` · 새 차단이 추가되면 따라와야 하는 기존 검사와 fixture:
   `tests/test_scenario_3.py` · `tests/test_enforce_points.py` · `tests/test_blocks_enforcement.py` ·
   `fixtures/requests/fx-discord-computer-use-automation.yaml` ·
