@@ -1,0 +1,91 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-coordinator-procedure-gaps-y8fu",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/task/run_fc79c4267d1c-implementer.json",
+    "sha256": "1d3b90754d2dcce0fce6f38c74a4677fad55f50ea8e284651ecd86a162fcaf8b"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "awk '/^### 3\\.1 /,/^### 3\\.2 /' adapters/orca/RUNBOOK.md | grep -q 'attempts\\.yaml'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "awk '/^### 3\\.1 /,/^### 3\\.2 /' adapters/orca/RUNBOOK.md | grep -qE 'git (show|diff|ls-tree)[^|]*attempts\\.yaml'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_runbook_procedure -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -qE '^### 3\\.[0-9.]+ .*재작업'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -c \"import re,sys; t=open('adapters/orca/RUNBOOK.md').read(); m=re.search(r'^### 3\\.[0-9.]+ [^\\n]*재작업[^\\n]*\\n(.*?)(?=^#{2,3} )', t, re.S|re.M); b=m.group(1) if m else ''; sys.exit(0 if '_stamp_ids' in b and 'run-create' in b else 1)\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -q 'run-use --id'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -q 'run-current'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -c \"import yaml,sys; k=(yaml.safe_load(open('.harness/observations.yaml')) or {}).get('coordinator_run_rebinding') or {}; need=('a_switch_back','b_read_after_switch','c_rejection_shape'); sys.exit(0 if all(isinstance(k.get(n),dict) and any(str(k[n].get(f,'')).strip() for f in ('result','exit_code')) for n in need) else 1)\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-15",
+      "command": "python3 -c \"import glob,yaml,sys; hits=[c for f in glob.glob('docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml') for c in (yaml.safe_load(open(f)) or {}).get('commands',[]) if str(c.get('id','')).startswith('run-rebinding-probe')]; sys.exit(0 if hits and all(str(c.get('stdout_tail','')).strip() and c.get('log_sha256') for c in hits) else 1)\"",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "grep -q 'feat-20260901-coordinator-procedure-gaps-y8fu' docs/planning/progress.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "! grep -q '다음 정비 후보다' docs/planning/progress.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_fc79c4267d1c.yaml",
+  "notes": "15/15 exit 0 · gate_verdict PASS. **2회차다** — 1회차(`run_30aed12f8de0`)가 만든 산출물을 그대로 두고, 1회차가 FAIL 한 한 자리(AC-5 의 관측이 실행에 묶이지 않은 것)만 닫았다. 증거는 이 run 의 evidence 명령으로만 만들었고 손으로 쓴 기록은 없다(K-51).\n\n**1회차 검토자 findings 2건이 무엇이었고 무엇으로 닫혔나.** 둘 다 정당했다 — `.harness/observations.yaml` 도 `docs/work/<id>/observation/*.log` 도 `romeo/evidence.py` 의 `exclusions()` 제외 경로라, 증거 명령을 거치지 않은 관측은 어느 실행에서 나왔는지 말할 수 없다(Q-23 과 같은 계열). 이번 회차는 probe 를 `bin/romeo evidence run --label run-rebinding-probe -- docs/work/<id>/observation/run-rebinding-probe.sh <사본 경로>` 로 감쌌고, 그 기록이 이 run 의 `run-rebinding-probe`(exit 0 · log_sha256 `03fd5830b0a5c5a9…` · stdout_tail 399자)와 `run-rebinding-probe-worker-fence`(exit 1 · log_sha256 `30ad787c002cd9f1…`)다. check-15 가 그 두 자리를 본다(exit 0).\n\n**probe 스크립트를 한 곳 고쳤다 — 출력을 삼키던 자리다.** 1회차 스크립트는 `exec > \"$OUT\" 2>&1` 로 전부 파일에 넣어 stdout 이 비었고, 그래서 `stdout_tail` 에 봉인될 것이 없었다. 2회차는 본문을 `main()` 으로 감싸 `main 2>&1 | tee \"$OUT\"` 으로 바꿨다 — 관측 명령의 순서와 내용은 바꾸지 않았다. 이 우회는 Q-23 이 이미 적어 둔 방법(`>` 대신 `tee`)과 같은 것이다.\n\n**관측 결과는 1회차와 같다 — 달라진 것은 id 뿐이다.** 2회차 Run 쌍은 A `run_689f84f78176` · B `run_3a48508dac0d` 이고 (1회차는 A `run_e5ee724a61b5` · B `run_054594259ff6`), probe 터미널은 `term_79b766bf-f5b2-45df-9d23-2d20e6e79d95` 다. (a) `run-use --id` 로 옛 Run 에 되돌아가는 것, (b) 되돌아간 뒤 인박스·Task·상태를 읽는 것, (c) 거부가 exit 1 · `.ok == false` · `consumer_fenced` 로 오는 것 셋 다 같았고, consumer_generation 의 이동(1 → 해제 → 3)까지 같았다. `.harness/observations.yaml` 의 `coordinator_run_rebinding` 을 이번 실행 값으로 갱신하고 `reproduced` 항목에 '2회 실행에서 결론이 같다' 를 적었다. 세 결과 키 이름(`a_switch_back`·`b_read_after_switch`·`c_rejection_shape`)은 1회차 구조 그대로 두었다(check-8 exit 0).\n\n**되는 것처럼 꾸미지 않은 자리 둘.** ① RUNBOOK §11.1 의 2026-08-29 기록은 이 거부를 「종료 코드 0 · `.ok == false`」 로 적었는데 2026-09-01 실측은 **두 회차 다 exit 1** 이다. 어느 쪽이 옳은지 이 관측이 가리지 못한다는 것을 함께 적었고, §3.2 는 둘 다 보라고 쓴다. ② 바인딩이 옮겨간 상태에서 `run-show` 가 펜싱되는지는 **두 회차 다 미측정**이고, 워커가 실제로 보낸 메시지가 전환 뒤에도 읽히는지도 보지 못했다(관측한 인박스가 비어 있었다). 그 잔여가 `Q-26` 이고, 1회차가 '표본 1회' 로 적은 자리를 '표본 2회이나 같은 날·같은 기계·같은 CLI 빌드' 로 고쳤다 — 재현 횟수를 실제보다 크게 적지 않는다.\n\n**`.harness/observations.yaml` 은 evidence 의 changed_files 에 나타나지 않는다** — `exclusions()` 가 `.harness/` 를 트리 해시에서 빼기 때문이고, 그 키가 실재하는지는 check-8 이, 그 값이 이번 실행에서 나왔는지는 check-15 가 판정한다. changed_files 에 잡힌 것은 `adapters/orca/RUNBOOK.md` · `docs/planning/open-questions.md` · `docs/planning/progress.md` · `tests/test_runbook_procedure.py` 넷이고 전부 `allowed_paths` 안이다.\n\n**probe 는 별도 터미널에서 돌렸다.** 구현자 터미널에서 `run-create` 를 부르면 이 Run(`run_fc79c4267d1c`)과의 바인딩이 끊겨 `worker_done` 을 보내지 못한다. probe §9 의 `run-list` 가 그 제약을 그대로 보여준다 — 별도 터미널이 두 Run 을 주고받는 동안 `run_fc79c4267d1c` 의 coordinator_handle 은 코디네이터 터미널(`term_682733b1…`)에 그대로 남아 있었다. 관측이 만든 Run 두 개는 확인란이 승인한 대로 지우지 않는다.\n\n**수용 기준 6건을 전부 체크했다.** AC-1·2 는 check-1~3, AC-3 은 check-4·5, AC-4 는 check-6·7, AC-5 는 check-8·15 와 위 두 evidence 기록, AC-6 은 check-9·10 이 근거다. 확인란의 문장과 검증 계획은 고치지 않았고 체크 표시만 바꿨다."
+}

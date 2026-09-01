@@ -10,7 +10,7 @@
 # 기록을 지우지 않고 이어 붙인다. 관찰 시점의 개수가 지금 개수와 다르면 그 사실을 note 에 적는다.
 ---
 schema_version: 1
-updated: 2026-08-31
+updated: 2026-09-01
 
 runtime_load:
   claude:
@@ -448,3 +448,136 @@ bmad_install:
     설치가 **다른 머신·다른 npm 캐시**에서도 같은 결과를 내는지, 두 런타임이 한 세션에서 romeo 스킬과 bmad 스킬을
     섞어 쓸 때 라우터의 단일 진입점(K-60)이 유지되는지도 이 관측이 답하지 않는다.
     설치본은 커밋되지 않았으므로 **이 저장소를 새로 체크아웃하면 discovery.bmad 는 absent 다.**
+
+
+# 코디네이터 터미널과 Run 의 바인딩 — 2026-09-01 재실측.
+# doctor 는 이 블록을 읽지 않는다(runtime_load 만 읽는다). 사람과 검토자가 읽는 기록이다.
+#
+# 왜 다시 쟀나: 2026-08-29 관측(RUNBOOK §11.1)은 "run-create 가 터미널을 새 Run 에 바인딩하고 옛 Run 은
+# consumer_fenced 로 거부된다" 까지만 말한다. **전환이 되는 것**과 **전환한 뒤 그 Run 을 실제로 읽을 수 있는 것**은
+# 별개인데 그 둘을 구분한 기록이 없었고, 그래서 "답장이 워커에게 도달하는지" 를 확인할 방법이 절차에 없었다.
+#
+# 어디서 쟀나: **별도 터미널**이다. 관측 대상이 바인딩 이동 자체라, 위임된 워커가 자기 터미널에서 run-create 를
+# 부르면 자기를 띄운 Run 과의 연결이 끊겨 worker_done 을 보내지 못한다. 이 제약 자체가 관측 결과의 일부다.
+#
+# 어떻게 묶었나 (2회차): 1회차는 probe 를 그냥 실행하고 stdout 을 파일로 삼켰다. 그 파일도 이 관측 파일도
+# `romeo/evidence.py` 의 exclusions() 제외 경로(`.harness` · `docs/work/<id>`)라 어떤 실행에도 묶이지 않았고,
+# 검토자가 정확히 그 자리를 FAIL 로 짚었다(findings 2건). 2회차는 같은 스크립트를
+# `bin/romeo evidence run --label run-rebinding-probe -- …` 로 감싸 stdout 이 원시 로그와
+# `log_sha256`·`stdout_tail` 에 봉인되게 했다. 아래 `sealed_by` 가 그 자리다.
+coordinator_run_rebinding:
+  observed_at: '2026-09-01'
+  unit_id: feat-20260901-coordinator-procedure-gaps-y8fu
+  run_id: run_fc79c4267d1c                 # 이 관측(2회차)을 낸 위임의 Run. 관측 대상이 아니다
+  task_id: task_7a775f745f80
+  dispatch_id: ctx_ce011166b3ae
+  raw_log: docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/observation/run-rebinding-probe.log
+  probe_script: docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/observation/run-rebinding-probe.sh
+  sealed_by:
+    evidence: docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_fc79c4267d1c.yaml
+    commands:
+      run-rebinding-probe:
+        exit_code: 0
+        log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/01-run-rebinding-probe.log
+        log_sha256: 03fd5830b0a5c5a986b91eb4203933722e738d41bcc14831e999e63a5f1e2e94
+      run-rebinding-probe-worker-fence:
+        exit_code: 1
+        log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/02-run-rebinding-probe-worker-fence.log
+        log_sha256: 30ad787c002cd9f1e402db8cf25ce71adcc4dd292a4599b259774d1c0c2e2734
+    note: >-
+      위 두 기록의 stdout 이 이 절의 모든 값의 출처다. `raw_log` 는 tee 로 남긴 **사본**일 뿐이고
+      (커밋되지만 제외 경로라 실행에 묶이지 않는다), 원본은 `.harness/runs/…` 의 로그와 그 `log_sha256` 이다
+      (커밋되지 않는다 — K-24). 둘 중 어느 쪽도 혼자서는 앵커가 아니고, 앵커는 evidence yaml 의 해시다.
+  where:
+    probe_terminal: term_79b766bf-f5b2-45df-9d23-2d20e6e79d95   # `orca terminal create` 로 만든 별도 터미널 (2회차)
+    worker_terminal: term_1332b7bb-e457-4e47-bd54-b948203cb8ce  # 구현자 워커 터미널 (2회차)
+    coordinator_terminal: term_682733b1-e26f-4891-bb86-0e6d8027915a
+    why: >-
+      run-create 는 **호출한 터미널**을 새 Run 에 바인딩한다. 워커 터미널에서 부르면 그 워커를 띄운 Run 과의
+      연결이 끊겨 worker_done 을 보내지 못한다. 2회차 §9 의 run-list 가 그것을 그대로 보여준다 —
+      별도 터미널이 만든 두 Run(A·B)이 바인딩을 주고받는 동안 run_fc79c4267d1c 의 coordinator_handle 은
+      term_682733b1… (코디네이터)에 그대로 남아 있었다.
+    observed_side_effect: >-
+      워커 터미널에서 `check --run run_fc79c4267d1c --peek --json` 을 부르면 exit 1 ·
+      `consumer_fenced: This coordinator terminal is no longer bound to Run run_fc79c4267d1c.` 가 온다
+      (봉인: run-rebinding-probe-worker-fence). 워커 터미널은 그 Run 의 코디네이터가 아니므로 그쪽 인박스를
+      읽는 경로가 아니다 — 워커는 `check --terminal <자기 handle>` 로 읽는다.
+  runs_created:
+    round2:
+      A: run_689f84f78176
+      B: run_3a48508dac0d
+    round1:
+      A: run_e5ee724a61b5
+      B: run_054594259ff6
+    note: 관측이 만든 Run 은 확인란이 승인한 대로 지우지 않고 남긴다. 네 개 다 run-list 에 있다
+  a_switch_back:
+    result: 된다
+    command: orca orchestration run-use --id run_689f84f78176 --json
+    exit_code: 0
+    ok: true
+    evidence: >-
+      .result.run.id == run_689f84f78176 · .result.binding.consumerGeneration == 3.
+      바인딩이 옮겨갈 때마다 consumer_generation 이 오른다(A 생성 1 → B 생성으로 해제 → run-use 로 3).
+      run-list 에서 그 사이 밀려난 Run 의 coordinator_handle 은 null 로 풀린다(2회차에서 run_3a48508dac0d 가
+      coordinator_handle null · gen 2) — Run 자체는 사라지지 않는다.
+    flag_shape: >-
+      **--id 다. --run 은 없는 플래그다** — `run-use --run <run>` 은 exit 1 · .ok false ·
+      error.code "invalid_argument" · "Unknown flag --run for command: orchestration run-use"
+      (validFlags: environment · from · help · id · json · pairing-code · retry-request · takeover-legacy).
+      1회차·2회차·2026-08-29 관측이 모두 같다.
+  b_read_after_switch:
+    result: 읽을 수 있다
+    exit_code: 0
+    checks:
+      orca orchestration run-current --json: exit 0 · .result.run.id == run_689f84f78176
+      orca orchestration check --run run_689f84f78176 --peek --json: exit 0 · .ok true · messages [] · count 0
+      orca orchestration task-list --run run_689f84f78176 --brief --json: exit 0 · .ok true · 전환 전에 만든 task_4364fbd27cb2 이 보인다
+      orca orchestration run-show --id run_689f84f78176 --json: exit 0 · .ok true
+    note: >-
+      인박스가 비어 있는 것은 이 Run 에 아무도 메시지를 보내지 않았기 때문이다. 확인한 것은
+      **인박스 읽기가 거부되지 않는다**는 것이지 특정 메시지가 도달했다는 것이 아니다. 2회차도 같다 —
+      이 한계는 두 회차 모두 남아 있다.
+  c_rejection_shape:
+    exit_code: 1
+    ok: false
+    error_code: consumer_fenced
+    messages:
+      bound_elsewhere: 'This coordinator terminal is bound to <붙어 있는 run>, not <물어본 run>.'
+      not_bound: 'This coordinator terminal is no longer bound to Run <물어본 run>.'
+    where_each_was_seen: >-
+      2회차에서 bound_elsewhere 는 probe §4(`check --run A` · `task-update --id … --run A`, 둘 다 exit 1)와
+      §8(`check --run B`, exit 1)에서 나왔고, not_bound 는 아무 Run 에도 바인딩되지 않은 워커 터미널에서 나왔다
+      (run-rebinding-probe-worker-fence, exit 1). 두 메시지는 **바인딩 상태가 다를 뿐 같은 error.code** 다.
+    corrects_2026_08_29: >-
+      **종료 코드가 다르다.** RUNBOOK §11.1 의 2026-08-29 행은 이 거부를 "종료 코드 0 · .ok == false" 로 적었는데
+      2026-09-01 실측은 두 회차 다 exit 1 이다(1회차: check --run · task-update 각 1회 · 2회차: 같은 3회 + 워커 터미널 1회).
+      어느 쪽이 옳은지는 이 관측이 말하지 못한다 — CLI 가 바뀌었을 수도, 옛 기록이 .ok 만 보고 적었을 수도 있다.
+      그래서 §3.2 는 **둘 다 보라**고 쓴다.
+  fenced_surface:
+    check --run <옛 run> --peek: 거부 (consumer_fenced · exit 1)
+    task-update --id … --run <옛 run>: 거부 (consumer_fenced · exit 1). 존재하지 않는 task id 를 줬는데도 펜싱이 먼저 걸렸다
+    task-list --run <옛 run> --brief: 거부되지 않는다 (exit 0 · .ok true · 그 Run 의 Task 를 그대로 인쇄한다)
+    run-list: 거부되지 않는다 (모든 Run 이 보이고 coordinator_handle 로 누가 붙어 있는지도 보인다)
+    run-show --id <옛 run>: 미측정 — 두 회차 다 전환한 뒤에만 불렀다
+    why_it_matters: >-
+      task-list 가 옛 Run 의 Task 를 보여준다고 해서 그 Run 이 아직 내 것이라는 뜻이 아니다.
+      답장 도달을 판정하는 것은 check --run … --peek 뿐이다 — 워커의 ask 를 푸는 경로
+      (send --to run:<run-id> --thread-id <msg>)가 그 인박스를 쓰기 때문이다(RUNBOOK §3.6).
+  conclusion: >-
+    **(a) 도 (b) 도 된다.** run-use --id 로 옛 Run 에 되돌아갈 수 있고, 되돌아간 뒤 그 Run 의 인박스·Task·상태를
+    전부 읽을 수 있다. 잃는 것은 그 사이에 붙어 있던 다른 Run 쪽 접근이다(교대일 뿐 누적이 아니다).
+    거부는 조용하지 않다 — exit 1 과 .ok false 로 온다. 이 절차는 RUNBOOK §3.2 로 옮겨 적었다.
+  reproduced: >-
+    **2회 실행에서 결론이 같다.** 1회차(run_30aed12f8de0 · task_9a223853e4ab · ctx_e01717c9cbcb ·
+    probe 터미널 term_83b2d605… · Run A run_e5ee724a61b5 · B run_054594259ff6)와
+    2회차(위 값들)는 같은 스크립트를 서로 다른 터미널·서로 다른 Run 쌍으로 돌렸고
+    (a)·(b)·(c) 셋 다 같은 결과를 냈다. **달라진 것은 Run·Task·터미널 id 뿐**이고
+    consumer_generation 의 이동(1 → 해제 → 3)까지 같았다.
+    **1회차와 다른 것은 관측 내용이 아니라 관측이 묶인 자리다** — 1회차는 stdout 을 파일로 삼켜
+    어떤 실행에도 묶이지 않았고(그래서 FAIL), 2회차는 evidence 명령으로 봉인했다(위 sealed_by).
+  what_this_does_not_say: >-
+    **표본 2회이고 둘 다 같은 날·같은 기계·같은 CLI 빌드다.** 다른 빌드에서 같은지는 모른다.
+    Run 을 셋 이상 만들었을 때, 다른 터미널이 같은 Run 을 가로챘을 때(--takeover-legacy · --from),
+    그리고 **워커가 실제로 보낸 메시지가 전환 뒤에도 읽히는지**는 두 회차 다 보지 않았다 — 관측한 인박스는 비어 있었다.
+    바인딩이 옮겨간 상태에서 run-show 가 펜싱되는지도 미측정이다. 이 관측은 **명령이 거부되는가**만 말하고,
+    워커 쪽에서 그 거부가 어떤 증상으로 보이는지(예: ask 가 900초 뒤 escalation 이 되는 것)는 말하지 않는다.

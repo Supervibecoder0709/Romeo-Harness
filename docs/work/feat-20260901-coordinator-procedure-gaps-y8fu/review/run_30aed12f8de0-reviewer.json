@@ -1,0 +1,30 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-coordinator-procedure-gaps-y8fu",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/task/run_30aed12f8de0-reviewer.json",
+    "sha256": "4376fd8c2327d7055b9fe57ce54aa49ade7358eedea30d528b45c13b0385ef56"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET",
+    "EVIDENCE_NOT_RECORDED"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5의 check-8은 coordinator_run_rebinding 값의 존재와 비어 있지 않음만 검사하며, 실행 명령·출력이나 되는 것과 안 되는 결과를 대조하지 않는다. 따라서 기록된 exit 0만으로 AC-5 전체를 뒷받침할 수 없다.",
+      "file": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_30aed12f8de0.yaml",
+      "line": 263
+    },
+    {
+      "summary": "AC-5의 내용 근거인 .harness/observations.yaml과 작업 단위의 probe log는 모두 dirty_tree_hash와 changed_files의 제외 경로다. probe 실행도 evidence 명령과 log_sha256으로 봉인되지 않아 현재 관측 파일을 당시 실행에 묶을 수 없다.",
+      "file": "romeo/evidence.py",
+      "line": 43
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_30aed12f8de0.yaml",
+  "notes": "두 역할 계약의 base_sha와 현재 HEAD는 일치했다. 확인된 변경 경로는 allowed_paths 안이고 guards는 비어 있었다. AC-1~4와 AC-6의 현재 산출물은 확인했으나, AC-5의 실행 관측은 기록·신선도 근거가 부족해 PASS로 지목할 수 없다."
+}

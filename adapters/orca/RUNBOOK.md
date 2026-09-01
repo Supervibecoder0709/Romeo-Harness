@@ -132,8 +132,8 @@ bin/romeo approve <작업 단위 id> --by <승인자>
 다시 승인한다(체크리스트 37) — 이전 승인은 frontmatter `approval_history` 에 남고, `status` 를 손으로 내리지 않는다.
 재승인을 커밋하면 그 커밋이 새 승인 커밋이다.
 
-**`<base-sha>` 는 승인 커밋일 수도, 그 뒤의 커밋일 수도 있다 — 둘의 관계를 안다.** 아래 확인 1 은 승인 커밋이 만족하지만 확인 2·3 은
-승인 뒤에 하네스 커밋이 쌓였으면 승인 커밋이 만족하지 못한다(이 단위가 그 경우였다 — 승인 커밋 `f4c8d10`, 실제 `<base-sha>` 는 34 적용 커밋 `c237ea9`).
+**`<base-sha>` 는 승인 커밋일 수도, 그 뒤의 커밋일 수도 있다 — 둘의 관계를 안다.** 아래 확인 1 은 승인 커밋이 만족하지만 확인 2·3·4 는
+승인 뒤에 하네스 커밋이나 회차 기록이 쌓였으면 승인 커밋이 만족하지 못한다(이 단위가 그 경우였다 — 승인 커밋 `f4c8d10`, 실제 `<base-sha>` 는 34 적용 커밋 `c237ea9`).
 그래서 `<base-sha>` 는 **승인 커밋이거나 그 후손**이어야 하고, 그 커밋의 spec 이 담은 승인이 **지금의 승인과 같아야** 한다 —
 승인 동일성은 `envelope build` 가 검사해 재승인 전 승인을 담은 커밋(옛 `<base-sha>`)을 거부하고, 조상 관계는 §3.8 의 `BASE_SHA` 앵커
 (`envelope check`·`close`)가 검사한다. `--base-sha` 를 생략하면 승인 커밋 자체를 쓴다.
@@ -151,7 +151,7 @@ bin/romeo approve <작업 단위 id> --by <승인자>
 부착 파일이 없으면 라우터가 부품을 `pending_gate` 로 돌려주고, `core/workflows/implement/SKILL.md` 3번의
 "`status` 가 `active` 가 아닌 부품은 쓰지 않는다" 에 걸려 규율 부품이 워커 안에서 전부 꺼진다.
 
-관찰 가능한 성공 신호 — 셋을 **커밋 SHA 에 대고** 확인한다. 작업 트리에 파일이 있다는 것은 신호가 아니다.
+관찰 가능한 성공 신호 — 넷을 **커밋 SHA 에 대고** 확인한다. 작업 트리에 파일이 있다는 것은 신호가 아니다.
 
 1. 승인이 그 커밋 안에 있다 — `git show <base-sha>:docs/work/<id>/spec.md` 의 frontmatter 에
    `status: active` 와 `approved_at` 이 있다. 없으면 워커도 그것을 보지 못한다(다음 단계가 계약 생성을 거부한다).
@@ -176,11 +176,30 @@ S=$(mktemp -d) && git archive <base-sha> | tar -x -C "$S"
 rm -rf "$S"
 ```
 
-셋 중 하나라도 어긋나면 워커를 띄우지 않는다 — 커밋을 보완하고 `<base-sha>` 를 다시 잡는다.
+4. **재검토·회차 기록이 그 커밋 안에 있다** — `docs/work/<id>/attempts.yaml` 을 커밋과 작업 트리에서 대조한다.
+   이 파일은 확인 2 의 목록에 넣을 수 없다. **항상 있어야 하는 파일이 아니기 때문이다** — 첫 관통에는 아예 없고
+   (`envelope build` 의 중단 게이트가 실패 0 으로 보고 통과시킨다) 반복 중단을 한 번 겪은 뒤에야 생긴다.
+   목록에 넣으면 기록이 없는 단위에서 8행 판정이 깨진다. 그래서 개수가 아니라 **차이**로 본다.
+
+```bash
+diff <(git show "<base-sha>:docs/work/<id>/attempts.yaml" 2>/dev/null) \
+     <(cat "docs/work/<id>/attempts.yaml" 2>/dev/null)
+```
+
+   성공 신호: 종료 코드 0 과 출력 없음. **양쪽 다 없으면 빈 입력끼리의 비교라 통과한다** — 시도 기록이 없는 단위를 막지 않는다.
+   종료 코드 1(과 `<`·`>` 로 시작하는 차이 줄)이면 **회차 기록이나 재검토 결론이 작업 트리에만 있고 커밋 밖에 있다.**
+   그 상태로 위임하면 자식 워크트리 안의 워커는 그 기록을 보지 못한다 — 그 워커의 첫 명령인 `bin/romeo envelope build` 가
+   커밋된 트리의 `attempts.yaml`(없거나 옛것)로 중단 게이트를 평가해 `반복 중단` 으로 계약 생성을 **거부한다.**
+   브레이크를 푼 사람은 풀었다고 알고 있는데 워커는 막힌 채 끝나므로, 그 회차는 판정 없이 중단된다
+   (2026-08-31 관통 3회차가 정확히 그것이었다 — `docs/planning/progress.md` 의 회차 표 3행).
+   고치는 방법: `attempts.yaml` 을 승인 커밋에 함께 담고(`git add docs/work/<id>/attempts.yaml`) `<base-sha>` 를 그 커밋으로 다시 잡는다.
+   `bin/romeo run-unit … --after-review` 로 브레이크를 푼 직후가 이 확인이 가장 잘 걸리는 자리다 — 그 명령은 파일을 쓸 뿐 커밋하지 않는다(§3.3 「중단 게이트」).
+
+넷 중 하나라도 어긋나면 워커를 띄우지 않는다 — 커밋을 보완하고 `<base-sha>` 를 다시 잡는다.
 이 확인은 §3.5·§3.5.1·§3.7 의 기동 전 조건이다 — 특히 §3.5.1 은 자식 워크트리 안의 `bin/romeo` 로 계약을 다시 만드므로,
 확인 2·3 이 통과하지 않았으면 그 명령이 실패하거나 다른 바이트를 낸다.
 
-**이 셋은 §3.8 의 종료 검사 조건이기도 하다.** 종료 검사의 작업 계약 앵커는 봉투가 가리킨 계약을
+**앞의 셋(확인 1·2·3)은 §3.8 의 종료 검사 조건이기도 하다.** 종료 검사의 작업 계약 앵커는 봉투가 가리킨 계약을
 **커밋된 원본에서 다시 계산해** 바이트로 대조한다(`romeo/close.py` 의 `_task_anchor` → `romeo/envelope.py` 의 `build_envelope`).
 봉투가 주장하는 해시와 그 해시가 가리키는 파일은 둘 다 봉투 작성자가 정하는 값이라 해시 대조만으로는 앵커가 되지 않기 때문이다 —
 재계산이라야 위조하려면 올바른 계약을 만들어야 하고, 그건 이미 올바른 계약이다.
@@ -203,6 +222,45 @@ orca orchestration run-create --objective "<작업 단위 id> · <한 줄 목표
 
 성공 신호: `.ok == true`, `.result.run.id` 가 `run_` 접두 문자열(예: `run_7865ac0ae3e3`). 이 값이 이후 모든 명령의 `--run` 이다.
 Run 은 이름 공간과 홈 인박스일 뿐 배치를 하지 않는다(실측 Notes).
+
+#### Run 바인딩 — 이 명령은 Run 을 만들 뿐 아니라 **이 터미널을 그 Run 에 옮겨 붙인다**
+
+`run-create` 는 호출한 터미널을 새 Run 의 코디네이터로 바인딩한다(`.result.run.coordinator_handle` 이 그 터미널 handle 이 된다).
+**한 터미널은 한 번에 한 Run 에만 바인딩된다.** 그래서 한 세션에서 Run 을 둘 만들면 **뒤에 만든 것이 이기고**,
+앞의 Run 에 대한 코디네이터 명령이 거부된다. 옛 Run 은 사라지지 않는다 — `coordinator_handle` 이 `null` 로 풀릴 뿐이다.
+
+```bash
+orca orchestration run-current --json               # 지금 어느 Run 에 붙어 있나. .result.run 이 null 이면 아무 데도 안 붙어 있다
+orca orchestration run-use --id <옛 run-id> --json  # 그 Run 으로 되돌린다. --run 이 아니라 --id 다
+```
+
+거부의 모양 — **종료 코드 1 · `.ok == false` · `.error.code == "consumer_fenced"`**. 메시지는 두 가지다:
+다른 Run 에 붙어 있으면 `This coordinator terminal is bound to <붙어 있는 run>, not <물어본 run>.`,
+아무 Run 에도 붙어 있지 않으면 `This coordinator terminal is no longer bound to Run <물어본 run>.`
+`.ok` 만 읽고 종료 코드를 안 보거나 그 반대로 해도 잡히지만, **둘 다 보는 쪽이 안전하다** —
+2026-08-29 관측은 이 거부를 「종료 코드 0」 으로 적었고 2026-09-01 재실측은 **1** 이었다(§11.1 · `.harness/observations.yaml` 의 `coordinator_run_rebinding`).
+
+**모든 명령이 펜싱되는 것은 아니다.** 2026-09-01 실측 — 같은 스크립트를 두 번 돌려 결론이 같았고, 2회차는 그 실행을
+`bin/romeo evidence run --label run-rebinding-probe -- …` 로 감싸 stdout 을 봉인했다
+(증거 `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_fc79c4267d1c.yaml` 의 `run-rebinding-probe` ·
+사람이 읽는 사본 `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/observation/run-rebinding-probe.log`).
+**관측 파일도 그 로그도 `romeo/evidence.py` 의 `exclusions()` 제외 경로다** — 증거 명령을 거치지 않으면
+어느 실행에서 나온 값인지 말할 수 없다(Q-23 과 같은 계열). 관측을 적을 때는 그 명령으로 돌린다:
+
+| 옛 Run 에 대해 | 바인딩이 옮겨간 뒤 | `run-use --id` 로 되돌린 뒤 |
+| --- | --- | --- |
+| `check --run <run> --peek` (인박스 읽기) | **거부** — `consumer_fenced` · exit 1 | **읽힌다** — `.ok == true` · exit 0 |
+| `task-update --id … --run <run>` (상태 변경) | **거부** — `consumer_fenced` · exit 1 | (되돌린 뒤에는 그 Run 이 지금 Run 이다) |
+| `task-list --run <run> --brief` | **읽힌다** — `.ok == true` · exit 0. 바인딩과 무관하다 | 읽힌다 |
+| `run-show --id <run>` | 미측정 — 되돌린 뒤에만 확인했다 | 읽힌다 — `.ok == true` · exit 0 |
+
+그러니 `task-list` 가 옛 Run 의 Task 를 보여준다고 해서 그 Run 이 아직 내 것이라는 뜻이 아니다.
+**답장이 도달하는지를 판정하는 것은 `check --run … --peek` 뿐이다** — 워커의 `ask` 를 푸는 경로(`send --to run:<run-id> --thread-id <msg>`)가
+그 인박스를 쓰기 때문이다(§3.6). 그래서 워커를 기다리기 전에 `run-current --json` 으로 **지금 그 Run 에 붙어 있는지** 확인한다.
+
+**워커 터미널에서는 이 절을 밟지 않는다.** 위임된 워커가 자기 터미널에서 `run-create` 를 부르면 그 터미널이 새 Run 으로 옮겨 붙어
+자기를 띄운 Run 과의 연결이 끊긴다 — `worker_done` 을 보낼 수 없게 된다. Run 을 하나 더 만들어 무엇을 시험해야 한다면
+`orca terminal create` 로 만든 **별도 터미널** 안에서 한다(2026-09-01 의 AC-5 실측이 그 형태였다).
 
 ### 3.3 작업 계약 생성 — 두 역할분
 
@@ -351,9 +409,58 @@ orca orchestration task-create --run <run-id> \
 말할 수 없으므로, 바꾸려면 관통을 끝내거나 중단하고 **새 base 로 다시 시작한다.** 옛 Run 의 Task 는
 `task-update --id <task> --run <run> --status failed` 로 닫아 두어 DAG 에 열린 채 남지 않게 한다.
 
+### 3.4.2 승인은 그대로인 채 재작업만 다시 위임한다면 — 그래도 Run 을 새로 만든다
+
+§3.4.1 과 다른 경우다. 여기서는 **`spec.md` 가 하나도 바뀌지 않았다** — 검토자가 findings 를 냈거나, 검사가 실패했거나,
+워커가 도중에 멈춰서 **구현만 다시 붙이는** 것이다. 승인도 `<base-sha>` 도 그대로이므로 §3.1 을 처음부터 다시 밟지 않는다.
+그런데도 옛 `<run-id>` 를 재사용하면 안 된다. 이유가 둘이고, 첫째가 실행을 실제로 막는다.
+
+**(1) 증거가 거부한다.** 위임 식별자는 evidence 레코드에 run 당 한 번만 새겨진다 — `romeo/evidence.py` 의 `_stamp_ids` 는
+빈 자리는 채우지만 **이미 다른 값이 적힌 자리는 덮어쓰지 못하고 그 기록을 거부한다.** 재작업은 새 Task 와 새 Dispatch 를 만들므로
+새 워커가 `bin/romeo evidence checks --run <옛 run-id> --task-id <새 task> --dispatch-id <새 dispatch>` 를 부르는 순간 거기서 멈춘다.
+이것은 고쳐야 할 결함이 아니라 **의도된 방어**다 — 한 run 의 증거가 두 위임에 걸쳐 있으면 그 증거는 어느 실행이 만든 것인지 말하지 못한다.
+§3.8 의 식별자 대조가 「값이 다르면 새 `--run` 으로 다시 돌린다」 고 말하는 자리가 여기다.
+
+**(2) 산출물 이름이 겹친다.** `<run-id>` 는 네 산출물의 이름 축이다(§3.0) — `task/`·`evidence/`·`result/`·`review/`.
+같은 값을 다시 쓰면 재작업이 앞 회차의 봉투와 증거를 덮어쓰고, 무엇이 무엇을 낳았는지 이력에서 사라진다.
+회차를 나란히 남기는 것이 반복 중단 판정(`attempts.yaml`)의 근거이기도 하다.
+
+밟을 순서 — **닫기가 먼저다.** `run-create` 는 그 자리에서 이 터미널을 새 Run 으로 옮겨 붙이므로(§3.2),
+옛 Run 의 Task 를 먼저 닫지 않으면 그 다음부터 `consumer_fenced` 로 거부된다.
+
+```bash
+# 1. 옛 Run 의 Task 를 닫는다 — 아직 그 Run 에 붙어 있을 때. 아니면 run-use --id <옛 run-id> 로 먼저 되돌린다
+orca orchestration task-update --id <옛 implementer-task> --run <옛 run-id> --status failed --json
+orca orchestration task-update --id <옛 reviewer-task>    --run <옛 run-id> --status failed --json
+
+# 2. 회차를 기록한다 — 판정이 났으면 그 판정으로, 판정 없이 중단됐으면 기록하지 않는다
+bin/romeo run-unit record --unit <작업 단위 id> --run <옛 run-id> --result fail [--failure-class outputs|harness|goal]
+
+# 3. 새 Run. 이 명령이 터미널을 여기로 옮겨 붙인다
+orca orchestration run-create --objective "<작업 단위 id> · <몇 회차 · 무엇을 다시 붙이나>" --json
+
+# 4. 계약을 새 run-id 로 다시 만든다. --base-sha 는 그대로 — 내용은 옛 계약과 바이트로 같고 파일 이름만 다르다
+bin/romeo envelope build --unit <작업 단위 id> --role implementer --base-sha <같은 base-sha> --run <새 run-id>
+bin/romeo envelope build --unit <작업 단위 id> --role reviewer    --base-sha <같은 base-sha> --run <새 run-id>
+```
+
+그 다음은 §3.4(Task 생성)부터 평소대로다.
+
+**2번이 §3.1 확인 4 를 되살린다.** `run-unit record` 는 `docs/work/<id>/attempts.yaml` 에 쓸 뿐 커밋하지 않는다.
+연속 2회 실패로 브레이크가 걸려 `--after-review` 로 풀었다면 그 결론도 같은 파일에만 있다.
+**그 파일을 커밋하지 않고 재위임하면 자식 워크트리 안의 워커가 브레이크를 못 푼다** — §3.1 확인 4 의 `diff` 를
+기동 전에 한 번 더 돌린다. 승인이 안 바뀌었어도 이 확인만은 회차마다 다시 본다.
+
+**앞 회차의 산출물을 시작점으로 쓸지 정한다.** 새 워크트리를 만들면 앞 회차의 **미커밋** 산출물은 그 트리에 없다.
+이어 쓸 것이면 앞 회차의 워크트리를 그대로 쓰거나, 남길 것을 `<base-sha>` 커밋에 담고 그 커밋을 새 `<base-sha>` 로 삼는다
+(후자는 계약이 바뀌므로 §3.3 부터 다시 계산된다). 어느 쪽이든 앞 회차의 봉투·증거는 **지우지 않는다.**
+
+**검증 계획이나 확인란이 함께 바뀐다면 이 절이 아니라 §3.4.1 이다.** 그것은 재승인이고, 재승인은 새 승인 커밋과
+새 `<base-sha>` 를 만든다. 실패한 검사를 없애 통과를 만드는 것과 구분한다 — 검증 계획을 고치는 것은 언제나 재승인 대상이다(D-27).
+
 ### 3.5 구현자 기동
 
-**기동 전 조건.** §3.1 의 확인 3개(승인·`ls-tree` 8행·`--help` 프로브 2개)가 전부 통과해야 한다.
+**기동 전 조건.** §3.1 의 확인 4개(승인·`ls-tree` 8행·`--help` 프로브 2개·`attempts.yaml` 대조)가 전부 통과해야 한다.
 하나라도 실패한 채 띄우면 그 워커는 자기가 실행할 하네스가 없는 트리에서 시작한다 — 첫 명령이 실패한다.
 
 ```bash
@@ -539,7 +646,7 @@ argv 를 비운 TUI 로 띄우고 프롬프트를 주입에 맡기는 형태는 
 터미널만 만들어 `-o` 출력으로 회수한다. 그때 그 Task 는 orchestration 이 완료로 표시하지 못하므로
 **`task-update` 로 사람이 정리해야 한다** — lifecycle 을 포기하는 선택임을 알고 해야 한다.
 
-**기동 전 조건.** §3.1 의 확인 3개를 통과했고, **§3.5.1 의 확인 3개(종료 코드·sha256 일치·`ls` 2행)를 통과했으며**,
+**기동 전 조건.** §3.1 의 확인 4개를 통과했고, **§3.5.1 의 확인 3개(종료 코드·sha256 일치·`ls` 2행)를 통과했으며**,
 검토자 기동 **직전**의 §4 방어 검사(`review-tree-before`)를 이미 기록했다.
 계약이 `$W` 안에 없으면 아래 `$(cat '$T')` 가 빈 문자열이 되어 검토자가 프롬프트 없이 돈다 — 그 실패는 조용하다.
 
@@ -1298,7 +1405,7 @@ orca orchestration gate-list --json
 | **§3.7 로 기동한 검토자에 read-only 강제가 걸리는가** | **걸린다.** §4 의 방어 검사가 `유효` 를 냈다 — `review-tree-before` 와 `review-tree-after` 의 `log_sha256` 이 같은 값이었다. 검토자가 실행되는 동안 작업 트리가 바뀌지 않았다 |
 | 자식 워크트리에서 close 를 돌릴 수 있는가 | **있다.** `--root "$W"` 로 돌렸고 신선도·재실행·로그 대조가 모두 그 체크아웃 기준으로 성립했다 |
 | **같은 산출물에 같은 검토자 런타임을 다시 띄우면 판정이 재현되는가** (2026-08-29 · Q-08 (a) · Run `run_241a35112ca3`·`run_5dd1b2c232c7`·`run_222f508b5541`) | **재현되지 않는다 — 두 런타임 다.** §6.6 절차를 그대로 써서 기준 실행의 구현자 워크트리에 codex 검토자를 두 번, claude 검토자를 한 번 더 띄웠다. 산출물 고정의 근거: 검토자 계약 다섯 개가 `cmp` identical(`f79f4bc1…`), 방어 검사 스냅샷 열 개가 전부 `2bc7dad48f31…`(구현 종료 01:24 부터 12:17 까지 트리 불변), 봉투마다 두 체크아웃에서 `envelope check` 5개 PASS. **판정: codex `PASS`(0) · `FAIL`(1) · `FAIL`(4) · claude `FAIL`(6) · `PASS`(8).** codex 의 `run_5dd1b2c232c7` 이 낸 4건은 claude 의 6건과 실질적으로 겹친다(루트 오염 · 증거 결박 · `Varies by skill` · `bash -c` 결함) — 보는 능력의 차이가 아니다. claude 의 두 번째 실행은 findings 를 **더 많이**(8건) 내고도 게이트 판정은 `PASS` 였다 — findings 수와 판정이 같은 방향으로 움직이지도 않는다. 기동 경로가 교란 변수로 남는다(PASS 가 나온 codex 실행만 TUI). 이 관측이 **D-74**(재현성 요구)의 근거다. 해석은 `.harness/observations.yaml` 의 `reviewer_verdict_reproducibility` |
-| **coordinator 터미널과 Run 의 바인딩** (2026-08-29) | **한 번에 한 Run 에만 바인딩된다.** `run-create` 는 그 터미널을 새 Run 에 바인딩하므로, Run 을 둘 만들면 뒤에 만든 것이 바인딩되고 앞의 Run 에 대한 `task-create`·`task-update` 는 `consumer_fenced: This coordinator terminal is bound to <다른 run>` 으로 거부된다(종료 코드 0 · `.ok == false`). 전환은 `orca orchestration run-use --id <run-id>` 다 — **`--run` 이 아니라 `--id`** 를 받는다(`--run` 은 `invalid_argument`). `run-current --json` 이 지금 바인딩된 Run 을 보여준다 |
+| **coordinator 터미널과 Run 의 바인딩** (2026-08-29) | **한 번에 한 Run 에만 바인딩된다.** `run-create` 는 그 터미널을 새 Run 에 바인딩하므로, Run 을 둘 만들면 뒤에 만든 것이 바인딩되고 앞의 Run 에 대한 `task-create`·`task-update` 는 `consumer_fenced: This coordinator terminal is bound to <다른 run>` 으로 거부된다(종료 코드 0 · `.ok == false`). 전환은 `orca orchestration run-use --id <run-id>` 다 — **`--run` 이 아니라 `--id`** 를 받는다(`--run` 은 `invalid_argument`). `run-current --json` 이 지금 바인딩된 Run 을 보여준다. **2026-09-01 재실측이 두 가지를 정정한다** — 거부의 종료 코드는 **0 이 아니라 1** 이고, 펜싱되는 것은 `check --run`·`task-update` 뿐이라 `task-list --run <옛 run>` 은 바인딩과 무관하게 읽힌다. 전환 뒤 그 Run 의 인박스를 실제로 읽는 것까지 확인한 것도 이때가 처음이다. **같은 날 두 번 돌려 결론이 같았고**(1회차 `run_30aed12f8de0` · 2회차 `run_fc79c4267d1c`), 2회차는 그 실행을 증거 명령으로 봉인했다. 절차는 §3.2 로 옮겨 적었다 · 원문 기록은 `.harness/observations.yaml` 의 `coordinator_run_rebinding` |
 | **`terminal wait --for exit` 이 비대화형 실행의 종료를 알려주는가** (2026-08-29) | **못 한다.** `terminal create --command` 로 만든 터미널은 그 명령이 끝나도 셸이 살아 있어 `--for exit` 이 만료된다 — 900초를 줬는데 4~5분에 끝난 두 실행 모두 `ok:false · code:timeout` 이었다(그런데 CLI 자신의 종료 코드는 0 이다 — `.ok` 를 읽지 않으면 성공으로 오독한다). 실제 완료 신호는 `-o` 가 만드는 **출력 파일의 존재**다. §6.6 5 가 "완료는 출력 파일의 표식으로 기다린다" 고 한 이유가 이것이다 |
 | **`worker-start --terminal` 채택의 성패를 가르는 변수** (2026-08-30) | **`프롬프트가 argv 에 있는가` 다 — '대화형이냐' 가 아니다.** TUI(`codex -s read-only`)로 띄워도 프롬프트를 `--command` 의 argv 에 실으면 비대화형과 같은 `agent_prompt_stalled` 로 실패했다. `terminal wait --for tui-idle` 이 `satisfied: true` 를 낸 **뒤에** 채택해도 같았다 — 원인이 채택 시점이 아니라는 뜻이다. 표본 1건. §3.7 의 표 |
 | **`tui-idle` 이 완료 신호인가** (2026-08-30) | **아니다.** 작업이 시작된 직후에도 `satisfied: true` 가 나왔다 — 완료 판정에 쓰면 오탐이다. 완료를 실제로 읽은 자리는 `~/.codex/sessions/<YYYY>/<MM>/<DD>/rollout-*.jsonl` 의 `task_complete.last_agent_message` 였다(결과 계약 JSON 본문이 그 자리에 실려 있었다). §3.7 |

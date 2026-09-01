@@ -1,0 +1,79 @@
+{
+  "schema": "romeo/task-envelope@0.1.0",
+  "unit_id": "feat-20260901-coordinator-procedure-gaps-y8fu",
+  "role": "implementer",
+  "spec_ref": {
+    "path": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/spec.md",
+    "sha256": "1d020723d398e016b1f95981b04d4ec5eed80a6eea655b37144370e83115e473"
+  },
+  "base_sha": "a1bfeac32d197acd1c7ae1df2c79575f2c58c14a",
+  "allowed_paths": [
+    "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/",
+    "adapters/orca/RUNBOOK.md",
+    "tests/test_runbook_procedure.py",
+    ".harness/observations.yaml",
+    "docs/planning/progress.md",
+    "docs/planning/open-questions.md"
+  ],
+  "guards": [],
+  "required_checks": [
+    {
+      "id": "check-1",
+      "command": "awk '/^### 3\\.1 /,/^### 3\\.2 /' adapters/orca/RUNBOOK.md | grep -q 'attempts\\.yaml'"
+    },
+    {
+      "id": "check-2",
+      "command": "awk '/^### 3\\.1 /,/^### 3\\.2 /' adapters/orca/RUNBOOK.md | grep -qE 'git (show|diff|ls-tree)[^|]*attempts\\.yaml'"
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_runbook_procedure -v"
+    },
+    {
+      "id": "check-4",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -qE '^### 3\\.[0-9.]+ .*재작업'"
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -c \"import re,sys; t=open('adapters/orca/RUNBOOK.md').read(); m=re.search(r'^### 3\\.[0-9.]+ [^\\n]*재작업[^\\n]*\\n(.*?)(?=^#{2,3} )', t, re.S|re.M); b=m.group(1) if m else ''; sys.exit(0 if '_stamp_ids' in b and 'run-create' in b else 1)\""
+    },
+    {
+      "id": "check-6",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -q 'run-use --id'"
+    },
+    {
+      "id": "check-7",
+      "command": "awk '/^## 3\\. 실행 순서/,/^## 4\\./' adapters/orca/RUNBOOK.md | grep -q 'run-current'"
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -c \"import yaml,sys; d=yaml.safe_load(open('.harness/observations.yaml')); k=d.get('coordinator_run_rebinding'); sys.exit(0 if k and str(k).strip() else 1)\""
+    },
+    {
+      "id": "check-9",
+      "command": "grep -q 'feat-20260901-coordinator-procedure-gaps-y8fu' docs/planning/progress.md"
+    },
+    {
+      "id": "check-10",
+      "command": "! grep -q '다음 정비 후보다' docs/planning/progress.md"
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest discover -s tests"
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo validate"
+    },
+    {
+      "id": "check-13",
+      "command": "bin/romeo doctor --strict --scope repository"
+    },
+    {
+      "id": "check-14",
+      "command": "bin/romeo compile --check"
+    }
+  ],
+  "output_schema": "core/schemas/result-envelope.json",
+  "workspace": "worktree"
+}

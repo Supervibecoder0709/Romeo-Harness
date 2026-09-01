@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-coordinator-procedure-gaps-y8fu",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/task/run_fc79c4267d1c-reviewer.json",
+    "sha256": "b47838ec5af3ef79c6b93a2b43d3edd66f1248c070009bdc20f53f9736787021"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/run_fc79c4267d1c.yaml",
+  "notes": "두 역할 계약의 base_sha가 일치한다. AC-1·2는 RUNBOOK §3.1과 반례 테스트 및 check-1~3, AC-3은 §3.4.2와 check-4·5, AC-4는 §3.2와 check-6·7, AC-5는 관측 기록과 봉인된 probe 로그 및 check-8·15, AC-6은 progress·open-questions 정합성과 check-9·10으로 지목된다. required_checks 15건의 기록된 종료 코드는 모두 0이며 재실행 불가능 선언은 없다. 승인 시점 대비 spec 변경은 AC 체크 표시뿐이고 검증 계획 문장은 유지됐다. 현재 변경은 구현자 계약의 allowed_paths 안이며 guards는 비어 있다. 현재 HEAD와 증거의 head_sha가 base_sha에 일치하고, 최종 검사들과 review-tree-before가 같은 dirty_tree_hash를 기록한다.\n\n"
+}

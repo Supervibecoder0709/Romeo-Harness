@@ -1,0 +1,710 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_fc79c4267d1c
+task_id: task_7a775f745f80
+dispatch_id: ctx_ce011166b3ae
+unit_id: feat-20260901-coordinator-procedure-gaps-y8fu
+spec_ref:
+  path: docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/spec.md
+  sha256: a213e7f0b27085d955ed99fd6694e0db0f6a1b08b2dcd2816bd1f6136d6905c1
+base_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu
+started_at: '2026-09-01T12:06:59+09:00'
+finished_at: '2026-09-01T12:19:52+09:00'
+commands:
+- id: run-rebinding-probe
+  command: docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/observation/run-rebinding-probe.sh
+    docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/observation/run-rebinding-probe.log
+  exit_code: 0
+  started_at: '2026-09-01T12:06:59+09:00'
+  finished_at: '2026-09-01T12:07:01+09:00'
+  seconds: 2.224
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/01-run-rebinding-probe.log
+  log_sha256: 03fd5830b0a5c5a986b91eb4203933722e738d41bcc14831e999e63a5f1e2e94
+  stdout_tail: "\",\n        \"coordinator_handle\": null,\n        \"coordinator_pane_key\": null,\n\
+    \        \"consumer_generation\": 0,\n        \"legacy\": 0,\n        \"created_at\": \"2026-07-31T23:53:44Z\"\
+    ,\n        \"updated_at\": \"2026-07-31T23:53:44Z\"\n      }\n    ],\n    \"nextCursor\": null\n \
+    \ },\n  \"_meta\": {\n    \"runtimeId\": \"8fc4a32f-d80a-49af-9fd3-067d98600499\"\n  }\n}\nexit=0\n\
+    \n=== DONE A=run_689f84f78176 B=run_3a48508dac0d ==="
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 5588351d1e64fc665453cd3d60d308eaebdf944c3e670574252fe670d73e7de1
+- id: run-rebinding-probe-worker-fence
+  command: orca orchestration check --run run_fc79c4267d1c --peek --json
+  exit_code: 1
+  started_at: '2026-09-01T12:08:27+09:00'
+  finished_at: '2026-09-01T12:08:27+09:00'
+  seconds: 0.132
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/02-run-rebinding-probe-worker-fence.log
+  log_sha256: 30ad787c002cd9f1e402db8cf25ce71adcc4dd292a4599b259774d1c0c2e2734
+  stdout_tail: "{\n  \"id\": \"29f21518-64ad-4c8e-8135-33ee862fd39d\",\n  \"ok\": false,\n  \"error\"\
+    : {\n    \"code\": \"consumer_fenced\",\n    \"message\": \"This coordinator terminal is no longer\
+    \ bound to Run run_fc79c4267d1c.\"\n  },\n  \"_meta\": {\n    \"runtimeId\": \"8fc4a32f-d80a-49af-9fd3-067d98600499\"\
+    \n  }\n}"
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 5588351d1e64fc665453cd3d60d308eaebdf944c3e670574252fe670d73e7de1
+- id: check-1
+  command: awk '/^### 3\.1 /,/^### 3\.2 /' adapters/orca/RUNBOOK.md | grep -q 'attempts\.yaml'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:50+09:00'
+  finished_at: '2026-09-01T12:10:50+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/03-check-1.log
+  log_sha256: 272098ef2c324a95a4db1d5f549f9d385ca4246a6673096e2288bced239ab0d3
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-2
+  command: awk '/^### 3\.1 /,/^### 3\.2 /' adapters/orca/RUNBOOK.md | grep -qE 'git (show|diff|ls-tree)[^|]*attempts\.yaml'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:50+09:00'
+  finished_at: '2026-09-01T12:10:50+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/04-check-2.log
+  log_sha256: 4a312413f3157f5276997c0ff9c896ca2dd5648c5af816d231b13483cbb035c3
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-3
+  command: python3 -m unittest tests.test_runbook_procedure -v
+  exit_code: 0
+  started_at: '2026-09-01T12:10:50+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.374
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/05-check-3.log
+  log_sha256: c73ea0b753298fdb9697db77f12fa9da0dcb7252cc0f10edc1dd76fb16e08021
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-4
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -qE '^### 3\.[0-9.]+ .*재작업'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/06-check-4.log
+  log_sha256: ddc8562197b5510b3779483466a81d6e95a11aa27886a29809d92196efb92d05
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-5
+  command: python3 -c "import re,sys; t=open('adapters/orca/RUNBOOK.md').read(); m=re.search(r'^### 3\.[0-9.]+
+    [^\n]*재작업[^\n]*\n(.*?)(?=^#{2,3} )', t, re.S|re.M); b=m.group(1) if m else ''; sys.exit(0 if '_stamp_ids'
+    in b and 'run-create' in b else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/07-check-5.log
+  log_sha256: c248ae98ff87de7bc1bc87bcc75684c1c162e72fd300ef0e7117cf152c787bbd
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-6
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -q 'run-use --id'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/08-check-6.log
+  log_sha256: 4766500a1d6c707da8426a1fa79c3f817d17d840ed844d06ad6f565e6116390d
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-7
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -q 'run-current'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/09-check-7.log
+  log_sha256: 7b3c90574c423e882f935e9666af2fa4b6b7450acb8143de154e6c6101fbae82
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-8
+  command: python3 -c "import yaml,sys; k=(yaml.safe_load(open('.harness/observations.yaml')) or {}).get('coordinator_run_rebinding')
+    or {}; need=('a_switch_back','b_read_after_switch','c_rejection_shape'); sys.exit(0 if all(isinstance(k.get(n),dict)
+    and any(str(k[n].get(f,'')).strip() for f in ('result','exit_code')) for n in need) else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.044
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/10-check-8.log
+  log_sha256: 6b3d6e682f69f1f9ce851a994e02acaa1fb08a2f8f98ba473284dd70e64d3b63
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-15
+  command: python3 -c "import glob,yaml,sys; hits=[c for f in glob.glob('docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml')
+    for c in (yaml.safe_load(open(f)) or {}).get('commands',[]) if str(c.get('id','')).startswith('run-rebinding-probe')];
+    sys.exit(0 if hits and all(str(c.get('stdout_tail','')).strip() and c.get('log_sha256') for c in hits)
+    else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.048
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/11-check-15.log
+  log_sha256: dffa54ace666fd809bb1d3058339afdb76eb561745041efa6c88bed09b0913a2
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-9
+  command: grep -q 'feat-20260901-coordinator-procedure-gaps-y8fu' docs/planning/progress.md
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/12-check-9.log
+  log_sha256: ab187881845cd479b7cccef896ee54820e087dae04e933282b7a0e5cd923697a
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-10
+  command: '! grep -q ''다음 정비 후보다'' docs/planning/progress.md'
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:10:51+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/13-check-10.log
+  log_sha256: 5d947fdbee3a1ff89395c4e38e281df4973c0b4457d6f8691c6305c0a9e8820c
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-11
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T12:10:51+09:00'
+  finished_at: '2026-09-01T12:12:38+09:00'
+  seconds: 106.725
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/14-check-11.log
+  log_sha256: 78f3422bf766bc795b8742136a54fcc0e1b7c6df92855ffc70040d516d7d6f5e
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-12
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-01T12:12:38+09:00'
+  finished_at: '2026-09-01T12:12:38+09:00'
+  seconds: 0.124
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/15-check-12.log
+  log_sha256: fdb589e92f0356b4599df9b89e20b7f119a27774dab70cbe644e10e04fde69fd
+  stdout_tail: "tor-procedure-gaps-y8fu/docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/brief.md\
+    \ lines=70 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu/docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/spec.md\
+    \ lines=155 needs_input=0 unchecked_ac=6\n    WARN  BUDGET_EXCEEDED 155 > 150\n    WARN  UNCHECKED_AC\
+    \ 6개"
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-13
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-01T12:12:38+09:00'
+  finished_at: '2026-09-01T12:12:39+09:00'
+  seconds: 0.533
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/16-check-13.log
+  log_sha256: 46338488acd0f474acdbc9c482b32b4f2ca1c1f66c1ef99a8380b86054632193
+  stdout_tail: "x-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자\
+    \ 고지: 일치\n\n## 능력 프로브 (설치 흔적만 본다)\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-14
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-01T12:12:39+09:00'
+  finished_at: '2026-09-01T12:12:39+09:00'
+  seconds: 0.162
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/17-check-14.log
+  log_sha256: 1273d25109cba3aa210c4b66463d71962ccd1fa2afc5d51468b193bb5de1517c
+  stdout_tail: compile 검사 PASS
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-1
+  command: awk '/^### 3\.1 /,/^### 3\.2 /' adapters/orca/RUNBOOK.md | grep -q 'attempts\.yaml'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:12+09:00'
+  finished_at: '2026-09-01T12:13:12+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/18-check-1.log
+  log_sha256: 272098ef2c324a95a4db1d5f549f9d385ca4246a6673096e2288bced239ab0d3
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-2
+  command: awk '/^### 3\.1 /,/^### 3\.2 /' adapters/orca/RUNBOOK.md | grep -qE 'git (show|diff|ls-tree)[^|]*attempts\.yaml'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:12+09:00'
+  finished_at: '2026-09-01T12:13:12+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/19-check-2.log
+  log_sha256: 4a312413f3157f5276997c0ff9c896ca2dd5648c5af816d231b13483cbb035c3
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-3
+  command: python3 -m unittest tests.test_runbook_procedure -v
+  exit_code: 0
+  started_at: '2026-09-01T12:13:12+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.467
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/20-check-3.log
+  log_sha256: 1eeebef3a06a738249988a594850d215c0c23b53999523f48f11a364ff1e3f22
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-4
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -qE '^### 3\.[0-9.]+ .*재작업'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/21-check-4.log
+  log_sha256: ddc8562197b5510b3779483466a81d6e95a11aa27886a29809d92196efb92d05
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-5
+  command: python3 -c "import re,sys; t=open('adapters/orca/RUNBOOK.md').read(); m=re.search(r'^### 3\.[0-9.]+
+    [^\n]*재작업[^\n]*\n(.*?)(?=^#{2,3} )', t, re.S|re.M); b=m.group(1) if m else ''; sys.exit(0 if '_stamp_ids'
+    in b and 'run-create' in b else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/22-check-5.log
+  log_sha256: c248ae98ff87de7bc1bc87bcc75684c1c162e72fd300ef0e7117cf152c787bbd
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-6
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -q 'run-use --id'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/23-check-6.log
+  log_sha256: 4766500a1d6c707da8426a1fa79c3f817d17d840ed844d06ad6f565e6116390d
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-7
+  command: awk '/^## 3\. 실행 순서/,/^## 4\./' adapters/orca/RUNBOOK.md | grep -q 'run-current'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/24-check-7.log
+  log_sha256: 7b3c90574c423e882f935e9666af2fa4b6b7450acb8143de154e6c6101fbae82
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-8
+  command: python3 -c "import yaml,sys; k=(yaml.safe_load(open('.harness/observations.yaml')) or {}).get('coordinator_run_rebinding')
+    or {}; need=('a_switch_back','b_read_after_switch','c_rejection_shape'); sys.exit(0 if all(isinstance(k.get(n),dict)
+    and any(str(k[n].get(f,'')).strip() for f in ('result','exit_code')) for n in need) else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:13+09:00'
+  seconds: 0.047
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/25-check-8.log
+  log_sha256: 6b3d6e682f69f1f9ce851a994e02acaa1fb08a2f8f98ba473284dd70e64d3b63
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-15
+  command: python3 -c "import glob,yaml,sys; hits=[c for f in glob.glob('docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml')
+    for c in (yaml.safe_load(open(f)) or {}).get('commands',[]) if str(c.get('id','')).startswith('run-rebinding-probe')];
+    sys.exit(0 if hits and all(str(c.get('stdout_tail','')).strip() and c.get('log_sha256') for c in hits)
+    else 1)"
+  exit_code: 0
+  started_at: '2026-09-01T12:13:13+09:00'
+  finished_at: '2026-09-01T12:13:14+09:00'
+  seconds: 0.057
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/26-check-15.log
+  log_sha256: dffa54ace666fd809bb1d3058339afdb76eb561745041efa6c88bed09b0913a2
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-9
+  command: grep -q 'feat-20260901-coordinator-procedure-gaps-y8fu' docs/planning/progress.md
+  exit_code: 0
+  started_at: '2026-09-01T12:13:14+09:00'
+  finished_at: '2026-09-01T12:13:14+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/27-check-9.log
+  log_sha256: ab187881845cd479b7cccef896ee54820e087dae04e933282b7a0e5cd923697a
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-10
+  command: '! grep -q ''다음 정비 후보다'' docs/planning/progress.md'
+  exit_code: 0
+  started_at: '2026-09-01T12:13:14+09:00'
+  finished_at: '2026-09-01T12:13:14+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/28-check-10.log
+  log_sha256: 5d947fdbee3a1ff89395c4e38e281df4973c0b4457d6f8691c6305c0a9e8820c
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-11
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T12:13:14+09:00'
+  finished_at: '2026-09-01T12:14:53+09:00'
+  seconds: 98.835
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/29-check-11.log
+  log_sha256: 8af8f72307e8a848e4435fab97286f965ad7d8345377f9c40e20694aa9d15a46
+  stdout_tail: ''
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-12
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-01T12:14:53+09:00'
+  finished_at: '2026-09-01T12:14:53+09:00'
+  seconds: 0.125
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/30-check-12.log
+  log_sha256: 4e1004c112ad108068c9733a37ab8189498e1daa23ac3ae7352fc6c888db4309
+  stdout_tail: "mpl-feat-20260901-coordinator-procedure-gaps-y8fu/docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/brief.md\
+    \ lines=70 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu/docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/spec.md\
+    \ lines=155 needs_input=0 unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 155 > 150"
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-13
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-01T12:14:53+09:00'
+  finished_at: '2026-09-01T12:14:54+09:00'
+  seconds: 0.533
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/31-check-13.log
+  log_sha256: 46338488acd0f474acdbc9c482b32b4f2ca1c1f66c1ef99a8380b86054632193
+  stdout_tail: "x-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자\
+    \ 고지: 일치\n\n## 능력 프로브 (설치 흔적만 본다)\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: check-14
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-01T12:14:54+09:00'
+  finished_at: '2026-09-01T12:14:54+09:00'
+  seconds: 0.167
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/32-check-14.log
+  log_sha256: 1273d25109cba3aa210c4b66463d71962ccd1fa2afc5d51468b193bb5de1517c
+  stdout_tail: compile 검사 PASS
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-coordinator-procedure-gaps-y8fu'
+  exit_code: 0
+  started_at: '2026-09-01T12:16:54+09:00'
+  finished_at: '2026-09-01T12:16:54+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/33-review-tree-before.log
+  log_sha256: f2afce10760ea7659eb5f600faef645bdaae0032e464b16793f46bfb0393bcae
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    ?? tests/test_runbook_procedure.py"
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu/.harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-01T12:16:54+09:00'
+  finished_at: '2026-09-01T12:16:54+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/34-reviewer-brief.log
+  log_sha256: ada65d527f5a6bd73232669b7c525d7e7828d4feb5cf6026df4d81479cc80c1e
+  stdout_tail: ae35ded02d7ef3b43583ce1d40b19f98ececafa7717417279afc6da876e39e5c  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu/.harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/reviewer-brief.md
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-coordinator-procedure-gaps-y8fu'
+  exit_code: 0
+  started_at: '2026-09-01T12:19:39+09:00'
+  finished_at: '2026-09-01T12:19:39+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/35-review-tree-after.log
+  log_sha256: f2afce10760ea7659eb5f600faef645bdaae0032e464b16793f46bfb0393bcae
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    ?? tests/test_runbook_procedure.py"
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/review/run_fc79c4267d1c-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-01T12:19:52+09:00'
+  finished_at: '2026-09-01T12:19:52+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260901-coordinator-procedure-gaps-y8fu/run_fc79c4267d1c/36-review-record.log
+  log_sha256: 6a2533739eb1d2eb946fb15d92a4c70b2e97a48980c3f17344faa0d11a7d2fde
+  stdout_tail: 7268e6354cd37a09ba0d188d63b2b388a9dea05e32e9172b920060fe367a4c37  docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/review/run_fc79c4267d1c-reviewer.json
+  head_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  dirty_tree_hash: 25c74b9f4627324dc18f4de997934bdb5ba91638f4f4a58e9f1ba59e1775a783
+changed_files:
+- adapters/orca/RUNBOOK.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- tests/test_runbook_procedure.py
+artifact_hash: 6ebe5eb30e8c2ee5689a2be9e22af538508d1f4a530b01086c97656ada614487
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-01T12:23:35+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 155 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-01T12:02:17+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_fc79c4267d1c — 검증 계획 15건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 82a8191ddf11 vs 현재 82a8191ddf11
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 25c74b9f4627 vs 현재 25c74b9f4627 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — awk ''/^### 3\.1 /,/^### 3\.2 /'' adapters/orca/RUNBOOK.md | grep -q ''attempts\.yaml'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — awk ''/^### 3\.1 /,/^### 3\.2 /'' adapters/orca/RUNBOOK.md | grep -qE ''git
+      (show|diff|ls-tree)[^|]*attempts\.yaml'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_runbook_procedure -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep -qE ''^###
+      3\.[0-9.]+ .*재작업'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -c "import re,sys; t=open(''adapters/orca/RUNBOOK.md'').read();
+      m=re.search(r''^### 3\.[0-9.]+ [^\n]*재작업[^\n]*\n(.*?)(?=^#{2,3} )'', t, re.S|re.M); b=m.group(1)
+      if m else ''''; sys.exit(0 if ''_stamp_ids'' in b and ''run-create'' in b else 1)"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep -q ''run-use
+      --id'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep -q ''run-current'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -c "import yaml,sys; k=(yaml.safe_load(open(''.harness/observations.yaml''))
+      or {}).get(''coordinator_run_rebinding'') or {}; need=(''a_switch_back'',''b_read_after_switch'',''c_rejection_shape'');
+      sys.exit(0 if all(isinstance(k.get(n),dict) and any(str(k[n].get(f,'''')).strip() for f in (''result'',''exit_code''))
+      for n in need) else 1)"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-15: exit 0 — python3 -c "import glob,yaml,sys; hits=[c for f in glob.glob(''docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml'')
+      for c in (yaml.safe_load(open(f)) or {}).get(''commands'',[]) if str(c.get(''id'','''')).startswith(''run-rebinding-probe'')];
+      sys.exit(0 if hits and all(str(c.get(''stdout_tail'','''')).strip() and c.get(''log_sha256'') for
+      c in hits) else 1)"'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — grep -q ''feat-20260901-coordinator-procedure-gaps-y8fu'' docs/planning/progress.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — ! grep -q ''다음 정비 후보다'' docs/planning/progress.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-14: exit 0 — bin/romeo compile --check'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 36건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 15건이 승인 커밋 82a8191ddf11 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — awk ''/^### 3\.1 /,/^### 3\.2 /'' adapters/orca/RUNBOOK.md | grep
+      -q ''attempts\.yaml'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — awk ''/^### 3\.1 /,/^### 3\.2 /'' adapters/orca/RUNBOOK.md | grep
+      -qE ''git (show|diff|ls-tree)[^|]*attempts\.yaml'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_runbook_procedure -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep
+      -qE ''^### 3\.[0-9.]+ .*재작업'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -c "import re,sys; t=open(''adapters/orca/RUNBOOK.md'').read();
+      m=re.search(r''^### 3\.[0-9.]+ [^\n]*재작업[^\n]*\n(.*?)(?=^#{2,3} )'', t, re.S|re.M); b=m.group(1)
+      if m else ''''; sys.exit(0 if ''_stamp_ids'' in b and ''run-create'' in b else 1)"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep
+      -q ''run-use --id'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — awk ''/^## 3\. 실행 순서/,/^## 4\./'' adapters/orca/RUNBOOK.md | grep
+      -q ''run-current'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -c "import yaml,sys; k=(yaml.safe_load(open(''.harness/observations.yaml''))
+      or {}).get(''coordinator_run_rebinding'') or {}; need=(''a_switch_back'',''b_read_after_switch'',''c_rejection_shape'');
+      sys.exit(0 if all(isinstance(k.get(n),dict) and any(str(k[n].get(f,'''')).strip() for f in (''result'',''exit_code''))
+      for n in need) else 1)"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-15: 재실행도 exit 0 — python3 -c "import glob,yaml,sys; hits=[c for f in glob.glob(''docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/evidence/*.yaml'')
+      for c in (yaml.safe_load(open(f)) or {}).get(''commands'',[]) if str(c.get(''id'','''')).startswith(''run-rebinding-probe'')];
+      sys.exit(0 if hits and all(str(c.get(''stdout_tail'','''')).strip() and c.get(''log_sha256'') for
+      c in hits) else 1)"'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — grep -q ''feat-20260901-coordinator-procedure-gaps-y8fu'' docs/planning/progress.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — ! grep -q ''다음 정비 후보다'' docs/planning/progress.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-14: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 82a8191ddf11 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'docs/planning/open-questions.md', 'docs/planning/progress.md',
+      'tests/test_runbook_procedure.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_30aed12f8de0-reviewer.json: FAIL(findings 2건 — 첫째: AC-5의 check-8은 coordinator_run_rebinding
+      값의 존재와 비어 있지 않음만 검사) — 재승인 전 승인(approved_at 2026-09-01T10:19:36+09:00)으로 낸 판정 · 다른 산출물(a1bfeac+5588351d1e64)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 82a8191+25c74b9f4627 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_fc79c4267d1c-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

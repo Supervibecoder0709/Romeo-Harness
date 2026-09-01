@@ -1,0 +1,921 @@
+
+=== 0. 이 터미널의 handle 과 시작 시점 바인딩 ===
+ORCA_TERMINAL_HANDLE=term_79b766bf-f5b2-45df-9d23-2d20e6e79d95
+$ orca orchestration run-current --json
+{
+  "id": "b3433fb9-ec1a-454b-9ac5-03c5f8eeaff1",
+  "ok": true,
+  "result": {
+    "run": null
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 1. Run A 생성 ===
+A=run_689f84f78176
+$ orca orchestration run-current --json
+{
+  "id": "9d5c13a8-4960-4573-bf20-bfbaf976221d",
+  "ok": true,
+  "result": {
+    "run": {
+      "id": "run_689f84f78176",
+      "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+      "home_database": "this_database",
+      "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "consumer_generation": 1,
+      "legacy": 0,
+      "created_at": "2026-09-01T03:06:59Z",
+      "updated_at": "2026-09-01T03:06:59Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 2. Run A 에 Task 를 하나 만들어 둔다 — 전환 뒤 '읽을 수 있는가' 의 대상 ===
+$ orca orchestration task-create --run run_689f84f78176 --task-title AC-5 probe task A --spec 관측 전용. 배치하지 않는다 --json
+{
+  "id": "be48a251-c9fe-4cba-9ac2-69d2c7d54149",
+  "ok": true,
+  "result": {
+    "task": {
+      "id": "task_4364fbd27cb2",
+      "parent_id": null,
+      "created_by_terminal_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "task_title": "AC-5 probe task A",
+      "display_name": "AC-5 probe task A",
+      "spec": "관측 전용. 배치하지 않는다",
+      "status": "ready",
+      "deps": "[]",
+      "result": null,
+      "created_at": "2026-09-01 03:06:59",
+      "completed_at": null,
+      "run_id": "run_689f84f78176",
+      "created_by_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "created_by_process_incarnation": "706c419b-c187-4196-a4b0-f5b61f38e44e::/Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu@@d5e144cb:fb768586-4867-456a-a2a6-dbf6b5038ed9",
+      "created_by_run_generation": 1
+    },
+    "mutation": {
+      "requestId": "add9a9c0-dac0-4a01-b470-395d51566fa3",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 3. Run B 생성 — 여기서 바인딩이 옮겨간다 ===
+B=run_3a48508dac0d
+$ orca orchestration run-current --json
+{
+  "id": "6d17dff1-230e-4366-9d63-e1ef77bd5679",
+  "ok": true,
+  "result": {
+    "run": {
+      "id": "run_3a48508dac0d",
+      "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run B",
+      "home_database": "this_database",
+      "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "consumer_generation": 1,
+      "legacy": 0,
+      "created_at": "2026-09-01T03:06:59Z",
+      "updated_at": "2026-09-01T03:06:59Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 4. (c) 거부의 모양 — 옛 Run A 에 대한 명령 3종 ===
+$ orca orchestration check --run run_689f84f78176 --peek --json
+{
+  "id": "364155cd-4dca-41f8-bf01-e808fcc7cbbd",
+  "ok": false,
+  "error": {
+    "code": "consumer_fenced",
+    "message": "This coordinator terminal is bound to run_3a48508dac0d, not run_689f84f78176."
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=1
+$ orca orchestration task-list --run run_689f84f78176 --brief --json
+{
+  "id": "0a213b00-341b-4602-8887-9fc26897b16d",
+  "ok": true,
+  "result": {
+    "runId": "run_689f84f78176",
+    "legacyReadOnly": false,
+    "tasks": [
+      {
+        "id": "task_4364fbd27cb2",
+        "parent_id": null,
+        "created_by_terminal_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+        "task_title": "AC-5 probe task A",
+        "display_name": "AC-5 probe task A",
+        "spec": "관측 전용. 배치하지 않는다",
+        "status": "ready",
+        "deps": "[]",
+        "result": null,
+        "created_at": "2026-09-01 03:06:59",
+        "completed_at": null,
+        "run_id": "run_689f84f78176",
+        "created_by_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+        "created_by_process_incarnation": "706c419b-c187-4196-a4b0-f5b61f38e44e::/Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu@@d5e144cb:fb768586-4867-456a-a2a6-dbf6b5038ed9",
+        "created_by_run_generation": 1,
+        "spec_truncated": false
+      }
+    ],
+    "count": 1
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+$ orca orchestration task-update --id task_doesnotexist --run run_689f84f78176 --status failed --json
+{
+  "id": "65797223-bfd9-4bb7-b327-063c9d532d31",
+  "ok": false,
+  "error": {
+    "code": "consumer_fenced",
+    "message": "This coordinator terminal is bound to run_3a48508dac0d, not run_689f84f78176."
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=1
+
+=== 5. (a) run-use --run 은 받지 않는다는 것 ===
+$ orca orchestration run-use --run run_689f84f78176 --json
+{
+  "id": "local",
+  "ok": false,
+  "error": {
+    "code": "invalid_argument",
+    "message": "Unknown flag --run for command: orchestration run-use",
+    "data": {
+      "validFlags": [
+        "environment",
+        "from",
+        "help",
+        "id",
+        "json",
+        "pairing-code",
+        "retry-request",
+        "takeover-legacy"
+      ],
+      "suggestions": [
+        "from",
+        "id",
+        "json"
+      ],
+      "nextSteps": [
+        "Did you mean: --from, --id, --json",
+        "Valid flags: --environment, --from, --help, --id, --json, --pairing-code, --retry-request, --takeover-legacy"
+      ]
+    }
+  },
+  "_meta": {
+    "runtimeId": null
+  }
+}
+exit=1
+
+=== 6. (a) run-use --id 로 전환 ===
+$ orca orchestration run-use --id run_689f84f78176 --json
+{
+  "id": "6c015e3a-f459-496f-91e1-4b9fed714321",
+  "ok": true,
+  "result": {
+    "run": {
+      "id": "run_689f84f78176",
+      "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+      "home_database": "this_database",
+      "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "consumer_generation": 3,
+      "legacy": 0,
+      "created_at": "2026-09-01T03:06:59Z",
+      "updated_at": "2026-09-01T03:07:00Z"
+    },
+    "binding": {
+      "consumerGeneration": 3
+    },
+    "mutation": {
+      "requestId": "710afced-40af-480a-94eb-8c979ae4076b",
+      "replayed": false
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+$ orca orchestration run-current --json
+{
+  "id": "1913ee51-4297-4349-93d2-d90b279044ca",
+  "ok": true,
+  "result": {
+    "run": {
+      "id": "run_689f84f78176",
+      "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+      "home_database": "this_database",
+      "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "consumer_generation": 3,
+      "legacy": 0,
+      "created_at": "2026-09-01T03:06:59Z",
+      "updated_at": "2026-09-01T03:07:00Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 7. (b) 전환 뒤 그 Run 의 상태·메시지를 실제로 읽을 수 있는가 ===
+$ orca orchestration check --run run_689f84f78176 --peek --json
+{
+  "id": "9a7c38e8-9d22-4ff1-beee-aafcb7eb9a7c",
+  "ok": true,
+  "result": {
+    "runId": "run_689f84f78176",
+    "messages": [],
+    "count": 0,
+    "acknowledged": null
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+$ orca orchestration task-list --run run_689f84f78176 --brief --json
+{
+  "id": "3d3dc974-c53e-4160-a82d-cb68a3cc8ca2",
+  "ok": true,
+  "result": {
+    "runId": "run_689f84f78176",
+    "legacyReadOnly": false,
+    "tasks": [
+      {
+        "id": "task_4364fbd27cb2",
+        "parent_id": null,
+        "created_by_terminal_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+        "task_title": "AC-5 probe task A",
+        "display_name": "AC-5 probe task A",
+        "spec": "관측 전용. 배치하지 않는다",
+        "status": "ready",
+        "deps": "[]",
+        "result": null,
+        "created_at": "2026-09-01 03:06:59",
+        "completed_at": null,
+        "run_id": "run_689f84f78176",
+        "created_by_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+        "created_by_process_incarnation": "706c419b-c187-4196-a4b0-f5b61f38e44e::/Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-coordinator-procedure-gaps-y8fu@@d5e144cb:fb768586-4867-456a-a2a6-dbf6b5038ed9",
+        "created_by_run_generation": 1,
+        "spec_truncated": false
+      }
+    ],
+    "count": 1
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+$ orca orchestration run-show --id run_689f84f78176 --json
+{
+  "id": "17190703-dbc0-44c1-aa31-b02ac71b1172",
+  "ok": true,
+  "result": {
+    "run": {
+      "id": "run_689f84f78176",
+      "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+      "home_database": "this_database",
+      "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+      "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+      "consumer_generation": 3,
+      "legacy": 0,
+      "created_at": "2026-09-01T03:06:59Z",
+      "updated_at": "2026-09-01T03:07:00Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 8. 전환 뒤 새 Run B 는 어떻게 되는가 — 이제 B 가 옛 Run 이다 ===
+$ orca orchestration check --run run_3a48508dac0d --peek --json
+{
+  "id": "b69df35f-431e-419f-9b5e-e8eb2c5b2784",
+  "ok": false,
+  "error": {
+    "code": "consumer_fenced",
+    "message": "This coordinator terminal is bound to run_689f84f78176, not run_3a48508dac0d."
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=1
+$ orca orchestration task-list --run run_3a48508dac0d --brief --json
+{
+  "id": "2b2ec10d-9b08-426a-8c6f-b84c674aaed0",
+  "ok": true,
+  "result": {
+    "runId": "run_3a48508dac0d",
+    "legacyReadOnly": false,
+    "tasks": [],
+    "count": 0
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== 9. run-list — 두 Run 이 다 남아 있는가 ===
+$ orca orchestration run-list --json
+{
+  "id": "2fc5ce14-0add-4221-bc5f-dc9cc8b6c872",
+  "ok": true,
+  "result": {
+    "runs": [
+      {
+        "id": "run_689f84f78176",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+        "home_database": "this_database",
+        "coordinator_handle": "term_79b766bf-f5b2-45df-9d23-2d20e6e79d95",
+        "coordinator_pane_key": "9ebefeb1-9720-42fc-b4f1-1b5109477f53:78a93cb1-b5cf-4f28-b808-245af0cdc1a9",
+        "consumer_generation": 3,
+        "legacy": 0,
+        "created_at": "2026-09-01T03:06:59Z",
+        "updated_at": "2026-09-01T03:07:00Z"
+      },
+      {
+        "id": "run_3a48508dac0d",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run B",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-09-01T03:06:59Z",
+        "updated_at": "2026-09-01T03:07:00Z"
+      },
+      {
+        "id": "run_fc79c4267d1c",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu 2회차 · AC-5 관측을 evidence 로 봉인하고 check-8·15 를 통과시킨다",
+        "home_database": "this_database",
+        "coordinator_handle": "term_682733b1-e26f-4891-bb86-0e6d8027915a",
+        "coordinator_pane_key": "a3ef0ea9-81c7-4ac3-a291-bb44d5ceccde:4f60b1e5-80a2-4592-854f-370d694e3c67",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-09-01T03:03:48Z",
+        "updated_at": "2026-09-01T03:03:48Z"
+      },
+      {
+        "id": "run_054594259ff6",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run B",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-09-01T01:26:10Z",
+        "updated_at": "2026-09-01T01:26:10Z"
+      },
+      {
+        "id": "run_e5ee724a61b5",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · AC-5 관측 Run A",
+        "home_database": "this_database",
+        "coordinator_handle": "term_83b2d605-1c67-4307-8ce4-10a062f0b8a6",
+        "coordinator_pane_key": "ebb6b117-fb1a-4aff-91a4-63795e6d5030:5c48c682-5320-40f7-b09a-57663a00f735",
+        "consumer_generation": 3,
+        "legacy": 0,
+        "created_at": "2026-09-01T01:26:09Z",
+        "updated_at": "2026-09-01T01:26:10Z"
+      },
+      {
+        "id": "run_30aed12f8de0",
+        "objective": "feat-20260901-coordinator-procedure-gaps-y8fu · 코디네이터 위임 절차 결함 3건을 RUNBOOK 실행 순서에 반영하고 Run 바인딩 전환을 실측한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-09-01T01:21:01Z",
+        "updated_at": "2026-09-01T03:03:48Z"
+      },
+      {
+        "id": "run_e3a4af18582c",
+        "objective": "feat-20260831-park-defects-actm · 5회차 (check-16 교체 후)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T17:32:55Z",
+        "updated_at": "2026-09-01T01:21:01Z"
+      },
+      {
+        "id": "run_43a8b64c0d69",
+        "objective": "feat-20260831-park-defects-actm · 검토 findings 2건 반영 (4회차 이어서 — 새 위임이므로 새 run)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T16:18:17Z",
+        "updated_at": "2026-08-31T17:32:55Z"
+      },
+      {
+        "id": "run_8d29cf346816",
+        "objective": "feat-20260831-park-defects-actm · park 된 하네스 결함 5건 정비 (3회차 — evidence.py 앵커 수정 포함, 2회차 작업 시딩)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T15:35:21Z",
+        "updated_at": "2026-08-31T16:18:17Z"
+      },
+      {
+        "id": "run_e5c7c10f80aa",
+        "objective": "feat-20260831-park-defects-actm · park 된 하네스 결함 4건 정비 (2회차 — 검증 계획 오타 수정 후 재승인 base)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T14:57:08Z",
+        "updated_at": "2026-08-31T15:35:21Z"
+      },
+      {
+        "id": "run_6e8ac2710600",
+        "objective": "feat-20260831-park-defects-actm · park 된 하네스 결함 4건 정비",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T14:06:07Z",
+        "updated_at": "2026-08-31T14:57:08Z"
+      },
+      {
+        "id": "run_4d3ee0b42e5a",
+        "objective": "feat-20260831-bmad-install-observe-a3bm · BMAD 실제 설치와 두 런타임 discovery 관측 (4회차)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T12:37:37Z",
+        "updated_at": "2026-08-31T14:06:07Z"
+      },
+      {
+        "id": "run_923ba2a01bb4",
+        "objective": "feat-20260831-bmad-install-observe-a3bm 3회차 · 마스킹 오탐을 고친 새 base(84968ac)에서 관측을 재현하고 검토자까지 돌려 close 를 시도한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T11:19:26Z",
+        "updated_at": "2026-08-31T12:37:37Z"
+      },
+      {
+        "id": "run_6165c4796868",
+        "objective": "feat-20260831-bmad-install-observe-a3bm 2회차 · 검증 계획 결함 2건을 닫은 새 base(54dd04d)에서 BMAD 설치·공존·두 런타임 discovery 를 다시 관측한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T10:45:30Z",
+        "updated_at": "2026-08-31T11:19:26Z"
+      },
+      {
+        "id": "run_67c238a254e1",
+        "objective": "feat-20260831-bmad-install-observe-a3bm · BMAD 를 격리 워크트리에 실제 설치해 romeo 스킬 공존·프로브 present·두 런타임 discovery 를 관측한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T09:17:01Z",
+        "updated_at": "2026-08-31T10:45:30Z"
+      },
+      {
+        "id": "run_606b5a67b44d",
+        "objective": "feat-20260831-bmad-attach-probe-tgnb 관통 2회차",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T06:36:37Z",
+        "updated_at": "2026-08-31T09:17:01Z"
+      },
+      {
+        "id": "run_7c27d82a0748",
+        "objective": "feat-20260831-bmad-attach-probe-tgnb 관통",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-31T06:27:11Z",
+        "updated_at": "2026-08-31T06:36:37Z"
+      },
+      {
+        "id": "run_6bd72dea65db",
+        "objective": "feat-20260831-repeat-brake-82zv · 3회차 — AC-6 수정 뒤 증거 기록(재승인 c842dc0)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T15:55:13Z",
+        "updated_at": "2026-08-31T06:27:11Z"
+      },
+      {
+        "id": "run_7fae68b8791b",
+        "objective": "feat-20260831-repeat-brake-82zv · 2회차 — 브레이크 유지 + expect 는 템플릿 한정(재승인 31a64a3)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T15:38:48Z",
+        "updated_at": "2026-08-30T15:55:13Z"
+      },
+      {
+        "id": "run_2e44c6ab0b3a",
+        "objective": "feat-20260831-repeat-brake-82zv · 반복 중단 브레이크를 실제로 걸고 expect 함정을 없앤다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T15:11:45Z",
+        "updated_at": "2026-08-30T15:38:48Z"
+      },
+      {
+        "id": "run_583f325f5c94",
+        "objective": "feat-20260830-runbook-delegation-gaps-biae · RUNBOOK 위임 절차 결함 6건을 adapters/orca/RUNBOOK.md 에 반영한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T14:25:33Z",
+        "updated_at": "2026-08-30T15:11:45Z"
+      },
+      {
+        "id": "run_c62036661689",
+        "objective": "feat-20260830-reviewer-fail-reasons-938r · 검토자 FAIL 사유를 닫힌 목록으로 만들고 결과 봉투 스키마로 강제한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T12:57:17Z",
+        "updated_at": "2026-08-30T14:25:33Z"
+      },
+      {
+        "id": "run_f4f810c1baa6",
+        "objective": "Romeo G-M3 선행: BMAD 본체 v6.10.0 한국어 아카이브 + 결함 5건 하네스 정비",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T05:19:46Z",
+        "updated_at": "2026-08-30T12:57:17Z"
+      },
+      {
+        "id": "run_0dd59c8f75de",
+        "objective": "feat-20260830-harness-tuneup-6xcq · M3 진입 전 하네스 정비 8항목 (2차 위임)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T04:31:34Z",
+        "updated_at": "2026-08-30T05:19:46Z"
+      },
+      {
+        "id": "run_21d00ff8a98f",
+        "objective": "feat-20260830-harness-tuneup-6xcq · M3 진입 전 하네스 정비 8항목",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-30T04:16:27Z",
+        "updated_at": "2026-08-30T04:31:34Z"
+      },
+      {
+        "id": "run_3589e602e8e0",
+        "objective": "재승인된 M2 마일스톤 지연 근본 원인 리뷰를 Codex Sol/max로 조사하고, 사용자 스토리 중심 보고서와 증거를 남긴다",
+        "home_database": "this_database",
+        "coordinator_handle": "term_a63ac49a-ea6e-4f3a-b036-c367444bc604",
+        "coordinator_pane_key": "199cb5da-2146-40f1-8b62-73770b6754d2:4736fcd0-9541-4b43-91ae-3359248230a6",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-29T09:38:12Z",
+        "updated_at": "2026-08-29T09:38:12Z"
+      },
+      {
+        "id": "run_b8b6863da4d0",
+        "objective": "승인된 M2 마일스톤 지연 근본 원인 리뷰를 Codex Sol/max로 조사하고, 사용자 스토리 중심 보고서와 증거를 남긴다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T09:24:43Z",
+        "updated_at": "2026-08-29T09:38:12Z"
+      },
+      {
+        "id": "run_e82929ee03da",
+        "objective": "feat-20260829-license-field-46an · 3차 관통 교체 실행(구현자 codex · 검토자 claude) · base 7f8ecd7449a5953d6b1d6b3b16d1113b4bae4f98",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T08:36:53Z",
+        "updated_at": "2026-08-30T04:16:27Z"
+      },
+      {
+        "id": "run_42710f6ac93b",
+        "objective": "feat-20260829-license-field-46an · 3차 관통 기준 실행(구현자 claude · 검토자 codex) · base 7f8ecd7449a5953d6b1d6b3b16d1113b4bae4f98",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T08:10:44Z",
+        "updated_at": "2026-08-29T08:36:53Z"
+      },
+      {
+        "id": "run_26fbe9fb7fab",
+        "objective": "feat-20260829-license-field-46an · §6.6 검토자 표본 claude-b (산출물 고정: impl3)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T05:24:44Z",
+        "updated_at": "2026-08-29T08:10:44Z"
+      },
+      {
+        "id": "run_410f3f12a645",
+        "objective": "feat-20260829-license-field-46an · §6.6 검토자 표본 claude-a (산출물 고정: impl3)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T05:24:43Z",
+        "updated_at": "2026-08-29T05:24:44Z"
+      },
+      {
+        "id": "run_6c143185ea1b",
+        "objective": "feat-20260829-license-field-46an · §6.6 검토자 표본 codex-2 (산출물 고정: impl3)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T05:22:31Z",
+        "updated_at": "2026-08-29T05:24:43Z"
+      },
+      {
+        "id": "run_ba40ff663b44",
+        "objective": "feat-20260829-license-field-46an · M2 재관통 교체 실행(구현자 codex · 검토자 claude) — base_sha c237ea9",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T05:21:17Z",
+        "updated_at": "2026-08-29T05:22:31Z"
+      },
+      {
+        "id": "run_5a5a894aa26d",
+        "objective": "feat-20260829-license-field-46an · M2 재관통 기준 실행(구현자 claude · 검토자 codex) — base_sha c237ea9",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T04:55:59Z",
+        "updated_at": "2026-08-29T05:21:17Z"
+      },
+      {
+        "id": "run_222f508b5541",
+        "objective": "feat-20260829-license-field-46an · Q-09 표본 보강 — claude 검토자 2번째 실행",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-29T03:12:17Z",
+        "updated_at": "2026-08-29T04:55:59Z"
+      },
+      {
+        "id": "run_5dd1b2c232c7",
+        "objective": "feat-20260829-license-field-46an · Q-08 재현성 측정 B — 같은 산출물에 codex 검토자 재실행 2/2",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 4,
+        "legacy": 0,
+        "created_at": "2026-08-29T02:41:23Z",
+        "updated_at": "2026-08-29T03:12:17Z"
+      },
+      {
+        "id": "run_241a35112ca3",
+        "objective": "feat-20260829-license-field-46an · Q-08 재현성 측정 A — 같은 산출물에 codex 검토자 재실행 1/2",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 4,
+        "legacy": 0,
+        "created_at": "2026-08-29T02:41:14Z",
+        "updated_at": "2026-08-29T02:50:15Z"
+      },
+      {
+        "id": "run_5fc794f15236",
+        "objective": "feat-20260829-license-field-46an · 검토자-only 재실행(RUNBOOK §6.6) — 기준 산출물(run_31e175742892, 트리 7b035490…) 고정, 검토자만 claude 로 교체해 검토자 면 동등성 관측",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-28T20:12:37Z",
+        "updated_at": "2026-08-29T02:41:14Z"
+      },
+      {
+        "id": "run_b5cdadaffcdc",
+        "objective": "feat-20260829-license-field-46an · 아카이브 스키마 라이선스 필드 (M2 T1 swapped: implementer=codex, reviewer=claude)",
+        "home_database": "this_database",
+        "coordinator_handle": "term_7bfda6e9-841a-4a33-a715-5d2061605d7f",
+        "coordinator_pane_key": "02a47218-0e95-4f63-a8a9-521b189c9869:8c2dfb14-a824-4956-af43-b4624e92eb82",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-28T16:52:50Z",
+        "updated_at": "2026-08-28T16:52:50Z"
+      },
+      {
+        "id": "run_31e175742892",
+        "objective": "feat-20260829-license-field-46an · 아카이브 스키마 라이선스 필드 (M2 T1 baseline: implementer=claude, reviewer=codex)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-28T16:20:42Z",
+        "updated_at": "2026-08-28T16:52:50Z"
+      },
+      {
+        "id": "run_7865ac0ae3e3",
+        "objective": "Codex(gpt-5.6-sol, fast) review of Romeo implementation plan 2026-08-27",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-27T02:42:48Z",
+        "updated_at": "2026-08-28T16:20:42Z"
+      },
+      {
+        "id": "run_6862976555f0",
+        "objective": "Archive 17 GitHub repositories in Korean (repo-archive skill)",
+        "home_database": "this_database",
+        "coordinator_handle": "term_71acffa4-7d01-4b4f-850c-975b8ce396cf",
+        "coordinator_pane_key": "662695ec-420a-4c18-bba3-df77f3304f26:d4dd0f45-bddb-4b65-bf1c-f23d1a74d333",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-23T18:41:15Z",
+        "updated_at": "2026-08-23T18:41:15Z"
+      },
+      {
+        "id": "run_128d17183894",
+        "objective": "Archive sindresorhus/slugify in Korean as an end-to-end /repo test",
+        "home_database": "this_database",
+        "coordinator_handle": "term_9bd9365b-2a8b-4188-934d-adba9dce7712",
+        "coordinator_pane_key": "bedd8d3a-f1d2-4095-9acb-1345d0bd8a24:0090a85f-0e53-459f-be04-c91cc47d99f1",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-12T23:49:27Z",
+        "updated_at": "2026-08-12T23:49:27Z"
+      },
+      {
+        "id": "run_74c13627b562",
+        "objective": "§6-E door 적대 리뷰 확정 결함 수정 — CRITICAL 6 + CONFIRMED HIGH 15 + H-j + §6.2 배선/§6.3 테스트/§7 스캐너",
+        "home_database": "this_database",
+        "coordinator_handle": "term_81eed6d3-4bdd-4e78-a842-d49a42d0a74a",
+        "coordinator_pane_key": "3ca76811-fa15-4f32-b34a-7fa48696597d:fe75925b-e831-46bf-b908-5533b0a1420b",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-09T20:25:51Z",
+        "updated_at": "2026-08-09T20:25:51Z"
+      },
+      {
+        "id": "run_506b9817e47d",
+        "objective": "Execute the canonical 34-product Coupang A-to-B migration through implementation, read-only preflight, B middle-save drafts, reopen verification, and final evidence report without final product registration",
+        "home_database": "this_database",
+        "coordinator_handle": "term_08f86561-8064-4092-8018-66f244735447",
+        "coordinator_pane_key": "bbff1934-184d-4abf-a651-211b8f847815:3b7a5d4f-1545-40bb-a39d-253b5356ed79",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-09T19:36:18Z",
+        "updated_at": "2026-08-09T19:36:18Z"
+      },
+      {
+        "id": "run_f0cdef6b821d",
+        "objective": "§6-E door 구현 코드 적대적 리뷰 — 결함 및 구현 계획서/SPEC 이탈 탐지 (범위 6분할 병렬)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-09T18:03:54Z",
+        "updated_at": "2026-08-09T20:25:51Z"
+      },
+      {
+        "id": "run_4ee8e4b245c5",
+        "objective": "Claude Fable이 account-migration 자동화 계획서를 별도 워크트리에서 검토하고, 검토 결과를 반영해 최종 계획서를 확정한다",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 2,
+        "legacy": 0,
+        "created_at": "2026-08-09T09:57:11Z",
+        "updated_at": "2026-08-09T19:36:18Z"
+      },
+      {
+        "id": "run_e35236dc05aa",
+        "objective": "Ordi 랜딩 모바일 최적화(커밋 b0c822a) Codex 실구현 검토 및 피드백 반영",
+        "home_database": "this_database",
+        "coordinator_handle": "term_1cd244a1-e4f6-4271-a9f4-dcf0b1521885",
+        "coordinator_pane_key": "baf8fb08-2a84-44db-b360-398fd5b4bd54:27bdc83f-f3fe-400c-823a-ff85773ca470",
+        "consumer_generation": 1,
+        "legacy": 0,
+        "created_at": "2026-08-07T07:52:28Z",
+        "updated_at": "2026-08-07T07:52:28Z"
+      },
+      {
+        "id": "run_legacy_local",
+        "objective": "Legacy orchestration state (adopted; inspect only)",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 0,
+        "legacy": 1,
+        "created_at": "2026-07-31T23:53:44Z",
+        "updated_at": "2026-07-31T23:53:44Z"
+      },
+      {
+        "id": "run_803dcda5b53b",
+        "objective": "Recovered orchestration work from a contract update",
+        "home_database": "this_database",
+        "coordinator_handle": null,
+        "coordinator_pane_key": null,
+        "consumer_generation": 0,
+        "legacy": 0,
+        "created_at": "2026-07-31T23:53:44Z",
+        "updated_at": "2026-07-31T23:53:44Z"
+      }
+    ],
+    "nextCursor": null
+  },
+  "_meta": {
+    "runtimeId": "8fc4a32f-d80a-49af-9fd3-067d98600499"
+  }
+}
+exit=0
+
+=== DONE A=run_689f84f78176 B=run_3a48508dac0d ===
