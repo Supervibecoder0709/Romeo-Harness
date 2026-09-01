@@ -3,8 +3,9 @@ import subprocess
 from pathlib import Path
 
 from . import HARNESS_ROOT, frontmatter
+from .blocks import evaluate as evaluate_blocks
 from .ids import new_id
-from .policy import load_policy
+from .policy import classification_from_frontmatter, load_policy, load_project_state, route
 from .util import now_iso, rel, today
 
 SPEC_EXTRA_ORDER = ["risk-backup-recovery", "environment-plan", "ui-state-table", "discovery-plan", "experiment-design", "capability-check"]
@@ -124,6 +125,10 @@ def approve_unit(unit_id, by, project_root=".", reapprove=False, reason=None):
         raise ValueError("확인란 절이 없다")
     if "NEEDS_INPUT" in check:
         raise ValueError("확인란에 NEEDS_INPUT 이 남아 있다 — 사용자가 읽고 승인할 내용이 비어 있다")
+    unmet = unmet_blocks(unit_id, fm, body, udir, project_root=project_root)
+    if unmet:
+        raise ValueError("차단이 충족되지 않아 승인할 수 없다(승인은 구현을 여는 사건이다, D-27) — "
+                         + "; ".join(f"{bid}: {why}" for bid, why in unmet))
     now = now_iso()
     if reapprove:
         history = list(fm.get("approval_history") or [])
@@ -137,6 +142,17 @@ def approve_unit(unit_id, by, project_root=".", reapprove=False, reason=None):
     fm["updated"] = today()
     frontmatter.write(spec, fm, body)
     return fm
+
+
+def unmet_blocks(unit_id, fm, body, unit_dir, project_root=".", point="approve", policy=None):
+    """이 집행 지점에서 **막는** 차단 목록 → `[(block_id, 이유)]`. 라우팅을 문서 frontmatter 에서 다시 계산한다.
+
+    차단은 분류에서 나오므로 저장된 값을 읽지 않고 재계산한다 — 문서의 `routing.fired_rules` 는 만든 시점의 기록이고,
+    정책표가 바뀌면 낡는다. 재계산은 정책표를 원본으로 두는 유일한 방법이다(K-63)."""
+    pol = policy or load_policy()
+    out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
+    return [(bid, why) for bid, ok, why
+            in evaluate_blocks(pol["packages"], out["blocks"], point, unit_dir, fm, body) if not ok]
 
 
 def _iso(value):

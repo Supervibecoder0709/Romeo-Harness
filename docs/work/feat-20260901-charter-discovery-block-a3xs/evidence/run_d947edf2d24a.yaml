@@ -1,0 +1,515 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_d947edf2d24a
+task_id: task_a2e8b0e3a8ad
+dispatch_id: ctx_dc4ae0133fd8
+unit_id: feat-20260901-charter-discovery-block-a3xs
+spec_ref:
+  path: docs/work/feat-20260901-charter-discovery-block-a3xs/spec.md
+  sha256: 512188591aa8b8a831041ffdd9e38f65a61fada05543fd27e152f1eef17fed80
+base_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-charter-discovery-block-a3xs
+started_at: '2026-09-01T15:46:04+09:00'
+finished_at: '2026-09-01T15:54:52+09:00'
+commands:
+- id: check-1
+  command: test -f core/templates/charter.md
+  exit_code: 0
+  started_at: '2026-09-01T15:46:04+09:00'
+  finished_at: '2026-09-01T15:46:04+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/01-check-1.log
+  log_sha256: 8c2fb1f434116b115c77e2171b555bad844ea49eaa8f7066f9369f4688270c5f
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-2
+  command: grep -q '^## 마일스톤 계획' core/templates/charter.md
+  exit_code: 0
+  started_at: '2026-09-01T15:46:04+09:00'
+  finished_at: '2026-09-01T15:46:04+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/02-check-2.log
+  log_sha256: e2df8bd9610ee99da19cc27383bcbd7a5e20de35c2b03651a17a1740d3a3354e
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-3
+  command: python3 -m unittest tests.test_blocks_enforcement.TestBlockCatalog
+  exit_code: 0
+  started_at: '2026-09-01T15:46:04+09:00'
+  finished_at: '2026-09-01T15:46:04+09:00'
+  seconds: 0.092
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/03-check-3.log
+  log_sha256: 001c92081a61731c63bc94184aceec01e2c3f7fb8fd78e49a13f35ca1819b49f
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-4
+  command: python3 -m unittest tests.test_blocks_enforcement.TestCatalogMappingMismatch
+  exit_code: 0
+  started_at: '2026-09-01T15:46:04+09:00'
+  finished_at: '2026-09-01T15:46:05+09:00'
+  seconds: 0.27
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/04-check-4.log
+  log_sha256: 207b8ad7c89a23066e72f9c0bf019bf0065f02c4801fa4bbffd792500aa24d92
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-5
+  command: python3 -m unittest tests.test_blocks_enforcement.TestApproveRejectsUnsatisfied
+  exit_code: 0
+  started_at: '2026-09-01T15:46:05+09:00'
+  finished_at: '2026-09-01T15:46:05+09:00'
+  seconds: 0.36
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/05-check-5.log
+  log_sha256: 86866494421dfc0f87f9894189e19380e2db3c36a98dc9a7f2b00d4be1d3e241
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-6
+  command: python3 -m unittest tests.test_blocks_enforcement.TestDiscoveryResultNeedsInputs
+  exit_code: 0
+  started_at: '2026-09-01T15:46:05+09:00'
+  finished_at: '2026-09-01T15:46:06+09:00'
+  seconds: 0.299
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/06-check-6.log
+  log_sha256: d953ddbaccbd834515246045c5355159b2114d9dd7414916e0fdc536029a4721
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-7
+  command: python3 -m unittest tests.test_blocks_enforcement.TestMilestonePlanNeedsCharter
+  exit_code: 0
+  started_at: '2026-09-01T15:46:06+09:00'
+  finished_at: '2026-09-01T15:46:06+09:00'
+  seconds: 0.417
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/07-check-7.log
+  log_sha256: 0676bd02537e41071d9833a5ef06435cc1eab2b5b8a5bcab9139ac841ece6db5
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-8
+  command: python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied
+  exit_code: 0
+  started_at: '2026-09-01T15:46:06+09:00'
+  finished_at: '2026-09-01T15:46:08+09:00'
+  seconds: 1.265
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/08-check-8.log
+  log_sha256: 5d6ee1eb20d92beba870efe6173dce9f7d9dfb9995b936a5189196b21322feda
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-9
+  command: python3 -m unittest tests.test_blocks_enforcement.TestNoRetroactiveEffect
+  exit_code: 0
+  started_at: '2026-09-01T15:46:08+09:00'
+  finished_at: '2026-09-01T15:46:08+09:00'
+  seconds: 0.85
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/09-check-9.log
+  log_sha256: 19d0c587c69a77fa12af62e8dcb79d220a436160ea94f8e7b501f6bd48ea91d3
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-10
+  command: python3 -m unittest tests.test_scenario_3
+  exit_code: 0
+  started_at: '2026-09-01T15:46:08+09:00'
+  finished_at: '2026-09-01T15:46:10+09:00'
+  seconds: 1.454
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/10-check-10.log
+  log_sha256: c1892d4b921a53c3aab72d143a16037ca8bde3e5faf00f3a51392adcb1ad3b8c
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-11
+  command: test -f scenarios/3-discovery-block.md && test -f scenarios/README.md
+  exit_code: 0
+  started_at: '2026-09-01T15:46:10+09:00'
+  finished_at: '2026-09-01T15:46:10+09:00'
+  seconds: 0.003
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/11-check-11.log
+  log_sha256: 715dd26c683872c47d747bc5b19a930e16159a26c07bd137460fb2c1d4b83b23
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-12
+  command: bin/romeo close --unit feat-20260901-task-copy-brief-count-erc6 --dry-run --no-rerun > /dev/null;
+    test $? -eq 1
+  exit_code: 0
+  started_at: '2026-09-01T15:46:10+09:00'
+  finished_at: '2026-09-01T15:46:10+09:00'
+  seconds: 0.298
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/12-check-12.log
+  log_sha256: 306ce5fe5d16356e7a4c2504daa0ef81adad176f5a484c23ed3d105399831763
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-13
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T15:46:10+09:00'
+  finished_at: '2026-09-01T15:48:10+09:00'
+  seconds: 119.993
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/13-check-13.log
+  log_sha256: f521a6063a4d75a0383d098f9157653e322e3d4f1c0580061de839cbc120f8b6
+  stdout_tail: ''
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-14
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-01T15:48:11+09:00'
+  finished_at: '2026-09-01T15:48:11+09:00'
+  seconds: 0.198
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/14-check-14.log
+  log_sha256: 5e1114bd9fcd0a69ee84ebccc54a953f8456a2a9b06763b4e2416e1f066d15a4
+  stdout_tail: compile 검사 PASS
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-15
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-01T15:48:11+09:00'
+  finished_at: '2026-09-01T15:48:11+09:00'
+  seconds: 0.127
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/15-check-15.log
+  log_sha256: 5432666ac0733bfd3365f5dd1e3c9d4f03ee1bf856e57917913376f90921b646
+  stdout_tail: '/Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-charter-discovery-block-a3xs/docs/work/feat-20260901-task-copy-brief-count-erc6/brief.md
+    lines=59 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-charter-discovery-block-a3xs/docs/work/feat-20260901-task-copy-brief-count-erc6/spec.md
+    lines=135 needs_input=0 unchecked_ac=0'
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-16
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-01T15:48:11+09:00'
+  finished_at: '2026-09-01T15:48:12+09:00'
+  seconds: 0.518
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/16-check-16.log
+  log_sha256: 9712d0f5fbbe20868b3aaae7c244c3ab374c998087ba1d4d1fdcbd02a3c0463a
+  stdout_tail: "x-m2-review/SKILLS_SEEN.md)\n\n## 부착 상태\n  ✓ 컴파일 산출물: 일치\n  ✓ vendor 원문·출처: 일치\n  ✓ 제3자\
+    \ 고지: 일치\n\n## 능력 프로브 (설치 흔적만 본다)\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: check-17
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-01T15:48:12+09:00'
+  finished_at: '2026-09-01T15:48:12+09:00'
+  seconds: 0.13
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/17-check-17.log
+  log_sha256: 6f0a779e5494df1282b20cec76f4cf7c86b274ff520a196c6e491aff361c2aec
+  stdout_tail: PASS 33 fixtures
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-charter-discovery-block-a3xs'
+  exit_code: 0
+  started_at: '2026-09-01T15:50:08+09:00'
+  finished_at: '2026-09-01T15:50:08+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/18-review-tree-before.log
+  log_sha256: bc44db356ddcf84eecb4d567d0f1e1bc2898554f3bfad594664ff0f5c4e0e2b5
+  stdout_tail: "M core/policy/packages.yaml\n M romeo/close.py\n M romeo/docs.py\n M romeo/policy.py\n\
+    ?? core/templates/charter.md\n?? romeo/blocks.py\n?? scenarios/\n?? tests/test_blocks_enforcement.py\n\
+    ?? tests/test_scenario_3.py"
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-charter-discovery-block-a3xs/.harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-01T15:50:17+09:00'
+  finished_at: '2026-09-01T15:50:17+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/19-reviewer-brief.log
+  log_sha256: bdc610bdd1e3deaffb9b52b9bb96fcc2d7fee185e7118c071bb46d14fb6829e1
+  stdout_tail: 6fccdd92de1190d284dabdc43c8cbedfc47e3470f00115758a398656789c7184  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-charter-discovery-block-a3xs/.harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/reviewer-brief.md
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-charter-discovery-block-a3xs'
+  exit_code: 0
+  started_at: '2026-09-01T15:54:43+09:00'
+  finished_at: '2026-09-01T15:54:43+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/20-review-tree-after.log
+  log_sha256: bc44db356ddcf84eecb4d567d0f1e1bc2898554f3bfad594664ff0f5c4e0e2b5
+  stdout_tail: "M core/policy/packages.yaml\n M romeo/close.py\n M romeo/docs.py\n M romeo/policy.py\n\
+    ?? core/templates/charter.md\n?? romeo/blocks.py\n?? scenarios/\n?? tests/test_blocks_enforcement.py\n\
+    ?? tests/test_scenario_3.py"
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260901-charter-discovery-block-a3xs/review/run_d947edf2d24a-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-01T15:54:52+09:00'
+  finished_at: '2026-09-01T15:54:52+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260901-charter-discovery-block-a3xs/run_d947edf2d24a/21-review-record.log
+  log_sha256: f4414db93beda529d40f0397f8bed0a5d61c6ed4d595517601c705fd026a8916
+  stdout_tail: d624282e612040319590d470743de4d1a5261a388faf49dac753e9801fac97d5  docs/work/feat-20260901-charter-discovery-block-a3xs/review/run_d947edf2d24a-reviewer.json
+  head_sha: 86c17ef94ecfd6ec912871b9429e1f02bd7d812c
+  dirty_tree_hash: 612215cfb1e5b7c9c9c8e68bfc737683fed44a4bf7301598c4b18551912721d9
+changed_files:
+- core/policy/packages.yaml
+- core/templates/charter.md
+- romeo/blocks.py
+- romeo/close.py
+- romeo/docs.py
+- romeo/policy.py
+- scenarios/3-discovery-block.md
+- scenarios/README.md
+- tests/test_blocks_enforcement.py
+- tests/test_scenario_3.py
+artifact_hash: 926558cc627bc01d8029acdaa070b408dbb375f29026b36f466b19f925da9e56
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-01T15:59:10+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-01T15:26:22+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_d947edf2d24a — 검증 계획 17건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 86c17ef94ecf vs 현재 86c17ef94ecf
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 612215cfb1e5 vs 현재 612215cfb1e5 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — test -f core/templates/charter.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — grep -q ''^## 마일스톤 계획'' core/templates/charter.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestBlockCatalog'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCatalogMappingMismatch'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestApproveRejectsUnsatisfied'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestDiscoveryResultNeedsInputs'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestMilestonePlanNeedsCharter'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestNoRetroactiveEffect'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest tests.test_scenario_3'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — test -f scenarios/3-discovery-block.md && test -f scenarios/README.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo close --unit feat-20260901-task-copy-brief-count-erc6 --dry-run
+      --no-rerun > /dev/null; test $? -eq 1'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-14: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-15: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-16: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-17: exit 0 — bin/romeo fixtures check'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 21건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 8건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 17건이 승인 커밋 86c17ef94ecf 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — test -f core/templates/charter.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — grep -q ''^## 마일스톤 계획'' core/templates/charter.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestBlockCatalog'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCatalogMappingMismatch'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestApproveRejectsUnsatisfied'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestDiscoveryResultNeedsInputs'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestMilestonePlanNeedsCharter'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — python3 -m unittest tests.test_blocks_enforcement.TestNoRetroactiveEffect'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest tests.test_scenario_3'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — test -f scenarios/3-discovery-block.md && test -f scenarios/README.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo close --unit feat-20260901-task-copy-brief-count-erc6 --dry-run
+      --no-rerun > /dev/null; test $? -eq 1'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-14: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-15: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-16: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-17: 재실행도 exit 0 — bin/romeo fixtures check'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 86c17ef94ecf 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: NEEDS_INPUT 0곳
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['core/policy/packages.yaml', 'core/templates/charter.md', 'romeo/blocks.py',
+      'romeo/close.py', 'romeo/docs.py', 'romeo/policy.py', 'scenarios/3-discovery-block.md', 'scenarios/README.md',
+      'tests/test_blocks_enforcement.py', 'tests/test_scenario_3.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_d947edf2d24a-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

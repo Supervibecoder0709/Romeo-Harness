@@ -86,6 +86,29 @@ sections:
     always: true
     note: close 시 evidence 파일 링크가 채워진다.
 
+# ── 차단 카탈로그 ────────────────────────────────────────────────────────────
+# 차단은 "무엇을 막는가"이지 표시가 아니다. base·overlays 가 거는 id 는 전부 여기와
+# romeo/blocks.py 의 BLOCK_CHECKS 양쪽에 있어야 하고, 한쪽이라도 없으면 정책 로드가 실패한다
+# (romeo.blocks.catalog_defects). 계산만 되고 아무것도 막지 않던 상태가 이 결함의 원래 모양이었다.
+# enforced_at: approve(=romeo approve) · close(=romeo close). 둘 다면 승인 뒤에 조건이 무너져도 잡힌다.
+blocks:
+  spec-ready:
+    title: Tech Spec 승인 준비
+    enforced_at: [approve, close]
+    requires: spec.md 의 「확인란」이 NEEDS_INPUT 없이 채워져 있고 수용 기준 항목이 1건 이상이다(D-60).
+  milestone-plan:
+    title: 마일스톤 계획
+    enforced_at: [approve, close]
+    requires: charter.md 가 있고 그 「마일스톤 계획」 절이 NEEDS_INPUT 없이 채워져 있다.
+  discovery-result:
+    title: 조사 결과
+    enforced_at: [approve, close]
+    requires: "frontmatter 의 inputs: 에 조사 산출물 링크가 1건 이상 있다 — 복사가 아니라 링크다(K-62)."
+  approval-gate:
+    title: 게이트 승인 준비
+    enforced_at: [approve, close]
+    requires: spec.md 의 「위험·백업·복구」 절이 NEEDS_INPUT 없이 채워져 있다(K-50).
+
 # ── 기본 패키지 (unit별) ──────────────────────────────────────────────────────
 base:
   none:

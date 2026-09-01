@@ -4,9 +4,9 @@ import re
 import subprocess
 from pathlib import Path
 
-import yaml
-
 from . import HARNESS_ROOT, frontmatter
+from .blocks import evaluate as evaluate_blocks
+from .blocks import required_checks
 from .docs import approval_chain_warnings, approval_commit, approval_key, approval_key_at, find_unit_dir
 from .evidence import (RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
                        list_runs, replay, review_record_state, sealed_product)
@@ -18,7 +18,6 @@ from .schema import validate as validate_schema
 from .util import dump_yaml, load_json, load_yaml, now_iso, rel, sha256_bytes, sha256_file, today
 from .validate import UNCHECKED_RE, section_lines, validate_doc
 
-CHECKS_BLOCK_RE = re.compile(r"```yaml\s*\n(required_checks:.*?)\n```", re.S)
 RESULT_SCHEMA = "core/schemas/result-envelope.json"
 
 # 검사가 성립하지 않았다는 상태. 어긴 것(FAIL)과 구분해 인쇄하되 **통과로 세지 않는다** —
@@ -28,14 +27,6 @@ UNVERIFIED = "unverified"
 # 결과 계약 하나에 적용하는 검사와 그 순서. close 와 `romeo envelope check` 가 같은 목록을 쓴다.
 ENVELOPE_CHECKS = ("ENVELOPE_VALID", "TASK_ANCHORED", "BASE_SHA", "EVIDENCE_ANCHORED", "ROLE_CONTRACT")
 UNREADABLE = "봉투를 읽을 수 없어 대조가 성립하지 않는다"
-
-
-def required_checks(body):
-    m = CHECKS_BLOCK_RE.search(body)
-    if not m:
-        return []
-    data = yaml.safe_load(m.group(1)) or {}
-    return data.get("required_checks") or []
 
 
 # 하네스 자신을 대상으로 하는 검사. 페이로드(하네스를 부착한 프로젝트) 작업 단위의 검증 계획에는 넣지 않는다 —
@@ -337,6 +328,12 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     # 승인되지 않은 가드가 걸린 단위에서 그것을 먼저 돌리면 K-66(승인 없이 실행하지 않는다)을 어긴다.
     # dry-run 도 마찬가지다 — 읽기만 한다고 알려진 명령이 부작용을 내면 안 된다.
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
+    # 차단(blocks) — 라우터가 이 단위에 건 차단마다 충족 여부를 판정한다. 승인에서 한 번 보고 여기서 다시 보는 이유는
+    # 승인 뒤에 조건이 무너질 수 있기 때문이다(조사 링크를 지우거나 마일스톤 절을 비우는 것).
+    # **이미 done 인 단위에는 소급하지 않는다** — 그 단위는 닫힐 때의 규칙으로 이미 닫혔고, 지금 다시 막을 것이 없다.
+    if fm.get("status") != "done":
+        for bid, ok, why in evaluate_blocks(pol["packages"], out["blocks"], "close", udir, fm, body):
+            check("BLOCK_SATISFIED", ok, f"{bid}: {why}")
     unapproved = []
     for g in out["guards"]:
         entries = [a for r in runs for a in (r.get("approvals") or []) if isinstance(a, dict) and a.get("guard") == g["id"]]

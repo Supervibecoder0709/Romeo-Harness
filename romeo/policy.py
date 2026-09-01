@@ -8,6 +8,7 @@ from pathlib import Path
 import yaml
 
 from . import HARNESS_ROOT
+from .blocks import catalog_defects
 from .schema import validate as _validate
 from .util import load_json, load_yaml
 from .util import project_root as _cwd_project_root
@@ -22,6 +23,10 @@ class RouteError(ValueError):
     pass
 
 
+class PolicyError(ValueError):
+    """정책표 자체가 성립하지 않는다. 라우팅 이전에, 로드에서 난다."""
+
+
 def load_policy(harness_root=None):
     root = harness_root or HARNESS_ROOT
     key = str(root)
@@ -33,6 +38,11 @@ def load_policy(harness_root=None):
             "fixture_schema": load_json(root / "core/schemas/fixture.json"),
         }
         pol["version"] = pol["classification"]["policy_version"]
+        # 차단 카탈로그·집행 매핑·실사용을 대조한다. 어긋나면 **로드가 실패한다** — 아무것도 막지 않는
+        # 차단이 카드에만 인쇄되던 것이 이 결함의 원래 모양이었으므로, 그 상태로는 정책을 읽지 않는다.
+        defects = catalog_defects(pol["packages"])
+        if defects:
+            raise PolicyError([f"정책표의 차단 카탈로그가 성립하지 않는다 ({root}):"] + defects)
         _CACHE[key] = pol
     return _CACHE[key]
 

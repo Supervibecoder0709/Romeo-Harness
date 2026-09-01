@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-01T15:26:22+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-01T15:59:10+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_d947edf2d24a.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -46,14 +46,14 @@ updated: '2026-09-01'
   정책표에 새 차단을 적고 집행을 잊으면 정책 로드 자체가 실패한다 — 지금 이 결함이 같은 모양으로 재발하지 않는다.
   T2 요청이 Charter 부터 만들어진다.
 - **수용 기준:**
-  - [ ] AC-1 `core/templates/charter.md` 가 있고 「마일스톤 계획」 절을 갖는다. T2 분류로 문서를 만들면 charter.md 가 `NOT_AVAILABLE_YET` 없이 생성된다.
-  - [ ] AC-2 정책표에 차단 카탈로그가 생기고, 기본 패키지·오버레이가 쓰는 모든 차단 id 가 카탈로그와 집행 코드 양쪽에 있어야 정책이 로드된다 — 한쪽이라도 없으면 로드가 실패한다.
-  - [ ] AC-3 차단이 미충족이면 `romeo approve` 가 승인을 거부하고, 어느 차단이 무엇 때문에 막았는지가 메시지에 나온다.
-  - [ ] AC-4 `romeo close` 가 그 단위에 걸린 차단마다 `BLOCK_SATISFIED` 판정을 낸다.
-  - [ ] AC-5 `discovery-result` 는 discovery 단위의 frontmatter `inputs:` 가 비어 있으면 막는다 — 조사 산출물은 복사가 아니라 링크로만 붙는다(K-62).
-  - [ ] AC-6 `milestone-plan` 은 T2 단위에 charter.md 가 없거나 마일스톤 절이 채워지지 않았으면 막는다.
-  - [ ] AC-7 `scenarios/3-discovery-block.md` 런북이 있고, 그 단계를 자동 실행하는 테스트가 기존 discovery·T2 fixture 로 차단·부품 추천·`inputs:` 요구를 재현한다.
-  - [ ] AC-8 차단은 소급하지 않는다 — 이미 `done` 인 단위를 다시 검사해도 판정(FAIL·`NOT_ALREADY_DONE`)과 문서가 그대로다.
+  - [x] AC-1 `core/templates/charter.md` 가 있고 「마일스톤 계획」 절을 갖는다. T2 분류로 문서를 만들면 charter.md 가 `NOT_AVAILABLE_YET` 없이 생성된다.
+  - [x] AC-2 정책표에 차단 카탈로그가 생기고, 기본 패키지·오버레이가 쓰는 모든 차단 id 가 카탈로그와 집행 코드 양쪽에 있어야 정책이 로드된다 — 한쪽이라도 없으면 로드가 실패한다.
+  - [x] AC-3 차단이 미충족이면 `romeo approve` 가 승인을 거부하고, 어느 차단이 무엇 때문에 막았는지가 메시지에 나온다.
+  - [x] AC-4 `romeo close` 가 그 단위에 걸린 차단마다 `BLOCK_SATISFIED` 판정을 낸다.
+  - [x] AC-5 `discovery-result` 는 discovery 단위의 frontmatter `inputs:` 가 비어 있으면 막는다 — 조사 산출물은 복사가 아니라 링크로만 붙는다(K-62).
+  - [x] AC-6 `milestone-plan` 은 T2 단위에 charter.md 가 없거나 마일스톤 절이 채워지지 않았으면 막는다.
+  - [x] AC-7 `scenarios/3-discovery-block.md` 런북이 있고, 그 단계를 자동 실행하는 테스트가 기존 discovery·T2 fixture 로 차단·부품 추천·`inputs:` 요구를 재현한다.
+  - [x] AC-8 차단은 소급하지 않는다 — 이미 `done` 인 단위를 다시 검사해도 판정(FAIL·`NOT_ALREADY_DONE`)과 문서가 그대로다.
 - **위험과 되돌리기:** `romeo/close.py`·`romeo/docs.py` 는 이 저장소가 자기 작업을 닫는 데 쓰는 코드다.
   잘못 손대면 **이 단위 자신이 닫히지 않거나**, 반대로 막아야 할 것을 통과시킨다. 그래서 AC-8 이 소급 금지를 검사로 고정하고,
   차단 판정은 전부 반례 테스트(막아야 할 입력이 실제로 막히는지)로 확인한다. 전부 저장소 안 파일이고 외부 상태를 바꾸지 않는다 —
@@ -143,6 +143,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-01T15:59:10+09:00 · HEAD 86c17ef94ecf · 검사 기록 run_d947edf2d24a
 
-- (없음)
+- [evidence/run_d947edf2d24a.yaml](evidence/run_d947edf2d24a.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
