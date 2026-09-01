@@ -83,7 +83,9 @@ def _probe_install_trace(root, cap_id, spec):
     entry = {"id": cap_id, "kind": spec.get("kind"), "marker": marker,
              "label": "absent", "detail": str(spec.get("absent_detail") or "설치 흔적 없음"),
              "reads": {f: None for f in (spec.get("reads") or [])},
-             "honesty": str(spec.get("honesty") or ""), "part": spec.get("part")}
+             "honesty": str(spec.get("honesty") or ""), "part": spec.get("part"),
+             "title": str(spec.get("title") or ""),
+             "alternatives": [str(a) for a in (spec.get("alternatives") or [])]}
     path = Path(root) / marker if marker else None
     if not marker or not path.is_file():
         return entry
@@ -99,27 +101,91 @@ def _probe_install_trace(root, cap_id, spec):
     return entry
 
 
-CAPABILITY_KINDS = {"install_trace": _probe_install_trace}
+def adapter_markers(root):
+    """어댑터가 선언한 능력 흔적 경로 → `{능력 id: [(런타임 id, 경로), ...]}`.
+
+    **경로를 아는 곳은 어댑터뿐이다.** 코어(`core/policy/capabilities.yaml`)는 그 능력이 무엇이고
+    없을 때 무엇으로 대신하는지만 안다 — 런타임 경로를 코어가 알면 그것이 곧 도구명이다(C-C6).
+    어댑터가 그 능력에 경로를 주지 않으면 그 런타임에서는 `absent` 다. 빈 목록은 키를 지운 것과 다르다:
+    앞은 '모른다고 적은 결정' 이고 뒤는 '적지 않아서 아무도 안 본 사고' 다."""
+    from .compile import load_adapters
+
+    out = {}
+    for adapter in load_adapters(Path(root)):
+        rid = str(adapter.get("id") or adapter["_dir"].name)
+        for cap_id, paths in ((adapter.get("capability_markers") or {})).items():
+            out.setdefault(str(cap_id), []).append((rid, [str(p) for p in (paths or [])]))
+    return out
 
 
-def probe_capabilities(root=None):
+def _probe_adapter_marker(root, cap_id, spec, markers=None):
+    """어댑터가 준 흔적 경로를 **읽기만** 한다. 만들지 않는다(자동 설치 금지).
+
+    라벨은 여전히 `present`·`absent` 둘뿐이다. 한 런타임에서라도 흔적이 있으면 `present` 이고,
+    어느 쪽에 있고 어느 쪽에 없는지는 `detail` 과 `by_runtime` 이 그대로 말한다 — 라벨 하나로
+    두 런타임의 차이를 뭉개지 않는다(D-68)."""
+    root = Path(root)
+    entry = {"id": cap_id, "kind": spec.get("kind"), "marker": "",
+             "label": "absent", "detail": str(spec.get("absent_detail") or "흔적 경로 없음"),
+             "reads": {}, "honesty": str(spec.get("honesty") or ""), "part": spec.get("part"),
+             "title": str(spec.get("title") or ""),
+             "alternatives": [str(a) for a in (spec.get("alternatives") or [])],
+             "by_runtime": {}}
+    declared = (markers if markers is not None else adapter_markers(root)).get(cap_id) or []
+    if not declared:
+        entry["detail"] = "어댑터가 흔적 경로를 주지 않았다 — 이 저장소의 어느 런타임에서도 확인할 수 없다"
+        return entry
+    found, notes = [], []
+    for rid, paths in sorted(declared):
+        hit = next((p for p in paths if (root / p).is_file()), None)
+        entry["by_runtime"][rid] = {"paths": paths, "label": "present" if hit else "absent",
+                                    "marker": hit or ""}
+        if hit:
+            found.append(f"{rid}: {hit}")
+        else:
+            notes.append(f"{rid}: " + (" · ".join(paths) + " 없음" if paths else "경로 선언 없음"))
+    if found:
+        entry["label"] = "present"
+        entry["marker"] = found[0].split(": ", 1)[1]
+        entry["detail"] = "흔적 확인 — " + " · ".join(found) + (" · " + " · ".join(notes) if notes else "")
+    else:
+        entry["detail"] = " · ".join(notes)
+    return entry
+
+
+CAPABILITY_KINDS = {"install_trace": _probe_install_trace,
+                    "adapter_marker": _probe_adapter_marker}
+
+
+def probe_capabilities(root=None, harness_root=None):
     """`core/policy/capabilities.yaml` 의 프로브를 실행한다.
 
     반환값의 `label` 은 정책표의 `result_labels` 안에서만 나온다(`present`·`absent`).
     **미설치는 결함이 아니다** — 부르는 쪽은 이 결과를 문제 수에 더하지 않는다.
+
+    루트가 둘인 이유: **무엇을 보는가**(능력 카탈로그·어댑터 선언)는 하네스의 내용이고,
+    **거기 있는가**(흔적 파일)는 작업 대상 저장소의 상태다. 하네스를 부착한 프로젝트에서는 둘이 다르다 —
+    한 루트로 뭉치면 부착된 프로젝트에서 카탈로그를 찾지 못해 모든 능력이 '프로브 없음' 이 된다.
+    `harness_root` 를 주지 않으면 이 저장소처럼 둘이 같은 경우로 본다.
     """
     root = Path(root) if root else _project_root()
+    harness_root = Path(harness_root) if harness_root else root
+    caps_by_group = load_capabilities(harness_root) or {}
+    markers = adapter_markers(harness_root) if caps_by_group else {}
     out = []
-    for group, caps in sorted((load_capabilities(root) or {}).items()):
+    for group, caps in sorted(caps_by_group.items()):
         for name, spec in sorted((caps or {}).items()):
             cap_id = f"{group}.{name}"
-            fn = CAPABILITY_KINDS.get((spec or {}).get("kind"))
+            kind = (spec or {}).get("kind")
+            fn = CAPABILITY_KINDS.get(kind)
             if not fn:
-                out.append({"id": cap_id, "kind": (spec or {}).get("kind"), "marker": "",
-                            "label": "absent", "detail": f"모르는 프로브 kind: {(spec or {}).get('kind')}",
-                            "reads": {}, "honesty": "", "part": (spec or {}).get("part")})
+                out.append({"id": cap_id, "kind": kind, "marker": "",
+                            "label": "absent", "detail": f"모르는 프로브 kind: {kind}",
+                            "reads": {}, "honesty": "", "part": (spec or {}).get("part"),
+                            "title": str((spec or {}).get("title") or ""), "alternatives": []})
                 continue
-            out.append(_plain(fn(root, cap_id, spec)))
+            kwargs = {"markers": markers} if kind == "adapter_marker" else {}
+            out.append(_plain(fn(root, cap_id, spec, **kwargs)))
     return out
 
 
@@ -504,6 +570,8 @@ def format_report(rep):
             out.append(f"  · {cap['id']}: {cap['label']} — {cap['detail']}"
                        + (f" ({cap['marker']})" if cap.get("marker") else ""))
             if cap["label"] != "present":
+                for alt in (cap.get("alternatives") or [])[:3]:
+                    out.append(f"      대안: {alt}")
                 continue
             for field, values in (cap.get("reads") or {}).items():
                 out.append(f"      {field}: " + (", ".join(values) if values else "marker 에 기록 없음"))

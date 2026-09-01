@@ -14,7 +14,9 @@ from romeo.close import close_unit
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
 from romeo.evidence import run_command
-from romeo.policy import load_policy, load_project_state, route
+from romeo.doctor import probe_capabilities
+from romeo.policy import (classification_from_frontmatter, load_policy, load_project_state,
+                          route)
 from romeo.util import load_yaml
 
 RUNBOOK = HARNESS_ROOT / "scenarios/3-discovery-block.md"
@@ -27,6 +29,28 @@ RESEARCH_LINK = "../../research/2026-09-01-discord-computer-use.md"
 #: 그럴듯한 거짓 값 — 경로 모양이지만 저장소에 없는 파일. 빈 값만 막는 검사는 이것을 통과시킨다.
 #: 이 런북의 이전 판이 실제로 그랬다: 여기 적힌 경로는 한 번도 존재한 적이 없는데 승인이 통과했다.
 MISSING_LINK = "../../research/없는파일.md"
+
+#: 「능력 확인」 표의 자리표시자 행. 절이 걸린 단위의 spec 에만 있다.
+CAPABILITY_ROW = "| NEEDS_INPUT | NEEDS_INPUT | NEEDS_INPUT | NEEDS_INPUT |"
+
+
+def fill_capability_table(fm, body, root):
+    """「능력 확인」 표를 **프로브가 실제로 낸 값**으로 채운다 — 카드가 인쇄한 것을 옮겨 적는 자리다.
+
+    다른 절처럼 `NEEDS_INPUT` 를 아무 글자로 바꾸면 이 표는 미완료 토큰 검사만 통과하고
+    차단(`capability-probed`)에 걸린다. 그것이 이 차단의 요점이다 — 형태가 그럴듯하고 내용이 거짓인 값.
+    절이 걸리지 않은 단위에서는 아무것도 하지 않는다."""
+    if CAPABILITY_ROW not in body:
+        return body
+    required = route(classification_from_frontmatter(fm),
+                     project_state=load_project_state(HARNESS_ROOT))["capabilities"]
+    probes = {c["id"]: c for c in probe_capabilities(root, HARNESS_ROOT)}
+    rows = []
+    for cid in required:
+        c = probes[cid]
+        alt = "" if c["label"] == "present" else (c.get("alternatives") or [""])[0]
+        rows.append(f"| {c['title'] or cid} | {cid} | {c['label']} | {alt} |")
+    return body.replace(CAPABILITY_ROW, "\n".join(rows))
 
 
 def git(*args, cwd):
@@ -63,6 +87,7 @@ class TestScenario3(unittest.TestCase):
 
     def fill_spec(self, spec):
         fm, body = frontmatter.read(spec)
+        body = fill_capability_table(fm, body, self.root)
         body = (body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
                     .replace('command: "채움"', 'command: "true"').replace("- [ ] AC-1", "- [x] AC-1"))
         frontmatter.write(spec, fm, body)
@@ -215,7 +240,8 @@ class TestScenario3(unittest.TestCase):
         unit, _files = self._closable_discovery()
         res = close_unit(unit, project_root=self.root, dry_run=True, rerun=False)
         rows = [c for c in res["checks"] if c["id"] == "BLOCK_SATISFIED"]
-        self.assertEqual(sorted(r["detail"].split(":")[0] for r in rows), ["discovery-result", "spec-ready"])
+        self.assertEqual(sorted(r["detail"].split(":")[0] for r in rows),
+                         ["capability-probed", "discovery-result", "spec-ready"])
         self.assertTrue(all(r["ok"] for r in rows), rows)
 
     def test_step8b_close_catches_a_block_that_broke_after_dispatch(self):

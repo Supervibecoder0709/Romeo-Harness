@@ -152,7 +152,16 @@ def unmet_blocks(unit_id, fm, body, unit_dir, project_root=".", point="approve",
     pol = policy or load_policy()
     out = route(classification_from_frontmatter(fm), pol, project_state=load_project_state(project_root))
     return [(bid, why) for bid, ok, why
-            in evaluate_blocks(pol["packages"], out["blocks"], point, unit_dir, fm, body) if not ok]
+            in evaluate_blocks(pol["packages"], out["blocks"], point, unit_dir, fm, body,
+                               context=block_context(out, project_root)) if not ok]
+
+
+def block_context(route_out, project_root):
+    """차단 판정이 **문서 밖에서** 받아야 하는 사실. 문서에 적힌 값으로 그 문서를 판정하지 않는다.
+
+    `capabilities` 는 라우터가 요구한 능력 목록이고, `project_root` 는 프로브가 흔적 경로를 볼 기준이다."""
+    return {"capabilities": list((route_out or {}).get("capabilities") or []),
+            "project_root": project_root, "harness_root": HARNESS_ROOT}
 
 
 def _iso(value):

@@ -51,7 +51,7 @@ def cmd_route(args):
         if not proposal:
             print("--card 는 --proposal 이 필요하다", file=sys.stderr)
             return 2
-        print(render_card(proposal, out))
+        print(render_card(proposal, out, root=_root(args), harness_root=HARNESS_ROOT))
         return 0
     print(json.dumps(out, ensure_ascii=False, indent=1) if args.json else dump_yaml(out))
     return 0
@@ -62,7 +62,7 @@ def cmd_card(args):
     from .policy import load_project_state, route
     prop = load_any(args.proposal)
     out = route(prop["candidate"], project_state=load_project_state(_root(args)))
-    text = render_card(prop, out)
+    text = render_card(prop, out, root=_root(args), harness_root=HARNESS_ROOT)
     if args.out:
         Path(args.out).write_text(text + "\n", encoding="utf-8")
     print(text)

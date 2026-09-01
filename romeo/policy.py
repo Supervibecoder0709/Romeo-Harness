@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 
 from . import HARNESS_ROOT
-from .blocks import catalog_defects, section_defects
+from .blocks import capability_defects, catalog_defects, section_defects
 from .schema import validate as _validate
 from .util import load_json, load_yaml
 from .util import project_root as _cwd_project_root
@@ -27,6 +27,13 @@ class PolicyError(ValueError):
     """정책표 자체가 성립하지 않는다. 라우팅 이전에, 로드에서 난다."""
 
 
+def _load_capabilities(root):
+    path = Path(root) / "core/policy/capabilities.yaml"
+    if not path.is_file():
+        return {}
+    return (load_yaml(path) or {}).get("capabilities") or {}
+
+
 def load_policy(harness_root=None):
     root = harness_root or HARNESS_ROOT
     key = str(root)
@@ -35,6 +42,9 @@ def load_policy(harness_root=None):
             "classification": load_yaml(root / "core/policy/classification.yaml"),
             "packages": load_yaml(root / "core/policy/packages.yaml"),
             "guards": load_yaml(root / "core/policy/execution-guards.yaml"),
+            # 능력 카탈로그는 **없을 수 있다** — 프로브가 없는 저장소가 정상 상태다(doctor.load_capabilities 와 같은 규칙).
+            # 없으면 빈 카탈로그로 읽고, 그때 능력을 요구하는 오버레이가 있으면 아래 대조가 그것을 잡는다.
+            "capabilities": _load_capabilities(root),
             "fixture_schema": load_json(root / "core/schemas/fixture.json"),
         }
         pol["version"] = pol["classification"]["policy_version"]
@@ -49,6 +59,12 @@ def load_policy(harness_root=None):
         defects = section_defects(pol["packages"])
         if defects:
             raise PolicyError([f"정책표의 절 집행 선언이 성립하지 않는다 ({root}):"] + defects)
+        # 능력도 같은 대조를 받는다. 라우터가 능력을 **요구**할 수 있는데 그것을 정의하는 자리는 다른 파일이고,
+        # 대조하는 자리는 또 다른 차단이다 — 셋이 어긋나면 카드는 '프로브 없음' 을 인쇄하고 차단은 채울 수 없는
+        # 행을 요구한다. 차단·절에서 두 번 닫은 결함이 능력으로 자리만 옮겨 앉지 않게 여기서 본다(§11).
+        defects = capability_defects(pol["packages"], pol["capabilities"])
+        if defects:
+            raise PolicyError([f"정책표의 능력 요구가 성립하지 않는다 ({root}):"] + defects)
         _CACHE[key] = pol
     return _CACHE[key]
 
@@ -251,7 +267,7 @@ def route(classification, policy=None, project_state=None):
             else:
                 sections[doc].append(sid)
 
-    parts = []
+    parts, capabilities = [], []
     order = {tier: i for i, tier in enumerate(cls["conflict_priority"])}
     overlays = sorted(pk["overlays"], key=lambda o: order.get(o.get("tier"), 99))
     for o in overlays:
@@ -268,6 +284,14 @@ def route(classification, policy=None, project_state=None):
         for pid in o.get("add_parts", []):
             if pid not in parts:
                 parts.append(pid)
+        # 능력은 부품과 별개다 — **부품에 붙지 않은 능력**도 라우터가 요구할 수 있고, 카드는 그것도 인쇄한다.
+        # 문서 package 를 조건으로 걸지 않는다. 차단(add_blocks)은 **문서를 읽어서** 판정하므로 package 가
+        # 없으면 볼 것이 없지만, 능력은 **카드가 인쇄하는 것**이라 문서를 만들지 않는 요청에서도 나와야 한다.
+        # 오히려 문서 없이 답변으로 끝나는 요청(unit none)이야말로 카드가 유일한 기록이므로, 여기서 능력을
+        # 비우면 사람은 그 능력이 있는 것으로 읽고 계획에 넣는다(K-51 · 시나리오 8).
+        for cid in o.get("add_capabilities", []):
+            if cid not in capabilities:
+                capabilities.append(cid)
         for wid in o.get("add_warnings", []):
             warn(wid)
 
@@ -320,6 +344,7 @@ def route(classification, policy=None, project_state=None):
         "isolation": isolation,
         "blocks": blocks,
         "parts": parts_out,
+        "capabilities": capabilities,
         "guards": guards,
         "warnings": warnings,
         "fired_rules": fired,

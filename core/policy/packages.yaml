@@ -91,9 +91,9 @@ sections:
     note: 가설·측정 방법·성공 기준·중단 조건.
   capability-check:
     title: 능력 확인
-    enforcement: [open-loop]
+    enforcement: [open-loop, block:capability-probed]
     doc: spec
-    note: 필요한 도구·능력과 프로브 결과. 없으면 BLOCKED_CAPABILITY로 정직 보고(자동 설치 금지).
+    note: 필요한 도구·능력과 프로브 결과. 없으면 BLOCKED_CAPABILITY로 정직 보고(자동 설치 금지). 미완료 토큰 검사만으로는 그럴듯한 거짓 값이 통과한다 — 프로브와 대조하는 차단이 함께 본다.
   evidence:
     title: 증거
     enforcement: [advisory]
@@ -126,6 +126,12 @@ blocks:
     reads: brief|charter
     requires: "조사 계획이 사는 문서(brief, 없으면 charter)의 inputs: 에 조사 산출물 링크가 1건 이상 있고 그 경로가 실재한다 — 복사가 아니라 링크다(K-62)."
     note: 승인이 아니라 **구현 위임**에서 막는다. 승인에서 막으면 조사 단위가 조사를 시작할 창구가 없어진다(2026-09-01 실측).
+  capability-probed:
+    title: 능력 확인 결과가 프로브와 일치
+    enforced_at: [approve]
+    reads: spec
+    requires: "spec.md 의 「능력 확인」 표가 라우터가 요구한 능력을 전부 담고, 각 행의 프로브 id 가 능력 카탈로그에 실재하며, 결과 칸이 프로브가 실제로 낸 라벨과 같고, present 가 아닌 행에 대안이 적혀 있다."
+    note: "**없다는 사실 자체는 막지 않는다** — 없는 것을 있다고 적은 거짓과 대안 없는 부재만 막는다. 부재를 막으면 「되는지 조사해 보자」 가 불가능해진다(Q-28). 그 자리에 글자가 있는지가 아니라 그 문장이 참인지를 본다."
   risk-plan-ready:
     title: 위험 계획 준비
     enforced_at: [approve]
@@ -195,6 +201,10 @@ overlays:
     tier: required_overlay
     when: {facets_any: [browser-automation]}
     add_sections: [capability-check]
+    add_blocks: [capability-probed]
+    # 라우터가 요구하는 능력. 카드가 프로브 결과·대안을 인쇄하고, 차단이 「능력 확인」 표를 이것과 대조한다.
+    # 절·차단·요구를 같은 자리에서 함께 정한다 — 요구를 적고 집행을 잊는 것이 이 하네스의 반복 결함이다(§11).
+    add_capabilities: [automation.ui-control, automation.tool-server]
     add_warnings: [CAPABILITY_CHECK_REQUIRED]
   - id: unit.t2.parts
     tier: required_overlay

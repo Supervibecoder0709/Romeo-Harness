@@ -30,6 +30,7 @@ expected:
   blocks:
   - spec-ready
   - discovery-result
+  - capability-probed
   warnings:
   - CAPABILITY_CHECK_REQUIRED
   parts:

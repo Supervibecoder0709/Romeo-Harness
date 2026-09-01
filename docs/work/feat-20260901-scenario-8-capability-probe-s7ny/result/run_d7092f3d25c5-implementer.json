@@ -1,0 +1,76 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-scenario-8-capability-probe-s7ny",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/task/run_d7092f3d25c5-implementer.json",
+    "sha256": "59d0aaf9c476cc3e98a6c63d100906dda83598d2204c7b5498a406a17d8f8eb8"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_scenario_8 -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "! bin/romeo route --fixtures fixtures/requests --report | grep -q '✗'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -q capability_markers adapters/claude/adapter.yaml && grep -q capability_markers adapters/codex/adapter.yaml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo card --proposal fixtures/proposals/fx-discord-computer-use-automation.yaml | grep -q '능력:'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "grep -q '8-capability-absent.md' scenarios/README.md",
+      "exit_code": 0
+    },
+    {
+      "id": "ac10-before-state",
+      "command": "D=$(mktemp -d); git archive 01ec50d | tar -x -C \"$D\"; cp tests/test_scenario_8.py \"$D/tests/\"; (cd \"$D\" && python3 -m unittest tests.test_scenario_8 >/dev/null 2>&1); rc=$?; rm -rf \"$D\"; test \"$rc\" -ne 0",
+      "exit_code": 0
+    },
+    {
+      "id": "new-branches-before-fix",
+      "command": "D=$(mktemp -d); tar -c --exclude=.git --exclude=__pycache__ . | tar -x -C \"$D\"; sed -i \"\" \"s/            if cid not in capabilities:/            if package and cid not in capabilities:/\" \"$D/romeo/policy.py\"; sed -i \"\" \"s/, root=_root(args), harness_root=HARNESS_ROOT)/)/\" \"$D/romeo/cli.py\"; (cd \"$D\" && python3 -m unittest tests.test_scenario_8.TestRouterAndCard.test_step1c_a_request_that_makes_no_document_still_requires_them tests.test_scenario_8.TestRouterAndCard.test_step2e_card_prints_them_when_no_document_is_made tests.test_scenario_8.TestRouterAndCard.test_step2f_the_card_probes_the_repo_that_root_points_at >/dev/null 2>&1); rc=$?; rm -rf \"$D\"; test \"$rc\" -ne 0",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/evidence/run_d7092f3d25c5.yaml",
+  "notes": "5회차. 4회차 검토자 findings 2건을 고치고, 그 두 경로를 놓친 검사 빈틈을 같은 회차에서 메웠다.\n\n**findings ① — romeo/policy.py**: `add_capabilities` 루프의 `if package and cid not in capabilities` 에서 `package` 조건을 뺐다. 차단(`add_blocks`)은 **문서를 읽어** 판정하므로 package 가 없으면 볼 것이 없지만, 능력은 **카드가 인쇄하는 것**이라 문서를 만들지 않는 요청에서도 나와야 한다. 오히려 unit none 은 카드가 유일한 기록이므로 여기서 비우면 사람이 그 능력을 있는 것으로 읽는다(K-51). `blocks` 는 그대로 package 조건 아래 둔다 — 실측으로 unit none 요청은 capabilities 2종 · blocks 빈 목록이 된다.\n\n**findings ② — romeo/cli.py + romeo/card.py**: `cmd_card` 와 `cmd_route --card` **두 자리** 모두 `render_card` 에 root 를 넘기지 않았다(검토자는 `cmd_card` 만 지목했고 나머지 한 자리는 실측으로 찾았다). 두 자리에 `root=_root(args), harness_root=HARNESS_ROOT` 를 넘긴다. `card.py` 에 `harness_root` 배선을 함께 넣은 이유: 능력 카탈로그·어댑터 선언은 하네스의 내용이고 흔적 파일은 대상 저장소의 상태라, root 하나만 넘기면 부착 프로젝트에서 카탈로그를 못 찾아 **모든 능력이 「프로브 없음」** 이 된다(검토자가 든 두 증상 중 하나다). 집행 쪽 `blocks.py:253` 은 이미 두 루트를 쓴다 — 카드만 어긋나 있었다.\n\n**검사 빈틈(§11)**: `tests/test_scenario_8.py` 에 분기 3건을 더했다. `test_step1c`(unit none 도 같은 능력을 요구한다) · `test_step2e`(문서를 만들지 않아도 카드가 인쇄한다) · `test_step2f`(임시 프로젝트에 `.mcp.json` 을 두고 `bin/romeo card --root <그곳>` 을 **CLI 그대로 실행**해 `present` 를 본다). 셋 다 자기 분기임을 스스로 확인한다 — `test_step1c` 는 `package == []` 를, `test_step2e` 는 「문서: 없음」 을 먼저 단언해서 T1 분기의 중복이면 그 자리에서 드러나게 했다.\n\n**양쪽 보이기(§11)**: 반례는 빈 값이 아니라 그럴듯한 거짓 값이다. `new-branches-before-fix` 는 현재 트리에서 **두 결함만 되돌려** 새 검사 3건을 돌린다 — 셋 다 실패하고, `test_step2f` 가 본 거짓 값은 `absent — .mcp.json 없음`(형태가 멀쩡하고 대상이 틀린 값)이다. 통과 쪽은 check-1 이 본다. `ac10-before-state` 는 새 base 01ec50d 트리에 이 테스트만 얹어 파일 전체의 고치기 전 실패를 재현한다.\n\n**검증 계획은 바꾸지 않았다**(D-27). required_checks 10건은 승인된 문자열 그대로이고 전건 exit 0(check-2 는 215.0초). 라벨 레코드 2건은 required_checks 가 아니라 근거 기록이다.\n\n**증거 재생성 1회**: 앞선 수동 시연에서 셸 이스케이프 실수로 저장소 루트에 `&1` 이라는 32바이트 파일이 생겼고, 그것이 첫 증거의 changed_files 에 섞였다. 파일을 지우고 `evidence/run_d7092f3d25c5.yaml` 을 지운 뒤 같은 명령으로 전부 다시 돌렸다 — 지금 증거의 changed_files 21개는 모두 계약의 allowed_paths 안이다. 손으로 고치지 않았다(K-51).\n\n**보고 사항(고치지 않음)**: 이 run 의 계약 allowed_paths 에 `cmd_card` 가 경로처럼 한 줄 들어가 있다. `envelope.change_scope_paths` 가 항목을 `·` 로 나눈 뒤 **각 조각의 첫 백틱**을 경로로 읽는데, 재승인된 「변경 범위」 줄의 `` `romeo/cli.py`(… `cmd_card` 와 `cmd_route --card` 두 자리) `` 에서 `·` 뒤 조각의 첫 백틱이 `cmd_card` 였다. 상한이 넓어지는 방향이라 이번 판정에는 영향이 없지만(존재하지 않는 경로다), 설명용 백틱이 쓰기 상한에 실린다는 것 자체가 §11 모양의 어긋남이다. `romeo/envelope.py` 는 이 계약의 범위 밖이라 고치지 않았다 — findings 가 아니라 다음 정비 거리로 남긴다. 함께: `attempts.yaml` 의 5회차 base_sha 는 93f0c0a 인 채인데(record_start 가 run 단위로 멱등해 재승인 커밋 01ec50d 로 갱신되지 않았다) 증거·계약의 base 는 01ec50d 다.\n\n계약 밖 쓰기 없음 · 되돌리기 어려운 작업 없음(guards 빈 목록) · 커밋·push 하지 않았다."
+}

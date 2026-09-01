@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-02T00:08:52+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-02T00:45:28+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_7c32a145569d.yaml, evidence/run_de465802c277.yaml, evidence/run_d7092f3d25c5.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -60,22 +60,22 @@ approval_history:
 - **기대 결과:** 없는 능력은 카드에 「없음」으로 인쇄되고 대안이 함께 나온다. 있다고 적은 거짓은
   승인 자리에서 막힌다. **없다는 사실 자체는 막지 않는다** — 막으면 「되는지 조사해 보자」 가 불가능해진다(Q-28).
 - **수용 기준:**
-  - [ ] AC-1 `core/policy/capabilities.yaml` 에 브라우저·데스크톱 자동화 능력과 외부 도구 서버 능력이
+  - [x] AC-1 `core/policy/capabilities.yaml` 에 브라우저·데스크톱 자동화 능력과 외부 도구 서버 능력이
         정의되고 각각 `why`·`alternatives`·`honesty` 를 갖는다. 코어에 도구명·모델명은 없다(C-C6).
-  - [ ] AC-2 그 능력의 흔적 경로는 어댑터가 소유한다(`adapters/*/adapter.yaml`). 어댑터가 경로를 주지
+  - [x] AC-2 그 능력의 흔적 경로는 어댑터가 소유한다(`adapters/*/adapter.yaml`). 어댑터가 경로를 주지
         않으면 그 런타임에서 `absent` 다 — 코어가 경로를 알지 않는다.
-  - [ ] AC-3 라우터가 `browser-automation` facet 요청에 필요 능력 목록을 계산해 출력한다.
-  - [ ] AC-4 카드가 그 능력의 프로브 결과와 대안을 인쇄한다 — 부품에 붙지 않은 능력도 인쇄한다.
+  - [x] AC-3 라우터가 `browser-automation` facet 요청에 필요 능력 목록을 계산해 출력한다.
+  - [x] AC-4 카드가 그 능력의 프로브 결과와 대안을 인쇄한다 — 부품에 붙지 않은 능력도 인쇄한다.
         (지금은 한 줄도 인쇄하지 않는다.)
-  - [ ] AC-5 새 차단 `capability-probed` 가 카탈로그와 `BLOCK_CHECKS` 양쪽에 있고 `enforced_at` 은
+  - [x] AC-5 새 차단 `capability-probed` 가 카탈로그와 `BLOCK_CHECKS` 양쪽에 있고 `enforced_at` 은
         `approve` 하나다. 「능력 확인」 절의 `enforcement` 가 그 차단을 가리킨다.
-  - [ ] AC-6 그럴듯한 거짓 값 넷이 **전부 승인에서 막힌다**: ① `absent` 를 `present` 로 적음
+  - [x] AC-6 그럴듯한 거짓 값 넷이 **전부 승인에서 막힌다**: ① `absent` 를 `present` 로 적음
         ② 카탈로그에 없는 프로브 id ③ `absent` 인데 대안 칸이 빔 ④ 라우터가 요구한 능력이 표에 없음.
-  - [ ] AC-7 `absent` 를 사실대로 적고 대안을 쓰면 **승인된다**. 능력 부재는 승인을 막지 않는다.
-  - [ ] AC-8 프로브는 파일을 읽기만 한다 — 실행 뒤에도 흔적 파일이 생기지 않는다(자동 설치 금지).
-  - [ ] AC-9 런북 `scenarios/8-capability-absent.md` 가 `scenarios/README.md` 목록에 등재되고,
+  - [x] AC-7 `absent` 를 사실대로 적고 대안을 쓰면 **승인된다**. 능력 부재는 승인을 막지 않는다.
+  - [x] AC-8 프로브는 파일을 읽기만 한다 — 실행 뒤에도 흔적 파일이 생기지 않는다(자동 설치 금지).
+  - [x] AC-9 런북 `scenarios/8-capability-absent.md` 가 `scenarios/README.md` 목록에 등재되고,
         구현자가 `BLOCKED_CAPABILITY` 로 끝내야 하는 자리를 명시한다. 통과만 보이지 않는다 — 반례를 담는다.
-  - [ ] AC-10 `tests/test_scenario_8.py` 가 런북의 단계를 그대로 실행하고, **고치기 전 상태에서 실패하는
+  - [x] AC-10 `tests/test_scenario_8.py` 가 런북의 단계를 그대로 실행하고, **고치기 전 상태에서 실패하는
         것**을 증거로 남긴다 — base 리비전 트리에 이 테스트만 얹어 재현한다. 고친 뒤 성공은 check-1 이
         보인다. 두 기록이 §11 의 양쪽이다 — 통과만 보인 검사는 빈 검사이고, 실패만 보인 검사는 통과
         불가능한 검사다. **이 단위의 산출물인 검사를 승인 전에 실행할 수는 없다**(D-27).
@@ -169,6 +169,8 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-02T00:45:28+09:00 · HEAD 01ec50d1f27d · 검사 기록 run_d7092f3d25c5
 
-- (없음)
+- [evidence/run_7c32a145569d.yaml](evidence/run_7c32a145569d.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_de465802c277.yaml](evidence/run_de465802c277.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_d7092f3d25c5.yaml](evidence/run_d7092f3d25c5.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

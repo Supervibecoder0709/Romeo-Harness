@@ -33,6 +33,7 @@ expected:
   - spec-ready
   - milestone-plan
   - risk-plan-ready
+  - capability-probed
   guards:
   - production-deploy
   - ops-data-change

@@ -21,7 +21,8 @@ from romeo.util import dump_yaml, load_yaml
 
 #: load_policy 가 읽는 파일 전부. 임시 harness_root 를 만들 때 이만큼만 복사하면 된다.
 POLICY_FILES = ("core/policy/classification.yaml", "core/policy/packages.yaml",
-                "core/policy/execution-guards.yaml", "core/schemas/fixture.json")
+                "core/policy/execution-guards.yaml", "core/policy/capabilities.yaml",
+                "core/schemas/fixture.json")
 
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
 SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
@@ -117,9 +118,10 @@ class TestBlockCatalog(_Repo):
     def tearDown(self):
         pass
 
-    def test_catalog_exists_with_the_four_blocks(self):
+    def test_catalog_exists_with_the_five_blocks(self):
         cat = blocks.catalog(self.pk)
-        self.assertEqual(sorted(cat), ["discovery-result", "milestone-plan", "risk-plan-ready", "spec-ready"])
+        self.assertEqual(sorted(cat), ["capability-probed", "discovery-result", "milestone-plan",
+                                       "risk-plan-ready", "spec-ready"])
         for bid, meta in cat.items():
             self.assertTrue(meta.get("title"), bid)
             self.assertTrue(meta.get("requires"), bid)
@@ -127,7 +129,8 @@ class TestBlockCatalog(_Repo):
 
     def test_every_used_block_is_in_catalog_and_in_enforcement(self):
         used = blocks.used_blocks(self.pk)
-        self.assertEqual(sorted(used), ["discovery-result", "milestone-plan", "risk-plan-ready", "spec-ready"])
+        self.assertEqual(sorted(used), ["capability-probed", "discovery-result", "milestone-plan",
+                                        "risk-plan-ready", "spec-ready"])
         for bid in used:
             self.assertIn(bid, blocks.catalog(self.pk))
             self.assertIn(bid, blocks.BLOCK_CHECKS)

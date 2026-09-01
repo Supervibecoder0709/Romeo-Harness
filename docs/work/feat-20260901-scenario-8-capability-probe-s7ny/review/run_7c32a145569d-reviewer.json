@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-scenario-8-capability-probe-s7ny",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/task/run_7c32a145569d-reviewer.json",
+    "sha256": "a13fafb347a2d6749bb545e57b46c8723856d049b447b45ac452a2d23489ab41"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-10은 고치기 전 실패와 고친 뒤 성공을 승인 전에 관찰하도록 요구하지만(spec.md:68), 기록된 ac10-before-state는 승인 시각 22:28:19 이후인 22:46:05에 시작했다. 현재 증거에는 승인 전 양쪽 관찰을 지목할 기록이 없다.",
+      "file": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/evidence/run_7c32a145569d.yaml",
+      "line": 145
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/evidence/run_7c32a145569d.yaml",
+  "notes": "AC-1부터 AC-9까지와 AC-10의 현재 구현 성공·기준 리비전 실패 자체는 기록된 check-1 및 ac10-before-state가 뒷받침한다. 판정을 내린 사유는 AC-10에 명시된 승인 전 관찰 시점이 증거로 확인되지 않는다는 한 가지다."
+}

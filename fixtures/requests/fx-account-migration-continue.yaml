@@ -36,6 +36,7 @@ expected:
   blocks:
   - spec-ready
   - risk-plan-ready
+  - capability-probed
   guards:
   - production-deploy
   - ops-data-change

@@ -52,3 +52,13 @@ project_vendor_skills: true
 local_skills:
   - name: repo-archive
     source: skills/repo-archive
+
+# 능력 흔적 경로(core/policy/capabilities.yaml 의 `kind: adapter_marker`).
+#
+# **경로를 주지 않는다.** 이 런타임에서 저장소에 커밋해 발견되는 도구 서버 선언 경로를 확인하지 못했다 —
+# `agents_dir` 를 비워 둔 것과 같은 이유다(2026-08-28 대조). 확인하지 못한 경로를 적으면 프로브가
+# 그 경로의 부재를 능력의 부재로 말하게 되는데, 그것은 관찰이 아니라 추측이다(K-51).
+# 빈 목록은 "이 런타임에서는 absent" 로 읽힌다 — 키를 지우는 것과 달리 **모른다고 적은 결정**이다.
+capability_markers:
+  automation.ui-control: []
+  automation.tool-server: []

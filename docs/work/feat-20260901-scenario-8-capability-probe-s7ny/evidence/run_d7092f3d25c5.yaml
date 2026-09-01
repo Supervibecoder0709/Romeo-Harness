@@ -1,0 +1,443 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_d7092f3d25c5
+task_id: task_dae583a726f1
+dispatch_id: ctx_d207570bb6fa
+unit_id: feat-20260901-scenario-8-capability-probe-s7ny
+spec_ref:
+  path: docs/work/feat-20260901-scenario-8-capability-probe-s7ny/spec.md
+  sha256: 4edb81f0b4cfb93490d8d891f9c9210201b6c3e7fd4f32164d1fe695ef9fc4d3
+base_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny
+started_at: '2026-09-02T00:21:24+09:00'
+finished_at: '2026-09-02T00:39:32+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_scenario_8 -v
+  exit_code: 0
+  started_at: '2026-09-02T00:21:24+09:00'
+  finished_at: '2026-09-02T00:21:25+09:00'
+  seconds: 1.715
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/01-check-1.log
+  log_sha256: b396d7515533e28ac4ae813cd86b56095f51ba03f277b1deedd4eedc2853ea2c
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-2
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-02T00:21:25+09:00'
+  finished_at: '2026-09-02T00:25:01+09:00'
+  seconds: 214.971
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/02-check-2.log
+  log_sha256: 4a4fea6d6f34f9d3e8b739332f872ec819ae584d916c2cb39e98a214ba6aa76f
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-3
+  command: '! bin/romeo route --fixtures fixtures/requests --report | grep -q ''✗'''
+  exit_code: 0
+  started_at: '2026-09-02T00:25:01+09:00'
+  finished_at: '2026-09-02T00:25:01+09:00'
+  seconds: 0.236
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/03-check-3.log
+  log_sha256: 983efd378f89bdd662041d744ec15f2926e89e2c2be26f740d18d371375388fd
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-4
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-02T00:25:01+09:00'
+  finished_at: '2026-09-02T00:25:01+09:00'
+  seconds: 0.232
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/04-check-4.log
+  log_sha256: e03c239e2590e42c02438d14f0b2d79d61fef9aee7eeab1bb6341007371b786c
+  stdout_tail: PASS 33 fixtures
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-02T00:25:01+09:00'
+  finished_at: '2026-09-02T00:25:02+09:00'
+  seconds: 0.247
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/05-check-5.log
+  log_sha256: 9ce1edbd796e4d15c44195cdb588e85d21b68f83295137de27587c8b548cabc3
+  stdout_tail: 'julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/docs/work/feat-20260901-task-copy-brief-count-erc6/brief.md
+    lines=59 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/docs/work/feat-20260901-task-copy-brief-count-erc6/spec.md
+    lines=135 needs_input=0 unchecked_ac=0'
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-02T00:25:02+09:00'
+  finished_at: '2026-09-02T00:25:02+09:00'
+  seconds: 0.337
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/06-check-6.log
+  log_sha256: 8fc72ab07488316cc91f523c9f4f9cf7ff4d228d30f26de5ddf7428e58695ef9
+  stdout_tail: compile 검사 PASS
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-7
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-02T00:25:02+09:00'
+  finished_at: '2026-09-02T00:25:03+09:00'
+  seconds: 0.919
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/07-check-7.log
+  log_sha256: 543ccd726dc31aa91ff8c6404677b00fd2000f74873cd845a1ef12f025eced8e
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-8
+  command: grep -q capability_markers adapters/claude/adapter.yaml && grep -q capability_markers adapters/codex/adapter.yaml
+  exit_code: 0
+  started_at: '2026-09-02T00:25:03+09:00'
+  finished_at: '2026-09-02T00:25:03+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/08-check-8.log
+  log_sha256: 02ea3a55c261273580e3b76a2e8202b568f4e1841266ce2fb021370a2488e376
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-9
+  command: bin/romeo card --proposal fixtures/proposals/fx-discord-computer-use-automation.yaml | grep
+    -q '능력:'
+  exit_code: 0
+  started_at: '2026-09-02T00:25:03+09:00'
+  finished_at: '2026-09-02T00:25:04+09:00'
+  seconds: 0.191
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/09-check-9.log
+  log_sha256: dc4f43f085eab40316654c423803417aa5e79d989ae8f3e5cf8b15c7822086a9
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: check-10
+  command: grep -q '8-capability-absent.md' scenarios/README.md
+  exit_code: 0
+  started_at: '2026-09-02T00:25:04+09:00'
+  finished_at: '2026-09-02T00:25:04+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/10-check-10.log
+  log_sha256: b948f81fbe5835a12b5ac77b4ed522ce38ab499d21d62288db7781ed94055b83
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: ac10-before-state
+  command: D=$(mktemp -d); git archive 01ec50d | tar -x -C "$D"; cp tests/test_scenario_8.py "$D/tests/";
+    (cd "$D" && python3 -m unittest tests.test_scenario_8 >/dev/null 2>&1); rc=$?; rm -rf "$D"; test "$rc"
+    -ne 0
+  exit_code: 0
+  started_at: '2026-09-02T00:25:24+09:00'
+  finished_at: '2026-09-02T00:25:25+09:00'
+  seconds: 1.016
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/11-ac10-before-state.log
+  log_sha256: 3aa09770f7f0e2ccae58895fe8c093cf8809ef03d5c6bc92d0bca85812e613c0
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: new-branches-before-fix
+  command: D=$(mktemp -d); tar -c --exclude=.git --exclude=__pycache__ . | tar -x -C "$D"; sed -i "" "s/            if
+    cid not in capabilities:/            if package and cid not in capabilities:/" "$D/romeo/policy.py";
+    sed -i "" "s/, root=_root(args), harness_root=HARNESS_ROOT)/)/" "$D/romeo/cli.py"; (cd "$D" && python3
+    -m unittest tests.test_scenario_8.TestRouterAndCard.test_step1c_a_request_that_makes_no_document_still_requires_them
+    tests.test_scenario_8.TestRouterAndCard.test_step2e_card_prints_them_when_no_document_is_made tests.test_scenario_8.TestRouterAndCard.test_step2f_the_card_probes_the_repo_that_root_points_at
+    >/dev/null 2>&1); rc=$?; rm -rf "$D"; test "$rc" -ne 0
+  exit_code: 0
+  started_at: '2026-09-02T00:25:25+09:00'
+  finished_at: '2026-09-02T00:25:28+09:00'
+  seconds: 2.617
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/12-new-branches-before-fix.log
+  log_sha256: a0ad2c4a78c5fbd6691e111a3b40c4018dcc35e0608d3cc0df87de745de65298
+  stdout_tail: ''
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-scenario-8-capability-probe-s7ny'
+  exit_code: 0
+  started_at: '2026-09-02T00:31:47+09:00'
+  finished_at: '2026-09-02T00:31:47+09:00'
+  seconds: 0.035
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/13-review-tree-before.log
+  log_sha256: 053ea5272857ec565fec7b2c2e33971692006542357b1f1cc1ea51343f33615c
+  stdout_tail: "-computer-use-automation.yaml\n M fixtures/requests/fx-s07-coupang-migration-initiative.yaml\n\
+    \ M romeo/blocks.py\n M romeo/card.py\n M romeo/cli.py\n M romeo/close.py\n M romeo/docs.py\n M romeo/doctor.py\n\
+    \ M romeo/policy.py\n M scenarios/README.md\n M tests/test_blocks_enforcement.py\n M tests/test_enforce_points.py\n\
+    \ M tests/test_scenario_3.py\n?? scenarios/8-capability-absent.md\n?? tests/test_scenario_8.py"
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/.harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-02T00:31:47+09:00'
+  finished_at: '2026-09-02T00:31:47+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/14-reviewer-brief.log
+  log_sha256: 344c579a66fa1e4d8d17ac10e9e2b4152b74b97a81c7359fddd060bf26e67339
+  stdout_tail: 9a43a2f57500d5b98c2befb8fc2eef996fa06f0f5d497e0567f58de2312b5b3e  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/.harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/reviewer-brief.md
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-scenario-8-capability-probe-s7ny'
+  exit_code: 0
+  started_at: '2026-09-02T00:37:22+09:00'
+  finished_at: '2026-09-02T00:37:22+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/15-review-tree-after.log
+  log_sha256: 053ea5272857ec565fec7b2c2e33971692006542357b1f1cc1ea51343f33615c
+  stdout_tail: "-computer-use-automation.yaml\n M fixtures/requests/fx-s07-coupang-migration-initiative.yaml\n\
+    \ M romeo/blocks.py\n M romeo/card.py\n M romeo/cli.py\n M romeo/close.py\n M romeo/docs.py\n M romeo/doctor.py\n\
+    \ M romeo/policy.py\n M scenarios/README.md\n M tests/test_blocks_enforcement.py\n M tests/test_enforce_points.py\n\
+    \ M tests/test_scenario_3.py\n?? scenarios/8-capability-absent.md\n?? tests/test_scenario_8.py"
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260901-scenario-8-capability-probe-s7ny/review/run_d7092f3d25c5-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-02T00:39:32+09:00'
+  finished_at: '2026-09-02T00:39:32+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_d7092f3d25c5/16-review-record.log
+  log_sha256: 236fb77b21a51c3e4282ee47a2ebe5dc1584988b580fd5f8d9b34aa2e334ab67
+  stdout_tail: 33ac4601c0bd9715051c3af7c719fbe0635f45a1fe08819a5dde701d5997ed74  docs/work/feat-20260901-scenario-8-capability-probe-s7ny/review/run_d7092f3d25c5-reviewer.json
+  head_sha: 01ec50d1f27d80ce75c3757847ba184cd270aae6
+  dirty_tree_hash: 0c8788af4e15b5276aab188a8289d821fe6688dc72a8f54558bdc8321e072864
+changed_files:
+- adapters/claude/adapter.yaml
+- adapters/codex/adapter.yaml
+- core/policy/capabilities.yaml
+- core/policy/packages.yaml
+- core/templates/sections/capability-check.md
+- fixtures/requests/fx-account-migration-continue.yaml
+- fixtures/requests/fx-discord-computer-use-automation.yaml
+- fixtures/requests/fx-s07-coupang-migration-initiative.yaml
+- romeo/blocks.py
+- romeo/card.py
+- romeo/cli.py
+- romeo/close.py
+- romeo/docs.py
+- romeo/doctor.py
+- romeo/policy.py
+- scenarios/8-capability-absent.md
+- scenarios/README.md
+- tests/test_blocks_enforcement.py
+- tests/test_enforce_points.py
+- tests/test_scenario_3.py
+- tests/test_scenario_8.py
+artifact_hash: ef6c19546e7bdea343f9ca77f06ff398be7ff8b905aa4b7c8ba51512812f434c
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-02T00:45:28+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 175 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-02T00:08:52+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_d7092f3d25c5 — 검증 계획 10건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/3건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 01ec50d1f27d vs 현재 01ec50d1f27d
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 0c8788af4e15 vs 현재 0c8788af4e15 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_scenario_8 -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — ! bin/romeo route --fixtures fixtures/requests --report | grep -q ''✗'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo fixtures check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — grep -q capability_markers adapters/claude/adapter.yaml && grep -q capability_markers
+      adapters/codex/adapter.yaml'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo card --proposal fixtures/proposals/fx-discord-computer-use-automation.yaml
+      | grep -q ''능력:'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — grep -q ''8-capability-absent.md'' scenarios/README.md'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 16건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 10건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 10건이 승인 커밋 01ec50d1f27d 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_scenario_8 -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — ! bin/romeo route --fixtures fixtures/requests --report | grep -q
+      ''✗'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo fixtures check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — grep -q capability_markers adapters/claude/adapter.yaml && grep -q
+      capability_markers adapters/codex/adapter.yaml'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo card --proposal fixtures/proposals/fx-discord-computer-use-automation.yaml
+      | grep -q ''능력:'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — grep -q ''8-capability-absent.md'' scenarios/README.md'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 01ec50d1f27d 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/claude/adapter.yaml', 'adapters/codex/adapter.yaml', 'core/policy/capabilities.yaml',
+      'core/policy/packages.yaml', 'core/templates/sections/capability-check.md', 'fixtures/requests/fx-account-migration-continue.yaml',
+      'fixtures/requests/fx-discord-computer-use-automation.yaml', 'fixtures/requests/fx-s07-coupang-migration-initiative.yaml',
+      'romeo/blocks.py', 'romeo/card.py', 'romeo/cli.py', 'romeo/close.py', 'romeo/docs.py', 'romeo/doctor.py',
+      'romeo/policy.py', 'scenarios/8-capability-absent.md', 'scenarios/README.md', 'tests/test_blocks_enforcement.py',
+      'tests/test_enforce_points.py', 'tests/test_scenario_3.py', 'tests/test_scenario_8.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_7c32a145569d-reviewer.json: FAIL(findings 1건 — 첫째: AC-10은 고치기 전 실패와 고친 뒤 성공을 승인 전에 관찰하도록
+      요구하지만(spec.md:68), 기록된) — 재승인 전 승인(approved_at 2026-09-01T22:28:19+09:00)으로 낸 판정 · 다른 산출물(dd39a42+bb0b400c9cc1)을
+      본 판정이라 이 close 의 대상이 아니다; run_de465802c277-reviewer.json: FAIL(findings 2건 — 첫째: AC-3은 `browser-automation`
+      facet 요청의 필요 능력 목록 출력을 단위 제한 없이 요) — 재승인 전 승인(approved_at 2026-09-01T23:00:08+09:00)으로 낸 판정 · 다른
+      산출물(9917c51+bb0b400c9cc1)을 본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 01ec50d+0c8788af4e15 이다(검사 기록 run 의
+      head_sha+dirty_tree_hash, D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_d7092f3d25c5-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

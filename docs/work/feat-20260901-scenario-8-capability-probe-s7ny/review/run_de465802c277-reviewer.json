@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-scenario-8-capability-probe-s7ny",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/task/run_de465802c277-reviewer.json",
+    "sha256": "16c64179795f4abca9c966ea9b9f21ea80be343431a4e137452c581086649cb8"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-3은 `browser-automation` facet 요청의 필요 능력 목록 출력을 단위 제한 없이 요구하고, 정책 overlay도 unit 조건 없이 `add_capabilities`를 건다(spec.md:62, core/policy/packages.yaml:200). 그러나 라우터는 문서 package가 있을 때만 능력을 추가한다. package가 빈 unit `none` 요청에서는 같은 facet이어도 `capabilities`가 비며, check-1은 T1 분기만 검사해 이 미충족 분기를 뒷받침하지 못한다.",
+      "file": "romeo/policy.py",
+      "line": 289
+    },
+    {
+      "summary": "AC-4의 카드 프로브는 작업 대상 저장소를 봐야 하지만 `cmd_card`는 `--root`를 프로젝트 상태 조회에만 쓰고 `render_card`에는 전달하지 않는다. 따라서 현재 작업 디렉터리와 `--root`가 다른 부착 프로젝트에서는 대상 프로젝트가 아닌 현재 저장소를 프로브하여 잘못된 결과 또는 `프로브 없음`을 인쇄할 수 있다. 기록된 check-9도 현재 루트에서만 실행되어 이 경로를 검사하지 않는다.",
+      "file": "romeo/cli.py",
+      "line": 65
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/evidence/run_de465802c277.yaml",
+  "notes": "두 계약의 base_sha는 일치한다. 승인된 required_checks 10건은 변경되지 않았고 증거와 원시 로그에 모두 exit 0으로 기록됐다. 증거의 changed_files는 구현자 allowed_paths 안이며 guards는 비어 있다. FAIL은 AC-3과 AC-4의 미검사·미충족 분기 때문이다."
+}

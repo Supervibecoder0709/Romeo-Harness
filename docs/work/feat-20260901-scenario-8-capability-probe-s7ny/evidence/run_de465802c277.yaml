@@ -1,0 +1,216 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_de465802c277
+task_id: task_e0899df116dd
+dispatch_id: ctx_fdc29eab962e
+unit_id: feat-20260901-scenario-8-capability-probe-s7ny
+spec_ref:
+  path: docs/work/feat-20260901-scenario-8-capability-probe-s7ny/spec.md
+  sha256: a7e08f13ef0fc11ccb167fa4e6f74f424e328534a27957938907f06f8836c481
+base_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny
+started_at: '2026-09-01T23:02:01+09:00'
+finished_at: '2026-09-01T23:16:48+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_scenario_8 -v
+  exit_code: 0
+  started_at: '2026-09-01T23:02:01+09:00'
+  finished_at: '2026-09-01T23:02:03+09:00'
+  seconds: 1.543
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/01-check-1.log
+  log_sha256: 80075395aca0a37b213c31b08453949cf25e9e44060527e0093ce0ba1ec92cae
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-2
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T23:02:03+09:00'
+  finished_at: '2026-09-01T23:05:43+09:00'
+  seconds: 220.434
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/02-check-2.log
+  log_sha256: b76aca22483bbf783877ef8a6695ea660e813be73add92ad67c96aa0f7be5aa0
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-3
+  command: '! bin/romeo route --fixtures fixtures/requests --report | grep -q ''✗'''
+  exit_code: 0
+  started_at: '2026-09-01T23:05:43+09:00'
+  finished_at: '2026-09-01T23:05:44+09:00'
+  seconds: 0.262
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/03-check-3.log
+  log_sha256: 3abf93ac680c7a17320f2cb55bf08474aece315c29b345f41838472656a8ce9c
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-4
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-01T23:05:44+09:00'
+  finished_at: '2026-09-01T23:05:44+09:00'
+  seconds: 0.232
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/04-check-4.log
+  log_sha256: 12739dd719a60f15d5d79419bc7acffaad3096a0c59e3d2fe0dc10f9df0420bc
+  stdout_tail: PASS 33 fixtures
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-01T23:05:44+09:00'
+  finished_at: '2026-09-01T23:05:44+09:00'
+  seconds: 0.247
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/05-check-5.log
+  log_sha256: 102cc4fd408e0a279282253210ef5580e326e463c1eded769da2d95599de72c7
+  stdout_tail: 'julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/docs/work/feat-20260901-task-copy-brief-count-erc6/brief.md
+    lines=59 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/docs/work/feat-20260901-task-copy-brief-count-erc6/spec.md
+    lines=135 needs_input=0 unchecked_ac=0'
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-01T23:05:44+09:00'
+  finished_at: '2026-09-01T23:05:45+09:00'
+  seconds: 0.341
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/06-check-6.log
+  log_sha256: a500524d37e24949174a2ab6b45c589f6bf398c78f7605a091ebe9f56db05084
+  stdout_tail: compile 검사 PASS
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-7
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-01T23:05:45+09:00'
+  finished_at: '2026-09-01T23:05:46+09:00'
+  seconds: 0.997
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/07-check-7.log
+  log_sha256: ef1d4be14962d64a6e6469d490e143b30944a25f6a4257a2fd1d5e3757aca367
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-8
+  command: grep -q capability_markers adapters/claude/adapter.yaml && grep -q capability_markers adapters/codex/adapter.yaml
+  exit_code: 0
+  started_at: '2026-09-01T23:05:46+09:00'
+  finished_at: '2026-09-01T23:05:46+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/08-check-8.log
+  log_sha256: 5abbd381b5599791d8f8b4b943f72774d436e6e522a1540e41e6f39d3d49c273
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-9
+  command: bin/romeo card --proposal fixtures/proposals/fx-discord-computer-use-automation.yaml | grep
+    -q '능력:'
+  exit_code: 0
+  started_at: '2026-09-01T23:05:46+09:00'
+  finished_at: '2026-09-01T23:05:46+09:00'
+  seconds: 0.199
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/09-check-9.log
+  log_sha256: 646757a6b96320d595045e2c96de6a98d8415b2058733274c2328b5db2e0fbba
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: check-10
+  command: grep -q '8-capability-absent.md' scenarios/README.md
+  exit_code: 0
+  started_at: '2026-09-01T23:05:47+09:00'
+  finished_at: '2026-09-01T23:05:47+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/10-check-10.log
+  log_sha256: 0b45e98540867ba4ab4a620ae053ea50dc69077779a83ceebb731596448f26df
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: ac10-before-state
+  command: D=$(mktemp -d); git archive 9917c51 | tar -x -C "$D"; cp tests/test_scenario_8.py "$D/tests/";
+    (cd "$D" && python3 -m unittest tests.test_scenario_8 >/dev/null 2>&1); rc=$?; rm -rf "$D"; test "$rc"
+    -ne 0
+  exit_code: 0
+  started_at: '2026-09-01T23:05:58+09:00'
+  finished_at: '2026-09-01T23:05:59+09:00'
+  seconds: 0.924
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/11-ac10-before-state.log
+  log_sha256: 12e6f6212e0b6b62be0f57c58e03877262e9623dca63dc7ba14bcd6805247583
+  stdout_tail: ''
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-scenario-8-capability-probe-s7ny'
+  exit_code: 0
+  started_at: '2026-09-01T23:08:06+09:00'
+  finished_at: '2026-09-01T23:08:07+09:00'
+  seconds: 0.038
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/12-review-tree-before.log
+  log_sha256: f77c81244cd43789acb96c8e22c22ae9beb8a736721b32c4426f1bb8c926ae2a
+  stdout_tail: "uests/fx-discord-computer-use-automation.yaml\n M fixtures/requests/fx-s07-coupang-migration-initiative.yaml\n\
+    \ M romeo/blocks.py\n M romeo/card.py\n M romeo/close.py\n M romeo/docs.py\n M romeo/doctor.py\n M\
+    \ romeo/policy.py\n M scenarios/README.md\n M tests/test_blocks_enforcement.py\n M tests/test_enforce_points.py\n\
+    \ M tests/test_scenario_3.py\n?? scenarios/8-capability-absent.md\n?? tests/test_scenario_8.py"
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/.harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-01T23:08:13+09:00'
+  finished_at: '2026-09-01T23:08:13+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/13-reviewer-brief.log
+  log_sha256: f64aef6eedd34f717ed1ae1ba4b4704060f0fd64bba869988222a158911adf94
+  stdout_tail: 02c6ea8ef9a5285e62c1636f08d73360eaea6e65134800513a3b46174628979a  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260901-scenario-8-capability-probe-s7ny/.harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/reviewer-brief.md
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260901-scenario-8-capability-probe-s7ny'
+  exit_code: 0
+  started_at: '2026-09-01T23:16:48+09:00'
+  finished_at: '2026-09-01T23:16:48+09:00'
+  seconds: 0.029
+  log: .harness/runs/feat-20260901-scenario-8-capability-probe-s7ny/run_de465802c277/14-review-tree-after.log
+  log_sha256: f77c81244cd43789acb96c8e22c22ae9beb8a736721b32c4426f1bb8c926ae2a
+  stdout_tail: "uests/fx-discord-computer-use-automation.yaml\n M fixtures/requests/fx-s07-coupang-migration-initiative.yaml\n\
+    \ M romeo/blocks.py\n M romeo/card.py\n M romeo/close.py\n M romeo/docs.py\n M romeo/doctor.py\n M\
+    \ romeo/policy.py\n M scenarios/README.md\n M tests/test_blocks_enforcement.py\n M tests/test_enforce_points.py\n\
+    \ M tests/test_scenario_3.py\n?? scenarios/8-capability-absent.md\n?? tests/test_scenario_8.py"
+  head_sha: 9917c5179a5014fec51009d7a00de7265cccca93
+  dirty_tree_hash: bb0b400c9cc1bb6ba7acaffe2dc801220bf52fb182ec11b139885d75a8abc67b
+changed_files:
+- adapters/claude/adapter.yaml
+- adapters/codex/adapter.yaml
+- core/policy/capabilities.yaml
+- core/policy/packages.yaml
+- core/templates/sections/capability-check.md
+- fixtures/requests/fx-account-migration-continue.yaml
+- fixtures/requests/fx-discord-computer-use-automation.yaml
+- fixtures/requests/fx-s07-coupang-migration-initiative.yaml
+- romeo/blocks.py
+- romeo/card.py
+- romeo/close.py
+- romeo/docs.py
+- romeo/doctor.py
+- romeo/policy.py
+- scenarios/8-capability-absent.md
+- scenarios/README.md
+- tests/test_blocks_enforcement.py
+- tests/test_enforce_points.py
+- tests/test_scenario_3.py
+- tests/test_scenario_8.py
+artifact_hash: a2c7caa18c2de65448cb82257a83186471d3448679e6f03f71c62d6975474396
+reviewer: null
+verdict: null
+approvals: []

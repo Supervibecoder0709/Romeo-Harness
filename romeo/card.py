@@ -41,7 +41,7 @@ def _wrap(prefix, items, width=88, sep=" · ", indent="      "):
     return lines
 
 
-def _parts_detail(parts, root=None):
+def _parts_detail(parts, root=None, harness_root=None):
     """부품 절의 아래 줄 — 추천 목록 · 산출물 결합 규칙 · 설치 프로브 결과.
 
     추천을 인쇄하면서 설치 여부를 말하지 않으면 사람은 지금 쓸 수 있는 것으로 읽는다.
@@ -60,14 +60,45 @@ def _parts_detail(parts, root=None):
         if not cap_id:
             continue
         if probes is None:
-            probes = {c["id"]: c for c in probe_capabilities(root)}
+            probes = {c["id"]: c for c in probe_capabilities(root, harness_root)}
         c = probes.get(cap_id)
         lines.append(f"  설치: {cap_id} {c['label']} — {c['detail']}" if c
                      else f"  설치: {cap_id} 프로브 없음 — 확인되지 않았다")
     return lines
 
 
-def render_card(proposal, route_out, policy=None, root=None):
+def _capabilities_detail(cap_ids, root=None, harness_root=None):
+    """라우터가 요구한 능력마다 **프로브 결과와 대안**을 인쇄한다.
+
+    부품에 붙지 않은 능력도 인쇄한다 — 부품 절에만 프로브를 매달아 두면, 부품 없이 요구되는 능력은
+    카드에 한 줄도 나오지 않는다. 그러면 사람은 그 능력이 있는 것으로 읽고 계획에 넣는다(K-51).
+    없는 것은 **없다고 인쇄하고 대안을 함께 준다** — 부재를 숨기지도 않고 막지도 않는다(Q-28).
+
+    루트가 둘인 이유는 `doctor.probe_capabilities` 와 같다: 능력 카탈로그·어댑터 선언은 하네스의 내용이고
+    흔적 파일은 **작업 대상 저장소**의 상태다. 부착한 프로젝트에서 하나로 뭉치면 카탈로그를 찾지 못해
+    모든 능력이 「프로브 없음」 이 되고, 사람은 그것을 대상 프로젝트의 상태로 읽는다(K-51).
+    부르는 쪽(`cli.cmd_card` · `cmd_route --card`)이 `--root` 를 대상 저장소로, `HARNESS_ROOT` 를
+    하네스로 넘긴다 — 집행 쪽(`blocks.py`)은 이미 두 루트를 쓴다."""
+    if not cap_ids:
+        return []
+    probes = {c["id"]: c for c in probe_capabilities(root, harness_root)}
+    lines = [f"능력: {len(cap_ids)}종 — 없는 것은 없다고 인쇄한다(자동 설치 금지)"]
+    for cid in cap_ids:
+        c = probes.get(cid)
+        if not c:
+            lines.append(f"  {cid}: 프로브 없음 — 확인되지 않았다")
+            continue
+        row = f"  {cid}: {c['label']} — {_clip(c['detail'], 46)}"
+        alts = c.get("alternatives") or []
+        # 한 능력에 한 줄. 카드는 30줄 예산 안에서 사실·가정·미확인과 자리를 나눠 쓰므로,
+        # 대안을 여러 줄로 펼치면 그 줄들이 예산에 밀려 잘린다(정책표는 그대로 남는다).
+        if c["label"] != "present" and alts:
+            row += f" · 대안 {_clip(alts[0], 44)}" + (f" 외 {len(alts) - 1}" if len(alts) > 1 else "")
+        lines.append(row)
+    return lines
+
+
+def render_card(proposal, route_out, policy=None, root=None, harness_root=None):
     pol = policy or load_policy()
     pk = pol["packages"]
     cand = proposal["candidate"]
@@ -106,9 +137,10 @@ def render_card(proposal, route_out, policy=None, root=None):
         lines.append("문서: 없음 (카드만 기록)")
     guards = ", ".join(g["name"] for g in route_out["guards"]) or "없음"
     lines.append(f"실행: {REVIEWER_KO[route_out['reviewer']]} · {ISOLATION_KO[route_out['isolation']]} · 차단 {', '.join(route_out['blocks']) or '없음'} · 가드 {guards}")
+    lines.extend(_capabilities_detail(route_out.get("capabilities"), root, harness_root))
     if route_out["parts"]:
         lines.append("부품: " + " · ".join(f"{p['id']}({p['gate']} {'활성' if p['status']=='active' else '대기'})" for p in route_out["parts"]))
-        lines.extend(_parts_detail(route_out["parts"], root))
+        lines.extend(_parts_detail(route_out["parts"], root, harness_root))
     warns = [w for w in route_out["warnings"] if w["id"] not in ("PART_PENDING_GATE",)]
     if warns:
         lines.append("경고:")

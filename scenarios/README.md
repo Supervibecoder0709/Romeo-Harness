@@ -30,3 +30,4 @@
 | # | 시나리오 | 무엇을 고정하나 | 테스트 |
 | --- | --- | --- | --- |
 | 3 | [조사 없이 구현으로 넘어가는 것을 막는다](3-discovery-block.md) | 차단 `discovery-result`·`milestone-plan` 집행, 부품 추천, `inputs:` 링크 요구 | `tests/test_scenario_3.py` |
+| 8 | [없는 능력을 있는 것처럼 쓰는 것을 막는다](8-capability-absent.md) | 능력 프로브(어댑터가 흔적 경로 소유), 카드의 부재·대안 인쇄, 차단 `capability-probed` 집행 | `tests/test_scenario_8.py` |

@@ -16,7 +16,9 @@ from romeo.close import close_unit
 from romeo.docs import approve_unit, create_unit
 from romeo.envelope import write_envelope
 from romeo.evidence import run_command
-from romeo.policy import PolicyError, load_policy, load_project_state, route
+from romeo.doctor import probe_capabilities
+from romeo.policy import (PolicyError, classification_from_frontmatter, load_policy,
+                          load_project_state, route)
 from romeo.run_unit import load_attempts
 from romeo.util import dump_yaml, load_yaml
 
@@ -28,6 +30,28 @@ NOT_A_SPIKE = "spike 없이 곧바로 전체 구현한다"
 DISCOVERY_FX = HARNESS_ROOT / "fixtures/requests/fx-discord-computer-use-automation.yaml"
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
 SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `impl.txt`"
+
+#: 「능력 확인」 표의 자리표시자 행. 절이 걸린 단위의 spec 에만 있다.
+CAPABILITY_ROW = "| NEEDS_INPUT | NEEDS_INPUT | NEEDS_INPUT | NEEDS_INPUT |"
+
+
+def fill_capability_table(fm, body, root):
+    """「능력 확인」 표를 **프로브가 실제로 낸 값**으로 채운다 — 카드가 인쇄한 것을 옮겨 적는 자리다.
+
+    다른 절처럼 `NEEDS_INPUT` 를 아무 글자로 바꾸면 이 표는 미완료 토큰 검사만 통과하고
+    차단(`capability-probed`)에 걸린다. 그것이 이 차단의 요점이다 — 형태가 그럴듯하고 내용이 거짓인 값.
+    절이 걸리지 않은 단위에서는 아무것도 하지 않는다."""
+    if CAPABILITY_ROW not in body:
+        return body
+    required = route(classification_from_frontmatter(fm),
+                     project_state=load_project_state(HARNESS_ROOT))["capabilities"]
+    probes = {c["id"]: c for c in probe_capabilities(root, HARNESS_ROOT)}
+    rows = []
+    for cid in required:
+        c = probes[cid]
+        alt = "" if c["label"] == "present" else (c.get("alternatives") or [""])[0]
+        rows.append(f"| {c['title'] or cid} | {cid} | {c['label']} | {alt} |")
+    return body.replace(CAPABILITY_ROW, "\n".join(rows))
 
 
 def git(*args, cwd):
@@ -60,6 +84,7 @@ class _Repo(unittest.TestCase):
     def fill_spec(self):
         spec = self.files["spec.md"]
         fm, body = frontmatter.read(spec)
+        body = fill_capability_table(fm, body, self.root)
         frontmatter.write(spec, fm, (body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
                                          .replace('command: "채움"', 'command: "true"')
                                          .replace("- [ ] AC-1", "- [x] AC-1")))
@@ -270,7 +295,8 @@ class _PolicyRepo(unittest.TestCase):
         (self.root / "core/policy").mkdir(parents=True)
         (self.root / "core/schemas").mkdir(parents=True)
         for rel in ("core/policy/classification.yaml", "core/policy/packages.yaml",
-                    "core/policy/execution-guards.yaml", "core/schemas/fixture.json"):
+                    "core/policy/execution-guards.yaml", "core/policy/capabilities.yaml",
+                    "core/schemas/fixture.json"):
             (self.root / rel).write_bytes((HARNESS_ROOT / rel).read_bytes())
 
     def tearDown(self):

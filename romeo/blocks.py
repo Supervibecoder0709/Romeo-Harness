@@ -102,7 +102,7 @@ def _section_state(text, where, title):
 AC_RE = re.compile(r"^\s*- \[[ xX]\]\s*\S", re.M)
 
 
-def _spec_ready(unit_dir, fm, body, meta=None):
+def _spec_ready(unit_dir, fm, body, meta=None, context=None):
     """승인 창구(확인란)가 채워졌고, 그 안에 수용 기준이 적혀 있다.
 
     검증 계획(`required_checks`)이 비어 있는 것은 여기서 막지 않는다 — 그것은 완료 판정의 문제이고
@@ -118,7 +118,7 @@ def _spec_ready(unit_dir, fm, body, meta=None):
     return True, f"확인란이 채워졌고 수용 기준 {len(ac)}건"
 
 
-def _milestone_plan(unit_dir, fm, body, meta=None):
+def _milestone_plan(unit_dir, fm, body, meta=None, context=None):
     """T2 는 Charter 의 「마일스톤 계획」이 채워진 뒤에만 열린다."""
     charter = Path(unit_dir) / "charter.md"
     if not charter.is_file():
@@ -156,7 +156,7 @@ def _points_at_a_file(unit_dir, item):
     return (Path(unit_dir) / path).is_file()
 
 
-def _discovery_result(unit_dir, fm, body, meta=None):
+def _discovery_result(unit_dir, fm, body, meta=None, context=None):
     """조사 단위는 **실재하는** 조사 산출물이 붙기 전에는 구현 위임으로 넘어가지 않는다.
 
     두 가지가 이 판정의 요점이다.
@@ -188,7 +188,7 @@ def _discovery_result(unit_dir, fm, body, meta=None):
     return True, f"{DOC_FILES[where]} 의 inputs: {len(items)}건 실재 — {', '.join(items[:3])}" + (" …" if len(items) > 3 else "") + note
 
 
-def _risk_plan_ready(unit_dir, fm, body, meta=None):
+def _risk_plan_ready(unit_dir, fm, body, meta=None, context=None):
     """hard gate 영역은 영향 범위·백업·복구가 적힌 뒤에만 **승인 대상**이 된다(K-50).
 
     이 차단은 **문서가 준비됐는가**를 본다. 되돌리기 어려운 행동을 **실행해도 되는가**는 보지 않는다 —
@@ -202,12 +202,94 @@ def _risk_plan_ready(unit_dir, fm, body, meta=None):
     return True, f"게이트 {gates} — 「위험·백업·복구」 절이 채워졌다"
 
 
+#: 「능력 확인」 표의 열. 순서가 판정에 쓰이므로 템플릿과 여기가 같아야 한다.
+CAPABILITY_COLUMNS = ("능력", "프로브", "결과", "대안")
+
+#: 「능력 확인」 표를 프로브와 대조하는 차단. 능력을 요구하는 오버레이는 이것을 함께 건다.
+CAPABILITY_BLOCK = "capability-probed"
+
+
+def table_rows(text):
+    """마크다운 표의 **데이터 행**만 → `[[셀]]`. 헤더와 구분선은 버린다.
+
+    표가 없거나 헤더뿐이면 빈 목록이다 — '표가 있다' 와 '표에 무엇이 적혀 있다' 는 다르다."""
+    rows = []
+    for ln in (text or "").split("\n"):
+        line = ln.strip()
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if cells and all(set(c) <= set("-: ") and c for c in cells):
+            continue  # 구분선
+        rows.append(cells)
+    return rows[1:] if rows else []
+
+
+def _cell(text):
+    """표 셀에서 값만 꺼낸다. 백틱·굵게 표시는 값이 아니다."""
+    return str(text or "").strip().strip("`").strip("*").strip()
+
+
+def _capability_probed(unit_dir, fm, body, meta=None, context=None):
+    """「능력 확인」 표가 **프로브가 실제로 낸 결과**와 같은가.
+
+    **없다는 사실 자체는 막지 않는다.** 막으면 「되는지 조사해 보자」 라는 요청이 통째로 불가능해진다(Q-28).
+    막는 것은 넷이다 — ① 없는 것을 있다고 적음 ② 실재하지 않는 프로브 id ③ 부재인데 대안 칸이 빔
+    ④ 라우터가 요구한 능력이 표에 없음. 넷 다 **형태가 그럴듯하고 내용이 거짓인 값**이다:
+    미완료 토큰 검사(open-loop)는 넷 다 통과시킨다 — 빈칸이 아니기 때문이다.
+
+    요구하는 자리와 보는 자리를 같게 둔다(§11). 요구는 라우터의 `capabilities`(정책표 overlay 의
+    `add_capabilities`)에서 오고, 결과는 능력 프로브에서 온다. 둘 다 이 판정이 직접 읽는다 —
+    문서에 적힌 값을 근거로 문서를 판정하지 않는다."""
+    title = "능력 확인"
+    why = _section_state(section(body, title), "spec.md", title)
+    if why:
+        return False, (f"{why} — 필요한 능력과 프로브 결과가 적히지 않으면 "
+                       f"없는 능력이 있는 것처럼 계획에 들어간다(K-51)")
+    ctx = context or {}
+    required = [str(c) for c in (ctx.get("capabilities") or [])]
+    root = ctx.get("project_root") or Path(unit_dir).parents[2]
+    from .doctor import probe_capabilities  # 지연 import — doctor 는 policy 를 거치지 않는다
+    probes = {p["id"]: p for p in probe_capabilities(root, ctx.get("harness_root"))}
+    rows = table_rows(section(body, title))
+    if not rows:
+        return False, (f"spec.md 의 「{title}」 절에 표의 데이터 행이 없다 — "
+                       f"열은 {' | '.join(CAPABILITY_COLUMNS)} 다")
+    seen, bad = [], []
+    for cells in rows:
+        if len(cells) < len(CAPABILITY_COLUMNS):
+            bad.append(f"행의 열이 {len(cells)}개다({len(CAPABILITY_COLUMNS)}개여야 한다): {' | '.join(cells)}")
+            continue
+        cap_id, result, alt = _cell(cells[1]), _cell(cells[2]), _cell(cells[3])
+        probe = probes.get(cap_id)
+        if probe is None:
+            bad.append(f"프로브 id {cap_id!r} 가 능력 카탈로그에 없다 — "
+                       f"실재하지 않는 프로브의 결과는 결과가 아니다")
+            continue
+        seen.append(cap_id)
+        if result != probe["label"]:
+            bad.append(f"{cap_id}: 표에 {result!r} 라고 적혔는데 프로브가 낸 값은 {probe['label']!r} 다")
+            continue
+        if result != "present" and not alt:
+            bad.append(f"{cap_id}: {result} 인데 대안 칸이 비어 있다 — "
+                       f"없다는 것만 적고 무엇으로 대신할지 적지 않으면 구현자가 가능한 척 우회한다")
+    missing = [c for c in required if c not in seen]
+    if missing:
+        bad.append(f"라우터가 요구한 능력이 표에 없다: {', '.join(missing)}")
+    if bad:
+        return False, "; ".join(bad[:4]) + (" …" if len(bad) > 4 else "")
+    absent = [c for c in seen if probes[c]["label"] != "present"]
+    return True, (f"능력 {len(seen)}건이 프로브 결과와 일치한다"
+                  + (f" (없는 것 {len(absent)}건은 대안과 함께 적혔다 — 부재는 막지 않는다)" if absent else ""))
+
+
 #: 차단 id → 충족 판정. 카탈로그와 **같은 집합**이어야 한다(load_policy 가 대조한다).
 BLOCK_CHECKS = {
     "spec-ready": _spec_ready,
     "milestone-plan": _milestone_plan,
     "discovery-result": _discovery_result,
     "risk-plan-ready": _risk_plan_ready,
+    "capability-probed": _capability_probed,
 }
 
 
@@ -271,6 +353,61 @@ def catalog_defects(pk):
             defects.append(f"base·overlays 가 거는 차단 {bid!r} 가 카탈로그에 없다")
         if bid not in BLOCK_CHECKS:
             defects.append(f"base·overlays 가 거는 차단 {bid!r} 에 집행 코드가 없다")
+    return defects
+
+
+#: 라우터가 요구할 수 있는 능력이 카드와 「능력 확인」 절에서 쓰이려면 반드시 있어야 하는 필드.
+#: `why` 없이 요구하면 사람이 왜 그것을 보는지 알 수 없고, `alternatives` 없이 요구하면
+#: 부재를 인쇄해도 읽는 사람이 할 수 있는 일이 남지 않는다. `honesty` 는 프로브 결과가
+#: 실행 증거로 읽히는 것을 막는 문장이다(A-11).
+CAPABILITY_REQUIRED_FIELDS = ("why", "alternatives", "honesty")
+
+
+def required_capabilities(pk):
+    """오버레이가 요구하는 능력 id 전부. 중복 없이 선언 순서대로."""
+    ids = []
+    for o in (pk or {}).get("overlays") or []:
+        for cid in (o or {}).get("add_capabilities") or []:
+            if cid not in ids:
+                ids.append(str(cid))
+    return ids
+
+
+def capability_defects(pk, capabilities):
+    """요구하는 자리(정책표 overlay)와 정의하는 자리(능력 카탈로그)의 어긋남. 빈 목록이면 성립한다.
+
+    `load_policy` 가 로드 시점에 읽고, 하나라도 있으면 정책을 읽지 않는다 — 차단·절에서 두 번 닫은
+    결함(요구를 적고 집행을 잊는 것)이 능력으로 자리만 옮겨 앉는 것을 막는다(§11).
+
+    셋을 본다.
+    1. 요구한 능력 id 가 카탈로그에 실재하는가 — 없으면 카드는 '프로브 없음' 을 인쇄하고
+       차단은 그 행을 영원히 채울 수 없게 만든다.
+    2. 요구한 능력이 `why`·`alternatives`·`honesty` 를 갖는가 — 인쇄할 것이 없으면 요구가 장식이다.
+    3. 능력을 요구하는 오버레이가 그것을 **보는 차단**(`capability-probed`)도 함께 거는가 —
+       요구만 하고 대조하지 않으면 그럴듯한 거짓 값이 그대로 통과한다."""
+    flat, defects = {}, []
+    for group, caps in (capabilities or {}).items():
+        for name, spec in (caps or {}).items():
+            flat[f"{group}.{name}"] = spec or {}
+    for o in (pk or {}).get("overlays") or []:
+        wanted = [str(c) for c in ((o or {}).get("add_capabilities") or [])]
+        if not wanted:
+            continue
+        oid = (o or {}).get("id")
+        for cid in wanted:
+            spec = flat.get(cid)
+            if spec is None:
+                defects.append(f"overlays.{oid}.add_capabilities: {cid!r} 가 능력 카탈로그"
+                               f"(core/policy/capabilities.yaml)에 없다 — 확인할 수 없는 것을 요구한다")
+                continue
+            for field in CAPABILITY_REQUIRED_FIELDS:
+                if not spec.get(field):
+                    defects.append(f"capabilities.{cid}: {field} 가 없다 — "
+                                   f"라우터가 요구하는 능력은 왜 필요한지·없으면 무엇으로 대신하는지·"
+                                   f"프로브 결과가 무엇이 아닌지를 함께 인쇄해야 한다")
+        if CAPABILITY_BLOCK not in ((o or {}).get("add_blocks") or []):
+            defects.append(f"overlays.{oid}: 능력을 요구하면서 차단 {CAPABILITY_BLOCK!r} 를 걸지 않는다 — "
+                           f"요구만 하고 대조하지 않으면 그럴듯한 거짓 값이 그대로 통과한다")
     return defects
 
 
@@ -340,15 +477,19 @@ def enforced_at(pk, block_ids, point):
     return [b for b in (block_ids or []) if point in ((cat.get(b) or {}).get("enforced_at") or [])]
 
 
-def satisfied(block_id, unit_dir, fm, body, meta=None):
-    """차단 하나의 충족 판정 → `(ok, reason)`. 집행 코드가 없는 id 는 조용히 통과시키지 않는다."""
+def satisfied(block_id, unit_dir, fm, body, meta=None, context=None):
+    """차단 하나의 충족 판정 → `(ok, reason)`. 집행 코드가 없는 id 는 조용히 통과시키지 않는다.
+
+    `context` 는 **문서 밖에서 와야 하는 사실**을 나른다 — 라우터가 요구한 능력(`capabilities`)과
+    저장소 루트(`project_root`). 문서에 적힌 값으로 그 문서를 판정하면 판정이 성립하지 않는다."""
     fn = BLOCK_CHECKS.get(block_id)
     if fn is None:
         raise KeyError(f"집행 코드가 없는 차단 id: {block_id}")
-    return fn(Path(unit_dir), fm or {}, body or "", meta or {})
+    return fn(Path(unit_dir), fm or {}, body or "", meta or {}, context or {})
 
 
-def evaluate(pk, block_ids, point, unit_dir, fm, body):
+def evaluate(pk, block_ids, point, unit_dir, fm, body, context=None):
     """이 집행 지점에서 보는 차단 전부의 판정 → `[(block_id, ok, reason)]`."""
     cat = catalog(pk)
-    return [(b, *satisfied(b, unit_dir, fm, body, cat.get(b))) for b in enforced_at(pk, block_ids, point)]
+    return [(b, *satisfied(b, unit_dir, fm, body, cat.get(b), context))
+            for b in enforced_at(pk, block_ids, point)]

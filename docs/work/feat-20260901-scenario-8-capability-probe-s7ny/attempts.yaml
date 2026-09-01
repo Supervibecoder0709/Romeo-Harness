@@ -33,6 +33,14 @@ attempts:
   failure_class: outputs
   note: null
   settled_at: '2026-09-01T23:16:48+09:00'
+- n: 5
+  run: run_d7092f3d25c5
+  base_sha: 93f0c0a14d6eaa5169ed98a1fd6f9304593576f6
+  started_at: '2026-09-01T23:29:55+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
 reviews:
 - after_attempt: 4
   conclusion: '완료 정의는 달성 가능하다. 두 실패의 원인이 서로 달랐다 — 3회차는 목표(AC-10 문장이 이 단위의 산출물을 승인 전에 실행하라고 요구해 D-27 과

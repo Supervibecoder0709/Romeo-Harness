@@ -333,7 +333,9 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     # 마일스톤 절을 비우는 것)을 잡을 자리가 이것 하나뿐이기 때문이다.
     # **이미 done 인 단위에는 소급하지 않는다** — 그 단위는 닫힐 때의 규칙으로 이미 닫혔고, 지금 다시 막을 것이 없다.
     if fm.get("status") != "done":
-        for bid, ok, why in evaluate_blocks(pol["packages"], out["blocks"], "close", udir, fm, body):
+        from .docs import block_context
+        for bid, ok, why in evaluate_blocks(pol["packages"], out["blocks"], "close", udir, fm, body,
+                                            context=block_context(out, project_root)):
             check("BLOCK_SATISFIED", ok, f"{bid}: {why}")
     unapproved = []
     for g in out["guards"]:

@@ -106,3 +106,16 @@ settings_deny:
   - "Bash(sudo rm:*)"
   - "Bash(git push --force:*)"
   - "Bash(git push -f:*)"
+
+# 능력 흔적 경로(core/policy/capabilities.yaml 의 `kind: adapter_marker`).
+#
+# **무엇이 그 능력인가**는 코어가 소유하고, **이 런타임에서 그것을 어디서 확인하는가**는 여기가 소유한다.
+# 코어가 런타임 경로를 알면 그것이 곧 도구명이다(C-C6). 여기 없는 능력은 이 런타임에서 `absent` 다 —
+# 프로브는 이 경로를 **읽기만** 하고 만들지 않는다(자동 설치 금지).
+capability_markers:
+  # 이 런타임에서 화면 조작도 외부 도구 서버를 통해 붙는다. 저장소에 커밋되는 선언은 이 파일 하나뿐이고,
+  # 사용자 개인 설정(홈 디렉터리)은 저장소의 상태가 아니므로 여기서 보지 않는다.
+  automation.ui-control:
+    - .mcp.json
+  automation.tool-server:
+    - .mcp.json
