@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-01T17:58:17+09:00'
+approved_at: '2026-09-01T18:31:03+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,10 @@ routing:
   history: []
 created: '2026-09-01'
 updated: '2026-09-01'
+approval_history:
+- {approved_at: '2026-09-01T17:58:17+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T18:31:03+09:00',
+  reason: '1회차 검토자 findings 반영 — AC-3 에 mailto 명시, AC-8 을 이름 존재에서 상태 검사로, AC-9 에서 기계가 셀 수 없는 spike 판정을
+    빼고 경계를 명시, 변경 범위에 AGENTS.md·CLAUDE.md·fixtures/shadow·tests/test_run_unit.py 추가, check-9 강화'}
 ---
 
 # 요구하는 자리와 보는 자리를 같게 둔다 — 집행 지점 어휘·차단 충족 조건·절 로드 대조
