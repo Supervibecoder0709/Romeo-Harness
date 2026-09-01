@@ -100,11 +100,18 @@ authority: derived
   `Q-26` 은 위 ③ 이 **실측으로도 닫히지 않은 부분**이다 — 전환 뒤 인박스를 읽을 수 있다는 것까지는 봤지만,
   그 인박스에 워커가 실제로 보낸 메시지가 있을 때도 읽히는지는 보지 못했다(관측한 Run 은 비어 있었다).
 - **CI:** `b19f753` 까지 푸시돼 있고 그 시점 실행(`33466439591`) success — 정비 2회까지가 원격 CI 를 통과했다. **`dc7b161`~`045ea08`(정비 3회)은 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
-- **워크트리 6개** — 위 다섯에 `impl-feat-20260901-task-copy-brief-count-erc6`(정비 3회, 통합 완료 — 정리 대상)이 늘었다. 이전 기록:
-  **워크트리 5개 — 그 세션에 6개를 지웠다.** `mvp_planning` · `impl-`·`impl2-`·`impl4-`·`impl5-feat-20260831-park-defects-actm` 과 원본 체크아웃(`main`).
-  bmad 계열 6개와 `impl3-park-defects` 를 정리했고(928MB → 330MB), 소실 위험이 있던 3건은 태그로 보존했다
-  (`preserve/bmad-install-observe-a3bm-run1`~`run3`). **`orca worktree rm` 은 브랜치도 지운다** — 지우기 전에 커밋이 다른 ref 로 도달 가능한지 본다.
-  `impl-`·`impl2-park-defects` 는 미커밋 산출물이 남아 있다.
+- **워크트리 1개 — 2026-09-01 에 여섯을 전부 정리했다.** 남은 것은 `mvp_planning` 과 원본 체크아웃(`main`) 뿐이다(495MB 회수).
+  `impl-`·`impl2-`·`impl4-`·`impl5-feat-20260831-park-defects-actm` · `impl-feat-20260901-coordinator-procedure-gaps-y8fu` ·
+  `impl-feat-20260901-task-copy-brief-count-erc6` 이 지워졌다.
+  **지우기 전에 두 가지를 본다 — 커밋이 다른 ref 로 도달 가능한가, 그리고 미커밋 산출물이 있는가.** 여섯 중 셋은 tip 이 이미 도달 가능하고
+  미커밋도 0 이라 바로 지웠고, `actm` 계열 셋에는 **통합 이력에 없는** 잔여가 있었다 — 그 단위의 통합에는 5회차(`run_e3a4af18582c`)의
+  evidence·result·review 만 들어갔고 1~4회차의 것은 워크트리에만 있었다. 그래서 WIP 커밋을 만들고 태그로 붙잡은 뒤에 지웠다:
+  `preserve/park-defects-actm-run1`(1회차) · `run2`(2회차) · `run34`(3·4회차 — **검토자 봉투 2건 포함**).
+  봉투를 남긴 것은 RUNBOOK §3.8 이 옛 산출물의 검토 봉투를 §6 의 관측 표본이라 지워서도 안 된다고 적기 때문이다.
+  꺼내는 법은 `git show <태그>:<경로>` 이고, 삭제 **뒤에** 실제로 꺼내 읽어 확인했다(`run_43a8b64c0d69-reviewer.json` = FAIL · findings 1).
+  이전 세션의 `preserve/bmad-install-observe-a3bm-run1`~`run3` 도 같은 방식이다.
+  **`orca worktree rm` 이 브랜치도 지운다는 서술은 조건부다** — 2026-09-01 의 `actm` 계열 셋은 응답에 `preservedBranch` 가 실려 **브랜치가 남았고**,
+  같은 날 먼저 지운 셋에는 그 필드가 없었다. 무엇이 그 차이를 만드는지는 **미확인**이다. 그래서 도달 가능성 확인은 그대로 한다.
 - **문서 지연:** 「미검증·남은 위험」은 맨 위 소절(M2 close 이후)만 최신이다.
 
 
