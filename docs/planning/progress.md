@@ -17,15 +17,16 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `fd7c7b9` · 2026-09-01)
+## 지금 상태 (기준 `c945686` · 2026-09-01)
 
 > 이 블록은 손으로 갱신한다. 위 SHA 는 **이 요약이 서술하는 상태의 기준 커밋**이지 블록을 쓴 커밋이 아니다.
-> `git log --oneline fd7c7b9..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
+> `git log --oneline c945686..HEAD` 에 커밋이 있으면 그 커밋들이 아래 항목을 바꿨는지 먼저 본다 —
 > 바꿨다면 블록을 믿지 말고 CI 최신 실행과 검사 재실행으로 실측하고, 이 블록을 갱신한다.
 
 - **마일스톤:** M2 완료(2026-08-29 · D-76). **M3 진행 중** — G-M3 §6.1 1~5단계는 `a9e7af1` 로 닫혔다.
-  그 뒤 **관통과 관통 사이의 하네스 정비 1회를 마쳤다** — `feat-20260831-park-defects-actm` 이 **5회차(`run_e3a4af18582c`)에서 close 를 통과**했고(`status: done`),
-  통합 커밋은 `fd7c7b9` 다. 남은 M3 는 charter(T2)·MCP/브라우저 프로브·gate·시나리오 3·8·9 다.
+  그 뒤 **관통 사이의 하네스 정비를 두 번 마쳤다** — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 통합 `fd7c7b9`),
+  2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · **2회차 `run_fc79c4267d1c` 에서 close 통과** · `status: done` · 통합 `c945686`).
+  남은 M3 는 charter(T2)·MCP/브라우저 프로브·gate·시나리오 3·8·9 다.
 - **park 된 결함 5건이 닫혔다.** 넷은 승인된 범위였고 하나는 이 단위가 스스로 드러낸 것이다.
   | # | 무엇이 막고 있었나 | 고친 자리 | 회귀 테스트 |
   | --- | --- | --- | --- |
@@ -51,7 +52,7 @@ authority: derived
   봉투 앵커 **양쪽 5/5** · 방어 검사 **유효**(before/after `log_sha256` 동일 `1b7a3364afac`) · 검토자(codex `gpt-5.6-sol`, read-only) **PASS · findings 0**.
   유일한 WARN 은 `REVIEW_SAMPLE` 이고 **D-75 (b) 가 이미 1건으로 닫기로 확정한 것**이다.
   산출물 트리 `3a5ba01c58ff` 는 4회차와 **바이트로 같다** — 5회차는 코드를 새로 만들지 않고 검증 계획만 교체했다.
-- **정비 중에 새로 드러난 코디네이터 절차 결함 셋은 `feat-20260901-coordinator-procedure-gaps-y8fu` 가 가져갔다(승인 커밋 `a1bfeac` · 구현 진행 중).**
+- **정비 중에 새로 드러난 코디네이터 절차 결함 셋을 `feat-20260901-coordinator-procedure-gaps-y8fu` 가 닫았다(재승인 `82a8191` · 통합 `c945686` · `status: done`).**
   셋을 park 으로 열지 않았다 — 여는 대신 **바로 그 단위에서 닫고 있기 때문**이다. 그 단위의 산출물이 추적 지점이고,
   실측으로도 닫히지 않은 잔여만 `Q-26` 으로 열었다(아래).
   ① RUNBOOK §3.1 의 위임 전 확인에 **재검토 기록(`attempts.yaml`) 대조가 없었다** — 없으면 자식 워크트리가 브레이크를 못 푼다(3회차가 겪었다).
@@ -63,6 +64,22 @@ authority: derived
   펜싱되는 것은 `check --run`·`task-update` 뿐이고 `task-list --run` 은 바인딩과 무관하게 읽힌다.
   원문은 `.harness/observations.yaml` 의 `coordinator_run_rebinding`. **관측은 2회 돌았고 결론이 같다** —
   2회차(`run_fc79c4267d1c`)는 같은 스크립트를 다른 터미널·다른 Run 쌍으로 돌렸고 달라진 것은 id 뿐이다.
+- **이 정비는 2회차에 닫혔고, 1회차 FAIL 이 검증 계획의 결함을 드러냈다.**
+  1회차(`run_30aed12f8de0`)는 구현 쪽이 required_checks **14/14 exit 0** · 재실행 14/14 · 앵커 양쪽 5/5 · 방어 검사 유효였는데
+  검토자(codex read-only)가 **FAIL**(findings 2건)을 냈고 close 가 `REVIEW_VERDICT` 하나에서 막혔다. 지적은 둘 다 정당했다 —
+  `check-8` 이 관측 키의 **존재만** 보아 AC-5 의 「되는 것과 안 되는 것을 구분」을 대조하지 않았고,
+  AC-5 의 근거 파일 둘(`.harness/observations.yaml` · `docs/work/<id>/observation/*.log`)이 **모두 `exclusions()` 제외 경로**라
+  probe 를 증거 명령으로 돌리지 않으면 관측이 그 실행과 연결되지 않았다(Q-23 과 같은 계열).
+  재승인(`82a8191`)으로 AC-5 에 봉인 요구를 더하고 `check-8` 을 세 결과 키 대조로 강화하고 `check-15`(probe 의 `stdout_tail`·`log_sha256`)를 더해 **15건**으로 만들었다.
+  2회차는 1회차 워크트리를 시딩해 `exec > $OUT` 을 `main | tee $OUT` 으로 바꾸고 `evidence run --label run-rebinding-probe` 로 다시 돌린 것만으로 닫혔다.
+- **2회차가 통과한 근거.** required_checks **15/15 exit 0** · 재실행 대조 **15/15** · 봉투 앵커 **양쪽 5/5** ·
+  방어 검사 **유효**(before/after `log_sha256` 동일 `f2afce10760e`) · 검토자(codex, read-only) **PASS · findings 0** · close **PASS 52건 · FAIL 0**.
+  WARN 은 둘 — `REVIEW_SUPERSEDED`(1회차 FAIL 봉투는 산출물 `a1bfeac+5588351d1e64` 를 본 판정이라 대상 밖)와 `REVIEW_SAMPLE`(D-75 (b) 가 1건으로 확정).
+- **이 관통이 밟은 하네스 결함 둘 — 다음 정비 후보다.**
+  ① **Q-14 를 재현했다.** 재승인 커밋에 위임한 쪽 계약 사본(`task/*.json`)이 딸려 들어가 `merge --ff-only` 가 거부됐다 —
+  `git add docs/work/<id>/` 가 폴더째 담았기 때문이고 amend 로 뺐다(`f53d096` → `82a8191`). `task/` 를 무시 목록에 두거나 승인 커밋 범위를 좁히는 자리가 없다.
+  ② **`adapters/orca/prompts/implementer-brief.md` 에 `required_checks` 건수가 하드코딩돼 있다**(「6건」). 이번엔 `sed` 로 15건으로 바꿔 넘겼다 —
+  템플릿이 검사 개수를 아는 것은 구조적으로 틀렸다.
   2회차가 더 한 것은 그 실행을 **증거에 묶은 것**이다 — probe 를 `bin/romeo evidence run --label run-rebinding-probe` 로
   감싸 stdout 이 `log_sha256`·`stdout_tail` 에 봉인되게 했다(1회차는 stdout 을 파일로 삼켜 어느 실행에서 나왔는지
   말할 수 없었고 검토자가 그 자리를 FAIL 로 짚었다). **남은 것:** 워커가 실제로 보낸 메시지가
@@ -70,7 +87,7 @@ authority: derived
 - **기존 park 은 `Q-12`~`Q-17`·`Q-19`·`Q-23`·`Q-24` 그대로이고, `Q-26` 이 하나 늘었다.**
   `Q-26` 은 위 ③ 이 **실측으로도 닫히지 않은 부분**이다 — 전환 뒤 인박스를 읽을 수 있다는 것까지는 봤지만,
   그 인박스에 워커가 실제로 보낸 메시지가 있을 때도 읽히는지는 보지 못했다(관측한 Run 은 비어 있었다).
-- **CI:** `8d5af4f` 까지 푸시돼 있고 그 시점 실행 success. **`40b074b`~`fd7c7b9` 는 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
+- **CI:** `edf9dad` 까지 푸시돼 있고 그 시점 실행(`33456522794`) success — 정비 1회의 구현이 원격 CI 를 처음 통과했다. **`a1bfeac`~`c945686`(정비 2회)은 아직 로컬에만 있다** — 푸시는 별도 승인 대상이다(K-66).
 - **워크트리 5개 — 이번 세션에 6개를 지웠다.** `mvp_planning` · `impl-`·`impl2-`·`impl4-`·`impl5-feat-20260831-park-defects-actm` 과 원본 체크아웃(`main`).
   bmad 계열 6개와 `impl3-park-defects` 를 정리했고(928MB → 330MB), 소실 위험이 있던 3건은 태그로 보존했다
   (`preserve/bmad-install-observe-a3bm-run1`~`run3`). **`orca worktree rm` 은 브랜치도 지운다** — 지우기 전에 커밋이 다른 ref 로 도달 가능한지 본다.
@@ -85,7 +102,7 @@ authority: derived
 | M0 정책표·fixture·분류 카드 | **완료** | [원문](archive/milestones.md) |
 | M1 T0 최소 관통 (Claude 단독, 현재 작업 공간) | **완료** | [원문](archive/milestones.md) |
 | M2 어댑터·역할·Orca 위임·T1 교차 관통 | **완료 (2026-08-29 · D-76)** | [원문](archive/milestones.md) |
-| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 1회**를 마쳤다 — `feat-20260831-park-defects-actm` 이 park 된 결함 5건을 닫고 5회차(`run_e3a4af18582c`)에서 close 를 통과했다(required_checks 16/16 · 재실행 대조 16/16 · 앵커 양쪽 5/5 · 검토자 PASS · findings 0). M3 의 나머지(charter·MCP/브라우저 프로브·gate·시나리오 3·8·9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9` |
+| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 2회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). M3 의 나머지(charter·MCP/브라우저 프로브·gate·시나리오 3·8·9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686` |
 | M4 ~ M7 | 미착수 | [원문](archive/milestones.md) |
 
 ## §10 체크리스트

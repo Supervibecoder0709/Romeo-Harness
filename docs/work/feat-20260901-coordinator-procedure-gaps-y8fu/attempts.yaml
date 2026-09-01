@@ -15,4 +15,17 @@ attempts:
     과 같은 계열). 고치려면 probe 를 bin/romeo evidence run 으로 다시 돌려 stdout 을 원시 로그에 봉인하고, check-8 을 관측 내용까지 대조하도록
     바꿔 재승인해야 한다 — 검증 계획 변경이므로 RUNBOOK §3.4.1 에 따라 이 Run 은 중단하고 새 base 로 다시 시작한다.
   settled_at: '2026-09-01T10:54:27+09:00'
+- n: 2
+  run: run_fc79c4267d1c
+  base_sha: 82a8191ddf11c6e90263fab6a1356ebc74529c32
+  started_at: '2026-09-01T12:23:52+09:00'
+  result: pass
+  failure_class: null
+  note: '재승인본(82a8191)으로 1회차 워크트리를 시딩해 다시 돌렸다. 구현자 required_checks 15/15 exit 0 · gate_verdict PASS ·
+    앵커 양쪽 5/5 · 방어 검사 유효(f2afce10760e) · 검토자(codex read-only) PASS findings 0 · close 통과(PASS 52건, FAIL
+    0). 1회차가 막혔던 자리는 probe 스크립트의 exec > $OUT 을 main | tee $OUT 으로 바꾸고 bin/romeo evidence run --label run-rebinding-probe
+    로 다시 돌려 닫았다 — stdout 이 log_sha256 03fd5830 과 stdout_tail 399자에 봉인됐다. 관측 결론은 1회차와 같아 2회 재현이다: run-use
+    --id 전환 됨 · 전환 뒤 인박스·Task·상태 읽힘 · 거부는 exit 1 · .ok false · consumer_fenced. 2026-08-29 관측의 ''종료 코드
+    0'' 은 정정됐다. WARN 2건은 REVIEW_SUPERSEDED(1회차 FAIL 봉투는 다른 산출물의 판정)와 REVIEW_SAMPLE(D-75 (b) 가 1건으로 확정)이다.'
+  settled_at: '2026-09-01T12:23:52+09:00'
 reviews: []
