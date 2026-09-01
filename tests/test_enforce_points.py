@@ -333,3 +333,51 @@ class TestHandRunRecordsAttempt(_Repo):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestClosureMatchesCode(unittest.TestCase):
+    """닫힘으로 표시한 질문의 **해소문이 코드와 같은 말을 하는가.**
+
+    취소선이 있는지만 보는 검사는 내용이 반대인 해소문을 통과시킨다 — 2회차 검토자가 그것을 잡았다.
+    `mailto:` 를 코드에서는 막으면서 park 기록에는 「통과시킨다」 고 적어 둔 상태가 exit 0 이었다.
+    **그 자리에 글자가 있는지가 아니라 그 문장이 참인지를 본다**(§11) — 이 단위가 차단에 적용한 규칙을
+    이 단위의 검증 계획 자신에게도 적용한다.
+
+    각 항목은 `(질문 id, 해소문에 있어야 하는 문장, 코드가 그렇게 도는지 확인하는 함수)` 다.
+    문장만 맞고 코드가 다르거나, 코드만 맞고 문장이 다르면 둘 다 실패한다."""
+
+    QUESTIONS = ("Q-27", "Q-28", "Q-29", "Q-30", "Q-31")
+
+    #: 해소문이 주장하는 것 ↔ 그 주장이 참인지 실행으로 보는 것
+    CLAIMS = (
+        ("Q-29", "**`mailto:` 는 막는다**",
+         lambda: blocks.URL_RE.match("mailto:someone@example.com") is None),
+        ("Q-28", "dispatch",
+         lambda: blocks.catalog(load_policy()["packages"])["discovery-result"]["enforced_at"] == ["dispatch"]),
+        ("Q-31", "guards",
+         lambda: "guards" in (blocks.catalog(load_policy()["packages"])["risk-plan-ready"].get("note") or "")),
+    )
+
+    def setUp(self):
+        self.rows = {}
+        for line in (HARNESS_ROOT / "docs/planning/open-questions.md").read_text(encoding="utf-8").split("\n"):
+            for qid in self.QUESTIONS:
+                if line.startswith(f"| {qid} |"):
+                    self.rows[qid] = line
+
+    def test_every_closed_question_has_a_row(self):
+        self.assertEqual(sorted(self.rows), sorted(self.QUESTIONS))
+
+    def test_every_closed_question_is_struck_through(self):
+        for qid, row in self.rows.items():
+            self.assertIn("~~", row, qid)
+
+    def test_every_closed_question_names_the_unit_that_closed_it(self):
+        for qid, row in self.rows.items():
+            self.assertIn("해소(2026-09-01", row, qid)
+
+    def test_the_closure_text_says_what_the_code_does(self):
+        for qid, phrase, predicate in self.CLAIMS:
+            with self.subTest(qid=qid):
+                self.assertIn(phrase, self.rows[qid], f"{qid} 의 해소문에 {phrase!r} 가 없다")
+                self.assertTrue(predicate(), f"{qid} 의 해소문은 그렇게 적었는데 코드는 다르게 돈다")

@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-01T18:31:03+09:00'
+approved_at: '2026-09-01T18:58:11+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -28,6 +28,9 @@ approval_history:
 - {approved_at: '2026-09-01T17:58:17+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T18:31:03+09:00',
   reason: '1회차 검토자 findings 반영 — AC-3 에 mailto 명시, AC-8 을 이름 존재에서 상태 검사로, AC-9 에서 기계가 셀 수 없는 spike 판정을
     빼고 경계를 명시, 변경 범위에 AGENTS.md·CLAUDE.md·fixtures/shadow·tests/test_run_unit.py 추가, check-9 강화'}
+- {approved_at: '2026-09-01T18:31:03+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-01T18:58:11+09:00',
+  reason: 2회차 검토자 findings 반영 — Q-29 해소문이 mailto 를 통과시킨다고 적어 AC-3·코드와 반대였다(수정). check-9 을 취소선 존재 검사에서
+    「해소문의 주장 ↔ 코드 동작」 대조로 바꿨다(TestClosureMatchesCode)}
 ---
 
 # 요구하는 자리와 보는 자리를 같게 둔다 — 집행 지점 어휘·차단 충족 조건·절 로드 대조
@@ -173,7 +176,7 @@ required_checks:
   - id: check-8
     command: "python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt"
   - id: check-9
-    command: "python3 -c \"import pathlib,re; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert '## 11. 요구하는 자리와 보는 자리를 같게 둔다' in a; assert '회차는 세는 자리가 아니라 나는 자리에서 만든다' in a; d=[l for l in pathlib.Path('docs/decisions/decision-register.md').read_text().split(chr(10)) if l.startswith(('| D-78 |','| D-79 |'))]; assert len(d)==2 and all('| accepted |' in l for l in d), d; q=[l for l in pathlib.Path('docs/planning/open-questions.md').read_text().split(chr(10)) if re.match(r'^\\| Q-(27|28|29|30|31) ', l)]; assert len(q)==5, len(q); [ (_ for _ in ()).throw(AssertionError(l[:40])) for l in q if '~~' not in l ]\""
+    command: "python3 -c \"import pathlib; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert '## 11. 요구하는 자리와 보는 자리를 같게 둔다' in a; assert '회차는 세는 자리가 아니라 나는 자리에서 만든다' in a; d=[l for l in pathlib.Path('docs/decisions/decision-register.md').read_text().split(chr(10)) if l.startswith(('| D-78 |','| D-79 |'))]; assert len(d)==2 and all('| accepted |' in l for l in d), d\" && python3 -m unittest tests.test_enforce_points.TestClosureMatchesCode"
   - id: check-10
     command: "python3 -c \"import unittest; n=unittest.defaultTestLoader.loadTestsFromName('tests.test_enforce_points').countTestCases(); assert n>=20, n\" && python3 -c \"import pathlib; t=pathlib.Path('tests/test_enforce_points.py').read_text(); [ (_ for _ in ()).throw(AssertionError(p)) for p in ('ㅁㄴㅇㄹ','docs/research/없는파일.md','spike 없이') if p not in t ]\""
   - id: check-11
