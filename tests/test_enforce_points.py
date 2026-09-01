@@ -177,6 +177,32 @@ class TestDiscoveryResultReadsRealPath(_Repo):
         self.assertTrue(ok, why)
         self.assertIn("바깥 주소", why)
 
+    def test_a_fragment_only_link_does_not_count(self):
+        """**가장 그럴듯한 거짓 값** — 앵커를 떼면 빈 경로가 되어 작업 단위 폴더 자신을 가리킨다.
+        「없는 경로」만 겨눈 반례는 이것을 잡지 못했고 3회차 검토자가 잡았다."""
+        for probe in ("#section", "#", "  #x  "):
+            with self.subTest(probe=probe):
+                self.set_inputs(self.files["brief.md"], [probe], create=False)
+                self.assertFalse(self.discovery_verdict()[0], f"{probe!r} 이 조사 결과로 셌다")
+
+    def test_a_directory_is_not_a_research_output(self):
+        """디렉터리는 존재하지만 조사 산출물이 아니다 — `exists()` 와 `is_file()` 의 차이가 여기서 갈린다."""
+        for probe in (".", "../", "../.."):
+            with self.subTest(probe=probe):
+                self.set_inputs(self.files["brief.md"], [probe], create=False)
+                self.assertFalse(self.discovery_verdict()[0], f"{probe!r} 이 조사 결과로 셌다")
+
+    def test_a_scheme_other_than_http_is_refused_by_the_scheme_not_by_luck(self):
+        """`mailto:` 는 그 이름의 파일이 없어서가 아니라 **스킴이라서** 막힌다."""
+        (Path(self.udir) / "mailto:a@b.c").write_text("함정\n", encoding="utf-8")
+        self.set_inputs(self.files["brief.md"], ["mailto:a@b.c"], create=False)
+        self.assertFalse(self.discovery_verdict()[0])
+
+    def test_a_fragment_on_a_real_file_still_counts(self):
+        self.set_inputs(self.files["brief.md"], ["../../research/real.md"])
+        self.set_inputs(self.files["brief.md"], ["../../research/real.md#절"], create=False)
+        self.assertTrue(self.discovery_verdict()[0])
+
     def test_a_mailto_is_not_a_research_output(self):
         """확인할 수 없는 것과 확인할 필요가 없는 것을 같이 두면 구멍이 넓어진다."""
         self.set_inputs(self.files["brief.md"], ["mailto:someone@example.com"], create=False)

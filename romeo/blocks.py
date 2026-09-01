@@ -133,6 +133,27 @@ def _milestone_plan(unit_dir, fm, body, meta=None):
 URL_RE = re.compile(r"^https?://", re.I)
 
 
+SCHEME_RE = re.compile(r"^[a-z][a-z0-9+.-]*:", re.I)
+
+
+def _points_at_a_file(unit_dir, item):
+    """이 항목이 **실재하는 파일 하나**를 가리키는가. 디렉터리도 빈 경로도 조사 산출물이 아니다.
+
+    앵커(`#…`)를 떼고 남은 것이 비면 그 경로는 작업 단위 폴더 자신이 되어 `exists()` 가 참이 된다 —
+    `"#section"` · `"."` · `"../"` 가 전부 조사 결과로 셌다(2026-09-01 3회차 검토자 실측).
+    「없는 경로」만 겨눈 반례는 **경로가 아닌 것이 경로처럼 풀리는 것**을 잡지 못한다.
+
+    바깥 주소가 아닌데 스킴(`mailto:` 같은 `<이름>:`)을 달고 있으면 거부한다 — 같은 이름의 로컬 파일이
+    우연히 있으면 통과하던 자리를 스킴으로 막는다. 통과시키는 바깥 주소는 `URL_RE` 하나로만 정한다."""
+    item = str(item).strip()
+    if SCHEME_RE.match(item):
+        return False
+    path = item.split("#", 1)[0].strip()
+    if not path:
+        return False
+    return (Path(unit_dir) / path).is_file()
+
+
 def _discovery_result(unit_dir, fm, body, meta=None):
     """조사 단위는 **실재하는** 조사 산출물이 붙기 전에는 구현 위임으로 넘어가지 않는다.
 
@@ -155,11 +176,11 @@ def _discovery_result(unit_dir, fm, body, meta=None):
     if not items:
         return False, (f"{DOC_FILES[where]} 의 inputs: 가 비어 있다 — 조사 결과가 기록되기 전에는 구현 위임을 막는다. "
                        f"조사 산출물은 작업 단위로 복사하지 않고 inputs: 링크로만 붙인다(K-62)")
-    missing = [x for x in items if not URL_RE.match(x) and not (Path(unit_dir) / x.split("#")[0]).exists()]
-    if missing:
-        return False, (f"{DOC_FILES[where]} 의 inputs: 가 가리키는 경로가 없다: {', '.join(missing[:3])}"
-                       + (" …" if len(missing) > 3 else "")
-                       + " — 링크가 실재해야 조사 결과다. 있는 척하는 링크는 없는 것보다 나쁘다(K-51)")
+    bad = [x for x in items if not URL_RE.match(x) and not _points_at_a_file(unit_dir, x)]
+    if bad:
+        return False, (f"{DOC_FILES[where]} 의 inputs: 가 조사 산출물 파일을 가리키지 않는다: {', '.join(bad[:3])}"
+                       + (" …" if len(bad) > 3 else "")
+                       + " — 링크가 실재하는 **파일**이어야 조사 결과다. 있는 척하는 링크는 없는 것보다 나쁘다(K-51)")
     outside = [x for x in items if URL_RE.match(x)]
     note = f" (바깥 주소 {len(outside)}건은 여기서 확인하지 않는다)" if outside else ""
     return True, f"{DOC_FILES[where]} 의 inputs: {len(items)}건 실재 — {', '.join(items[:3])}" + (" …" if len(items) > 3 else "") + note

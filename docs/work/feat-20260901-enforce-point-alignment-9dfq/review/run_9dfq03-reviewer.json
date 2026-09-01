@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260901-enforce-point-alignment-9dfq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260901-enforce-point-alignment-9dfq/task/run_9dfq03-reviewer.json",
+    "sha256": "c2cbe0a4b1c298c276ee162c3365eba529626c846d1e8da951afa0b245f11045"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-3 미충족. 비-http 입력에서 fragment 앞부분만 경로로 검사하므로 `#section`은 빈 경로가 되어 존재하는 작업 단위 디렉터리로 판정되고 조사 결과로 통과한다. `mailto:`도 명시적으로 거부하지 않아 같은 이름의 로컬 경로가 존재하면 통과한다. 따라서 경로가 아닌 문자열과 `mailto:`를 막는다는 수용 기준을 현재 check-3의 정상 경로 테스트만으로 뒷받침할 수 없다.",
+      "file": "romeo/blocks.py",
+      "line": 158
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260901-enforce-point-alignment-9dfq/evidence/run_9dfq03.yaml",
+  "notes": "두 작업 계약의 base_sha는 일치한다. 기록된 required_checks 12건은 모두 exit 0이고 원시 로그가 존재하며 rerun:false 선언은 없다. 증거의 changed_files와 현재 작업 트리 변경은 allowed_paths 안이고 가드는 없다. 다만 AC-3의 실제 충족을 지목할 수 없어 FAIL이다."
+}
