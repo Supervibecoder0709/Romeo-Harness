@@ -177,6 +177,12 @@ class TestDiscoveryResultReadsRealPath(_Repo):
         self.assertTrue(ok, why)
         self.assertIn("바깥 주소", why)
 
+    def test_a_mailto_is_not_a_research_output(self):
+        """확인할 수 없는 것과 확인할 필요가 없는 것을 같이 두면 구멍이 넓어진다."""
+        self.set_inputs(self.files["brief.md"], ["mailto:someone@example.com"], create=False)
+        ok, _why = self.discovery_verdict()
+        self.assertFalse(ok)
+
     def test_one_bad_link_among_good_ones_still_blocks(self):
         self.set_inputs(self.files["brief.md"], ["../../research/real.md"])
         self.set_inputs(self.files["brief.md"], ["../../research/real.md", NOT_A_PATH], create=False)
@@ -195,9 +201,12 @@ class TestOpenLoopCoversPackage(_Repo):
             self.dispatch()
         self.assertIn("brief.md", str(ctx.exception))
 
-    def test_a_milestone_that_is_not_a_spike_is_a_filled_value(self):
-        """spike 여부는 사람이 읽고 판단한다 — 기계는 **빈칸이 아닌지**까지만 본다.
-        그 경계를 검사로 고정해 둔다: 채워져 있으면 통과하므로 spike 조건은 검토자의 몫이다."""
+    def test_spike_ness_is_the_reviewers_call_not_the_machines(self):
+        """**경계를 명시적으로 고정한다.** 기계는 「첫 마일스톤(spike)」 칸이 채워졌는지까지만 본다.
+        그 값이 실제로 spike 인지는 의미 판단이라 기계가 판별할 수 없다 —
+        낱말로 거르려 해도 `"spike 없이 곧바로 전체 구현한다"` 에 그 낱말이 들어 있다.
+        이것을 기계 반례로 약속했다가 1회차 검토자에게 잡혔고, AC-9 에서 그 약속을 뺐다.
+        경계를 검사로 적어 두지 않으면 다음 사람이 같은 약속을 다시 한다."""
         self.ready(spike=NOT_A_SPIKE)
         self.set_inputs(self.files["brief.md"], ["../../research/real.md"])
         self.approve_and_commit()

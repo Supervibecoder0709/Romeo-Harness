@@ -128,7 +128,9 @@ def _milestone_plan(unit_dir, fm, body, meta=None):
     return True, "charter.md 의 「마일스톤 계획」 절이 채워졌다"
 
 
-URL_RE = re.compile(r"^(https?|mailto):", re.I)
+#: 여기서 실재를 확인할 수 없는 바깥 주소. **`mailto:` 는 넣지 않는다** — 조사 산출물이 사는 자리가 아니다.
+#: 확인할 수 없는 것과 확인할 필요가 없는 것을 같이 두면, 확인을 건너뛰는 구멍이 넓어진다.
+URL_RE = re.compile(r"^https?://", re.I)
 
 
 def _discovery_result(unit_dir, fm, body, meta=None):
@@ -142,7 +144,8 @@ def _discovery_result(unit_dir, fm, body, meta=None):
 
     **무엇이 충족인가.** 링크가 가리키는 경로가 실재해야 한다. `inputs:` 가 비었는지만 보던 동안
     `["ㅁㄴㅇㄹ"]` 로 승인이 통과했다 — 그 자리에 글자가 있는지를 본 것이지 그 문장이 참인지를 본 것이 아니다.
-    바깥 주소(`http(s)://`·`mailto:`)는 여기서 확인할 수 없으므로 통과시키되 이유에 그렇게 적는다."""
+    바깥 주소(`http(s)://`)는 여기서 확인할 수 없으므로 통과시키되 이유에 그렇게 적는다.
+    `mailto:` 는 통과시키지 않는다 — 조사 산출물이 사는 자리가 아니다."""
     where, path = reads_doc(unit_dir, (meta or {}).get("reads") or "brief|charter")
     if path is None:
         return False, (f"{(meta or {}).get('reads') or 'brief|charter'} 에 해당하는 문서가 작업 단위에 없다 — "

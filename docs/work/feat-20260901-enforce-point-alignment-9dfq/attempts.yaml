@@ -1,0 +1,18 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260901-enforce-point-alignment-9dfq
+attempts:
+- n: 1
+  run: run_9dfq01
+  base_sha: fe5eb7b52cdf8081609bcf6c67579476fd4eaf2a
+  started_at: '2026-09-01T18:21:26+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자(codex read-only, gpt-5.6-sol) FAIL · findings 5건. 전부 확인했다. ① AC-9 가 「spike 가 아닌 마일스톤」을 기계
+    반례로 요구하는데 spike 여부는 의미 판단이라 기계가 못 센다 — 승인된 AC 가 달성 불가능한 것을 약속했다(goal). ② _discovery_result 가 mailto:
+    도 경로 검사 없이 통과시킨다 — AC-3 위반(outputs). ③ changed_files 6건이 계약 allowed_paths 밖이다 — AGENTS.md·CLAUDE.md(compile
+    산출물)·fixtures/shadow·tests/test_run_unit.py 를 변경 범위에 안 적었다(outputs). ④ check-9 가 문자열 존재만 봐서 D-78·D-79
+    의 상태와 Q-27 해소·§10 개정을 안 본다 — 빈 검사에 가깝다(outputs). ⑤ evidence 의 base_sha(29fdb6b)가 계약의 base_sha(fe5eb7b)와
+    다르다 — 구현자 계약을 만들기 전에 증거를 기록한 순서 오류다. romeo/evidence.py:114 가 "둘을 대조하는 검사는 없다" 고 이미 적고 있다. 2회차: 명세
+    보완 후 재승인하고 계약을 먼저 만든 뒤 증거를 다시 낸다.'
+  settled_at: '2026-09-01T18:29:20+09:00'
+reviews: []

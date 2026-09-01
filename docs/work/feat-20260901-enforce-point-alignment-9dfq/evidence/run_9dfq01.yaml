@@ -7,16 +7,16 @@ dispatch_id: null
 unit_id: feat-20260901-enforce-point-alignment-9dfq
 spec_ref:
   path: docs/work/feat-20260901-enforce-point-alignment-9dfq/spec.md
-  sha256: f67a2efca74316d306c20c8dffe4b385b9fe17ac49fb3ee92d3f2c8af9c093cf
+  sha256: 1b5085821185c4f88663a2391187436861624d8e3372f43d9b41639bd4264001
 base_sha: 29fdb6b8f69b36ba53804fbebc6d92c527b72988
-head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+head_sha: 283648201e1979b4a846f1340f77dbc5bedae245
 dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
 environment:
   os: macOS-26.5.2-arm64-arm-64bit
   python: 3.9.6
   cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
 started_at: '2026-09-01T18:19:01+09:00'
-finished_at: '2026-09-01T18:20:58+09:00'
+finished_at: '2026-09-01T18:21:55+09:00'
 commands:
 - id: check-1
   command: python3 -c "from romeo.blocks import ENFORCE_POINTS as P; assert 'dispatch' in P, P"
@@ -162,6 +162,17 @@ commands:
   log_sha256: dd6bf1f65ebcad094e4a5c5d00e32df5e2150f2661ac912edfb40d5d597463dd
   stdout_tail: ''
   head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: review-tree-before
+  command: git status --porcelain
+  exit_code: 0
+  started_at: '2026-09-01T18:21:55+09:00'
+  finished_at: '2026-09-01T18:21:55+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/13-review-tree-before.log
+  log_sha256: d77fba70770437df0e38c4fc92813bd8fe53585246acf97f025163e4c23c6007
+  stdout_tail: ?? docs/work/feat-20260901-enforce-point-alignment-9dfq/attempts.yaml
+  head_sha: 283648201e1979b4a846f1340f77dbc5bedae245
   dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
 changed_files:
 - AGENTS.md

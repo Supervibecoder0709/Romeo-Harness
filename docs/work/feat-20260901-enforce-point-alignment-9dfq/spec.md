@@ -51,7 +51,8 @@ updated: '2026-09-01'
         `close` 는 걸린 차단 전부를 계속 인쇄한다(a3xs AC-4).
   - [x] AC-2 `discovery-result` 가 `dispatch` 에서 걸린다 — 조사 결과 없이도 **승인은 되고**, 그 상태로 작업 계약을 만들면 막힌다.
   - [x] AC-3 `discovery-result` 는 `brief.md`(없으면 `charter.md`)의 `inputs:` 를 읽고 **경로가 실재할 때만** 충족한다 —
-        없는 경로와 경로가 아닌 문자열은 막힌다.
+        없는 경로 · 경로가 아닌 문자열 · `mailto:` 는 막힌다. 확인할 수 없는 것은 `http(s)://` 하나뿐이고
+        그때는 이유에 「확인하지 않는다」를 적는다.
   - [x] AC-4 `approval-gate` 가 `risk-plan-ready` 로 바뀌고 카탈로그가 "되돌리기 어려운 실행의 승인은 `guards` 소유" 를
         명시한다. 옛 id 는 정책표·코드·테스트·fixture 어디에도 남지 않는다.
   - [x] AC-5 미완료 검사가 **문서 패키지 전체**(brief·charter 포함)를 `close` 와 `dispatch` 양쪽에서 본다 —
@@ -59,9 +60,13 @@ updated: '2026-09-01'
   - [x] AC-6 절마다 **누가 집행하는지**(`enforcement:`)를 선언한다. 선언이 없거나 그 집행이 절의 문서를 실제로
         읽지 않으면 **정책이 로드되지 않는다.**
   - [x] AC-7 손으로 위임 절차를 밟은 관통도 `attempts.yaml` 에 회차가 남는다 — 반복 중단이 그 경로에서도 센다(Q-27).
-  - [x] AC-8 `AGENTS.core.md` §11 신설·§10 개정, `decision-register` D-78·D-79, `open-questions` Q-27~Q-31 닫힘.
-  - [x] AC-9 반례가 **빈 값이 아니라 그럴듯한 거짓 값**으로 고정된다 — 없는 경로 · 경로가 아닌 문자열 · spike 가 아닌
-        마일스톤 · `reads` 없는 차단 · `enforcement` 없는 절. 빈 값만 막는 반례는 지금 상태와 구별되지 않는다.
+  - [x] AC-8 `AGENTS.core.md` §11 신설·§10 개정, `decision-register` D-78·D-79(`accepted`),
+        `open-questions` Q-27~Q-31 **닫힘 표시까지**. 이름이 있는지가 아니라 **그 상태인지**를 검사한다.
+  - [x] AC-9 반례가 **빈 값이 아니라 그럴듯한 거짓 값**으로 고정된다 — 없는 경로 · 경로가 아닌 문자열 ·
+        `mailto:` 링크 · `reads` 없는 차단 · `enforcement` 없는 절 · 절의 문서를 읽지 않는 차단 선언.
+        빈 값만 막는 반례는 지금 상태와 구별되지 않는다. **첫 마일스톤이 spike 인가는 여기서 세지 않는다** —
+        의미 판단이라 기계가 판별할 수 없다(1회차 검토자가 이 어긋남을 잡았다). 기계는 그 칸이 채워졌는지까지 보고,
+        spike 여부는 검토자가 본다 — 그 경계를 테스트가 명시적으로 고정한다.
   - [x] AC-10 기존 테스트가 그대로 통과하고, 시나리오 3 런북 9단계가 새 집행 지점에 맞게 다시 쓰인다.
 - **위험과 되돌리기:** `dispatch` 훅을 계약 생성에 걸므로 잘못 걸면 **어떤 단위도 위임할 수 없게 된다 — 이 단위 자신 포함.**
   그래서 구현 단위 1 이 훅 자리를 세 경로에서 실측한 뒤에야 나머지가 붙는다. 둘째 위험은 조용한 약화다 —
@@ -93,7 +98,11 @@ updated: '2026-09-01'
   - `scenarios/3-discovery-block.md`
   - `docs/decisions/decision-register.md`
   - `docs/planning/open-questions.md`
-- 영향을 받는 부분: `romeo route` 의 출력(차단 id)이 바뀌므로 분류 카드의 표기가 달라진다. `docs/work/` 의 이미 `done` 인 단위는 소급 대상이 아니다(차단은 소급하지 않는다 — a3xs AC-8).
+  - `AGENTS.md`
+  - `CLAUDE.md`
+  - `fixtures/shadow/2026-08-27-cards.md`
+  - `tests/test_run_unit.py`
+- 영향을 받는 부분: `romeo route` 의 출력(차단 id)이 바뀌므로 분류 카드의 표기가 달라진다. `AGENTS.md`·`CLAUDE.md` 는 `romeo compile` 이 코어에서 다시 만든다 — 손으로 고치지 않는다. `docs/work/` 의 이미 `done` 인 단위는 소급 대상이 아니다(차단은 소급하지 않는다 — a3xs AC-8).
 - 바꾸지 않는 것(비범위): 새 `execute` 집행 지점을 만들지 않는다 — `core/policy/execution-guards.yaml` 의 `guards` 가 이미 실행 시점 승인을 소유하고 승인 기록을 원시 로그로 봉인한다(`close` 의 `GUARD_APPROVED`). 같은 일을 두 이름으로 하지 않는다. `docs/source-context/` 와 옛 리뷰 라운드 문서의 `approval-gate` 표기는 그때의 기록이므로 건드리지 않는다. 이미 `done` 인 단위의 문서·증거를 다시 쓰지 않는다. Q-19(`run-unit --spawn` 의 run id 인계)는 이 단위 밖이다.
 
 ## 구현 단위
@@ -160,7 +169,7 @@ required_checks:
   - id: check-8
     command: "python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt"
   - id: check-9
-    command: "python3 -c \"import pathlib; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert '## 11.' in a; d=pathlib.Path('docs/decisions/decision-register.md').read_text(); assert 'D-78' in d and 'D-79' in d; q=pathlib.Path('docs/planning/open-questions.md').read_text(); [ (_ for _ in ()).throw(AssertionError(n)) for n in ('Q-28','Q-29','Q-30','Q-31') if n not in q ]\""
+    command: "python3 -c \"import pathlib,re; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert '## 11. 요구하는 자리와 보는 자리를 같게 둔다' in a; assert '회차는 세는 자리가 아니라 나는 자리에서 만든다' in a; d=[l for l in pathlib.Path('docs/decisions/decision-register.md').read_text().split(chr(10)) if l.startswith(('| D-78 |','| D-79 |'))]; assert len(d)==2 and all('| accepted |' in l for l in d), d; q=[l for l in pathlib.Path('docs/planning/open-questions.md').read_text().split(chr(10)) if re.match(r'^\\| Q-(27|28|29|30|31) ', l)]; assert len(q)==5, len(q); [ (_ for _ in ()).throw(AssertionError(l[:40])) for l in q if '~~' not in l ]\""
   - id: check-10
     command: "python3 -c \"import unittest; n=unittest.defaultTestLoader.loadTestsFromName('tests.test_enforce_points').countTestCases(); assert n>=20, n\" && python3 -c \"import pathlib; t=pathlib.Path('tests/test_enforce_points.py').read_text(); [ (_ for _ in ()).throw(AssertionError(p)) for p in ('ㅁㄴㅇㄹ','docs/research/없는파일.md','spike 없이') if p not in t ]\""
   - id: check-11
