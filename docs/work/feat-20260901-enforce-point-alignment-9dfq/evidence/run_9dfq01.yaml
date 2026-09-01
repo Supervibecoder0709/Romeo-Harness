@@ -1,0 +1,195 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_9dfq01
+task_id: null
+dispatch_id: null
+unit_id: feat-20260901-enforce-point-alignment-9dfq
+spec_ref:
+  path: docs/work/feat-20260901-enforce-point-alignment-9dfq/spec.md
+  sha256: f67a2efca74316d306c20c8dffe4b385b9fe17ac49fb3ee92d3f2c8af9c093cf
+base_sha: 29fdb6b8f69b36ba53804fbebc6d92c527b72988
+head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
+started_at: '2026-09-01T18:19:01+09:00'
+finished_at: '2026-09-01T18:20:58+09:00'
+commands:
+- id: check-1
+  command: python3 -c "from romeo.blocks import ENFORCE_POINTS as P; assert 'dispatch' in P, P"
+  exit_code: 0
+  started_at: '2026-09-01T18:19:01+09:00'
+  finished_at: '2026-09-01T18:19:01+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/01-check-1.log
+  log_sha256: 32c1e839e1db71fbccee6fa4085969d12c61721a897af54ba9ac3785f69254e0
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-2
+  command: python3 -c "import yaml; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks']; [ (_
+    for _ in ()).throw(AssertionError(k)) for k,v in b.items() if len(v.get('enforced_at') or [])!=1 or
+    not v.get('reads') ]"
+  exit_code: 0
+  started_at: '2026-09-01T18:19:01+09:00'
+  finished_at: '2026-09-01T18:19:01+09:00'
+  seconds: 0.037
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/02-check-2.log
+  log_sha256: e9f7bffb619811794ffd1e89bf60383276755f8b7e28c222b7a1f36211350f28
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-3
+  command: python3 -m unittest tests.test_enforce_points.TestDispatchPoint tests.test_enforce_points.TestDiscoveryResultReadsRealPath
+  exit_code: 0
+  started_at: '2026-09-01T18:19:01+09:00'
+  finished_at: '2026-09-01T18:19:02+09:00'
+  seconds: 0.913
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/03-check-3.log
+  log_sha256: ee7a71efcf79d8bea07c9da9f0cde3c24962eac19ba27970ec613ee56f82f9fc
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-4
+  command: '! grep -rn ''approval-gate'' core/ romeo/ tests/ fixtures/'
+  exit_code: 0
+  started_at: '2026-09-01T18:19:02+09:00'
+  finished_at: '2026-09-01T18:19:03+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/04-check-4.log
+  log_sha256: 15ba137f5ec97948d0f68d79c6a6d2264bc39ebd2bb63aed18eb431727ded661
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-5
+  command: python3 -c "import yaml; from romeo.blocks import BLOCK_CHECKS; b=yaml.safe_load(open('core/policy/packages.yaml'))['blocks'];
+    assert 'risk-plan-ready' in b and 'risk-plan-ready' in BLOCK_CHECKS; assert 'guards' in (b['risk-plan-ready'].get('note')
+    or '')"
+  exit_code: 0
+  started_at: '2026-09-01T18:19:03+09:00'
+  finished_at: '2026-09-01T18:19:03+09:00'
+  seconds: 0.041
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/05-check-5.log
+  log_sha256: 9072a67b16e915977d8f80417adecfbbb6c7dcbf77e4134c6bbd42be7b752228
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-6
+  command: python3 -m unittest tests.test_enforce_points.TestOpenLoopCoversPackage
+  exit_code: 0
+  started_at: '2026-09-01T18:19:03+09:00'
+  finished_at: '2026-09-01T18:19:04+09:00'
+  seconds: 0.971
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/06-check-6.log
+  log_sha256: 6363c717975dfe7fe22b3d33e5f23c1fdc3c013f1d7f2ef3982844368f71d27c
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-7
+  command: python3 -c "import yaml; s=yaml.safe_load(open('core/policy/packages.yaml'))['sections']; [
+    (_ for _ in ()).throw(AssertionError(k)) for k,v in s.items() if not v.get('enforcement') ]" && python3
+    -m unittest tests.test_enforce_points.TestSectionEnforcementReconciliation
+  exit_code: 0
+  started_at: '2026-09-01T18:19:04+09:00'
+  finished_at: '2026-09-01T18:19:04+09:00'
+  seconds: 0.328
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/07-check-7.log
+  log_sha256: c82db3a089c3f50165ce0164360202687ee4da3fdf838316adc84955eebc7dbd
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-8
+  command: python3 -m unittest tests.test_enforce_points.TestHandRunRecordsAttempt
+  exit_code: 0
+  started_at: '2026-09-01T18:19:04+09:00'
+  finished_at: '2026-09-01T18:19:05+09:00'
+  seconds: 0.747
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/08-check-8.log
+  log_sha256: 9107373445df1e653147d48c4758de775bf88e6443eb47b9069b8876852bab88
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-9
+  command: python3 -c "import pathlib; a=pathlib.Path('core/principles/AGENTS.core.md').read_text(); assert
+    '## 11.' in a; d=pathlib.Path('docs/decisions/decision-register.md').read_text(); assert 'D-78' in
+    d and 'D-79' in d; q=pathlib.Path('docs/planning/open-questions.md').read_text(); [ (_ for _ in ()).throw(AssertionError(n))
+    for n in ('Q-28','Q-29','Q-30','Q-31') if n not in q ]"
+  exit_code: 0
+  started_at: '2026-09-01T18:19:05+09:00'
+  finished_at: '2026-09-01T18:19:05+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/09-check-9.log
+  log_sha256: 7614c7e4b12032da22e5ed56ee554882f3d82e03a59fd887631d1cea06f367b8
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-10
+  command: python3 -c "import unittest; n=unittest.defaultTestLoader.loadTestsFromName('tests.test_enforce_points').countTestCases();
+    assert n>=20, n" && python3 -c "import pathlib; t=pathlib.Path('tests/test_enforce_points.py').read_text();
+    [ (_ for _ in ()).throw(AssertionError(p)) for p in ('ㅁㄴㅇㄹ','docs/research/없는파일.md','spike 없이') if
+    p not in t ]"
+  exit_code: 0
+  started_at: '2026-09-01T18:19:05+09:00'
+  finished_at: '2026-09-01T18:19:05+09:00'
+  seconds: 0.066
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/10-check-10.log
+  log_sha256: df8a8e2aae9827f6d45830fccaefc1b367438b50a132e9570ca6fe11ef52fb54
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-11
+  command: grep -q 'enforced_at' scenarios/3-discovery-block.md && grep -q 'dispatch' tests/test_scenario_3.py
+    && python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-01T18:19:05+09:00'
+  finished_at: '2026-09-01T18:20:57+09:00'
+  seconds: 111.656
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/11-check-11.log
+  log_sha256: de31d3d9d9141a1e054bb65351e3d443c4bb4bdd741ad47011e5af4bb0d3b8c1
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+- id: check-12
+  command: python3 -m unittest tests.test_blocks_enforcement.TestCloseReportsBlockSatisfied
+  exit_code: 0
+  started_at: '2026-09-01T18:20:57+09:00'
+  finished_at: '2026-09-01T18:20:58+09:00'
+  seconds: 1.054
+  log: .harness/runs/feat-20260901-enforce-point-alignment-9dfq/run_9dfq01/12-check-12.log
+  log_sha256: dd6bf1f65ebcad094e4a5c5d00e32df5e2150f2661ac912edfb40d5d597463dd
+  stdout_tail: ''
+  head_sha: 5dc1f0f02fe8995b0c5433d720ca824762befbfa
+  dirty_tree_hash: 682e4deea42601e76878b66403b5f8efe75ca90ad482919ea59fe090099677d6
+changed_files:
+- AGENTS.md
+- CLAUDE.md
+- core/policy/packages.yaml
+- core/principles/AGENTS.core.md
+- docs/decisions/decision-register.md
+- docs/planning/open-questions.md
+- docs/reviews/2026-09-01-codex-architecture-review/CROSSCHECK_CLAUDE.md
+- docs/reviews/2026-09-01-codex-architecture-review/README.md
+- fixtures/requests/fx-account-migration-continue.yaml
+- fixtures/requests/fx-pr-review-remaining-fixes.yaml
+- fixtures/requests/fx-resolve-review-issues-parallel.yaml
+- fixtures/requests/fx-s07-coupang-migration-initiative.yaml
+- fixtures/requests/fx-vps-redeploy.yaml
+- fixtures/shadow/2026-08-27-cards.md
+- romeo/blocks.py
+- romeo/close.py
+- romeo/envelope.py
+- romeo/policy.py
+- romeo/run_unit.py
+- scenarios/3-discovery-block.md
+- tests/test_blocks_enforcement.py
+- tests/test_enforce_points.py
+- tests/test_policy.py
+- tests/test_run_unit.py
+- tests/test_scenario_3.py
+artifact_hash: 5c0695238cfd6fdbbe365a3918b4740c49d422b5452f80593ba217414571275e
+reviewer: null
+verdict: null
+approvals: []
