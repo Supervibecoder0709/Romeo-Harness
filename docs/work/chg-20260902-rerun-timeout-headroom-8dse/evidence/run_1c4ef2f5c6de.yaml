@@ -1,0 +1,191 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_1c4ef2f5c6de
+task_id: null
+dispatch_id: null
+unit_id: chg-20260902-rerun-timeout-headroom-8dse
+spec_ref:
+  path: docs/work/chg-20260902-rerun-timeout-headroom-8dse/spec.md
+  sha256: a3d82492e7ca7342d51e80285e961362279ba141dbb5a72cbbaf00bfb667ddc8
+base_sha: 2b0d876c36ee3541db974e5703a4a55980c2b453
+head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning
+started_at: '2026-09-02T17:57:20+09:00'
+finished_at: '2026-09-02T18:01:21+09:00'
+commands:
+- id: check-1
+  command: python3 -c "from romeo.evidence import RERUN_TIMEOUT; assert RERUN_TIMEOUT == 600, RERUN_TIMEOUT"
+    && bin/romeo close --help | grep -q '기본 600'
+  exit_code: 0
+  started_at: '2026-09-02T17:57:20+09:00'
+  finished_at: '2026-09-02T17:57:20+09:00'
+  seconds: 0.152
+  log: .harness/runs/chg-20260902-rerun-timeout-headroom-8dse/run_1c4ef2f5c6de/01-check-1.log
+  log_sha256: 105f4e9adbd7324549f445b41ade556aaad78403dd00f405216ce8a8f6756841
+  stdout_tail: ''
+  head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+- id: check-2
+  command: python3 -m unittest tests.test_docs_evidence_close.TestRerunNearTimeout
+  exit_code: 0
+  started_at: '2026-09-02T17:57:20+09:00'
+  finished_at: '2026-09-02T17:57:24+09:00'
+  seconds: 3.422
+  log: .harness/runs/chg-20260902-rerun-timeout-headroom-8dse/run_1c4ef2f5c6de/02-check-2.log
+  log_sha256: e7e3e4c3fc11526740bc2cf20b7ce7e97f5798e000393d4d3a9e5e0cbd4fe9c9
+  stdout_tail: ''
+  head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+- id: check-3
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-02T17:57:24+09:00'
+  finished_at: '2026-09-02T18:01:20+09:00'
+  seconds: 235.836
+  log: .harness/runs/chg-20260902-rerun-timeout-headroom-8dse/run_1c4ef2f5c6de/03-check-3.log
+  log_sha256: 2ba3b62f66dc0aedc2bad0ee542185c8856a8e9886621acd363a6590a0261b25
+  stdout_tail: ''
+  head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+- id: check-4
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-02T18:01:20+09:00'
+  finished_at: '2026-09-02T18:01:20+09:00'
+  seconds: 0.265
+  log: .harness/runs/chg-20260902-rerun-timeout-headroom-8dse/run_1c4ef2f5c6de/04-check-4.log
+  log_sha256: 16e137cf5ca5f15de10fff92f0c95afdfd99cdd5c75067857f11a03528afdd9b
+  stdout_tail: '/spec.md lines=123 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/brief.md
+    lines=85 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/mvp_planning/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/spec.md
+    lines=148 needs_input=0 unchecked_ac=0'
+  head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-02T18:01:20+09:00'
+  finished_at: '2026-09-02T18:01:21+09:00'
+  seconds: 0.33
+  log: .harness/runs/chg-20260902-rerun-timeout-headroom-8dse/run_1c4ef2f5c6de/05-check-5.log
+  log_sha256: 33aa65de70a2377dad0a09919f3f0e2810483fc5208243b880d0614ee5cd473d
+  stdout_tail: compile 검사 PASS
+  head_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  dirty_tree_hash: aefc626bfb3235f1e618305013083871c3f17c22c32cdbec4991beac1b3d3856
+changed_files:
+- romeo/close.py
+- romeo/evidence.py
+- tests/test_docs_evidence_close.py
+artifact_hash: f5bd2887626179c96c5bf4488a0422523bc6ef4b4d197565608ea5dd34c17410
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-02T18:05:40+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-02T17:51:27+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_1c4ef2f5c6de — 검증 계획 5건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence dd8980da3eb6 vs 현재 dd8980da3eb6
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence aefc626bfb32 vs 현재 aefc626bfb32 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -c "from romeo.evidence import RERUN_TIMEOUT; assert RERUN_TIMEOUT
+      == 600, RERUN_TIMEOUT" && bin/romeo close --help | grep -q ''기본 600'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestRerunNearTimeout'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo compile --check'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 5건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 3건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 5건이 승인 커밋 dd8980da3eb6 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -c "from romeo.evidence import RERUN_TIMEOUT; assert RERUN_TIMEOUT
+      == 600, RERUN_TIMEOUT" && bin/romeo close --help | grep -q ''기본 600'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestRerunNearTimeout'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 dd8980da3eb6 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['romeo/close.py', 'romeo/evidence.py', 'tests/test_docs_evidence_close.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: false
+    level: warning
+    detail: spec.md 가 evidence 이후 바뀜(AC 체크 등). 확인만.

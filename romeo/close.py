@@ -1,6 +1,7 @@
 """/plan-close 검사기. 결정적 차단 검사만 실패로 처리하고, 휴리스틱은 경고로 남긴다(C-E3). 검증 상태는 저장하지 않고 여기서 계산한다."""
 import json
 import re
+import time
 import subprocess
 from pathlib import Path
 
@@ -8,7 +9,7 @@ from . import HARNESS_ROOT, frontmatter
 from .blocks import evaluate as evaluate_blocks
 from .blocks import required_checks
 from .docs import approval_chain_warnings, approval_commit, approval_key, approval_key_at, find_unit_dir
-from .evidence import (RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
+from .evidence import (RERUN_NEAR_TIMEOUT_RATIO, RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
                        list_runs, replay, review_record_state, sealed_product)
 from .gitinfo import head_sha
 from .parity import (_envelope_defects, _evidence_product, _product_of, _product_text, evidence_ref_error,
@@ -198,8 +199,20 @@ def _check_rerun(check, project_root, unit_id, plan, cmds, rerun, timeout):
             check("REQUIRED_CHECK_RERUN", UNVERIFIED,
                   f"{cid}: 재실행 대조를 건너뛰라고 했다(--no-rerun) — 기록만 읽은 판정이다: {cmd}")
             continue
+        started = time.monotonic()
         code, why = replay(project_root, cmd, timeout=timeout)
+        elapsed = time.monotonic() - started
         ran = True
+        # **막지 않고 드러낸다.** 상한은 재실행 **한 건**에 걸리는데, 하네스 자신을 고치는 단위는
+        # 그 한 건에 전체 테스트를 넣는 것이 정당하다 — 그때는 그것이 그 단위의 산출물이기 때문이다.
+        # 그래서 이 값은 테스트가 늘수록 커지고, 상한을 넘는 날 그 검사가 미검증이 되어 완료가 서지 않는다.
+        # 넘기 전까지 아무 신호가 없던 것이 이 경고를 만든 이유다(2026-09-02 실측: 258초 / 상한 300초).
+        # 판정은 바꾸지 않는다 — 늘 뜨는 경고는 아무것도 알리지 않으므로 임계 아래에서는 인쇄하지 않는다.
+        if timeout and elapsed >= timeout * RERUN_NEAR_TIMEOUT_RATIO:
+            check("RERUN_NEAR_TIMEOUT", False,
+                  f"{cid}: 재실행이 {elapsed:.0f}초 걸렸다 — 상한 {timeout}초의 "
+                  f"{elapsed / timeout * 100:.0f}% 다. 넘으면 이 검사가 미검증이 되어 완료가 서지 않는다: {cmd}",
+                  level="warning")
         if code is None:
             check("REQUIRED_CHECK_RERUN", UNVERIFIED, f"{cid}: {why} — {cmd}")
         elif code != rec.get("exit_code"):

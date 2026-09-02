@@ -10,14 +10,14 @@ gates: []
 profile: quick
 blast_radius: small
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-09-02T17:51:27+09:00'
 approved_by: justjulliette0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-02T18:05:40+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_1c4ef2f5c6de.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T0=quick']
@@ -39,9 +39,9 @@ updated: '2026-09-02'
 - **왜 지금:** 전체 unittest 가 258초인데 상한이 300초다(2026-09-02 실측). 상한은 재실행 **한 건**에 걸리고, 하네스 자기 단위는 그 한 건에 전체 테스트를 넣는다 — 넘는 순간 그 검사가 미검증이 되고 `close` 가 done 을 선언하지 않는다. 즉 **모든 관통의 완료가 막힌다.** 테스트는 앞으로도 늘어난다.
 - **기대 결과:** 지금 258/600 = 43% 라 조용하다. 480초를 넘는 순간 경고가 떠서 "다음에 막힌다" 가 막히기 전에 보인다. 그때가 느린 테스트(현재 `test_docs_evidence_close` 104초)를 손볼 시점이고, 그것은 별도 단위로 연다 — 이 단위는 고치지 않는다(§12).
 - **수용 기준:**
-  - [ ] AC-1 `RERUN_TIMEOUT` 의 값이 600 이고, 그 값이 단일 출처로 남아 `--rerun-timeout` 기본값과 도움말 문구에 그대로 실린다.
-  - [ ] AC-2 재실행 한 건이 상한의 80% 이상을 쓰면 `close` 가 `RERUN_NEAR_TIMEOUT` 을 **경고로** 인쇄한다 — 판정을 바꾸지 않는다(PASS 는 PASS 로 남는다).
-  - [ ] AC-3 80% 미만인 재실행에서는 그 경고가 인쇄되지 않는다 — 늘 뜨는 경고는 아무것도 알리지 않는다.
+  - [x] AC-1 `RERUN_TIMEOUT` 의 값이 600 이고, 그 값이 단일 출처로 남아 `--rerun-timeout` 기본값과 도움말 문구에 그대로 실린다.
+  - [x] AC-2 재실행 한 건이 상한의 80% 이상을 쓰면 `close` 가 `RERUN_NEAR_TIMEOUT` 을 **경고로** 인쇄한다 — 판정을 바꾸지 않는다(PASS 는 PASS 로 남는다).
+  - [x] AC-3 80% 미만인 재실행에서는 그 경고가 인쇄되지 않는다 — 늘 뜨는 경고는 아무것도 알리지 않는다.
 - **위험과 되돌리기:** 상한을 올리면 정말로 매달린 명령을 더 오래 기다린다(최대 5분 추가). 그것은 `close` 한 번의 대기이고 상태를 바꾸지 않는다. 되돌리기: `romeo/evidence.py` 의 `RERUN_TIMEOUT` 을 300 으로 되돌리고 `close.py` 의 경고 블록을 지운다.
 - **결정 필요:** 없음
 
@@ -120,6 +120,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-02T18:05:40+09:00 · HEAD dd8980da3eb6 · 검사 기록 run_1c4ef2f5c6de
 
-- (없음)
+- [evidence/run_1c4ef2f5c6de.yaml](evidence/run_1c4ef2f5c6de.yaml) — exit codes [0, 0, 0, 0, 0] (검사 기록)

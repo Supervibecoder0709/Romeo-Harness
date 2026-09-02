@@ -1,0 +1,12 @@
+schema: romeo/attempts@0.1.0
+unit_id: chg-20260902-rerun-timeout-headroom-8dse
+attempts:
+- n: 1
+  run: run_1c4ef2f5c6de
+  base_sha: dd8980da3eb6f31e2c7ad0bdab5e25363ee6c851
+  started_at: '2026-09-02T17:51:31+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []

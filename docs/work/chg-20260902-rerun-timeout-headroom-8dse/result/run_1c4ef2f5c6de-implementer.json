@@ -1,0 +1,41 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "chg-20260902-rerun-timeout-headroom-8dse",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/chg-20260902-rerun-timeout-headroom-8dse/task/run_1c4ef2f5c6de-implementer.json",
+    "sha256": "056a79af0bc8c1017ddfa34e59af53a21743229edd1d21c72bb0dc607f185602"
+  },
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/chg-20260902-rerun-timeout-headroom-8dse/evidence/run_1c4ef2f5c6de.yaml",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -c \"from romeo.evidence import RERUN_TIMEOUT; assert RERUN_TIMEOUT == 600, RERUN_TIMEOUT\" && bin/romeo close --help | grep -q '기본 600'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestRerunNearTimeout",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    }
+  ],
+  "notes": "required_checks 5건 전부 exit 0 — 근거는 run_1c4ef2f5c6de 의 check-1~check-5 기록이다(evidence checks 1회 실행). TDD 순서로 판별 검사를 먼저 썼고 기존 상태에서 2건이 실패했다 — test_default_timeout_is_600(300 != 600)과 test_warning_when_rerun_uses_most_of_the_budget(경고 0건). test_warning_absent_below_threshold 는 기존 상태에서도 통과하는 반례 고정용이고, 경과 시간을 재지 않고 늘 경고하는 구현에서 실패한다. check-3(전체 테스트)은 235초로 새 상한 600초의 39% 다 — 이 단위 자신의 close 재실행에서 RERUN_NEAR_TIMEOUT 이 뜨지 않는 것이 임계 설계가 맞다는 관측이다. 느린 테스트(test_docs_evidence_close 104초 · 테스트 105개)는 이 단위에서 고치지 않았다 — 원인이 요청 밖이고 AGENTS.core §12 가 그것을 금지한다. 범위 밖에서 새로 발견한 결함은 없다."
+}

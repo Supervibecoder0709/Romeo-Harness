@@ -1705,3 +1705,70 @@ class TestValidateDirectoryTarget(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestRerunNearTimeout(unittest.TestCase):
+    """재실행이 상한에 가까워지는 것을 **막히기 전에** 드러낸다.
+
+    상한은 재실행 **한 건**에 걸리고(`romeo/close.py` 의 `_check_rerun`), 하네스 자기 단위는
+    그 한 건에 전체 테스트를 넣는다 — 그것이 정당한 이유는 그때 전체 테스트가 그 단위의
+    산출물이기 때문이다. 그래서 상한을 넘는 날 완료가 서지 않는데, 넘기 전까지 아무 신호가 없었다.
+    이 경고는 **판정을 바꾸지 않는다** — 막지 않고 드러낸다.
+
+    그럴듯한 거짓 값 반례는 `test_warning_absent_below_threshold` 다: 경과 시간을 재지 않고
+    늘 경고를 인쇄하는 구현은 형태가 그럴듯하지만 그 검사에서 실패한다. 늘 뜨는 경고는
+    아무것도 알리지 않는다.
+    """
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "테스트 T0", "test-t0", "테스트용 변경", project_root=self.root, date="20260827")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _run_close(self, command, rerun_timeout):
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
+        body = body.replace('command: "채움"', f'command: "{command}"')
+        body = body.replace("- [ ] AC-1", "- [x] AC-1")
+        frontmatter.write(self.spec, fm, body)
+        approve_unit(self.unit, "tester", project_root=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "impl", cwd=self.root)
+        run_command(self.unit, command, run_name="run-test", label="check-1", project_root=self.root)
+        return close_unit(self.unit, project_root=self.root, dry_run=True, rerun_timeout=rerun_timeout)
+
+    def _near(self, result):
+        return [c for c in result["checks"] if c["id"] == "RERUN_NEAR_TIMEOUT"]
+
+    def test_default_timeout_is_600(self):
+        from romeo.evidence import RERUN_TIMEOUT
+        self.assertEqual(RERUN_TIMEOUT, 600)
+
+    def test_warning_when_rerun_uses_most_of_the_budget(self):
+        # 상한 1초에 0.9초 걸리는 명령 = 90% — 경고가 뜬다. 판정은 그대로 PASS 다.
+        r = self._run_close("sleep 0.9", rerun_timeout=1)
+        near = self._near(r)
+        self.assertEqual(len(near), 1, [c["id"] for c in r["checks"]])
+        self.assertEqual(near[0]["level"], "warning")
+        self.assertFalse(near[0]["ok"])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+
+    def test_warning_absent_below_threshold(self):
+        # 상한 10초에 즉시 끝나는 명령 = 1% 미만 — 경고가 없어야 한다.
+        r = self._run_close("true", rerun_timeout=10)
+        self.assertEqual(self._near(r), [])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
