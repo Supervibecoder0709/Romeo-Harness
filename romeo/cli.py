@@ -39,7 +39,10 @@ def cmd_route(args):
             print(json.dumps(rep, ensure_ascii=False, indent=1))
         else:
             print(format_report(rep))
-        return 0 if rep["match_rate"] >= 0.9 and rep["gate_misses"] == 0 else 1
+        # 불일치나 gate 누락 의심이 1건이면 exit 1 이다(Q-37). 90% 임계값은 M0 진입 기준이었다 — 그 기준으로는 30/33 이 맞아도
+        # exit 0 이라 required_checks 와 CI 의 이 명령이 무엇을 확인하는지 적혀 있는 채로 아무것도 확인하지 않았다(AGENTS.core §11).
+        # 0/0 도 통과가 아니다 — 아무것도 대조하지 않은 실행을 성공으로 읽지 않는다(K-51).
+        return 0 if rep["total"] and rep["matched"] == rep["total"] and rep["gate_misses"] == 0 else 1
     proposal, cls = _load_classification(args)
     try:
         out = route(cls, project_state=load_project_state(_root(args)))
@@ -156,7 +159,8 @@ def cmd_fixtures(args):
         return 1
     rep = run_report(fx)
     print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_report(rep))
-    return 0 if rep["match_rate"] >= 0.9 and rep["gate_misses"] == 0 else 1
+    # `route --fixtures … --report` 와 같은 공식이다(Q-37) — 같은 리포트를 내는 두 명령이 다른 판정을 내지 않는다.
+    return 0 if rep["total"] and rep["matched"] == rep["total"] and rep["gate_misses"] == 0 else 1
 
 
 def cmd_approve(args):
@@ -224,13 +228,22 @@ def cmd_envelope(args):
     res = write_envelope(args.unit, args.role, project_root=_root(args),
                          base_sha=args.base_sha, run_name=args.run)
     env = res["envelope"]
+    # 「변경 범위」의 백틱 중 경로로 읽지 않은 토큰(Q-36) — 있을 때만 말한다. 계약 JSON 에는 없으므로 --json 이면 표준 오류로 낸다.
+    ignored = res.get("scope_ignored") or []
+    note = (f"  경로로 읽지 않은 백틱 {len(ignored)}개: " + " · ".join(f"`{tok}`" for tok in ignored)
+            + " — 경로는 `/` 나 `.` 을 담고 공백이 없어야 한다. 설명은 괄호 안에 쓴다(core/templates/tech-spec.md 「변경 범위」)"
+            ) if ignored else None
     if args.json:
         print(json.dumps(env, ensure_ascii=False, indent=1))
+        if note:
+            print(note, file=sys.stderr)
     else:
         print(f"built {env['role']} 계약 → {res['path']}")
         print(f"  base_sha {env['base_sha'][:12]} · spec {env['spec_ref']['sha256'][:12]} "
               f"· 계약 sha256 {res['sha256'][:12]} · workspace {env['workspace']} "
               f"· guards {[g['id'] for g in env['guards']]} · required_checks {len(env['required_checks'])}건")
+        if note:
+            print(note)
     return 0
 
 
@@ -253,8 +266,18 @@ def cmd_close(args):
 
 
 def cmd_run_unit(args):
-    from .run_unit import (format_record, format_review, format_run, record_result,
-                           record_review, run_unit)
+    from .run_unit import (compare_attempts, format_check, format_record, format_review, format_run,
+                           record_result, record_review, run_unit)
+    if args.action == "check":
+        # RUNBOOK §3.1 확인 4 — 커밋과 작업 트리의 attempts.yaml 을 **판정·재검토로만** 대조한다(Q-39). 아무것도 쓰지 않으므로
+        # --run 도 요구하지 않는다. started 는 대조하지 않는다 — 계약 생성이 막 남긴 회차로 첫 관통을 막지 않는다.
+        if not args.base_sha:
+            print("run-unit check 는 --base-sha <커밋> 이 필요하다 — 그 커밋의 attempts.yaml 과 작업 트리의 것을 "
+                  "판정·재검토로 대조한다(RUNBOOK §3.1 확인 4)", file=sys.stderr)
+            return 2
+        res = compare_attempts(_root(args), args.unit, args.base_sha)
+        print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_check(res))
+        return 1 if res["diffs"] else 0
     if args.action == "review":
         # 재검토를 **기록만** 한다(Q-25). 시도를 시작하지 않으므로 --run 도 요구하지 않는다 —
         # 기록은 run 에 묶이지 않고 '몇 회차까지를 사람이 봤는가' 에 묶인다.
@@ -375,7 +398,8 @@ def build_parser():
     g.add_argument("--classification", help="확정된 분류 YAML/JSON")
     g.add_argument("--proposal", help="제안 YAML/JSON (candidate 사용)")
     g.add_argument("--fixtures", help="fixture 디렉터리")
-    s.add_argument("--report", action="store_true", help="(fixtures) 리포트 출력")
+    s.add_argument("--report", action="store_true",
+                   help="(fixtures) 리포트 출력 — 불일치나 gate 누락 의심이 1건이면 exit 1 이다(Q-37)")
     s.add_argument("--json", action="store_true")
     s.add_argument("--card", action="store_true", help="(proposal) 카드 렌더링")
     s.add_argument("--root", help="부착 상태(.harness/romeo.project.yaml)를 찾을 프로젝트 루트")
@@ -498,14 +522,17 @@ def build_parser():
 
     s = sub.add_parser("run-unit", help="관통 1회를 5단계로 엮는다 (계약 → 위임 명령 → 회수·앵커 → 증거 → 관측). "
                                         "기동은 기본이 dry-run 이고 --spawn 을 명시해야 실제로 띄운다")
-    s.add_argument("action", nargs="?", default="start", choices=["start", "record", "review"],
+    s.add_argument("action", nargs="?", default="start", choices=["start", "record", "review", "check"],
                    help="start(기본) 관통 1회를 돌린다 · record 그 회차의 판정을 attempts.yaml 에 남긴다 · "
-                        "review 재검토 결론만 남긴다(시도를 시작하지 않는다, Q-25)")
+                        "review 재검토 결론만 남긴다(시도를 시작하지 않는다, Q-25) · "
+                        "check 커밋과 작업 트리의 attempts.yaml 을 판정·재검토로만 대조한다(RUNBOOK §3.1 확인 4, Q-39) — "
+                        "차이 없으면 exit 0, 있으면 exit 1. started 는 대조하지 않는다")
     s.add_argument("--unit", required=True)
     s.add_argument("--run", help="계약·증거·결과 봉투를 묶는 run id — RUNBOOK §3.2 의 Run id 를 그대로 쓴다. "
-                                 "start·record 에는 필수이고 review 에는 쓰지 않는다")
+                                 "start·record 에는 필수이고 review·check 에는 쓰지 않는다")
     s.add_argument("--base-sha", dest="base_sha",
-                   help="승인된 spec.md 가 들어 있는 커밋. 생략하면 이력에서 승인 커밋을 찾는다(D-a)")
+                   help="승인된 spec.md 가 들어 있는 커밋. start 에서 생략하면 이력에서 승인 커밋을 찾는다(D-a). "
+                        "check 에는 필수다 — 그 커밋의 attempts.yaml 과 작업 트리의 것을 대조한다")
     s.add_argument("--spawn", action="store_true",
                    help="위임 명령을 실제로 실행한다. 없으면 인쇄만 한다 — 기동은 비용이 드는 실행이다(K-66)")
     s.add_argument("--after-review", dest="after_review",

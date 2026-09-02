@@ -72,10 +72,49 @@ CHANGE_SCOPE_HEADING = "## 변경 범위"
 CHANGE_SCOPE_LABEL = "바뀌는 파일·모듈:"
 # 항목 구분자. 라벨 자체에도 `·` 가 있으므로 라벨 뒤부터 나눈다.
 CHANGE_SCOPE_SEP = "·"
+# 설명이 사는 자리 — 괄호 `(…)`·`（…）`. 안쪽 짝부터 반복해 지우므로 중첩도 지워진다(Q-36).
+_PAREN_RE = re.compile(r"[(（][^()（）]*[)）]", re.S)
+_BACKTICK_RE = re.compile(r"`([^`]+)`")
+# 괄호를 지우기 전에 빼 두는 백틱 토큰 — 한 줄 안에서만 짝을 짓는다(옛 규칙도 줄마다 읽었다 — 줄을 넘긴 짝을 새로 만들지 않는다).
+_HELD_BACKTICK_RE = re.compile(r"`[^`\n]+`")
+_HOLD_MARK = "\x00"
+_HELD_RE = re.compile(_HOLD_MARK + r"(\d+)" + _HOLD_MARK)
 
 
-def change_scope_paths(body):
-    """승인된 spec 의 「변경 범위」가 **바뀌는 파일·모듈** 로 선언한 경로들. 백틱 안의 값만 읽는다.
+def _blank_parentheses(text):
+    """**백틱 밖 구간의** 괄호 안을 공백으로 바꾼다 — **줄바꿈은 남긴다.**
+
+    백틱 토큰을 먼저 자리표로 빼 두고 그 사이 텍스트에서만 괄호를 지운다. 경로 안의 괄호(`app/(g)/page.tsx`)는 경로의 일부라
+    살아야 하고, 괄호 안의 백틱(`(설명 · `b/y.py` 는 그대로)`)은 설명이라 괄호와 함께 지워진다 — 자리표는 괄호 문자를 담지 않으므로
+    괄호 짝의 안팎 어느 한쪽에 통째로 놓인다.
+    줄을 지우면 괄호가 줄을 넘긴 뒤의 항목(`… ·\n  overlay · …) · `b/y.py``)이 앞 줄에 붙어 첫 백틱 규칙이 바뀐다.
+    안쪽 짝부터 반복해 지우고, 짝이 없는 괄호는 그대로 둔다(뒤를 통째로 지우지 않는다)."""
+    held = []
+
+    def _hold(found):
+        held.append(found.group(0))
+        return f"{_HOLD_MARK}{len(held) - 1}{_HOLD_MARK}"
+
+    text = _HELD_BACKTICK_RE.sub(_hold, text.replace(_HOLD_MARK, ""))
+    while True:
+        found = _PAREN_RE.search(text)
+        if not found:
+            break
+        blanked = "".join("\n" if ch == "\n" else " " for ch in found.group(0))
+        text = text[:found.start()] + blanked + text[found.end():]
+    # 괄호 안에 있던 토큰의 자리표는 위에서 공백이 됐다 — 남은 자리표만 원래 토큰으로 되돌린다.
+    return _HELD_RE.sub(lambda m: held[int(m.group(1))], text)
+
+
+def _path_shaped(token):
+    """경로 모양인가 — 공백이 없고 `/` 나 `.` 이 있다. 함수명(`cmd_card`)·플래그(`--root`)·문장(`a b`)은 경로가 아니다."""
+    return re.search(r"\s", token) is None and ("/" in token or "." in token)
+
+
+def change_scope_report(body):
+    """승인된 spec 의 「변경 범위」가 **바뀌는 파일·모듈** 로 선언한 경로들과, 백틱이지만 경로로 읽지 않은 토큰들.
+
+    → `{"paths": [...], "ignored": [...]}`. `paths` 가 쓰기 상한이고 `ignored` 는 인쇄용이다 — 계약 JSON 에는 들어가지 않는다.
 
     쓰기 상한을 역할 계약의 `must_include` 만으로 두면 작업 공간 전체(`.`)가 열린다 — 그러면
     검토 항목 '변경이 allowed_paths 안인가' 가 아무것도 걸러내지 못한다(2026-08-29 검토자 3명이 같은 자리를 지적했다).
@@ -87,7 +126,18 @@ def change_scope_paths(body):
     계약은 정상으로 보이고 구현자가 쓰려는 순간에야 막힌다(2026-08-31 `feat-20260831-bmad-attach-probe-tgnb`
     1회차가 이것으로 실패했다 — 선언한 9개 중 2개만 실렸다).
     이어 읽기는 **다음 항목을 삼키지 않는다**: 다음 목록 항목(`- `)·다음 제목(`#`)·빈 줄에서 멈춘다.
-    「영향을 받는 부분」 은 승인이 *쓰기 상한*으로 정한 것이 아니므로 상한에 들어가면 안 된다(K-66)."""
+    「영향을 받는 부분」 은 승인이 *쓰기 상한*으로 정한 것이 아니므로 상한에 들어가면 안 된다(K-66).
+
+    **설명 산문은 상한이 아니다**(Q-36). 종전에는 `·` 로 자른 조각의 첫 백틱을 무조건 경로로 읽어, 괄호 안 설명이
+    줄을 넘기자 다음 줄 첫 조각의 첫 백틱 — 함수명 `cmd_card` — 이 `allowed_paths` 에 실렸다(2026-09-02 시나리오 8 5회차).
+    넓어지는 방향이라 판정은 안 바뀌었지만, 승인하지 않은 경로가 상한에 조용히 들어가는 구멍이다. 그래서 문법을 둔다:
+    ① 괄호 `(…)`·`（…）` 안은 줄 경계를 보존한 채 공백으로 바꾼다(중첩은 반복 제거) — 괄호 안의 백틱은 경로 모양이어도 상한이 아니다.
+       지우는 것은 **백틱 밖 구간**의 괄호다 — 경로 안의 괄호(`app/(g)/page.tsx`)는 경로의 일부라 남는다
+    ② 줄마다 `·` 로 나눠 각 조각의 첫 백틱을 읽는 것은 그대로다 — 뒤따르는 백틱은 괄호 밖이어도 상한이 아니다
+    ③ 읽은 토큰이 경로 모양이 아니면(공백이 있거나 `/` 도 `.` 도 없으면) 상한에 넣지 않고 `ignored` 에 모은다
+    ④ 앞의 `./` 는 벗긴다 — 루트의 확장자 없는 파일은 `./LICENSE` 처럼 쓴다.
+    이 문법은 spec 을 쓰는 사람이 읽는 자리(`core/templates/tech-spec.md` 「변경 범위」)에도 적혀 있다 — 요구하는 자리와
+    보는 자리를 같게 둔다(AGENTS.core §11)."""
     inside = False
     lines = (body or "").split("\n")
     for i, line in enumerate(lines):
@@ -100,21 +150,34 @@ def change_scope_paths(body):
                 if nxt.startswith("#") or nxt.startswith("- ") or not nxt.strip():
                     break
                 declared.append(nxt)
-            out = []
+            paths, ignored = [], []
             # 항목은 `·` 로 나뉘고 **각 항목의 첫 백틱이 그 항목의 경로**다. 뒤따르는 백틱은 설명이다
             # (예: `scripts/generate-archive-index.py`(`collect` 에 …) — collect 는 함수 이름이지 경로가 아니다).
-            for raw in declared:
+            for raw in _blank_parentheses("\n".join(declared)).split("\n"):
                 for chunk in raw.split(CHANGE_SCOPE_SEP):
-                    found = re.search(r"`([^`]+)`", chunk)
+                    found = _BACKTICK_RE.search(chunk)
                     if not found:
                         continue
                     text = found.group(1).strip().replace("\\", "/")
+                    if not text:
+                        continue
+                    if not _path_shaped(text):
+                        if text not in ignored:
+                            ignored.append(text)
+                        continue
+                    while text.startswith("./"):
+                        text = text[2:]
                     if not text or text.startswith("/") or text.startswith("~") or ".." in text.split("/"):
                         continue
-                    if text not in out:
-                        out.append(text)
-            return out
-    return []
+                    if text not in paths:
+                        paths.append(text)
+            return {"paths": paths, "ignored": ignored}
+    return {"paths": [], "ignored": []}
+
+
+def change_scope_paths(body):
+    """`change_scope_report(body)["paths"]` — 승인된 spec 이 선언한 쓰기 상한. 규칙은 그 함수의 설명에 있다."""
+    return change_scope_report(body)["paths"]
 
 
 def _allowed_paths(harness_root, role, unit_id, body=None):
@@ -128,12 +191,17 @@ def _allowed_paths(harness_root, role, unit_id, body=None):
     if scope == "none":
         return []
     if scope == "workspace":
-        scoped = change_scope_paths(body)
+        report = change_scope_report(body)
+        scoped = report["paths"]
         if not scoped:
+            hint = ""
+            if report["ignored"]:
+                hint = (f" 백틱은 있었지만 경로 모양이 아니어서 읽지 않은 토큰: {report['ignored']} — "
+                        f"경로는 `/` 나 `.` 을 담고 공백이 없어야 한다(루트의 확장자 없는 파일은 `./LICENSE` 처럼 쓴다).")
             raise ValueError(
                 f"{unit_id}: spec 의 「{CHANGE_SCOPE_HEADING[3:]}」 절에서 '{CHANGE_SCOPE_LABEL}' 줄의 "
                 f"백틱 경로를 읽지 못했다 — 쓰기 상한을 승인된 문장에서 가져오지 못하면 계약을 만들지 않는다(K-66). "
-                f"그 줄에 바뀌는 파일·모듈을 백틱으로 적고 다시 승인·커밋한다(D-27).")
+                f"그 줄에 바뀌는 파일·모듈을 백틱으로 적고 다시 승인·커밋한다(D-27)." + hint)
         for path in scoped:
             if path not in paths:
                 paths.append(path)
@@ -152,6 +220,15 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     이전 승인본의 검증 계획으로 계약이 만들어지므로(이 결함이 실제로 5건 대 6건으로 났다) 거부한다 —
     `allow_superseded=True` 는 종료 검사의 재계산 대조에서만 쓴다: 이전 승인으로 만든 봉투도 봉투로 **식별**은 돼야 하고,
     그것을 지금의 판정에 세지 않는 것은 그쪽의 일이다."""
+    return _compute_envelope(unit_id, role, project_root=project_root, harness_root=harness_root,
+                             base_sha=base_sha, allow_superseded=allow_superseded)[0]
+
+
+def _compute_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=None, allow_superseded=False):
+    """`build_envelope` 의 본체 — (계약, 「변경 범위」 읽기 결과) 를 돌려준다.
+
+    두 번째 값은 인쇄용이다(`write_envelope` 가 `scope_ignored` 로 싣는다). 계약 JSON 에는 넣지 않는다 —
+    종료 검사와 동등성 관측이 계약을 승인 원본에서 다시 계산해 바이트로 대조하므로 필드가 늘면 옛 계약의 앵커가 전부 열리지 않는다."""
     if role not in ROLES:
         raise ValueError(f"역할을 모른다: {role!r} (허용: {' · '.join(ROLES)})")
     project_root = Path(project_root).resolve()
@@ -218,7 +295,7 @@ def build_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     errors = validate_schema(env, load_json(harness_root / TASK_SCHEMA))
     if errors:
         raise ValueError(f"작업 계약이 {TASK_SCHEMA} 에 맞지 않는다: " + "; ".join(errors))
-    return env
+    return env, change_scope_report(body)
 
 
 def envelope_text(env):
@@ -331,19 +408,25 @@ def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
         # 검토 봉투는 계약 경로의 <run> 으로 자기 run 의 증거(방어 검사)에 묶인다 — run 없는 자리(task/reviewer.json)의 계약으로 낸
         # 판정은 종료 검사가 세지 않는다. 만들 수 있는 자리를 두면 함정이므로 여기서 거부한다.
         raise ValueError("검토자 계약에는 --run 이 필요하다 — 검토 판정은 task/<run>-reviewer.json 의 <run> 으로 그 run 의 증거에 묶인다")
-    env = build_envelope(unit_id, role, project_root=project_root, harness_root=harness_root, base_sha=base_sha)
+    env, scope = _compute_envelope(unit_id, role, project_root=project_root, harness_root=harness_root, base_sha=base_sha)
     tdir = find_unit_dir(project_root, unit_id) / "task"
     tdir.mkdir(exist_ok=True)
     path = tdir / (f"{run_name}-{role}.json" if run_name else f"{role}.json")
     text = envelope_text(env)
     path.write_text(text, encoding="utf-8")
     started = record_start(project_root, unit_id, run_name, env["base_sha"]) if (run_name and record_attempt) else None
+    # `scope_ignored` 는 인쇄용이다 — 「변경 범위」의 백틱 중 경로로 읽지 않은 것(Q-36). 계약 JSON 에는 없다.
     return {"path": str(path), "envelope": env, "sha256": sha256_bytes(text.encode("utf-8")),
-            "attempt": started}
+            "attempt": started, "scope_ignored": scope["ignored"]}
 
 
 def record_start(project_root, unit_id, run, base_sha):
-    """이 run 의 기동을 `attempts.yaml` 에 남긴다 — 이미 있으면 그대로 둔다(두 역할분 계약이 한 회차다).
+    """이 run 의 기동을 `attempts.yaml` 에 남긴다 — 이미 있으면 회차를 늘리지 않는다(두 역할분 계약이 한 회차다).
+
+    **같은 run 인데 `base_sha` 가 다르면 새 값으로 옮기고 이전 값을 `base_sha_history` 에 남긴다**(Q-42).
+    관통 도중 재승인하면 계약·증거는 새 승인 커밋으로 옮겨가는데 회차는 기동 시점 값에 고정돼, 이력을 읽는 사람이
+    「그 회차가 무엇을 겨눴는가」 를 잘못 읽었다(2026-09-02 5회차: 기록 `93f0c0a` vs 계약·증거 `01ec50d`).
+    같으면 아무것도 쓰지 않는다 — 같은 입력에 같은 파일이어야 한다.
 
     회차를 만드는 창구가 `run-unit` 의 시작 경로뿐이던 동안, RUNBOOK §3 을 손으로 밟은 관통은
     성공하든 실패하든 **회차가 하나도 남지 않았다**(Q-27). 그래서 §10 의 연속 2회 실패 차단이
@@ -353,6 +436,12 @@ def record_start(project_root, unit_id, run, base_sha):
     data = load_attempts(project_root, unit_id)
     for att in data.get("attempts") or []:
         if att.get("run") == run:
+            if base_sha and att.get("base_sha") != base_sha:
+                history = list(att.get("base_sha_history") or [])
+                history.append(att.get("base_sha"))
+                att["base_sha_history"] = history
+                att["base_sha"] = base_sha
+                save_attempts(project_root, unit_id, data)
             return att
     entry = start_attempt(data, run, base_sha)
     save_attempts(project_root, unit_id, data)

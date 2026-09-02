@@ -1,0 +1,522 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_0b4ed250c691
+task_id: task_c3f051331949
+dispatch_id: ctx_b2a9314f0b2f
+unit_id: feat-20260902-scope-grammar-procedure-drift-z5mv
+spec_ref:
+  path: docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/spec.md
+  sha256: dce2b546302043d93a1f11389799366fe909b89697b4011ba12a8b3adb5eaabe
+base_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scope-grammar-procedure-drift-z5mv
+started_at: '2026-09-02T14:52:04+09:00'
+finished_at: '2026-09-02T15:07:31+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_envelope.TestChangeScopeGrammar tests.test_envelope.TestChangeScopeRegressionOnRecordedContracts
+  exit_code: 0
+  started_at: '2026-09-02T14:52:04+09:00'
+  finished_at: '2026-09-02T14:52:08+09:00'
+  seconds: 3.725
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/01-check-1.log
+  log_sha256: bca1fbbfaf81acae1043d26d5dcedbbd9d2c56ce68929f99761359e5a94eb9e2
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-2
+  command: grep -q '경로로 읽지 않' core/templates/tech-spec.md
+  exit_code: 0
+  started_at: '2026-09-02T14:52:08+09:00'
+  finished_at: '2026-09-02T14:52:08+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/02-check-2.log
+  log_sha256: 6c01f21d782c4f3941b550848ed362f6410c7ceefd5c36d4a6e251c15f77461b
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-3
+  command: grep -qE 'bin/romeo route --fixtures fixtures/requests --report$' .github/workflows/harness.yml
+    && ! grep -q 'continue-on-error' .github/workflows/harness.yml
+  exit_code: 0
+  started_at: '2026-09-02T14:52:08+09:00'
+  finished_at: '2026-09-02T14:52:08+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/03-check-3.log
+  log_sha256: 7fd1bae1c3a64201683b3248e191db6c660109631aef95c8dd9d6cdf52ac802f
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-4
+  command: bin/romeo route --fixtures fixtures/requests --report
+  exit_code: 0
+  started_at: '2026-09-02T14:52:08+09:00'
+  finished_at: '2026-09-02T14:52:09+09:00'
+  seconds: 0.265
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/04-check-4.log
+  log_sha256: 9d0d4d8324fa0eb5f8bac999aa2029bc7cca27735b0ee49b66d56c6caa8d1fba
+  stdout_tail: 'i×6, overlay:gate.any×6, overlay:facet.brand×6, profile:gate.any×5, overlay:facet.browser-automation×4,
+    warn:CAPABILITY_CHECK_REQUIRED×4, overlay:facet.docs-only-t0×4, warn:DOCS_ONLY_CHANGE×4, profile:gate.ops-boundary×3,
+    profile:blast.large×3
+
+    경고 빈도: PART_PENDING_GATE×20, CAPABILITY_CHECK_REQUIRED×4, DOCS_ONLY_CHANGE×4, WORKTREE_ISOLATES_CODE_ONLY×3,
+    OUT_OF_SCOPE_NON_CODE×2, UNIT_NONE_WITH_GATE×1'
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-5
+  command: python3 -m unittest tests.test_run_unit.TestDelegationCommandsMatchRunbook tests.test_run_unit.TestAttemptsDrift
+    tests.test_run_unit.TestAttemptBaseShaFollowsReapproval
+  exit_code: 0
+  started_at: '2026-09-02T14:52:09+09:00'
+  finished_at: '2026-09-02T14:52:16+09:00'
+  seconds: 7.119
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/05-check-5.log
+  log_sha256: c0c392cb8492526bb809af7668f400f9f0118d814ac1d4e4e5151849f7d28d64
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-6
+  command: python3 -m unittest tests.test_runbook_procedure.TestReapprovalRuleIsConditional tests.test_runbook_procedure.TestAttemptsCommittedCheck
+    tests.test_runbook_procedure.TestDelegationBlockMatchesRunUnit
+  exit_code: 0
+  started_at: '2026-09-02T14:52:16+09:00'
+  finished_at: '2026-09-02T14:52:18+09:00'
+  seconds: 1.837
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/06-check-6.log
+  log_sha256: 99d71f295f98e523d89bef4704d85d334990a9dd43a4e37b850b4c599bad6314
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-7
+  command: bin/romeo run-unit check --unit feat-20260902-scope-grammar-procedure-drift-z5mv --base-sha
+    HEAD
+  exit_code: 0
+  started_at: '2026-09-02T14:52:18+09:00'
+  finished_at: '2026-09-02T14:52:18+09:00'
+  seconds: 0.155
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/07-check-7.log
+  log_sha256: 53526e7802ab556295c4daf6166279d04efa5900db5ccb0aa4cb86fb7d8fd244
+  stdout_tail: romeo run-unit check feat-20260902-scope-grammar-procedure-drift-z5mv · base 06ea0916d500
+    → 일치 (판정 0건 · 재검토 0건 · started 는 대조하지 않는다)
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-8
+  command: test "$(grep -E '^\| Q-(3[6-9]|4[0-2]) \|' docs/planning/open-questions.md | grep -c '해소(2026-09-02')"
+    -eq 7
+  exit_code: 0
+  started_at: '2026-09-02T14:52:18+09:00'
+  finished_at: '2026-09-02T14:52:18+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/08-check-8.log
+  log_sha256: 6b14e33e6f18816a6b3a0dc605e10f3036d2bde6d68ac3ec58cad2e0fe7d80a1
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-9
+  command: grep -q '^| D-80 |' docs/decisions/decision-register.md
+  exit_code: 0
+  started_at: '2026-09-02T14:52:18+09:00'
+  finished_at: '2026-09-02T14:52:18+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/09-check-9.log
+  log_sha256: 194ae949b1a33b9099ef992cc2fdfd41b66856a227cf475d9e249af42cb120b2
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-10
+  command: python3 -m unittest tests.test_policy.TestFixtureReportExit
+  exit_code: 0
+  started_at: '2026-09-02T14:52:18+09:00'
+  finished_at: '2026-09-02T14:52:20+09:00'
+  seconds: 0.986
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/10-check-10.log
+  log_sha256: a0d8012503266e5a11ee0004388a3b29dfe79e0a0d0b1a502bb6a4f4a0e18271
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-11
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-02T14:52:20+09:00'
+  finished_at: '2026-09-02T14:56:38+09:00'
+  seconds: 258.707
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/11-check-11.log
+  log_sha256: a22e0ab6ddf176f61fb58d21248a405425013dd0299e7b4992ea4a0d9e52542a
+  stdout_tail: ''
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-12
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-02T14:56:39+09:00'
+  finished_at: '2026-09-02T14:56:39+09:00'
+  seconds: 0.402
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/12-check-12.log
+  log_sha256: 24550f69508bc794f60f3b131d28f972fb831d93f05feb2e00fac5ed49c97bf1
+  stdout_tail: compile 검사 PASS
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-13
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-02T14:56:39+09:00'
+  finished_at: '2026-09-02T14:56:39+09:00'
+  seconds: 0.263
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/13-check-13.log
+  log_sha256: 1628a4dff2baf26e8be827ec09aabc165165f410e989e6eb26ea01e91d44b164
+  stdout_tail: "feat-20260902-scope-grammar-procedure-drift-z5mv/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/brief.md\
+    \ lines=85 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scope-grammar-procedure-drift-z5mv/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/spec.md\
+    \ lines=148 needs_input=0 unchecked_ac=10\n    WARN  UNCHECKED_AC 10개"
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-14
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-02T14:56:39+09:00'
+  finished_at: '2026-09-02T14:56:41+09:00'
+  seconds: 1.067
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/14-check-14.log
+  log_sha256: ad3675b3807913328eacfc3468083638f75e4bc756d1115ebb1e8f478fb9955f
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-15
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-02T14:56:41+09:00'
+  finished_at: '2026-09-02T14:56:41+09:00'
+  seconds: 0.241
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/15-check-15.log
+  log_sha256: be936752ca1063dca3811c658ebe69a654bc1e8952b26ec167be26d67416fca6
+  stdout_tail: PASS 33 fixtures
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: check-16
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-09-02T14:56:41+09:00'
+  finished_at: '2026-09-02T14:56:43+09:00'
+  seconds: 1.843
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/16-check-16.log
+  log_sha256: fea144e9cda031aa66df453a1bab995fd06c608a18ee758f8a05fc1aef1fabbd
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv'
+  exit_code: 0
+  started_at: '2026-09-02T15:03:02+09:00'
+  finished_at: '2026-09-02T15:03:03+09:00'
+  seconds: 0.031
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/17-review-tree-before.log
+  log_sha256: 002393a132a398b11a092c89cd23acdafb5f3ed687d39dd0a4fdeb74477d749c
+  stdout_tail: "M .github/workflows/harness.yml\n M adapters/orca/RUNBOOK.md\n M core/templates/tech-spec.md\n\
+    \ M docs/decisions/decision-register.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/envelope.py\n\
+    \ M romeo/run_unit.py\n M tests/test_envelope.py\n M tests/test_policy.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py"
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scope-grammar-procedure-drift-z5mv/.harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-02T15:03:03+09:00'
+  finished_at: '2026-09-02T15:03:03+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/18-reviewer-brief.log
+  log_sha256: 483dcc4710ab8d22cc594c796e1b8f19c31648937348882f15d8d08b55e639a8
+  stdout_tail: 9c4141dfcde4e9b33267738d28b875fe7bcf977f38945739ed3aadb0f5290323  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scope-grammar-procedure-drift-z5mv/.harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/reviewer-brief.md
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv'
+  exit_code: 0
+  started_at: '2026-09-02T15:07:30+09:00'
+  finished_at: '2026-09-02T15:07:30+09:00'
+  seconds: 0.031
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/19-review-tree-after.log
+  log_sha256: 002393a132a398b11a092c89cd23acdafb5f3ed687d39dd0a4fdeb74477d749c
+  stdout_tail: "M .github/workflows/harness.yml\n M adapters/orca/RUNBOOK.md\n M core/templates/tech-spec.md\n\
+    \ M docs/decisions/decision-register.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/envelope.py\n\
+    \ M romeo/run_unit.py\n M tests/test_envelope.py\n M tests/test_policy.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py"
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/review/run_0b4ed250c691-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-02T15:07:31+09:00'
+  finished_at: '2026-09-02T15:07:31+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260902-scope-grammar-procedure-drift-z5mv/run_0b4ed250c691/20-review-record.log
+  log_sha256: 01a804a604fd30b4706a5df86b79bf1ea4e443073d8e7458fb96f6f12ba4be25
+  stdout_tail: c2cef9da46704c8b084299a0ff5f2a323dc7962b7094ed02452ab3a3b80c1c0b  docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/review/run_0b4ed250c691-reviewer.json
+  head_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  dirty_tree_hash: f64f33ed45cb518021900516899e8457465bc0cfb11059cf7f4934c2645a5cef
+changed_files:
+- .github/workflows/harness.yml
+- adapters/orca/RUNBOOK.md
+- core/templates/tech-spec.md
+- docs/decisions/decision-register.md
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/envelope.py
+- romeo/run_unit.py
+- tests/test_envelope.py
+- tests/test_policy.py
+- tests/test_run_unit.py
+- tests/test_runbook_procedure.py
+artifact_hash: 2520ace9c9876bb30ddbd5baae030e12b07038c281febff97bccf9c43035b520
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-02T15:12:03+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-02T14:47:31+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_0b4ed250c691 — 검증 계획 16건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 06ea0916d500 vs 현재 06ea0916d500
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence f64f33ed45cb vs 현재 f64f33ed45cb (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_envelope.TestChangeScopeGrammar tests.test_envelope.TestChangeScopeRegressionOnRecordedContracts'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — grep -q ''경로로 읽지 않'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — grep -qE ''bin/romeo route --fixtures fixtures/requests --report$'' .github/workflows/harness.yml
+      && ! grep -q ''continue-on-error'' .github/workflows/harness.yml'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo route --fixtures fixtures/requests --report'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest tests.test_run_unit.TestDelegationCommandsMatchRunbook
+      tests.test_run_unit.TestAttemptsDrift tests.test_run_unit.TestAttemptBaseShaFollowsReapproval'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_runbook_procedure.TestReapprovalRuleIsConditional
+      tests.test_runbook_procedure.TestAttemptsCommittedCheck tests.test_runbook_procedure.TestDelegationBlockMatchesRunUnit'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — bin/romeo run-unit check --unit feat-20260902-scope-grammar-procedure-drift-z5mv
+      --base-sha HEAD'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — test "$(grep -E ''^\| Q-(3[6-9]|4[0-2]) \|'' docs/planning/open-questions.md
+      | grep -c ''해소(2026-09-02'')" -eq 7'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — grep -q ''^| D-80 |'' docs/decisions/decision-register.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest tests.test_policy.TestFixtureReportExit'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-14: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-15: exit 0 — bin/romeo fixtures check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-16: exit 0 — bin/romeo fixtures parity --report'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 20건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 10건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 16건이 승인 커밋 06ea0916d500 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_envelope.TestChangeScopeGrammar tests.test_envelope.TestChangeScopeRegressionOnRecordedContracts'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — grep -q ''경로로 읽지 않'' core/templates/tech-spec.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — grep -qE ''bin/romeo route --fixtures fixtures/requests --report$''
+      .github/workflows/harness.yml && ! grep -q ''continue-on-error'' .github/workflows/harness.yml'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo route --fixtures fixtures/requests --report'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest tests.test_run_unit.TestDelegationCommandsMatchRunbook
+      tests.test_run_unit.TestAttemptsDrift tests.test_run_unit.TestAttemptBaseShaFollowsReapproval'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_runbook_procedure.TestReapprovalRuleIsConditional
+      tests.test_runbook_procedure.TestAttemptsCommittedCheck tests.test_runbook_procedure.TestDelegationBlockMatchesRunUnit'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — bin/romeo run-unit check --unit feat-20260902-scope-grammar-procedure-drift-z5mv
+      --base-sha HEAD'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — test "$(grep -E ''^\| Q-(3[6-9]|4[0-2]) \|'' docs/planning/open-questions.md
+      | grep -c ''해소(2026-09-02'')" -eq 7'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — grep -q ''^| D-80 |'' docs/decisions/decision-register.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest tests.test_policy.TestFixtureReportExit'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-14: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-15: 재실행도 exit 0 — bin/romeo fixtures check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-16: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 06ea0916d500 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.github/workflows/harness.yml', 'adapters/orca/RUNBOOK.md', 'core/templates/tech-spec.md',
+      'docs/decisions/decision-register.md', 'docs/planning/open-questions.md', 'romeo/cli.py', 'romeo/envelope.py',
+      'romeo/run_unit.py', 'tests/test_envelope.py', 'tests/test_policy.py', 'tests/test_run_unit.py',
+      'tests/test_runbook_procedure.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_0b4ed250c691-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

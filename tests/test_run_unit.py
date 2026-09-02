@@ -11,20 +11,22 @@
 import io
 import json
 import os
+import re
 import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stdout, redirect_stderr
 from pathlib import Path
 
-from romeo import frontmatter
+from romeo import HARNESS_ROOT, frontmatter
 from romeo.cli import main
 from romeo.docs import approve_unit, create_unit
+from romeo.envelope import write_envelope
 from romeo.policy import route
-from romeo.run_unit import (CONSECUTIVE_FAILURE_LIMIT, STAGES, consecutive_failures, gate,
+from romeo.run_unit import (CONSECUTIVE_FAILURE_LIMIT, STAGES, consecutive_failures, delegation_commands, gate,
                             load_attempts, record_result, record_review, run_unit,
                             save_attempts, start_attempt)
-from romeo.util import load_yaml
+from romeo.util import load_yaml, sha256_file
 
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
 SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `README.md`"
@@ -470,3 +472,333 @@ class TestReviewOnlyRecord(_UnitRepo, unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestDelegationCommandsMatchRunbook(_UnitRepo, unittest.TestCase):
+    """`[2/5]` 가 인쇄하는 위임 명령이 RUNBOOK §3.2~§3.7 과 같다 (Q-40·Q-41).
+
+    직전 관통에서 두 자리가 어긋났다. ① 첫 명령이 `run-create` 라 `--run` 으로 받은 Orca Run 이 있는데도 새 Run 을 만들었고,
+    ② 구현자 `task-create --spec` 이 §3.4 가 요구한 항목 5개(결과 계약 형식 · 체크박스는 구현자가 채운다 · 계약이 없으면
+    스스로 만든다 · `--task-id`·`--dispatch-id` 플래그 · dispatch-id 는 기동 뒤 전달)를 담지 않았다. 요구하는 자리(RUNBOOK)와
+    만드는 자리(`run_unit.py`)가 어긋난 §11 의 사례다 — 정본 절차 파일에서 채우게 해 둘을 같게 둔다.
+    검토자 `--spec` 에는 해시를 넣지 않는다(Q-41) — 해시는 `fill_brief.py --task-sha256` 이 그 자리에서 계산한다."""
+
+    BRIEF = HARNESS_ROOT / "adapters/orca/prompts/implementer-brief.md"
+    #: §3.4 의 항목 5개가 정본에 있다는 것을 보는 문구
+    BRIEF_PHRASES = ("core/schemas/result-envelope.json", "네가 채운다", "아직 없으면", "envelope build",
+                     "--task-id <task-id> --dispatch-id <dispatch-id>", "받기 전에는")
+
+    def _commands(self):
+        res = self._run()
+        contract = next(s for s in res["stages"] if s["stage"] == "contract")
+        delegate = next(s for s in res["stages"] if s["stage"] == "delegate")
+        return contract, delegate["commands"]
+
+    @staticmethod
+    def _one(cmds, name):
+        found = [c for n, c in cmds if n == name]
+        assert len(found) == 1, (name, [n for n, _ in cmds])
+        return found[0]
+
+    # ── ① run-create 가 없고 첫 명령이 run-show --id <run> 이다 ──────────────
+    def test_no_run_create_and_the_first_command_shows_the_existing_run(self):
+        _contract, cmds = self._commands()
+        joined = "\n".join(c for _n, c in cmds)
+        self.assertNotIn("run-create", joined)
+        self.assertIn("orca orchestration run-show --id run_a", cmds[0][1])
+
+    # ── ② 구현자 --spec 은 정본 절차 파일을 채운 것을 읽는다 ────────────────
+    def test_implementer_spec_is_read_from_the_filled_brief(self):
+        _contract, cmds = self._commands()
+        impl = self._one(cmds, "task-create:implementer")
+        spec_file = f".harness/runs/{self.unit}/run_a/implementer-spec.md"
+        self.assertIn(f'--spec "$(cat {spec_file})"', impl)
+        fill = self._one(cmds, "implementer-spec")
+        self.assertIn(str(HARNESS_ROOT / "adapters/orca/prompts/implementer-brief.md"), fill)
+        self.assertIn(f"mkdir -p .harness/runs/{self.unit}/run_a", fill)
+        for placeholder, value in (("<id>", self.unit), ("<run-id>", "run_a"), ("<base-sha>", self.base)):
+            self.assertIn(f"s/{placeholder}/{value}/g", fill)
+        self.assertTrue(fill.rstrip().endswith(f"> {spec_file}"), fill)
+        names = [n for n, _ in cmds]
+        self.assertLess(names.index("implementer-spec"), names.index("task-create:implementer"))
+        brief = self.BRIEF.read_text(encoding="utf-8")
+        for phrase in self.BRIEF_PHRASES:
+            self.assertIn(phrase, brief, phrase)
+
+    def test_the_filled_brief_carries_the_five_items_with_no_delegator_placeholders_left(self):
+        """인쇄된 채움 명령을 실제로 돌리면 정본의 자리표시자 셋이 채워지고 워커 몫(<task-id>·<dispatch-id>)만 남는다."""
+        _contract, cmds = self._commands()
+        fill = self._one(cmds, "implementer-spec")
+        proc = subprocess.run(["bash", "-c", fill], cwd=str(self.root), capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        filled = (self.root / ".harness/runs" / self.unit / "run_a" / "implementer-spec.md").read_text(encoding="utf-8")
+        for gone in ("<id>", "<run-id>", "<base-sha>"):
+            self.assertNotIn(gone, filled)
+        self.assertIn(self.unit, filled)
+        self.assertIn(self.base, filled)
+        for phrase in ("core/schemas/result-envelope.json", "네가 채운다", "아직 없으면", "envelope build",
+                       "--task-id <task-id> --dispatch-id <dispatch-id>", "받기 전에는"):
+            self.assertIn(phrase, filled, phrase)
+        self.assertFalse(filled.startswith("#"), "정본의 머리말(--- 앞)은 넘기지 않는다")
+
+    # ── ③ 검토자 task-create 에는 해시가 없다 ────────────────────────────────
+    def test_reviewer_spec_carries_paths_and_procedure_but_no_hash(self):
+        _contract, cmds = self._commands()
+        rev = self._one(cmds, "task-create:reviewer")
+        self.assertIsNone(re.search(r"[0-9a-f]{64}", rev), rev)
+        for want in (f"docs/work/{self.unit}/task/run_a-reviewer.json",
+                     f"docs/work/{self.unit}/review/run_a-reviewer.json",
+                     "core/workflows/review/SKILL.md", "§3.7", "해시는 거기서 계산한다", "읽기 전용"):
+            self.assertIn(want, rev, want)
+
+    # ── ④ fill_brief 명령이 1단계 검토자 계약의 sha256 을 그대로 싣는다 ──────
+    def test_fill_brief_command_carries_the_reviewer_contract_sha256(self):
+        contract, cmds = self._commands()
+        sha = next(b["sha256"] for b in contract["built"] if b["role"] == "reviewer")
+        self.assertEqual(sha, sha256_file(self.root / "docs/work" / self.unit / "task" / "run_a-reviewer.json"))
+        fill = self._one(cmds, "reviewer-brief")
+        self.assertIn(str(HARNESS_ROOT / "adapters/orca/prompts/fill_brief.py"), fill)
+        self.assertIn(f"--task-sha256 {sha}", fill)
+        self.assertIn(f"--unit {self.unit} --run run_a --base-sha {self.base}", fill)
+        self.assertIn("--runtime codex --mode base", fill)
+        self.assertIn(f"--out <W>/.harness/runs/{self.unit}/run_a/reviewer-brief.md", fill)
+        names = [n for n, _ in cmds]
+        self.assertLess(names.index("reviewer-brief"), names.index("reviewer-spawn"))
+
+    def test_delegation_commands_takes_the_harness_root_and_the_reviewer_sha256(self):
+        cmds = delegation_commands(self.unit, "run_x", self.base, "worktree", HARNESS_ROOT, "f" * 64)
+        self.assertEqual(cmds[0][0], "run-show")
+        self.assertIn("--task-sha256 " + "f" * 64, dict(cmds)["reviewer-brief"])
+
+    # ── ⑤ 종전 동작 유지 — 인쇄까지다 ─────────────────────────────────────────
+    def test_delegation_commands_are_printed_not_executed(self):
+        res = self._run()
+        delegate = next(s for s in res["stages"] if s["stage"] == "delegate")
+        self.assertEqual(delegate["state"], "dry-run")
+        self.assertTrue(delegate["commands"])
+        self.assertNotIn("ran", delegate)
+        self.assertFalse((self.root / ".harness").exists(), "dry-run 은 절차 파일도 만들지 않는다")
+
+
+class TestAttemptsDrift(unittest.TestCase):
+    """`attempts_drift` / `run-unit check` — §3.1 확인 4 를 **판정·재검토 대조**로 좁힌다 (Q-39).
+
+    회차 기록이 계약 생성으로 옮겨진 뒤(Q-27) `attempts.yaml` 은 언제나 승인 커밋 뒤에 생기므로, 파일 전체를 `diff` 하던
+    확인 4 는 첫 관통에서 항상 실패했고 지시된 해법은 순환이었다. 워커가 보지 못하면 실제로 판정이 바뀌는 것은
+    **판정 난 시도(pass·fail)와 재검토(reviews)** 뿐이다 — 중단 게이트는 그 둘만 읽는다. `started` 는 대조하지 않는다."""
+
+    UNIT = "feat-19700101-drift-unit-test"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        self.unit_dir = self.root / "docs" / "work" / self.UNIT
+        self.unit_dir.mkdir(parents=True)
+        (self.unit_dir / "spec.md").write_text("---\nid: x\n---\n", encoding="utf-8")
+        self.base = self._commit("base")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _commit(self, msg):
+        git("add", "-A", cwd=self.root)
+        git("commit", "-q", "-m", msg, cwd=self.root)
+        return git("rev-parse", "HEAD", cwd=self.root)
+
+    def _write(self, attempts=(), reviews=()):
+        data = {"schema": "romeo/attempts@0.1.0", "unit_id": self.UNIT,
+                "attempts": [{"n": i, "run": f"run_{i}", "base_sha": "a" * 40, "result": r}
+                             for i, r in enumerate(attempts, 1)],
+                "reviews": [{"after_attempt": n, "conclusion": c, "by": "사람", "at": "2026-01-01T00:00:00+09:00"}
+                            for n, c in reviews]}
+        save_attempts(self.root, self.UNIT, data)
+
+    def _drift(self, base=None):
+        from romeo.run_unit import attempts_drift   # 구현 전에는 이 이름이 없다 — 이 테스트만 실패한다
+        return attempts_drift(self.root, self.UNIT, base or self.base)
+
+    def _cli(self, *extra):
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            code = main(["run-unit", "check", "--unit", self.UNIT, "--root", str(self.root), *extra])
+        return code, out.getvalue() + err.getvalue()
+
+    def test_missing_on_both_sides_is_no_drift(self):
+        self.assertFalse((self.unit_dir / "attempts.yaml").exists())
+        self.assertEqual(self._drift(), [])
+
+    def test_started_only_in_the_working_tree_is_no_drift(self):
+        """첫 관통의 모양 — 계약 생성이 막 남긴 started 하나. 이것으로 막으면 어떤 관통도 시작하지 못한다."""
+        self._write(attempts=("started",))
+        self.assertEqual(self._drift(), [])
+
+    def test_fail_only_in_the_working_tree_is_drift(self):
+        self._write(attempts=("fail",))
+        diffs = self._drift()
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("fail", diffs[0])
+        self.assertIn("run_1", diffs[0])
+
+    def test_review_only_in_the_working_tree_is_drift(self):
+        self._write(attempts=(), reviews=((0, "완료 정의를 좁혔다"),))
+        diffs = self._drift()
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("재검토", diffs[0])
+        self.assertIn("완료 정의를 좁혔다", diffs[0])
+
+    def test_a_committed_fail_turned_pass_in_the_working_tree_is_drift(self):
+        self._write(attempts=("fail",))
+        base = self._commit("attempts")
+        self._write(attempts=("pass",))
+        diffs = self._drift(base)
+        self.assertTrue(diffs)
+        self.assertTrue(any("pass" in d for d in diffs), diffs)
+        self.assertTrue(any("fail" in d for d in diffs), diffs)
+
+    def test_identical_is_no_drift(self):
+        self._write(attempts=("fail", "pass"), reviews=((2, "좁혔다"),))
+        base = self._commit("attempts")
+        self.assertEqual(self._drift(base), [])
+
+    def test_a_started_added_on_top_of_a_committed_record_is_no_drift(self):
+        """재검토·판정은 커밋돼 있고 작업 트리에는 3회차 started 만 더 있다 — 브레이크를 풀고 막 기동한 자리다."""
+        self._write(attempts=("fail", "fail"), reviews=((2, "좁혔다"),))
+        base = self._commit("attempts")
+        self._write(attempts=("fail", "fail", "started"), reviews=((2, "좁혔다"),))
+        self.assertEqual(self._drift(base), [])
+
+    # ── 양방향이다 — 커밋에는 있는 판정·재검토가 작업 트리에 없어도 차이다 ───────
+    def test_a_committed_verdict_missing_from_the_working_tree_is_drift(self):
+        """fail 을 커밋한 뒤 작업 트리의 파일을 지웠다 — 워커는 커밋의 fail 을 보는데 위임한 쪽은 없는 줄 안다. 한쪽만 보면 통과한다."""
+        self._write(attempts=("fail",))
+        base = self._commit("attempts")
+        (self.unit_dir / "attempts.yaml").unlink()
+        diffs = self._drift(base)
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("커밋에만", diffs[0])
+        self.assertIn("run_1", diffs[0])
+        code, out = self._cli("--base-sha", base)
+        self.assertEqual(code, 1, out)
+        self.assertIn("커밋에만", out)
+
+    def test_a_committed_verdict_emptied_in_the_working_tree_is_drift(self):
+        """지우지 않고 `attempts: []` 로 비운 경우도 같다 — 파일이 있다는 것이 기록이 있다는 뜻은 아니다."""
+        self._write(attempts=("fail",))
+        base = self._commit("attempts")
+        self._write(attempts=())
+        diffs = self._drift(base)
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("커밋에만", diffs[0])
+        self.assertIn("fail", diffs[0])
+
+    def test_a_committed_review_missing_from_the_working_tree_is_drift(self):
+        self._write(attempts=("fail", "fail"), reviews=((2, "완료 정의를 좁혔다"),))
+        base = self._commit("attempts")
+        self._write(attempts=("fail", "fail"))
+        diffs = self._drift(base)
+        self.assertEqual(len(diffs), 1, diffs)
+        self.assertIn("재검토", diffs[0])
+        self.assertIn("커밋에만", diffs[0])
+        self.assertIn("완료 정의를 좁혔다", diffs[0])
+
+    def test_an_unknown_base_sha_is_an_error_not_an_empty_record(self):
+        with self.assertRaises(ValueError):
+            self._drift("0" * 40)
+
+    # ── CLI ──────────────────────────────────────────────────────────────────
+    def test_cli_exits_zero_and_says_what_it_did_not_compare(self):
+        self._write(attempts=("started",))
+        code, out = self._cli("--base-sha", self.base)
+        self.assertEqual(code, 0, out)
+        self.assertIn("→ 일치", out)
+        self.assertIn("started 는 대조하지 않는다", out)
+        self.assertIn("판정 0건", out)
+        self.assertIn("재검토 0건", out)
+
+    def test_cli_exits_one_and_prints_the_difference(self):
+        self._write(attempts=("fail",), reviews=((1, "좁혔다"),))
+        code, out = self._cli("--base-sha", self.base)
+        self.assertEqual(code, 1, out)
+        self.assertIn("run_1", out)
+        self.assertIn("좁혔다", out)
+        self.assertIn("커밋", out)
+
+    def test_cli_check_requires_base_sha_and_not_run(self):
+        code, out = self._cli()
+        self.assertEqual(code, 2, out)
+        self.assertIn("--base-sha", out)
+        self.assertFalse((self.unit_dir / "attempts.yaml").exists(), "check 는 아무것도 쓰지 않는다")
+
+    def test_cli_check_accepts_a_symbolic_ref(self):
+        code, out = self._cli("--base-sha", "HEAD")
+        self.assertEqual(code, 0, out)
+
+    def test_cli_unknown_base_sha_exits_one_with_error(self):
+        """없는 SHA 는 빈 기록이 아니라 ERROR 다 — 오타 난 SHA 가 「일치」 로 읽히면 안 된다."""
+        code, out = self._cli("--base-sha", "0" * 40)
+        self.assertEqual(code, 1, out)
+        self.assertIn("ERROR", out)
+        self.assertNotIn("일치", out)
+
+
+class TestAttemptBaseShaFollowsReapproval(_UnitRepo, unittest.TestCase):
+    """회차 기록의 `base_sha` 가 재승인을 따라간다 (Q-42).
+
+    관통 도중 재승인하면 계약·증거는 새 승인 커밋으로 옮겨가는데 `attempts.yaml` 의 회차는 기동 시점 값에 고정돼
+    「그 회차가 무엇을 겨눴는가」 를 이력에서 잘못 읽게 했다(2026-09-02 5회차: 기록 93f0c0a vs 계약 01ec50d).
+    같은 run 으로 계약을 다시 만들면 회차를 늘리지 않고 `base_sha` 만 옮기고, 이전 값은 `base_sha_history` 에 남긴다."""
+
+    def _build(self, base):
+        return write_envelope(self.unit, "implementer", project_root=self.root, base_sha=base, run_name="run_a")
+
+    def _reapprove(self, reason="검증 계획 변경"):
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason=reason)
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "reapprove", cwd=self.root)
+        return git("rev-parse", "HEAD", cwd=self.root)
+
+    def test_same_run_rebuilt_at_a_new_base_moves_base_sha_and_keeps_history(self):
+        a = self.base
+        self._build(a)
+        b = self._reapprove()
+        self.assertNotEqual(a, b)
+        self._build(b)
+        data = load_attempts(self.root, self.unit)
+        self.assertEqual(len(data["attempts"]), 1, "회차 수는 늘지 않는다")
+        self.assertEqual(data["attempts"][0]["base_sha"], b)
+        self.assertEqual(data["attempts"][0]["base_sha_history"], [a])
+        self.assertEqual(data["attempts"][0]["result"], "started")
+
+    def test_rebuilding_at_the_same_base_changes_nothing(self):
+        self._build(self.base)
+        path = self.root / "docs/work" / self.unit / "attempts.yaml"
+        before = path.read_text(encoding="utf-8")
+        self._build(self.base)
+        self.assertEqual(path.read_text(encoding="utf-8"), before)
+        att = load_attempts(self.root, self.unit)["attempts"][0]
+        self.assertNotIn("base_sha_history", att)
+
+    def test_two_reapprovals_append_to_the_history_in_order(self):
+        a = self.base
+        self._build(a)
+        b = self._reapprove("첫 재승인")
+        self._build(b)
+        c = self._reapprove("둘째 재승인")
+        self._build(c)
+        att = load_attempts(self.root, self.unit)["attempts"][0]
+        self.assertEqual(att["base_sha"], c)
+        self.assertEqual(att["base_sha_history"], [a, b])
+        self.assertEqual(len(load_attempts(self.root, self.unit)["attempts"]), 1)
+
+    def test_run_unit_at_the_new_base_reports_the_moved_base(self):
+        self._run(run="run_a")
+        b = self._reapprove()
+        res = run_unit(self.unit, project_root=self.root, run="run_a", base_sha=b)
+        self.assertEqual(res["base_sha"], b)
+        data = load_attempts(self.root, self.unit)
+        self.assertEqual(len(data["attempts"]), 1)
+        self.assertEqual(data["attempts"][0]["base_sha"], b)
+        self.assertEqual(data["attempts"][0]["base_sha_history"], [self.base])

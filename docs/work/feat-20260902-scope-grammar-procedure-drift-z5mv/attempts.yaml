@@ -1,0 +1,12 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260902-scope-grammar-procedure-drift-z5mv
+attempts:
+- n: 1
+  run: run_0b4ed250c691
+  base_sha: 06ea0916d5000775f476548ee5f83dbfd79624a2
+  started_at: '2026-09-02T14:49:46+09:00'
+  result: pass
+  failure_class: null
+  note: 관통 1회차 close PASS · 검토자 findings 0 · required_checks 16/16 · 재실행 16/16
+  settled_at: '2026-09-02T15:12:40+09:00'
+reviews: []

@@ -651,3 +651,294 @@ class TestChangeScopeMultiline(unittest.TestCase):
     def test_a_label_outside_the_section_is_still_ignored(self):
         got = change_scope_paths("## 다른 절\n\n- 바뀌는 파일·모듈: `a/x.py`\n  · `a/y.py`\n")
         self.assertEqual(got, [])
+
+
+def change_scope_paths_at_d9a3b12(body):
+    """이 단위 직전 하네스(`d9a3b12`)의 `change_scope_paths` — **참조 구현으로 고정**한 사본이다.
+
+    새 규칙과의 차이가 곧 이 단위의 변경이다. 둘을 대조하는 자리가 둘이다 — 시나리오 8 의 문장에서 옛 규칙은 `cmd_card` 를
+    읽고 새 규칙은 읽지 않는다는 것(부정 단언이 빈 검사가 아님을 보이는 대조군)과, 커밋된 계약 30건에서 두 규칙이 같은 목록을
+    낸다는 것(AC-2). 저장소의 코드를 부르지 않는다 — 그 코드는 이 단위가 바꾸는 대상이다."""
+    import re as _re
+    inside = False
+    lines = (body or "").split("\n")
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            inside = line.strip() == "## 변경 범위"
+            continue
+        if inside and "바뀌는 파일·모듈:" in line:
+            declared = [line.split("바뀌는 파일·모듈:", 1)[1]]
+            for nxt in lines[i + 1:]:
+                if nxt.startswith("#") or nxt.startswith("- ") or not nxt.strip():
+                    break
+                declared.append(nxt)
+            out = []
+            for raw in declared:
+                for chunk in raw.split("·"):
+                    found = _re.search(r"`([^`]+)`", chunk)
+                    if not found:
+                        continue
+                    text = found.group(1).strip().replace("\\", "/")
+                    if not text or text.startswith("/") or text.startswith("~") or ".." in text.split("/"):
+                        continue
+                    if text not in out:
+                        out.append(text)
+            return out
+    return []
+
+
+class TestChangeScopeGrammar(_ApprovalRepo):
+    """「변경 범위」 문법 (Q-36) — **설명 산문은 쓰기 상한에 들어가지 않는다.**
+
+    시나리오 8 의 승인 문장 ``romeo/cli.py`(카드 렌더러에 `--root` 를 넘기는 호출부 — `cmd_card` 와 …)`` 에서
+    `·` 로 자른 조각의 첫 백틱이 경로로 읽혀 **함수명 `cmd_card` 가 `allowed_paths` 에 실렸다**(2026-09-02 실측).
+    상한이 넓어지는 방향이라 판정에 영향이 없었지만, 승인하지 않은 경로가 상한에 조용히 들어가는 구멍이다(K-66).
+
+    규칙: 괄호 `(…)`·`（…）` 안은 줄 경계를 보존한 채 지운다(백틱 **밖** 구간에서만 — 경로 안의 괄호는 남는다) ·
+    각 조각의 **첫 백틱만** 경로다 · 공백이 들었거나 `/` 도 `.` 도 없는 토큰은 경로가 아니라 「경로로 읽지 않은 토큰」 이다 ·
+    앞의 `./` 는 벗긴다. 계약 JSON 의 필드는 바뀌지 않는다 — 앵커 재계산과 호환돼야 한다."""
+
+    HEAD = "## 변경 범위\n\n"
+    S8_SPEC = HARNESS_ROOT / "docs/work/feat-20260901-scenario-8-capability-probe-s7ny/spec.md"
+    #: 시나리오 8 spec 의 「변경 범위」 선언 — 2026-09-02 그대로 **상수로도** 박아 둔다. 저장소 파일이 나중에 고쳐져도
+    #: 아래 부정 단언(`cmd_card` 가 상한에 없다)이 빈 검사가 되지 않게 하기 위한 것이다.
+    S8_DECLARATION = (
+        "- 바뀌는 파일·모듈: `core/policy/capabilities.yaml` · `core/policy/packages.yaml`(절 enforcement ·\n"
+        "  overlay · 차단 카탈로그) · `core/templates/sections/capability-check.md` · `adapters/*/adapter.yaml` ·\n"
+        "  `romeo/doctor.py`(프로브) · `romeo/policy.py`(능력 계산) · `romeo/card.py`(인쇄) ·\n"
+        "  `romeo/blocks.py`(집행) · `romeo/docs.py`(차단에 라우터 컨텍스트를 넘기는 배선) ·\n"
+        "  `romeo/close.py`(같은 배선의 종료 검사 쪽 호출부) · `romeo/cli.py`(카드 렌더러에 `--root` 를\n"
+        "  넘기는 호출부 — `cmd_card` 와 `cmd_route --card` 두 자리) · `scenarios/8-capability-absent.md` ·\n"
+        "  `scenarios/README.md` · `tests/test_scenario_8.py` · 새 차단이 추가되면 따라와야 하는 기존 검사와 fixture:\n"
+        "  `tests/test_scenario_3.py` · `tests/test_enforce_points.py` · `tests/test_blocks_enforcement.py` ·\n"
+        "  `fixtures/requests/fx-discord-computer-use-automation.yaml` ·\n"
+        "  `fixtures/requests/fx-s07-coupang-migration-initiative.yaml` ·\n"
+        "  `fixtures/requests/fx-account-migration-continue.yaml`.\n"
+    )
+    TEMPLATE = HARNESS_ROOT / "core/templates/tech-spec.md"
+
+    @staticmethod
+    def _report(body):
+        from romeo.envelope import change_scope_report   # 구현 전에는 이 이름이 없다 — 이 테스트만 실패한다
+        return change_scope_report(body)
+
+    # ── ① 저장소의 실제 승인 문장 ───────────────────────────────────────────
+    def test_scenario_8_declaration_yields_paths_not_prose(self):
+        _fm, body = frontmatter.read(self.S8_SPEC)
+        got = change_scope_paths(body)
+        for prose in ("cmd_card", "--root", "cmd_route --card"):
+            self.assertNotIn(prose, got, got)
+        self.assertIn("romeo/cli.py", got)
+        self.assertIn("scenarios/8-capability-absent.md", got)
+
+    # ── ⑩ 같은 문장을 상수로 — 저장소 파일과 무관하게, 그리고 옛 규칙과의 대조군을 함께 ───
+    def test_scenario_8_sentence_as_a_constant_drops_cmd_card_that_the_old_rule_read(self):
+        body = self.HEAD + self.S8_DECLARATION
+        old = change_scope_paths_at_d9a3b12(body)
+        self.assertIn("cmd_card", old, "대조군 — 옛 규칙은 이 문장에서 cmd_card 를 읽었다. 아니면 아래 부정 단언은 빈 검사다")
+        new = change_scope_paths(body)
+        for prose in ("cmd_card", "--root", "cmd_route --card"):
+            self.assertNotIn(prose, new, new)
+        self.assertIn("romeo/cli.py", new)
+        self.assertIn("scenarios/8-capability-absent.md", new)
+        self.assertEqual([p for p in old if p != "cmd_card"], new, "이 문장에서 두 규칙의 차이는 cmd_card 하나다")
+        self.assertEqual(self._report(body)["ignored"], [], "cmd_card 는 괄호 안이라 ignored 에도 오르지 않는다")
+
+    # ── ⑦ 조각의 첫 백틱만 경로다 — 뒤따르는 백틱은 괄호 밖이어도 상한이 아니다 ───
+    def test_only_the_first_backtick_of_a_chunk_is_a_path(self):
+        body = self.HEAD + "- 바뀌는 파일·모듈: `a/x.py` 는 `b/y.py` 를 부른다 · `c/z.py`\n"
+        got = change_scope_paths(body)
+        self.assertEqual(got, ["a/x.py", "c/z.py"])
+        self.assertNotIn("b/y.py", got)
+
+    # ── ⑧ `·` 없이 줄바꿈으로만 나눈 선언 — 닫는 괄호와 같은 줄의 다음 항목이 산다 ───
+    def test_newline_separated_items_survive_a_wrapped_parenthesis(self):
+        got = change_scope_paths(self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`(설명\n  계속) `b/y.py`\n")
+        self.assertEqual(got, ["a/x.py", "b/y.py"])
+
+    # ── ⑨ 경로 안의 괄호는 지우지 않는다 — 괄호 제거는 백틱 밖 구간에만 ───
+    def test_parentheses_inside_a_backtick_path_are_kept(self):
+        body = self.HEAD + "- 바뀌는 파일·모듈: `app/(g)/page.tsx` · `b/y.py`(설명)\n"
+        rep = self._report(body)
+        self.assertEqual(rep["paths"], ["app/(g)/page.tsx", "b/y.py"])
+        self.assertEqual(rep["ignored"], [])
+
+    # ── ② 넓어지는 방향의 반례: 괄호 안의 경로 모양 백틱도 상한이 아니다 ─────
+    def test_a_path_shaped_backtick_inside_parentheses_is_not_a_path(self):
+        got = change_scope_paths(self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`(설명 · `b/y.py` 는 그대로)\n")
+        self.assertEqual(got, ["a/x.py"])
+
+    # ── ③ 괄호가 줄을 넘겨도 다음 줄의 항목은 산다 ──────────────────────────
+    def test_parentheses_that_wrap_a_line_do_not_eat_the_next_item(self):
+        got = change_scope_paths(self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`(설명 ·\n  다음 줄 · 계속) · `b/y.py`\n")
+        self.assertEqual(got, ["a/x.py", "b/y.py"])
+
+    # ── ④ 경로 모양이 아닌 토큰은 ignored 로 간다 ───────────────────────────
+    def test_tokens_without_slash_or_dot_or_with_spaces_are_ignored_not_paths(self):
+        body = self.HEAD + "- 바뀌는 파일·모듈: `cmd_card` · `--root` · `a b/c.py`\n"
+        self.assertEqual(change_scope_paths(body), [])
+        rep = self._report(body)
+        self.assertEqual(rep["paths"], [])
+        self.assertEqual(rep["ignored"], ["cmd_card", "--root", "a b/c.py"])
+
+    # ── ⑤ 루트의 확장자 없는 파일은 ./ 로 쓴다 ─────────────────────────────
+    def test_dot_slash_prefix_is_stripped(self):
+        self.assertEqual(change_scope_paths(self.HEAD + "- 바뀌는 파일·모듈: `./LICENSE` · `./a/x.py`\n"),
+                         ["LICENSE", "a/x.py"])
+
+    def test_fullwidth_and_nested_parentheses_are_removed(self):
+        got = change_scope_paths(
+            self.HEAD + "- 바뀌는 파일·모듈: `a/x.py`（설명（중첩 `c/z.py`）） · `b/y.py`(x(`d/w.py`)z)\n")
+        self.assertEqual(got, ["a/x.py", "b/y.py"])
+
+    def test_paths_outside_the_workspace_are_dropped_not_reported_as_ignored(self):
+        rep = self._report(self.HEAD + "- 바뀌는 파일·모듈: `a/x.py` · `/etc/passwd` · `../out.py` · `./../out.py`\n")
+        self.assertEqual(rep["paths"], ["a/x.py"])
+        self.assertEqual(rep["ignored"], [])
+
+    def test_change_scope_paths_is_the_paths_of_the_report(self):
+        body = self.HEAD + "- 바뀌는 파일·모듈: `a/x.py` · `cmd_card` · `b/y.py`(`--flag`)\n"
+        rep = self._report(body)
+        self.assertEqual(sorted(rep), ["ignored", "paths"])
+        self.assertEqual(change_scope_paths(body), rep["paths"])
+        self.assertEqual(rep["paths"], ["a/x.py", "b/y.py"])
+        self.assertEqual(rep["ignored"], ["cmd_card"])
+
+    # ── 계약 생성 — 목록은 인쇄하되 계약 JSON 은 그대로 ─────────────────────
+    def _scope(self, declaration):
+        fm, body = frontmatter.read(self.spec)
+        frontmatter.write(self.spec, fm, body.replace(SCOPE_PATHS, "- 바뀌는 파일·모듈: " + declaration))
+        approve_unit(self.unit, "tester", project_root=self.root)
+        return self._commit("approve")
+
+    def test_write_envelope_reports_ignored_tokens_but_the_contract_json_is_unchanged(self):
+        sha = self._scope("`docs/work/` · `cmd_card` · `scripts/`(`collect` 를 고친다) · `--root`")
+        res = write_envelope(self.unit, "implementer", project_root=self.root, base_sha=sha)
+        self.assertEqual(res["scope_ignored"], ["cmd_card", "--root"])
+        env = res["envelope"]
+        self.assertEqual(env["allowed_paths"], [f"docs/work/{self.unit}/", "docs/work/", "scripts/"])
+        self.assertNotIn("scope_ignored", env, "계약 JSON 의 필드는 바뀌지 않는다 — 앵커 재계산과 호환돼야 한다")
+        self.assertNotIn("scope_ignored", Path(res["path"]).read_text(encoding="utf-8"))
+        schema = load_json(HARNESS_ROOT / "core/schemas/task-envelope.json")
+        self.assertEqual(validate(env, schema), [])
+
+    def test_cli_build_prints_the_ignored_tokens_only_when_there_are_any(self):
+        sha = self._scope("`docs/work/` · `cmd_card`")
+        buf = io.StringIO()
+        with redirect_stdout(buf), redirect_stderr(buf):
+            rc = main(["envelope", "build", "--unit", self.unit, "--role", "implementer",
+                       "--base-sha", sha, "--root", str(self.root)])
+        self.assertEqual(rc, 0, buf.getvalue())
+        self.assertIn("경로로 읽지 않은 백틱 1개", buf.getvalue())
+        self.assertIn("cmd_card", buf.getvalue())
+        # --json 은 계약 JSON 만 표준 출력에 낸다 — 목록은 표준 오류로 간다
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            rc = main(["envelope", "build", "--unit", self.unit, "--role", "implementer",
+                       "--base-sha", sha, "--root", str(self.root), "--json"])
+        self.assertEqual(rc, 0, err.getvalue())
+        self.assertNotIn("cmd_card", json.loads(out.getvalue())["allowed_paths"])
+        self.assertIn("경로로 읽지 않은 백틱 1개", err.getvalue())
+
+    def test_cli_build_is_silent_about_ignored_tokens_when_there_are_none(self):
+        approve_unit(self.unit, "tester", project_root=self.root)
+        sha = self._commit("approve")
+        buf = io.StringIO()
+        with redirect_stdout(buf), redirect_stderr(buf):
+            rc = main(["envelope", "build", "--unit", self.unit, "--role", "implementer",
+                       "--base-sha", sha, "--root", str(self.root)])
+        self.assertEqual(rc, 0, buf.getvalue())
+        self.assertNotIn("경로로 읽지 않은", buf.getvalue())
+
+    # ── 문법은 spec 을 쓰는 사람이 읽는 자리에 있다 ────────────────────────
+    def test_the_template_states_the_grammar(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        section = text.split("\n## 변경 범위\n", 1)[1].split("\n## ", 1)[0]
+        self.assertIn("- 바뀌는 파일·모듈:", section)
+        guide = section.split("- 바뀌는 파일·모듈:", 1)[0]          # 목록 **앞**의 안내 문단
+        self.assertTrue(guide.strip(), "「변경 범위」 제목 아래, 목록 앞에 안내 문단이 있어야 한다")
+        for element in ("백틱", "괄호", "경로로 읽지 않", "./LICENSE", "change_scope_paths"):
+            self.assertIn(element, guide, element)
+        self.assertIn("`/`", guide)
+        self.assertIn("`.`", guide)
+        # 라벨 문자열(콜론 포함)은 안내 문단에 쓰지 않는다 — 파서가 그 줄을 선언으로 읽는다
+        self.assertNotIn("바뀌는 파일·모듈:", guide)
+        self.assertNotIn("NEEDS_INPUT", guide)
+
+
+class TestChangeScopeRegressionOnRecordedContracts(unittest.TestCase):
+    """기존 승인의 상한은 그대로다 (AC-2) — 저장소에 커밋된 구현자 계약 30건 전부에서, 그 계약의 `base_sha` 커밋의
+    spec 을 새 규칙으로 읽은 결과가 **이 단위 직전 하네스(`d9a3b12`)의 규칙**으로 읽은 결과와 순서까지 같다.
+
+    기록된 `allowed_paths` 와의 대조는 **목록으로**(순서 포함) 한다 — 집합 비교는 순서가 바뀐 계약을 통과시키는데,
+    앵커 재계산은 바이트로 대조하므로 순서도 계약의 일부다. 30건 중 3건은 이 단위와 무관한 이유로 지금 HEAD 의
+    규칙과도 이미 다르다 — 46an 의 두 건은 상한이 `.`(작업 공간 전체)이던 시절의 계약이고(체크리스트 34 이전),
+    tgnb 의 한 건은 줄을 넘긴 선언을 첫 줄에서 끊던 파서의 계약이다(Q-18 이전). 그 셋은 새 규칙이 아니라 이력이 만든
+    차이이므로 **이름으로** 제외한다 — 예외가 조용히 늘지 않게 하려는 것이다. 나머지 27건은 `[must_include 치환] + new`
+    가 기록과 목록으로 같아야 한다. `cmd_card` 는 커밋된 계약에는 없다 — 시나리오 8 의 계약은 `.gitignore` 로
+    커밋되지 않았으므로 그 차이는 `TestChangeScopeGrammar` 가 spec 재계산으로만 본다(AC-1)."""
+
+    #: 기록된 상한이 지금 HEAD 의 규칙으로도 재현되지 않는 계약 — 이 단위와 무관한 이력의 차이다.
+    HISTORICAL = {
+        "docs/work/feat-20260829-license-field-46an/task/run_31e175742892-implementer.json": "상한이 `.` 이던 시절",
+        "docs/work/feat-20260829-license-field-46an/task/run_b5cdadaffcdc-implementer.json": "상한이 `.` 이던 시절",
+        "docs/work/feat-20260831-bmad-attach-probe-tgnb/task/run_d7edd4884a83-implementer.json": "Q-18 이전 파서(첫 줄만 읽음)",
+    }
+    #: 이 단위가 시작한 시점에 커밋돼 있던 구현자 계약 수 — 줄어들면 대조 대상이 사라진 것이고, 늘면 새 계약이 이 검사 아래 들어온 것이다
+    RECORDED = 30
+
+    def _recorded_contracts(self):
+        files = git("ls-files", "docs/work/*/task/*-implementer.json", cwd=HARNESS_ROOT).split("\n")
+        return [f for f in files if f.strip()]
+
+    @staticmethod
+    def _spec_body_at(env):
+        raw = subprocess.run(["git", "show", f"{env['base_sha']}:{env['spec_ref']['path']}"],
+                             cwd=str(HARNESS_ROOT), capture_output=True, check=True).stdout.decode("utf-8")
+        _fm, body = frontmatter.split(raw)
+        return body
+
+    def test_the_new_rule_and_the_d9a3b12_rule_agree_on_every_recorded_contract(self):
+        """30건 전부 — 새 규칙 == 옛 규칙, 목록 동등(순서 포함). 부분집합 허용도 `cmd_card` 예외도 없다."""
+        files = self._recorded_contracts()
+        self.assertEqual(len(files), self.RECORDED, files)
+        for rel_path in files:
+            body = self._spec_body_at(load_json(HARNESS_ROOT / rel_path))
+            self.assertEqual(change_scope_paths(body), change_scope_paths_at_d9a3b12(body), rel_path)
+
+    def test_recorded_allowed_paths_are_reproduced_as_lists_except_the_three_historical_contracts(self):
+        """이력 3건을 이름으로 제외한 27건 — `[must_include 치환] + new` 가 기록된 `allowed_paths` 와 **리스트로** 같다."""
+        files = self._recorded_contracts()
+        self.assertEqual(len(files), self.RECORDED, files)
+        for missing in set(self.HISTORICAL) - set(files):
+            self.fail(f"이름으로 제외한 이력 계약이 저장소에 없다: {missing}")
+        compared = 0
+        for rel_path in files:
+            if rel_path in self.HISTORICAL:
+                continue
+            env = load_json(HARNESS_ROOT / rel_path)
+            must = f"docs/work/{env['unit_id']}/"
+            new = change_scope_paths(self._spec_body_at(env))
+            self.assertEqual([must] + [p for p in new if p != must], env["allowed_paths"], rel_path)
+            compared += 1
+        self.assertEqual(compared, self.RECORDED - len(self.HISTORICAL))
+
+    def test_the_three_historical_contracts_really_differ_from_the_recomputation(self):
+        """제외한 셋이 정말 재현되지 않는 계약인지 본다 — 재현되는 것을 제외 목록에 두면 그 목록은 장식이다."""
+        for rel_path in self.HISTORICAL:
+            env = load_json(HARNESS_ROOT / rel_path)
+            must = f"docs/work/{env['unit_id']}/"
+            new = change_scope_paths(self._spec_body_at(env))
+            self.assertNotEqual([must] + [p for p in new if p != must], env["allowed_paths"],
+                                f"{rel_path}: 재현되는 계약은 이력 예외에 둘 수 없다 — 목록에서 뺀다")
+
+    def test_the_parity_case_contracts_are_recomputed_identically(self):
+        """동등성 관측 케이스(`fixtures/parity/pr-license-field-t1-observed.yaml`)가 재계산하는 46an 의 두 계약 —
+        새 규칙으로도 기록과 같은 allowed_paths 다(`fixtures parity` 가 그대로 통과하는 근거)."""
+        for run in ("run_5a5a894aa26d", "run_ba40ff663b44"):
+            rel_path = f"docs/work/feat-20260829-license-field-46an/task/{run}-implementer.json"
+            env = load_json(HARNESS_ROOT / rel_path)
+            raw = subprocess.run(["git", "show", f"{env['base_sha']}:{env['spec_ref']['path']}"],
+                                 cwd=str(HARNESS_ROOT), capture_output=True, check=True).stdout.decode("utf-8")
+            _fm, body = frontmatter.split(raw)
+            self.assertEqual([f"docs/work/{env['unit_id']}/"] + change_scope_paths(body), env["allowed_paths"], run)

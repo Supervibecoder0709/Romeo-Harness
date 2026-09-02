@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scope-grammar-procedure-drift-z5mv",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/task/run_0b4ed250c691-reviewer.json",
+    "sha256": "24e4439fc17131de8943970ce4d2e70c8f726fb7f180125427b0465fc4926079"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/evidence/run_0b4ed250c691.yaml",
+  "notes": "양 역할 계약의 base_sha가 일치하며, 증거에 기록된 required_checks 16건은 모두 종료 코드 0이다. 현재 변경은 구현자 계약의 allowed_paths 안에 있고, 증거의 changed_files 및 review-tree-before 기록과 일치한다."
+}

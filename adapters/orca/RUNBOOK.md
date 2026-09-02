@@ -176,23 +176,30 @@ S=$(mktemp -d) && git archive <base-sha> | tar -x -C "$S"
 rm -rf "$S"
 ```
 
-4. **재검토·회차 기록이 그 커밋 안에 있다** — `docs/work/<id>/attempts.yaml` 을 커밋과 작업 트리에서 대조한다.
-   이 파일은 확인 2 의 목록에 넣을 수 없다. **항상 있어야 하는 파일이 아니기 때문이다** — 첫 관통에는 아예 없고
-   (`envelope build` 의 중단 게이트가 실패 0 으로 보고 통과시킨다) 반복 중단을 한 번 겪은 뒤에야 생긴다.
+4. **판정·재검토 기록이 그 커밋 안에 있다** — `docs/work/<id>/attempts.yaml` 을 커밋과 작업 트리에서
+   **판정 난 시도(`pass`·`fail`)와 재검토(`reviews`)로만** 대조한다. `started` 는 대조하지 않는다.
+   이 파일은 확인 2 의 목록에 넣을 수 없다. **항상 있어야 하는 파일이 아니기 때문이다** — 첫 계약 생성(§3.3) 전에는 없다.
    목록에 넣으면 기록이 없는 단위에서 8행 판정이 깨진다. 그래서 개수가 아니라 **차이**로 본다.
+   그리고 파일 전체를 `diff` 하지 않는다. 회차 기록은 계약 생성이 남기므로(Q-27) `attempts.yaml` 은 **언제나 승인 커밋 뒤에**
+   생기고 첫 회차는 `started` 다 — 전체 `diff` 는 첫 관통에서 항상 실패했고, 옛 지시(승인 커밋에 담고 `<base-sha>` 를 다시 잡는다)는
+   새 base 로 계약을 다시 만들면 회차가 또 추가돼 다시 어긋나는 순환이었다(Q-39). 워커가 보지 못하면 실제로 판정이 바뀌는 것은
+   판정과 재검토뿐이다 — §3.3 의 중단 게이트가 읽는 것이 그 둘이다.
 
 ```bash
-diff <(git show "<base-sha>:docs/work/<id>/attempts.yaml" 2>/dev/null) \
-     <(cat "docs/work/<id>/attempts.yaml" 2>/dev/null)
+# docs/work/<id>/attempts.yaml 의 판정(pass·fail)·재검토(reviews)만 커밋과 작업 트리에서 대조한다 — started 는 보지 않는다
+bin/romeo run-unit check --unit <id> --base-sha <base-sha>
 ```
 
-   성공 신호: 종료 코드 0 과 출력 없음. **양쪽 다 없으면 빈 입력끼리의 비교라 통과한다** — 시도 기록이 없는 단위를 막지 않는다.
-   종료 코드 1(과 `<`·`>` 로 시작하는 차이 줄)이면 **회차 기록이나 재검토 결론이 작업 트리에만 있고 커밋 밖에 있다.**
+   성공 신호: 종료 코드 0 과 `→ 일치 (판정 N건 · 재검토 M건 · started 는 대조하지 않는다)`. **양쪽 다 없으면 통과한다** —
+   시도 기록이 없는 단위를 막지 않는다. 작업 트리에 `started` 만 더 있어도 통과한다 — 이 확인이 도는 시점에 §3.3 이 막 남긴 회차가 그것이다.
+   종료 코드 1 과 차이 줄이면 **판정이나 재검토 결론이 작업 트리에만 있고 커밋 밖에 있다.**
    그 상태로 위임하면 자식 워크트리 안의 워커는 그 기록을 보지 못한다 — 그 워커의 첫 명령인 `bin/romeo envelope build` 가
    커밋된 트리의 `attempts.yaml`(없거나 옛것)로 중단 게이트를 평가해 `반복 중단` 으로 계약 생성을 **거부한다.**
    브레이크를 푼 사람은 풀었다고 알고 있는데 워커는 막힌 채 끝나므로, 그 회차는 판정 없이 중단된다
    (2026-08-31 관통 3회차가 정확히 그것이었다 — `docs/planning/progress.md` 의 회차 표 3행).
-   고치는 방법: `attempts.yaml` 을 승인 커밋에 함께 담고(`git add docs/work/<id>/attempts.yaml`) `<base-sha>` 를 그 커밋으로 다시 잡는다.
+   고치는 방법: **판정·재검토가 커밋 밖이면 그것을 커밋한다 — `started` 는 커밋하지 않아도 된다.** `attempts.yaml` 을 커밋에 담고
+   (`git add docs/work/<id>/attempts.yaml`) `<base-sha>` 를 그 커밋으로 다시 잡는다. 새 `<base-sha>` 로 같은 `<run-id>` 의 계약을
+   다시 만들어도 회차가 하나 더 생기지 않는다 — 기존 회차의 `base_sha` 가 새 값으로 옮겨지고 이전 값은 `base_sha_history` 에 남는다(Q-42).
    `bin/romeo run-unit … --after-review` 로 브레이크를 푼 직후가 이 확인이 가장 잘 걸리는 자리다 — 그 명령은 파일을 쓸 뿐 커밋하지 않는다(§3.3 「중단 게이트」).
 
 넷 중 하나라도 어긋나면 워커를 띄우지 않는다 — 커밋을 보완하고 `<base-sha>` 를 다시 잡는다.
@@ -349,31 +356,47 @@ bin/romeo run-unit --unit <작업 단위 id> --run <run-id> --base-sha <base-sha
 
 ### 3.4 Task 2개 생성 — 구현자와 검토자
 
-```bash
-orca orchestration task-create --run <run-id> \
-  --task-title "<id> implementer" \
-  --spec "<작업 계약 경로와 실행 조건>" --json
+아래 블록의 자리표시자는 `<id>`·`<run-id>`·`<implementer-task-id>` 셋이다 — `bin/romeo run-unit` 의 `[2/5]` 가 같은 이름으로
+인쇄하는 `task-create` 두 줄과 **문자열로 같다**(`tests/test_runbook_procedure.py::TestDelegationBlockMatchesRunUnit` 가 대조한다 — 요구하는 자리와 만드는 자리가 하나다).
 
+```bash
+# 구현자 --spec 은 정본 절차 파일을 채운 것을 읽는다 — 그 파일을 만드는 명령은 bin/romeo run-unit 의 [2/5] 가 implementer-spec 으로 인쇄한다
 orca orchestration task-create --run <run-id> \
-  --task-title "<id> reviewer" \
+  --task-title '<id> implementer' \
+  --spec "$(cat .harness/runs/<id>/<run-id>/implementer-spec.md)" --json
+
+# 검토자 --spec 은 경로와 절차만 — 해시를 넣지 않는다(§3.7 이 그 자리에서 계산한다)
+orca orchestration task-create --run <run-id> \
+  --task-title '<id> reviewer' \
   --deps '["<implementer-task-id>"]' \
-  --spec "<작업 계약 경로와 읽기 전용 조건>" --json
+  --spec '계약 docs/work/<id>/task/<run-id>-reviewer.json · 판정 docs/work/<id>/review/<run-id>-reviewer.json · 절차 core/workflows/review/SKILL.md · 절차 파일은 §3.7 이 채워 argv 로 넘긴다 — 해시는 거기서 계산한다 · 읽기 전용' --json
 ```
 
 `--deps` 로 검토자가 구현자에 의존한다고 선언한다. 순서를 사람 기억에 맡기지 않는다.
-`--spec` 에는 §3.0 표의 값을 그대로 넣는다 — **입력**(작업 계약 경로), **출력 경로**
-(구현자 `docs/work/<id>/result/<run-id>-implementer.json` · 검토자 `docs/work/<id>/review/<run-id>-reviewer.json`),
-그 출력의 **형식**(`core/schemas/result-envelope.json`), 그리고 봉투에 적을 `evidence_ref`
-(`docs/work/<id>/evidence/<run-id>.yaml`). 여기에 검사를 증거 기록 명령으로 돌리라는 조건과 §5 의 식별자 플래그,
-그리고 절차 문서(`core/workflows/{implement,review}/SKILL.md`)를 함께 넣는다 — 이것도 **자기 작업 루트 기준 상대 경로**다.
-구현자 `--spec` 에는 「수용 기준 체크박스는 뒷받침 증거를 지목할 수 있을 때 구현자가 `[x]` 로 채운다 — 자기 검토 선언이 아니라 완료 주장이다」
-를 넣는다(`core/workflows/implement/SKILL.md` 7번). 2026-08-29 재관통의 구현자가 이것을 C-D3 금지로 읽어 비워 두었고 close 가 `AC_ALL_CHECKED` 로 막혔다(체크리스트 31).
-**검토자 `--spec` 은 손으로 쓰지 않는다** — `adapters/orca/prompts/reviewer-brief.md` 의 자리표시자를 채운 것이 정본이고, §3.7 의 `P` 파일과 같은 내용이다.
+구현자 `--spec` 이 담아야 하는 것은 §3.0 표의 값이다 — **입력**(작업 계약 경로), **출력 경로**
+(`docs/work/<id>/result/<run-id>-implementer.json`), 그 출력의 **형식**(`core/schemas/result-envelope.json`), 봉투에 적을 `evidence_ref`
+(`docs/work/<id>/evidence/<run-id>.yaml`), 검사를 증거 기록 명령으로 돌리라는 조건과 §5 의 식별자 플래그,
+절차 문서(`core/workflows/implement/SKILL.md`) — 전부 **자기 작업 루트 기준 상대 경로**다. 그리고
+「수용 기준 체크박스는 뒷받침 증거를 지목할 수 있을 때 구현자가 `[x]` 로 채운다 — 자기 검토 선언이 아니라 완료 주장이다」
+(`core/workflows/implement/SKILL.md` 7번). 2026-08-29 재관통의 구현자가 이것을 C-D3 금지로 읽어 비워 두었고 close 가 `AC_ALL_CHECKED` 로 막혔다(체크리스트 31).
+**구현자 `--spec` 은 손으로 조립하지 않는다** — 정본은 `adapters/orca/prompts/implementer-brief.md` 다. 위 항목이 전부 그 안에 있다.
+자리표시자 `<id>`·`<run-id>`·`<base-sha>` 를 채운 파일을 `.harness/runs/<id>/<run-id>/implementer-spec.md` 에 두고
+블록의 `--spec "$(cat .harness/runs/<id>/<run-id>/implementer-spec.md)"` 가 그 파일을 읽는다. 그 채움 명령(`mkdir -p … && awk … | sed …`)은
+`bin/romeo run-unit` 의 `[2/5]` 가 `implementer-spec` 으로 인쇄한다 — 파일이 없으면 `$(cat …)` 이 빈 `--spec` 을 넘기므로 채움 명령을 먼저 돌린다.
+**검토자 `--spec` 에는 경로와 절차만 적는다** — 블록의 문장 그대로다: 계약 `docs/work/<id>/task/<run-id>-reviewer.json` · 판정 `docs/work/<id>/review/<run-id>-reviewer.json` ·
+절차 `core/workflows/review/SKILL.md` · 「절차 파일은 §3.7 이 채워 argv 로 넘긴다 — 해시는 거기서 계산한다」 · 읽기 전용.
+검토 지시의 본문은 `adapters/orca/prompts/reviewer-brief.md` 의 자리표시자를 채운 §3.7 의 `P` 파일이 정본이고, **그 내용을 `--spec` 에 복사하지 않는다** —
+`P` 에는 계약의 해시가 들어 있고, 해시가 든 `P` 를 `--spec` 에 넣은 것이 바로 §3.4.1 의 원인이었다.
 「명령을 실행하지 않는다」 를 조건 없이 옮겨 적으면 codex 검토자가 파일을 하나도 읽지 못한다 — 그 런타임에서 읽기·검색은 셸 명령이기 때문이다(체크리스트 42).
+
+**`--spec` 에는 해시를 넣지 않는다 — 경로와 절차만.** 계약 파일의 sha256 을 `--spec` 문자열에 복사하면, 재승인으로 계약이 바뀌어도
+그 문자열은 갱신되지 않아 검토자에게 낡은 해시가 도달한다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 **그 자리에서**
+계약 파일을 읽어 계산하고 절차 파일 `P` 에 적는다 — 검토자가 받는 해시는 그 하나다. 이 규칙을 지킨 실행에서는 재승인이 Run 재생성을
+요구하지 않는다(§3.4.1 · Q-41).
 
 **이 시점에 아는 식별자는 둘뿐이다 — `<run-id>` 와 `<task-id>`.** `<dispatch-id>` 는 §3.5 의 `worker-start` 가
 돌아오면서 발급하므로 지금 `--spec` 에 넣을 값이 없다. 없는 값을 자리표로 적어 넘기면 워커가 그 문자열을 그대로
-증거에 기록하고, 그 증거는 어느 위임에서 나왔는지 말하지 못한다. 그래서 `--spec` 에는 값 대신 **받는 방법**을 적는다:
+증거에 기록하고, 그 증거는 어느 위임에서 나왔는지 말하지 못한다. 그래서 `--spec`(구현자는 그 정본 파일)에는 값 대신 **받는 방법**을 적는다:
 
 - 「`<dispatch-id>` 는 기동 뒤에 전달된다. 받기 전에는 `bin/romeo evidence run`·`evidence checks` 를 시작하지 않는다.」
 - 「전달이 늦으면 `orca orchestration dispatch-show --task <task-id> --json` 으로 스스로 조회한다」
@@ -394,10 +417,10 @@ orca orchestration task-create --run <run-id> \
 종료 검사가 "저장소 밖" 으로 거부한다(§3.8) — 역할과 무관하다.
 
 **구현자는 §3.5.1 보다 먼저 기동된다.** `worker-start` 가 돌아온 직후에 §3.5.1 이 돌지만 워커는 이미 시작돼 있다.
-그래서 구현자 `--spec` 에만 한 줄을 더 넣는다 — 「그 상대 경로에 계약이 아직 없으면 자기 작업 루트에서
+그래서 구현자 정본에만 한 줄이 더 있다 — 「그 상대 경로에 계약이 아직 없으면 자기 작업 루트에서
 `bin/romeo envelope build --unit <id> --role implementer --base-sha <base-sha> --run <run-id>` 로 만든다」.
 같은 입력이면 바이트까지 같은 계약이 나오므로(§3.3) §3.5.1 과 경쟁하지 않는다 — 어느 쪽이 먼저 써도 같은 파일이다.
-검토자에게는 이 줄을 넣지 않는다. 검토자에게는 쓰기가 없다(§4) — 계약이 그 자리에 없으면 §3.5.1 을 빠뜨린 것이고,
+검토자 `--spec` 에는 이 줄이 없다. 검토자에게는 쓰기가 없다(§4) — 계약이 그 자리에 없으면 §3.5.1 을 빠뜨린 것이고,
 검토자는 만들지 말고 `BLOCKED_CAPABILITY` 로 끝낸다.
 성공 신호: `.ok == true` 와 task id. 이후 `orca orchestration task-list --run <run-id> --brief --json` 으로 두 건이 보인다.
 
@@ -413,15 +436,26 @@ orca orchestration task-create --run <run-id> \
 직전 관통에서 실제로 두 값이 함께 도달했다 — 그 실행은 검토자가 새 해시를 골라 우연히 넘어갔다.
 **우연을 절차로 두지 않는다.**
 
-**밟을 절차 — Run 을 새로 만든다.** 이미 만든 Task 의 `--spec` 을 갱신하는 명령은 없다(2026-08-30 실측).
+**그 위험은 `--spec` 에 해시가 들어간 경우에만 있다.** §3.4 의 규칙대로 `--spec` 에 경로와 절차만 넣었으면 갱신되지 않는
+문자열 안에 낡을 값이 없다 — 검토자가 받는 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 새 계약에서 그 자리에서 계산한 것 하나뿐이다.
+그때는 **Run 과 Task 를 유지한다.** 새 승인 커밋을 `<base-sha>` 로 삼아 봉투(§3.3 · §3.5.1 — 같은 `<run-id>` 로 다시 만든다)와
+절차 파일 `P`(§3.7)만 다시 만들고, §3.5.1 부터 평소대로 밟는다. 2026-09-02 시나리오 8 5회차가 그 형태였다 —
+Run 유지 · 봉투 재생성 · close PASS. 같은 `<run-id>` 로 계약을 다시 만들면 회차 기록의 `base_sha` 가 새 값으로 옮겨지고 이전 값은
+`base_sha_history` 에 남는다(Q-42) — 회차가 늘지 않는다. 옛 계약으로 이미 남은 증거·결과 봉투는 §3.8 의 재계산 대조가 그대로 거부하므로,
+재승인 뒤의 판정은 새 봉투로만 선다. 재승인이 정상 경로인 이유는 D-80 이다 — 「변경 범위」를 승인 시점에 다 알 수 없는 작업에서는
+구현해 봐야 따라와야 하는 검사·fixture·호출부가 드러나고, 그 비용을 낮추는 자리가 이 절이다.
+
+**`--spec` 에 낡은 해시가 들어간 경우에만 — Run 을 새로 만든다.** 이미 만든 Task 의 `--spec` 을 갱신하는 명령은 없다(2026-08-30 실측).
 `orca orchestration task-update --help` 가 받는 것은 `--id`·`--status`·`--result`·`--run`·`--from`·`--retry-request`
 뿐이고 `--spec` 이 없다. `orca orchestration --help` 의 명령 목록에도 Task 의 spec 을 고치는 명령이 없다.
-그래서 재승인이 일어나면 그 Run 은 **끝났거나 중단된 것으로 보고**, 새 승인 커밋을 `<base-sha>` 로 삼아
+그래서 그 경우 재승인이 일어나면 그 Run 은 **끝났거나 중단된 것으로 보고**, 새 승인 커밋을 `<base-sha>` 로 삼아
 §3.2(Run 생성)부터 다시 시작한다. 새 `<run-id>` 로 계약을 새로 만들고(§3.3·§3.5.1) Task 도 새로 만든다.
 
 이것은 코어 규칙 §10(동결)과 같은 결론이다 — 관통 도중 기준이 바뀌면 그 관통이 낸 판정은 무엇이 만든 것인지
 말할 수 없으므로, 바꾸려면 관통을 끝내거나 중단하고 **새 base 로 다시 시작한다.** 옛 Run 의 Task 는
 `task-update --id <task> --run <run> --status failed` 로 닫아 두어 DAG 에 열린 채 남지 않게 한다.
+해시 없는 `--spec` 으로 Run 을 유지하는 경로가 이 결론과 어긋나지 않는 이유는, 그 경로에서도 판정은 새 base 의 봉투로만 서기 때문이다 —
+바뀐 것은 Run 이라는 이름 공간을 다시 만드는지 여부이지 판정의 기준이 아니다.
 
 ### 3.4.2 승인은 그대로인 채 재작업만 다시 위임한다면 — 그래도 Run 을 새로 만든다
 
@@ -460,10 +494,12 @@ bin/romeo envelope build --unit <작업 단위 id> --role reviewer    --base-sha
 
 그 다음은 §3.4(Task 생성)부터 평소대로다.
 
-**2번이 §3.1 확인 4 를 되살린다.** `run-unit record` 는 `docs/work/<id>/attempts.yaml` 에 쓸 뿐 커밋하지 않는다.
-연속 2회 실패로 브레이크가 걸려 `--after-review` 로 풀었다면 그 결론도 같은 파일에만 있다.
-**그 파일을 커밋하지 않고 재위임하면 자식 워크트리 안의 워커가 브레이크를 못 푼다** — §3.1 확인 4 의 `diff` 를
-기동 전에 한 번 더 돌린다. 승인이 안 바뀌었어도 이 확인만은 회차마다 다시 본다.
+**2번이 §3.1 확인 4 를 되살린다.** `run-unit record` 는 `docs/work/<id>/attempts.yaml` 에 **판정**을 쓸 뿐 커밋하지 않는다.
+연속 2회 실패로 브레이크가 걸려 `--after-review` 로 풀었다면 그 **재검토 결론**도 같은 파일에만 있다.
+**판정·재검토를 커밋하지 않고 재위임하면 자식 워크트리 안의 워커가 브레이크를 못 푼다** — §3.1 확인 4 의
+`bin/romeo run-unit check --unit <id> --base-sha <base-sha>` 를 기동 전에 한 번 더 돌린다. 그 명령은 판정·재검토만 대조하고
+`started` 는 보지 않으므로, 4번이 막 남긴 새 회차 때문에 실패하지 않는다 — 실패하면 커밋 밖에 있는 것은 정말 판정이나 재검토다.
+승인이 안 바뀌었어도 이 확인만은 회차마다 다시 본다.
 
 **앞 회차의 산출물을 시작점으로 쓸지 정한다.** 새 워크트리를 만들면 앞 회차의 **미커밋** 산출물은 그 트리에 없다.
 이어 쓸 것이면 앞 회차의 워크트리를 그대로 쓰거나, 남길 것을 `<base-sha>` 커밋에 담고 그 커밋을 새 `<base-sha>` 로 삼는다

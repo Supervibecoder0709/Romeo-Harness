@@ -85,7 +85,8 @@ jobs:
       - name: unittest
         run: python3 -m unittest discover -s tests -v
 
-      - name: 정책표 fixture 리포트 (일치율·gate 누락)
+      # 명령은 그대로다 — 종료 코드가 판정이 됐다(Q-37): 불일치나 gate 누락 의심이 1건이면 exit 1. `|| true` 를 붙이지 않는다.
+      - name: 정책표 fixture 대조 — 불일치 1건이면 실패(Q-37)
         run: bin/romeo route --fixtures fixtures/requests --report
 
       - name: fixture 스키마 검사

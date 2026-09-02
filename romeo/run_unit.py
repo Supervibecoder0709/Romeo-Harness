@@ -16,12 +16,14 @@ import shlex
 import subprocess
 from pathlib import Path
 
+import yaml
+
 from . import HARNESS_ROOT
 from .close import harness_own_checks, required_checks
 from .docs import find_unit_dir
-from .envelope import check_result_envelope, write_envelope
+from .envelope import _committed_bytes, _rev_parse, check_result_envelope, write_envelope
 from .frontmatter import read as read_frontmatter
-from .util import dump_yaml, load_yaml, now_iso
+from .util import dump_yaml, load_yaml, now_iso, rel
 
 ATTEMPTS_SCHEMA = "romeo/attempts@0.1.0"
 ATTEMPTS_FILE = "attempts.yaml"
@@ -154,29 +156,120 @@ def settle_attempt(data, run, result, failure_class=None, note=None):
 
 # --------------------------------------------------------------------------- 위임 명령
 
-def delegation_commands(unit_id, run, base_sha, workspace):
+def delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewer_sha256):
     """RUNBOOK §3.2~§3.7 의 명령 문자열. 여기서 실행하지 않는다 — dry-run 은 인쇄까지다.
 
-    문자열을 만드는 자리를 한 곳에 두는 것이 목적이다. 손으로 조립하면 회차마다 달라진다."""
+    문자열을 만드는 자리를 한 곳에 두는 것이 목적이다. 손으로 조립하면 회차마다 달라진다.
+    요구하는 자리(RUNBOOK)와 만드는 자리(여기)가 어긋났던 곳을 맞췄다(Q-40·Q-41 · AGENTS.core §11):
+
+    - `--run` 은 §3.2 에서 **이미 만든** Orca Run id 다. 첫 명령은 그 Run 이 있는지 보는 `run-show --id` 이고 `run-create` 는 없다 —
+      종전 인쇄는 새 Run 을 만들고 그 뒤 명령의 `--run` 자리에 romeo run 이름을 박아, 그대로 실행하면 없는 Run 을 가리켰다.
+    - 구현자 `task-create --spec` 은 손으로 조립하지 않는다. 정본 절차 파일(`adapters/orca/prompts/implementer-brief.md`)의
+      자리표시자 `<id>`·`<run-id>`·`<base-sha>` 를 채워 `.harness/runs/<id>/<run>/implementer-spec.md` 에 두고 `$(cat …)` 로 읽는다.
+      §3.4 가 요구한 항목 5개(결과 계약 형식 · 체크박스는 구현자가 채운다 · 계약이 없으면 스스로 만든다 · `--task-id`·`--dispatch-id` ·
+      dispatch-id 는 기동 뒤 전달)는 그 정본에 있다 — 여기 다시 적으면 두 벌이 된다.
+    - 검토자 `task-create --spec` 은 경로와 절차만이다. **해시를 넣지 않는다** — `--spec` 에 복사된 해시는 재승인 뒤 갱신되지 않아
+      검토자에게 낡은 값이 도달했다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 그 자리에서 계산해 절차 파일에 적는다 —
+      그 명령을 `reviewer-brief` 로 함께 인쇄하고, 1단계가 만든 검토자 계약의 sha256 을 그대로 싣는다.
+      `<W>` 는 §3.5 가 만드는 구현자 워크트리의 절대 경로다 — 이 시점에는 없으므로 자리표시자로 남는다."""
+    harness_root = Path(harness_root or HARNESS_ROOT)
     udir = f"docs/work/{unit_id}"
     task = f"{udir}/task/{run}"
+    runs_dir = f".harness/runs/{unit_id}/{run}"
+    impl_spec = f"{runs_dir}/implementer-spec.md"
+    brief = shlex.quote(str(harness_root / "adapters/orca/prompts/implementer-brief.md"))
+    fill_brief = shlex.quote(str(harness_root / "adapters/orca/prompts/fill_brief.py"))
     return [
-        ("run-create", f"orca orchestration run-create --objective {shlex.quote(unit_id + ' 관통')} --json"),
+        ("run-show", f"orca orchestration run-show --id {run} --json"
+                     f"  # --run 은 §3.2 에서 이미 만든 Run id 다 — 없으면 여기서 exit≠0 으로 멈춘다"),
+        ("implementer-spec",
+         f"mkdir -p {runs_dir} && awk 'f;/^---$/{{f=1}}' {brief} "
+         f"| sed \"s/<id>/{unit_id}/g; s/<run-id>/{run}/g; s/<base-sha>/{base_sha}/g\" > {impl_spec}"),
         ("task-create:implementer",
          f"orca orchestration task-create --run {run} --task-title {shlex.quote(unit_id + ' implementer')} "
-         f"--spec {shlex.quote(f'계약 {task}-implementer.json · 결과 {udir}/result/{run}-implementer.json · 증거 {udir}/evidence/{run}.yaml · 절차 core/workflows/implement/SKILL.md')} --json"),
+         f"--spec \"$(cat {impl_spec})\" --json"),
         ("task-create:reviewer",
          f"orca orchestration task-create --run {run} --task-title {shlex.quote(unit_id + ' reviewer')} "
          f"--deps '[\"<implementer-task-id>\"]' "
-         f"--spec {shlex.quote(f'계약 {task}-reviewer.json · 판정 {udir}/review/{run}-reviewer.json · 절차 core/workflows/review/SKILL.md · 읽기 전용')} --json"),
+         f"--spec {shlex.quote(f'계약 {task}-reviewer.json · 판정 {udir}/review/{run}-reviewer.json · 절차 core/workflows/review/SKILL.md · 절차 파일은 §3.7 이 채워 argv 로 넘긴다 — 해시는 거기서 계산한다 · 읽기 전용')} --json"),
         ("worktree", f"orca worktree create --base-branch <승인 커밋이 tip 인 브랜치>  # workspace={workspace} · base_sha={base_sha[:12]}"),
         ("worker-start", f"orca orchestration worker-start --run {run} --task <implementer-task-id> --json"),
         ("identifiers",
          f"orca orchestration send --to dispatch:<dispatch-id> --type status --subject '위임 식별자' "
          f"--body '<task-id> · <dispatch-id> — 받기 전에는 evidence 기록을 시작하지 않는다'"),
+        ("reviewer-brief",
+         f"python3 {fill_brief} --unit {unit_id} --run {run} --base-sha {base_sha} --task-sha256 {reviewer_sha256} "
+         f"--runtime codex --mode base --out <W>/{runs_dir}/reviewer-brief.md"),
         ("reviewer-spawn", "codex exec -s read-only -C <구현자 워크트리 절대경로> "
                            "--output-schema core/schemas/result-envelope.json -o <워크트리 밖 출력 파일>"),
     ]
+
+
+# --------------------------------------------------------------------------- 확인 4 — 판정·재검토 대조
+
+def _attempts_at(project_root, unit_id, ref):
+    """`<ref>` 커밋의 attempts.yaml. 파일이 없으면 빈 기록이고, 커밋 자체가 없으면 ValueError 다 —
+    없는 커밋을 빈 기록으로 접으면 오타 난 SHA 가 「일치」 로 읽힌다."""
+    sha = _rev_parse(project_root, ref)
+    raw = _committed_bytes(project_root, sha, rel(attempts_path(project_root, unit_id), project_root))
+    data = (yaml.safe_load(raw.decode("utf-8")) or {}) if raw is not None else {}
+    return {"attempts": data.get("attempts") or [], "reviews": data.get("reviews") or []}, sha
+
+
+def _verdicts(data):
+    """판정 난 시도(pass·fail)의 식별자 — (n · run · result). `started` 는 없다."""
+    return {(str(a.get("n")), str(a.get("run")), str(a.get("result")))
+            for a in (data.get("attempts") or []) if (a or {}).get("result") in ("pass", "fail")}
+
+
+def _reviews(data):
+    """재검토의 식별자 — (after_attempt · conclusion · by)."""
+    return {(str(r.get("after_attempt")), str(r.get("conclusion")), str(r.get("by")))
+            for r in (data.get("reviews") or []) if r}
+
+
+def compare_attempts(project_root, unit_id, base_sha):
+    """RUNBOOK §3.1 확인 4 — 커밋과 작업 트리의 `attempts.yaml` 을 **판정(pass·fail)과 재검토(reviews)로만** 대조한다(Q-39).
+
+    회차 기록이 계약 생성으로 옮겨진 뒤(Q-27) 이 파일은 언제나 승인 커밋 **뒤에** 생기므로, 파일 전체를 `diff` 하던 옛 확인은
+    첫 관통에서 항상 실패했고 지시된 해법(승인 커밋에 담고 base-sha 를 다시 잡는다)은 순환이었다 — 새 base 로 계약을 다시 만들면
+    회차가 또 추가돼 다시 어긋났다. 워커가 보지 못하면 실제로 판정이 바뀌는 것은 **판정과 재검토**뿐이다 — 중단 게이트(`gate`)는
+    그 둘만 읽는다. 그래서 `started` 는 대조하지 않는다.
+
+    아무것도 쓰지 않는다. → {"unit_id", "base_sha", "diffs": [차이 줄…], "verdicts": 작업 트리의 판정 수, "reviews": 재검토 수}"""
+    project_root = Path(project_root).resolve()
+    committed, sha = _attempts_at(project_root, unit_id, base_sha)
+    working = load_attempts(project_root, unit_id)
+    cv, wv = _verdicts(committed), _verdicts(working)
+    cr, wr = _reviews(committed), _reviews(working)
+    diffs = []
+    for n, run, result in sorted(wv - cv):
+        diffs.append(f"판정이 작업 트리에만 있다(커밋 밖): 회차 {n} · run {run} · {result}")
+    for n, run, result in sorted(cv - wv):
+        diffs.append(f"판정이 커밋에만 있다(작업 트리에서 바뀌었거나 지워졌다): 회차 {n} · run {run} · {result}")
+    for after, conclusion, by in sorted(wr - cr):
+        diffs.append(f"재검토가 작업 트리에만 있다(커밋 밖): {after}회차까지 · {by} · 「{conclusion}」")
+    for after, conclusion, by in sorted(cr - wr):
+        diffs.append(f"재검토가 커밋에만 있다(작업 트리에서 바뀌었거나 지워졌다): {after}회차까지 · {by} · 「{conclusion}」")
+    return {"unit_id": unit_id, "base_sha": sha, "diffs": diffs, "verdicts": len(wv), "reviews": len(wr),
+            "attempts_path": str(attempts_path(project_root, unit_id))}
+
+
+def attempts_drift(project_root, unit_id, base_sha):
+    """`compare_attempts(...)["diffs"]` — 비어 있으면 일치다."""
+    return compare_attempts(project_root, unit_id, base_sha)["diffs"]
+
+
+def format_check(res):
+    head = f"romeo run-unit check {res['unit_id']} · base {res['base_sha'][:12]}"
+    if not res["diffs"]:
+        return head + f" → 일치 (판정 {res['verdicts']}건 · 재검토 {res['reviews']}건 · started 는 대조하지 않는다)"
+    lines = [head + f" → 차이 {len(res['diffs'])}건 — 자식 워크트리의 워커는 커밋된 것만 본다(D-a)"]
+    lines += [f"  {d}" for d in res["diffs"]]
+    lines.append("  고치는 방법: 판정·재검토가 커밋 밖이면 그것을 커밋한다 — started 는 커밋하지 않아도 된다. "
+                 "커밋 뒤 <base-sha> 를 그 커밋으로 다시 잡는다(RUNBOOK §3.1 확인 4)")
+    lines.append(f"  기록: {res['attempts_path']}")
+    return "\n".join(lines)
 
 
 # --------------------------------------------------------------------------- 5단계
@@ -222,13 +315,13 @@ def _stage_contract(project_root, unit_id, run, base_sha, harness_root, record=T
 PLACEHOLDER_RE = re.compile(r"<[^<>]+>")
 
 
-def _stage_delegate(unit_id, run, base_sha, workspace, spawn, cwd=None):
+def _stage_delegate(unit_id, run, base_sha, workspace, spawn, harness_root, reviewer_sha256, cwd=None):
     """② 위임 명령 출력. 기본은 인쇄까지다 — 기동은 비용이 드는 실행이라 `--spawn` 을 명시해야 한다(K-66).
 
     `--spawn` 은 **자리표시자가 없는 명령까지만** 실행하고, 첫 자리표시자에서 멈춰 무엇이 필요한지 말한다.
     이어붙이려면 각 명령의 반환 JSON 에서 어느 필드가 그 값인지 알아야 하는데 그 필드 이름은 아직 실측되지 않았다
     (RUNBOOK §11). 모르는 것을 아는 것처럼 파싱하지 않는다(K-54) — 값이 정해지면 여기서 이어진다."""
-    cmds = delegation_commands(unit_id, run, base_sha, workspace)
+    cmds = delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewer_sha256)
     if not spawn:
         return _stage("delegate", "dry-run", f"{len(cmds)}개 명령을 인쇄했다 — 실행하지 않았다(--spawn 없음)",
                       commands=cmds)
@@ -371,8 +464,11 @@ def run_unit(unit_id, project_root=".", harness_root=None, run=None, base_sha=No
     # 회차는 계약 생성이 이미 남겼다(K-63) — 여기서 다시 쓰면 그 기록을 낡은 사본으로 덮는다.
     data = load_attempts(project_root, unit_id)
 
+    # 검토자 계약의 sha256 — §3.7 의 fill_brief 명령이 이 값을 --task-sha256 으로 싣는다. 손으로 적지 않는다.
+    reviewer_sha256 = next(b["sha256"] for b in contract["built"] if b["role"] == "reviewer")
     stages.append(contract)
-    stages.append(_stage_delegate(unit_id, run, resolved_base, workspace, spawn, cwd=project_root))
+    stages.append(_stage_delegate(unit_id, run, resolved_base, workspace, spawn, harness_root, reviewer_sha256,
+                                  cwd=project_root))
     stages.append(_stage_collect(project_root, unit_id, run, harness_root))
     stages.append(_stage_evidence(project_root, unit_id, run))
     stages.append(_stage_observe(project_root, unit_id, run, harness_root))
