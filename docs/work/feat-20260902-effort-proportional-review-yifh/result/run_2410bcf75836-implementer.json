@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-effort-proportional-review-yifh",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-effort-proportional-review-yifh/task/run_2410bcf75836-implementer.json",
+    "sha256": "f9fe737d5831e2fa55e10e0f51a74222f56dae39d5364f5915b9eee30355a7c6"
+  },
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260902-effort-proportional-review-yifh/evidence/run_2410bcf75836.yaml",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_policy.TestBlastSmallDropsReviewer",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_roles_envelopes.TestOutOfScopeFindingRule",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo route --fixtures fixtures/requests --report",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    }
+  ],
+  "notes": "required_checks 6건 전부 exit 0 — 근거는 run_2410bcf75836 의 check-1~check-6 기록이다(evidence checks 1회 실행). TDD 순서로 판별 검사를 먼저 썼고, 구현 전 기존 상태에서 check-1 은 1건(test_small_no_gate_drops_reviewer), check-2 는 3건 전부 실패했다 — 나머지는 기존 상태에서도 통과하는 회귀 고정용이다. 1차 승인본은 오버레이 조건에서 uncertainty 를 보지 않았고, 그 상태에서 check-4(fixture 대조)가 exit 1 로 실패하며 실제 세션 로그에서 온 fx-coupang-rocket-badge-automation-plan(브라우저 자동화·외부 연동·불확실성 medium)이 검토자를 잃는 것을 드러냈다. 검증 계획을 바꾸지 않고 승인을 다시 받아(--reapprove, 9dda8e9) 조건에 uncertainty: [low] 를 더했고 그 반례를 test_uncertain_method_keeps_reviewer 로 고정했다. 앞선 run_fdefd389b51c 은 구현 변경이 재승인 커밋에 딸려 들어가 changed_files 가 비었고, 그 run 의 검토자가 그것을 finding 으로 냈다 — 구현을 미커밋 상태로 되돌려(git reset --mixed) 이 run 에서 다시 기록했다. AGENTS.core §12(요청한 문제만 푼다)를 이 단위 자신에게도 적용해 격리(isolation)는 건드리지 않았다. changed_files 의 .claude/agents/implementer.md 는 bin/romeo compile 이 core/roles/implementer.yaml 에서 파생한 산출물이다."
+}

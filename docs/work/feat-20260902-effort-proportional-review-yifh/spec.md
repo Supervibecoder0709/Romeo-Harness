@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-09-02T16:32:53+09:00'
 approved_by: justjulliette0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-02T16:51:53+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_2410bcf75836.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -43,10 +43,10 @@ approval_history:
 - **왜 지금:** 작업 단위 17건 실측에서 15건이 T1 이었고 전부 검토자 왕복을 받았다. 그 15건은 모두 영역이 `tooling`·`docs` 인 하네스 자기 정비다. 사람이 매번 확정하는 `blast_radius` 가 깊이(profile)만 올리고 검토자·격리에는 아무 영향을 못 주기 때문에, 영향 반경이 작다고 확정한 작업도 큰 작업과 같은 코스를 돈다.
 - **기대 결과:** 다음 단위부터, 영향 반경이 작고 게이트가 없는 T1 정비 작업은 검토자 왕복 없이 증거로만 닫힌다. 게이트가 하나라도 켜지면 검토자는 그대로 붙는다. 정비 단위가 요청 범위 밖으로 번지는 것은 조항이 막고, 판별력이 없는 검사를 두 상태에서 돌리던 관행은 사라진다.
 - **수용 기준:**
-  - [ ] AC-1 `unit=T1 · blast_radius=small · uncertainty=low · gates 없음 · mode=delivery · intent=write` 인 분류에서 라우터가 `reviewer: none` 을 낸다.
-  - [ ] AC-2 같은 분류에 hard gate 가 하나라도 켜지면 `reviewer` 가 `opposite-runtime-readonly` 로 유지된다 — 새 오버레이가 게이트가 켠 검토자를 덮어쓰지 않는다.
-  - [ ] AC-3 `blast_radius` 가 medium·large 이거나 `uncertainty` 가 low 가 아니거나 `unit` 이 T2 이면 검토자가 유지된다.
-  - [ ] AC-4 구현자 계약의 「요청 범위 밖 수정」 금지 항목과 §11 의 회귀 검사 문장이 두 런타임 지침 파일에 똑같이 실린다.
+  - [x] AC-1 `unit=T1 · blast_radius=small · uncertainty=low · gates 없음 · mode=delivery · intent=write` 인 분류에서 라우터가 `reviewer: none` 을 낸다.
+  - [x] AC-2 같은 분류에 hard gate 가 하나라도 켜지면 `reviewer` 가 `opposite-runtime-readonly` 로 유지된다 — 새 오버레이가 게이트가 켠 검토자를 덮어쓰지 않는다.
+  - [x] AC-3 `blast_radius` 가 medium·large 이거나 `uncertainty` 가 low 가 아니거나 `unit` 이 T2 이면 검토자가 유지된다.
+  - [x] AC-4 구현자 계약의 「요청 범위 밖 수정」 금지 항목과 §11 의 회귀 검사 문장이 두 런타임 지침 파일에 똑같이 실린다.
 - **위험과 되돌리기:** 이 변경은 안전 장치를 **낮추는** 방향이다 — 검토자가 잡던 결함을 앞으로 증거만으로 걸러야 한다. 완화는 조건을 좁게 잡은 것이다(게이트 없음 + 영향 반경 작음 + delivery + write 를 모두 만족할 때만). 되돌리기: `core/policy/packages.yaml` 에서 `blast.small.no-reviewer` 오버레이 행을 지우고 `bin/romeo compile` 을 다시 돌린다. 이미 닫힌 단위에는 영향이 없다.
 - **결정 필요:** 없음
 
@@ -117,6 +117,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-02T16:51:53+09:00 · HEAD 9dda8e9c7d88 · 검사 기록 run_2410bcf75836
 
-- (없음)
+- [evidence/run_2410bcf75836.yaml](evidence/run_2410bcf75836.yaml) — exit codes [0, 0, 0, 0, 0, 0] (검사 기록)

@@ -544,3 +544,46 @@ class TestSpecHashDifferenceIsNotAFailReason(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestOutOfScopeFindingRule(unittest.TestCase):
+    """범위 밖 발견 조항과 회귀 검사 조항이 **두 런타임 지침에 똑같이** 실린다.
+
+    이 두 조항의 집행은 다음과 같다(AGENTS.core §11 — 아무도 읽지 않아도 되는 것은 그렇다고 적는다).
+     · 범위 밖 수정 금지 — 기계 집행은 이미 있다: 작업 계약의 `allowed_paths`(romeo/envelope.py 의
+       change_scope_paths)가 「변경 범위」에 없는 파일의 쓰기를 막는다. 조항이 덮는 것은 그 상한이
+       막지 못하는 부분(허용된 파일 **안에서** 요청과 무관한 수정)이고, 거기서는 검토자와 사람이 읽는다.
+     · 회귀 방지 검사 제외 — 요구를 **줄이는** 조항이라 새 집행이 없다.
+    그래서 이 검사가 보는 것은 단 하나, **요구가 사는 자리(core)와 두 런타임이 읽는 자리(지침 파일)가
+    같은 문장을 담는가**다. 한쪽 런타임만 이 규칙을 보는 상태는 동등성의 증거가 아니다(C-C6).
+    """
+
+    GUIDES = ("CLAUDE.md", "AGENTS.md")
+
+    def test_implementer_forbids_out_of_scope_fixes(self):
+        forbidden = load_yaml(ROLE_FILES["implementer"])["forbidden"]
+        hits = [f for f in forbidden if "요청 범위 밖" in f]
+        self.assertEqual(len(hits), 1, f"구현자 계약에 요청 범위 밖 수정 금지가 정확히 1건이어야 한다: {forbidden}")
+        self.assertIn("open-questions", hits[0], "고치지 않는 대신 어디에 적는지가 같은 항목에 있어야 한다")
+        for guide in self.GUIDES:
+            with self.subTest(guide=guide):
+                self.assertIn(hits[0], (REPO / guide).read_text(encoding="utf-8"),
+                              f"{guide} 에 구현자 금지 항목이 실리지 않았다 — 한쪽 런타임만 보는 규칙이 된다")
+
+    def test_regression_checks_excluded_from_both_sided_probe(self):
+        core = (REPO / "core/principles/AGENTS.core.md").read_text(encoding="utf-8")
+        sentence = "회귀 방지 검사(양쪽에서 통과가 예상되는 검사)는 이 양쪽 실측의 대상이 아니다"
+        self.assertIn(sentence, core)
+        section = core.split("## 11.")[1].split("\n## ")[0]
+        self.assertIn(sentence, section, "이 문장은 §11 안에 있어야 한다 — 요구가 사는 절과 같은 자리다")
+        for guide in self.GUIDES:
+            with self.subTest(guide=guide):
+                self.assertIn(sentence, (REPO / guide).read_text(encoding="utf-8"))
+
+    def test_out_of_scope_section_reaches_both_guides(self):
+        core = (REPO / "core/principles/AGENTS.core.md").read_text(encoding="utf-8")
+        heading = "## 12. 요청한 문제만 푼다"
+        self.assertIn(heading, core)
+        for guide in self.GUIDES:
+            with self.subTest(guide=guide):
+                self.assertIn(heading, (REPO / guide).read_text(encoding="utf-8"))

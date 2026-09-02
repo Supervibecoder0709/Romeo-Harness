@@ -10,7 +10,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash
 
 역할 계약의 원본은 `core/roles/implementer.yaml` 이다. 이 파일은 그 계약을 Claude Code 에서 어떻게 맡는지만 적는다.
 
-<!-- romeo:managed start v0.1.0 source=core/roles/implementer.yaml sha=092d92fc -->
+<!-- romeo:managed start v0.1.0 source=core/roles/implementer.yaml sha=5e0c8575 -->
 - 능력: `read` · `search` · `run-command` · `workspace-write`
 - 쓰기 범위: `workspace` — 반드시 포함: `docs/work/{unit_id}/`
 - 계약: `core/schemas/task-envelope.json` → `core/schemas/result-envelope.json`
@@ -18,6 +18,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash
 - 금지: 승인 없이 되돌리기 어려운 작업 (비용 발생·권한 확대·공개 전환·삭제·소유권 이전·운영 데이터 변경·저장소 밖으로의 반영)
 - 금지: 기획을 다시 만드는 것 (누락·모순은 질문한다, K-61)
 - 금지: 자기 역할의 산출물을 스스로 검토했다고 선언하는 것 (C-D3)
+- 금지: 요청 범위 밖에서 발견한 결함을 그 김에 고치는 것 (고치지 말고 docs/planning/open-questions.md 에 열어 둔다, §12)
 
 - 바인딩: 기본 실행 · 쓰기 허용
 - 강제 수단: `.claude/settings.json 의 permissions.ask·deny (승인 게이트)`

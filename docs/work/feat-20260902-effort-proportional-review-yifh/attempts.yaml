@@ -1,0 +1,28 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260902-effort-proportional-review-yifh
+attempts:
+- n: 1
+  run: run_4a4f677c5565
+  base_sha: 28af9fabcf83fcdef0aa77fc8051314550e7aa11
+  started_at: '2026-09-02T16:11:29+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+- n: 2
+  run: run_fdefd389b51c
+  base_sha: ba290d7a0760744aa248c18eb8660c4a1bc2c0fd
+  started_at: '2026-09-02T16:33:02+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+- n: 3
+  run: run_2410bcf75836
+  base_sha: 9dda8e9c7d88603ae06270fa4b66fd249a7a4ffe
+  started_at: '2026-09-02T16:43:14+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []

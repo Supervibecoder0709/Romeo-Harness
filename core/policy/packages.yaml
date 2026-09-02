@@ -219,6 +219,20 @@ overlays:
     when: {unit: [T0], facets_only: [docs, copy]}
     add_warnings: [DOCS_ONLY_CHANGE]
     note: 코드 검증 대신 문서 검증(스키마·링크·길이)이 required_checks가 된다.
+  - id: blast.small.no-reviewer
+    tier: optional_overlay
+    when: {unit: [T1], blast_radius: [small], uncertainty: [low], gates: none, mode: [delivery], intent: [write]}
+    set_reviewer: none
+    # 검증은 많이 하는 것이 아니라 **실패 비용에 비례**해야 한다. 그 비례를 만드는 입력값(blast_radius)은
+    # 카드에서 사람이 이미 확정하는데, 지금까지 profile 을 올리는 데만 쓰이고 검토자를 정하는 자리에서는
+    # 읽히지 않았다 — 그래서 영향 반경이 작다고 확정한 정비 작업도 큰 작업과 같은 코스를 돌았다(17건 실측: T1 15건 전부).
+    # **`gates: none` 을 지우지 않는다.** optional_overlay 는 hard_gate 보다 뒤에 평가되므로, 이 조건이 없으면
+    # gate.any 가 켠 검토자를 이 행이 덮어써서 꺼 버린다 — 요구를 적고 집행을 잃는 그 결함의 모양이다(AGENTS.core §11).
+    # tests/test_policy.py 의 TestBlastSmallDropsReviewer.test_gate_keeps_reviewer 가 그 구현에서 실패한다.
+    # **`uncertainty: [low]` 도 지우지 않는다.** 방법이 일부 미정인 요청(medium)은 검토자가 볼 것이 남아 있다 —
+    # 이 조건 없이 처음 넣었을 때 실제 세션 로그에서 온 fx-coupang-rocket-badge-automation-plan
+    # (브라우저 자동화·외부 연동·불확실성 medium)이 검토자를 잃었고, fixture 대조가 그것을 잡았다(2026-09-02).
+    note: 영향 반경이 작고 게이트가 없는 delivery·write 는 검토자 왕복 없이 증거로만 닫는다. 격리(worktree)는 내리지 않는다.
 
 # ── 부품 레지스트리 (라우터가 켜는 대상; 실제 부착 상태는 .harness/romeo.project.yaml이 덮어쓴다) ──
 parts:

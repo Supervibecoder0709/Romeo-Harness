@@ -346,3 +346,66 @@ class TestFixtureReportExit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBlastSmallDropsReviewer(unittest.TestCase):
+    """영향 반경이 작고 게이트가 없는 T1 은 검토자 없이 돈다 — 그리고 그 조건을 하나라도 벗어나면 돌지 않는다.
+
+    이 클래스의 반례는 빈 값이 아니라 **그럴듯한 거짓 값**이다(AGENTS.core §11). 오버레이의
+    `when` 에서 `gates: none` 을 빠뜨린 구현은 형태가 그럴듯하지만, optional_overlay 가
+    hard_gate 보다 뒤에 평가되므로 gate.any 가 켠 검토자를 덮어써서 꺼 버린다.
+    test_gate_keeps_reviewer 가 정확히 그 구현에서 실패한다.
+    """
+
+    def _reviewer(self, **kw):
+        base = {"unit": "T1", "mode": "delivery", "intent": "write", "facets": ["tooling", "docs"],
+                "gates": [], "blast_radius": "small", "uncertainty": "low"}
+        base.update(kw)
+        return route(base)
+
+    def test_small_no_gate_drops_reviewer(self):
+        out = self._reviewer()
+        self.assertEqual(out["reviewer"], "none")
+        self.assertIn("overlay:blast.small.no-reviewer", out["fired_rules"])
+        # 격리는 내리지 않는다 — 이 단위가 바꾸지 않기로 한 것이다.
+        self.assertEqual(out["isolation"], "worktree")
+
+    def test_gate_keeps_reviewer(self):
+        out = self._reviewer(facets=["tooling", "security"], gates=["privacy-security"])
+        self.assertEqual(out["reviewer"], "opposite-runtime-readonly")
+        self.assertNotIn("overlay:blast.small.no-reviewer", out["fired_rules"])
+
+    def test_medium_and_large_keep_reviewer(self):
+        for radius in ("medium", "large"):
+            with self.subTest(radius=radius):
+                self.assertEqual(self._reviewer(blast_radius=radius)["reviewer"],
+                                 "opposite-runtime-readonly")
+
+    def test_t2_keeps_reviewer(self):
+        self.assertEqual(self._reviewer(unit="T2")["reviewer"], "opposite-runtime-readonly")
+
+    def test_discovery_and_experiment_keep_reviewer(self):
+        for mode in ("discovery", "experiment"):
+            with self.subTest(mode=mode):
+                self.assertEqual(self._reviewer(mode=mode)["reviewer"], "opposite-runtime-readonly")
+
+    def test_read_intent_keeps_reviewer(self):
+        self.assertEqual(self._reviewer(intent="mixed")["reviewer"], "opposite-runtime-readonly")
+
+    def test_uncertain_method_keeps_reviewer(self):
+        """방법이 일부 미정이면 검토자가 볼 것이 남아 있다.
+
+        이 조건 없이 오버레이를 넣었을 때, 실제 세션 로그에서 온 fixture
+        fx-coupang-rocket-badge-automation-plan(브라우저 자동화·외부 연동·불확실성 medium)이
+        검토자를 잃었다. fixture 대조(bin/romeo route --fixtures)가 그것을 exit 1 로 잡았다.
+        """
+        for unc in ("medium", "high"):
+            with self.subTest(uncertainty=unc):
+                out = self._reviewer(uncertainty=unc)
+                self.assertEqual(out["reviewer"], "opposite-runtime-readonly")
+                self.assertNotIn("overlay:blast.small.no-reviewer", out["fired_rules"])
+
+    def test_browser_automation_fixture_shape_keeps_reviewer(self):
+        out = self._reviewer(facets=["browser-automation", "integration", "data"], uncertainty="medium")
+        self.assertEqual(out["reviewer"], "opposite-runtime-readonly")
+        self.assertIn("capability-check", out["sections"]["spec"])
