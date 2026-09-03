@@ -1,0 +1,14 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260903-guard-guidance-vendor-drift-bvjz
+attempts:
+- n: 1
+  run: run_6ddedfce1b19
+  base_sha: a8bb36169576958a5be33a9decb84190a963547e
+  started_at: '2026-09-03T10:09:48+09:00'
+  result: fail
+  failure_class: outputs
+  note: 검토자 FAIL(AC_UNMET) — tests/test_guard_guidance_alignment.py 의 violations() 가 '라벨이 하나도 없으면 건너뛴다'
+    예외를 두어, 정책 라벨을 전면 개명하면 옛 라벨로 적힌 안내가 규칙 대상에서 빠지고 test_renaming_a_label_moves_the_verdict_with_it 이
+    그 통과를 정상으로 못박는다. AC-3(정책 라벨을 바꾸면 그 즉시 새 라벨로 대조한다)이 서지 않는다. 안내 3곳은 모두 라벨 4개를 직접 적었으므로 그 예외 자체가 불필요하다
+  settled_at: '2026-09-03T10:43:08+09:00'
+reviews: []
