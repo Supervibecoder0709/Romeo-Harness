@@ -2,7 +2,7 @@
 id: progress
 type: planning
 status: active
-updated: 2026-09-02
+updated: 2026-09-03
 authority: derived
 ---
 
@@ -17,32 +17,27 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `HEAD` · 2026-09-02)
+## 지금 상태 (기준 `HEAD` · 2026-09-03)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
 - **마일스톤:** M2 완료(D-76). **M3 진행 중.** G-M3 §6.1 닫힘(`a9e7af1`).
-  시나리오 3(`344fc7e`)·시나리오 8(`50d3901`) 뒤 **관통 사이 정비 4회차**를 마쳤다(`3efc026`).
-- **활성 작업 단위:** 없음. 마지막 완료는 `chg-20260902-rerun-timeout-headroom-8dse`
-  (재실행 상한 300→600초 + 상한 80% 경고 `RERUN_NEAR_TIMEOUT` · **1회차 close PASS** · 5/5 · 재실행 5/5).
-  그 앞이 `feat-20260902-effort-proportional-review-yifh`(검토자 오버레이 `blast.small.no-reviewer` ·
-  AGENTS.core §12 「요청한 문제만 푼다」 · §11 회귀 검사 제외 · 1회차 close PASS · 6/6 · 재실행 6/6 ·
-  **검토자 판정은 없다 — Q-43**).
+  **시나리오 3·8·9 가 전부 섰다**(`344fc7e`·`50d3901`·`16c0751`) — 계획 §10 #13 의 런북 조건 충족.
+- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260902-scenario-9-guard-enforcement-95e6`
+  (가드 설명 4항목 요구 · 거부 경로 `evidence reject`·`BLOCKED_APPROVAL` · `gate-create` 코어에서 제거 ·
+  **3회차 close PASS** · 12/12 · 재실행 12/12 · 검토자 PASS · **§10 브레이크 1회 작동**).
 - **다음 행동:**
-  1. 시나리오 9(gate 집행) — M3 본체.
-  2. charter 를 쓰는 실제 T2 관통 — M3 본체.
-  3. 그 뒤 **페이로드 1건에 손으로 부착한다**(사용자 확정 2026-09-02: M3 잔여부터). 부착 대상이 이 저장소
-     하나뿐이라 작업 단위 20건이 전부 `tooling`·`docs` — 하네스가 하네스만 시험하고 있다. `attach`(M5)를
-     먼저 만들지 않는다: 손으로 한 번 붙인 아픈 지점이 그 명령의 스펙이다.
-  4. 다음 관통에서 이전 정비가 실제로 서는지 본다 — `run-unit` 의 `--spec "$(cat …)"`, §3.4.1 Run 유지 경로의 증거 이어쓰기.
-- **blocker:** 없음. 프로브 워크트리 `probe-q36-q42`(미커밋 프로토타입)는 정리 대상이다 — 삭제는 승인 대상(K-66).
-- **최신 CI:** `cbf22fd` run `33598011419` success (2026-09-02 · 762 tests). 그 뒤 커밋은 이 CI 줄 갱신뿐이다(docs 만 바뀌면 CI 는 돌지 않는다). 원격과 로컬이 같다 — 미푸시 커밋 없음.
-- **열린 park:** Q-12·13·15·16·17·19·23·24·26·32·33·34·35·**43** (`open-questions.md`).
-  `우회 가능 — v1 이후` 는 사람이 승격하지 않는 한 v1 중에 닫지 않는다. Q-36~Q-42 는 해소됐다.
-- **다음 정비 후보:** 느린 테스트 — `tests/test_docs_evidence_close.py` 가 104초(테스트 105개, 전체의 40%)다.
-  상한 상향으로 급한 불은 껐고(235/600 = 39%) 80% 경고가 다시 붙기 전에 알린다. 원인은 테스트마다 임시 저장소를 세우는 구조.
-
+  1. charter 를 쓰는 실제 T2 관통 — M3 본체의 마지막 조각.
+  2. hard gate 8 각 fixture ≥ 1 확인 — M3 종료 조건의 나머지 절반(계획 §10 #13).
+  3. 그 뒤 **페이로드 1건에 손으로 부착한다**(사용자 확정 2026-09-02). 작업 단위 21건이 전부
+     `tooling`·`docs` — 하네스가 하네스만 시험하고 있다. `attach`(M5)보다 손으로 한 번이 먼저다.
+- **blocker:** 없음. 프로브 워크트리 `probe-q36-q42` 는 정리 대상 — 삭제는 승인 대상(K-66).
+- **최신 CI:** `cbf22fd` run `33598011419` success (2026-09-02 · 762 tests). **그 뒤 미푸시 커밋 8건** —
+  시나리오 9 의 코드 변경에 대한 CI 는 아직 돌지 않았다(푸시는 K-66 승인 대상).
+- **열린 park:** Q-12·13·15·16·17·19·23·24·26·32·33·34·35·43·**44·45** (`open-questions.md`).
+- **다음 정비 후보 (1순위 Q-45):** 절차 문서 3곳이 가드 승인 `--note` 의 4항목 요구를 모른다 —
+  지시대로 따르면 기록이 exit 2 로 거부된다. 그 다음은 느린 테스트(`test_docs_evidence_close` 104초).
 
 ## 마일스톤
 
@@ -51,7 +46,7 @@ authority: derived
 | M0 정책표·fixture·분류 카드 | **완료** | [원문](archive/milestones.md) |
 | M1 T0 최소 관통 (Claude 단독, 현재 작업 공간) | **완료** | [원문](archive/milestones.md) |
 | M2 어댑터·역할·Orca 위임·T1 교차 관통 | **완료 (2026-08-29 · D-76)** | [원문](archive/milestones.md) |
-| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 3회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0), 3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차** `run_e909a3e53aea` close · required_checks 14/14 · 재실행 14/14 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **M3 본체로 돌아와 시나리오 3 을 세웠다** — `feat-20260901-charter-discovery-block-a3xs`(계산만 되던 `blocks` 를 승인·종료 두 지점에서 집행 · `core/templates/charter.md`(T2) · `scenarios/` 런북 · **관통 1회차** `run_d947edf2d24a` close PASS · required_checks 17/17 · 재실행 17/17 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **시나리오 8 을 세웠다** — `feat-20260901-scenario-8-capability-probe-s7ny`(능력 프로브를 코어에 정의하고 흔적 경로는 어댑터가 소유 · 카드가 부재와 대안을 인쇄 · 차단 `capability-probed` 가 **거짓만 막고 부재는 막지 않는다** · `scenarios/8-capability-absent.md` · **관통 5회차** `run_d7092f3d25c5` close PASS · required_checks 10/10 · 재실행 10/10 · 검토자 PASS · **§10 브레이크 1회 작동**(3회차 goal · 4회차 outputs → 사람 재검토 뒤 5회차) · 재승인 3회 · 그 관통이 낸 결함은 Q-36~Q-42). 그 뒤 **관통 사이 정비 4회차** — `feat-20260902-scope-grammar-procedure-drift-z5mv`(시나리오 8 관통이 낸 결함 Q-36~Q-42 · 승인 산문이 쓰기 권한이 되던 구멍·CI 빈 검사·RUNBOOK/run-unit 어긋남 5건 · Q-38 은 D-80 · **관통 1회차** `run_0b4ed250c691` close PASS · required_checks 16/16 · 재실행 16/16 · 검토자 PASS findings 0 · 승인 전 프로브 양쪽 실측 + 세 렌즈 반박 검증). M3 의 나머지(charter 를 쓰는 실제 T2 관통 · gate 집행=시나리오 9)는 미착수 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686`, `docs/work/feat-20260901-task-copy-brief-count-erc6/`(status done) 통합 `045ea08`, `docs/work/feat-20260901-charter-discovery-block-a3xs/`(status done) 통합 `344fc7e`, `docs/work/feat-20260901-scenario-8-capability-probe-s7ny/`(status done) 통합 `50d3901`, `docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/`(status done) 통합 `3efc026` |
+| M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **진행 중** — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 3회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0), 3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차** `run_e909a3e53aea` close · required_checks 14/14 · 재실행 14/14 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **M3 본체로 돌아와 시나리오 3 을 세웠다** — `feat-20260901-charter-discovery-block-a3xs`(계산만 되던 `blocks` 를 승인·종료 두 지점에서 집행 · `core/templates/charter.md`(T2) · `scenarios/` 런북 · **관통 1회차** `run_d947edf2d24a` close PASS · required_checks 17/17 · 재실행 17/17 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **시나리오 8 을 세웠다** — `feat-20260901-scenario-8-capability-probe-s7ny`(능력 프로브를 코어에 정의하고 흔적 경로는 어댑터가 소유 · 카드가 부재와 대안을 인쇄 · 차단 `capability-probed` 가 **거짓만 막고 부재는 막지 않는다** · `scenarios/8-capability-absent.md` · **관통 5회차** `run_d7092f3d25c5` close PASS · required_checks 10/10 · 재실행 10/10 · 검토자 PASS · **§10 브레이크 1회 작동**(3회차 goal · 4회차 outputs → 사람 재검토 뒤 5회차) · 재승인 3회 · 그 관통이 낸 결함은 Q-36~Q-42). 그 뒤 **관통 사이 정비 4회차** — `feat-20260902-scope-grammar-procedure-drift-z5mv`(시나리오 8 관통이 낸 결함 Q-36~Q-42 · 승인 산문이 쓰기 권한이 되던 구멍·CI 빈 검사·RUNBOOK/run-unit 어긋남 5건 · Q-38 은 D-80 · **관통 1회차** `run_0b4ed250c691` close PASS · required_checks 16/16 · 재실행 16/16 · 검토자 PASS findings 0 · 승인 전 프로브 양쪽 실측 + 세 렌즈 반박 검증). 그 뒤 **시나리오 9 를 세워 M3 의 런북 조건을 닫았다** — `feat-20260902-scenario-9-guard-enforcement-95e6`(가드 설명 요구 4항목을 `execution-guards.yaml` 단일 출처에서 승인·종료 두 지점이 읽는다 · 거부 경로 `evidence reject` 와 `BLOCKED_APPROVAL` 종결 판정 · `gate-create` 를 코어에서 걷어내 어댑터가 소유(C-C6) · `scenarios/9-guard-approval.md` · **관통 3회차** `run_108f96346abc` close PASS · required_checks 12/12 · 재실행 12/12 · 검토자 PASS · **§10 브레이크 1회 작동**(1회차 `approval_log_state` 가 로그의 note·seq 를 대조하지 않아 두 지점이 같은 yaml 을 두 번 읽었다 · 2회차 AC-10 의 base 재현을 손으로 적어 봉인 누락 → 사람 재검토 「달성 가능」 뒤 3회차) · 그 관통이 낸 결함은 Q-44·Q-45). **계획 §10 #13 의 「시나리오 3·8·9 런북 PASS」 는 충족됐다** — M3 의 나머지는 charter 를 쓰는 실제 T2 관통과 hard gate 8 각 fixture ≥ 1 확인이다 | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686`, `docs/work/feat-20260901-task-copy-brief-count-erc6/`(status done) 통합 `045ea08`, `docs/work/feat-20260901-charter-discovery-block-a3xs/`(status done) 통합 `344fc7e`, `docs/work/feat-20260901-scenario-8-capability-probe-s7ny/`(status done) 통합 `50d3901`, `docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/`(status done) 통합 `3efc026`, `docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/`(status done) 통합 `16c0751` |
 | M4 ~ M7 | 미착수 | [원문](archive/milestones.md) |
 
 ## §10 체크리스트
