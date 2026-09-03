@@ -1,0 +1,50 @@
+id: fx-payment-metric-schema
+request_text: '혹시 lifetime 결제자랑 subscribe 결제자 숫자도 사인업이랑 대화 2회 이후 스키마 사이에 추가해줄 수 있어? 이때 환불이나 구독 취소는 고려 안해도
+  돼. 결제 실험이 계속 진행되기 때문에 위 두 스키마 지표 정합성이 주차별로 달라질 수 있는 점은 감안해서 볼게.'
+context:
+  project: internal-saas-analytics
+  kind: code
+  notes: 결제 지표(lifetime·subscribe 결제자 수)를 기존 퍼널 스키마 사이에 추가한다. 운영 데이터를 읽어 집계하지만 운영 데이터 자체를 바꾸지 않는다.
+classification:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - payment
+  - analytics
+  - data
+  gates:
+  - payment
+  blast_radius: small
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: current
+  blocks:
+  - spec-ready
+  - risk-plan-ready
+  sections:
+  - risk-backup-recovery
+  guards:
+  - payment-charge
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction:
+  reviewed_at: '2026-09-04'
+  reviewed_by: user
+  round: gate-coverage
+  verdict: confirmed
+  changes: []
+  note: 2026-09-04 승인 시점에 사용자가 이 요청을 payment 게이트 fixture 로 확정했다. 퍼널 스키마에 지표 두 개를 더하는 작은 변경이라 unit=T0 이고, payment 게이트가 profile 을
+    standard 로 올린다. 요청 원문은 세션 로그의 문장 그대로이고, 확인란 표의 인용은 그것을 줄인 것이다. 2026-09-04 사용자가 확인한 것은 이 분류 값과
+    notes/hand-derived-expected.md 의 항목별 expected 대조표(어긋난 항목 0건)이며, 그 확인 사실을 이 human_correction 이 기록한다.
+  followup: guards 에 payment-charge 가 실린다 — 이 요청은 돈을 쓰지 않지만 정책표의 trigger 가 facet(payment)×intent(write) 이라
+    발동한다. 게이트(요청이 건드리는 영역)와 가드(지금 하려는 행동)를 같은 facet 으로 켜는 자리라, 실행 가드가 실제 행동을 겨누는지는 별도 판정 대상이다
+source:
+  kind: session-log
+  ref: claude:Documents-Claude-Projects------------:f95922ee
+  date: '2026-07-07'

@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-04T05:53:23+09:00'
 approved_by: julliettelee
 base_sha: null
-closed_at: null
+closed_at: '2026-09-04T06:10:28+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_dd07b98f3f83.yaml, evidence/run_60db3d61480b.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -54,14 +54,14 @@ approval_history:
 
   실제 로그 우선 탐색은 68개 프로젝트의 세션 로그(597MB)를 2회 훑어 수행했다. 5개 게이트 중 실제 요청이 **1건**뿐인 이유는 사용자의 프로젝트가 아직 운영 데이터·법무·공개 API 단계에 이르지 않았기 때문이다. authored 4건은 「라우터가 실제 사용에서 맞는가」를 증명하지 않는다 — `source.kind: authored` 가 그 한계를 파일에 남긴다.
 - **수용 기준:**
-  - [ ] AC-1 `fixtures/requests/` 의 `classification.gates` 를 집계하면 `core/policy/classification.yaml` 의 `hard_gates[].id` 8개 각각에 대해 fixture 가 1건 이상이다.
-  - [ ] AC-2 추가한 5건의 `expected` 는 `notes/hand-derived-expected.md` 에 **항목별 근거**(어느 정책 규칙이 그 값을 내는가)와 함께 적혀 있고, `bin/romeo route --classification` 출력과의 항목별 대조표와 어긋난 항목 보고가 같은 파일에 있다. 그리고 **사용자가 그 표를 확인한 사실이 각 fixture 의 `human_correction` 에 기록된다**(`reviewed_by: user` · `verdict` · 확인 날짜). 그 뒤 `bin/romeo route --fixtures fixtures/requests --report` 가 38건 전부 일치로 exit 0 이다.
+  - [x] AC-1 `fixtures/requests/` 의 `classification.gates` 를 집계하면 `core/policy/classification.yaml` 의 `hard_gates[].id` 8개 각각에 대해 fixture 가 1건 이상이다.
+  - [x] AC-2 추가한 5건의 `expected` 는 `notes/hand-derived-expected.md` 에 **항목별 근거**(어느 정책 규칙이 그 값을 내는가)와 함께 적혀 있고, `bin/romeo route --classification` 출력과의 항목별 대조표와 어긋난 항목 보고가 같은 파일에 있다. 그리고 **사용자가 그 표를 확인한 사실이 각 fixture 의 `human_correction` 에 기록된다**(`reviewed_by: user` · `verdict` · 확인 날짜). 그 뒤 `bin/romeo route --fixtures fixtures/requests --report` 가 38건 전부 일치로 exit 0 이다.
 
     (**1회차 재승인 사유 · D-80 경로.** 이 AC 는 처음에 「route 실행 **전에** 손으로 적었다」는 시간 순서를 요구했고 1회차 검토자가 `AC_UNMET` 을 냈다 — 그 순서는 사전에 봉인하지 않으면 사후 관측이 불가능한데 AC 가 봉인을 지시하지 않았다. 원인이 산출물이 아니라 완료 정의였다. 자기참조를 실제로 끊는 자리는 시간 순서가 아니라 **사람의 확인**이다 — 근거 열이 있는 표는 route 출력의 단순 복사와 이미 구별되고, 남은 것은 그 값이 옳은지를 사람이 판정하는 것이다. 기존 fixture 33건의 `human_correction` 이 그 자리다. `route --fixtures … --report` 는 **회귀 방지 검사**로 남는다 — expected 를 route 출력으로 채우면 그것으로 채점해도 항상 통과한다.)
-  - [ ] AC-3 새 검사는 게이트 id 를 **정책표에서 읽는다** — 정책표의 게이트 id 하나를 개명한 가상 상태에서 커버리지 검사가 실패한다(id 를 하드코딩한 검사는 이 상태에서 통과해 버린다).
-  - [ ] AC-4 새 검사는 fixture 의 `gates` 값이 정책표 id 집합 밖이면 실패한다 — 정책표에 없는 게이트 id 를 fixture 하나에 넣은 가상 상태에서 id 유효성 검사가 실패한다. (AC-3 과 다른 상태를 본다: AC-3 은 정책표를 바꾸고 fixture 를 그대로 두며, AC-4 는 fixture 를 바꾸고 정책표를 그대로 둔다.)
-  - [ ] AC-5 새 검사는 **판별 검사**다 — fixture 5건을 뺀 가상 상태(= 이 단위 이전 상태)에서 커버리지 검사가 실패하고, 5건이 있는 상태에서 통과한다. 양쪽을 실행으로 보인다. 더해서 **게이트 id 를 하드코딩한 구현**을 개명된 정책표로 돌리면 통과해 버리는 것을 반례로 보인다 — 빈 값이 아니라 그럴듯한 거짓 구현에서 갈리는 것을 확인한다(§11).
-  - [ ] AC-6 추가한 5건 각각의 `source.kind` 가 실제 출처(`session-log`)인지 `authored` 인지 파일에 적혀 있고, `authored` 인 4건은 `source.ref` 에 그 근거가 적혀 있다.
+  - [x] AC-3 새 검사는 게이트 id 를 **정책표에서 읽는다** — 정책표의 게이트 id 하나를 개명한 가상 상태에서 커버리지 검사가 실패한다(id 를 하드코딩한 검사는 이 상태에서 통과해 버린다).
+  - [x] AC-4 새 검사는 fixture 의 `gates` 값이 정책표 id 집합 밖이면 실패한다 — 정책표에 없는 게이트 id 를 fixture 하나에 넣은 가상 상태에서 id 유효성 검사가 실패한다. (AC-3 과 다른 상태를 본다: AC-3 은 정책표를 바꾸고 fixture 를 그대로 두며, AC-4 는 fixture 를 바꾸고 정책표를 그대로 둔다.)
+  - [x] AC-5 새 검사는 **판별 검사**다 — fixture 5건을 뺀 가상 상태(= 이 단위 이전 상태)에서 커버리지 검사가 실패하고, 5건이 있는 상태에서 통과한다. 양쪽을 실행으로 보인다. 더해서 **게이트 id 를 하드코딩한 구현**을 개명된 정책표로 돌리면 통과해 버리는 것을 반례로 보인다 — 빈 값이 아니라 그럴듯한 거짓 구현에서 갈리는 것을 확인한다(§11).
+  - [x] AC-6 추가한 5건 각각의 `source.kind` 가 실제 출처(`session-log`)인지 `authored` 인지 파일에 적혀 있고, `authored` 인 4건은 `source.ref` 에 그 근거가 적혀 있다.
 - **위험과 되돌리기:** 파일 추가와 새 테스트 1개뿐이라 `git revert <통합 SHA>` 로 전부 되돌아간다. 실제 위험은 다른 데 있다 — authored fixture 의 `expected` 는 내가 정책표를 보고 계산한 값이므로, 그것을 정책표로 채점하면 자기참조다. 그래서 **분류(`classification`)를 사용자가 승인 시점에 확정**하고 `human_correction` 에 기록한다. 승인 없이 채워 넣지 않는다.
 - **결정 필요:** 없음 (fixture 출처 방침과 검사 범위는 2026-09-04 분류 확정 때 사용자가 정했다).
 
@@ -131,6 +131,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-04T06:10:28+09:00 · HEAD 528c7f1bf01b · 검사 기록 run_60db3d61480b
 
-- (없음)
+- [evidence/run_dd07b98f3f83.yaml](evidence/run_dd07b98f3f83.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_60db3d61480b.yaml](evidence/run_60db3d61480b.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

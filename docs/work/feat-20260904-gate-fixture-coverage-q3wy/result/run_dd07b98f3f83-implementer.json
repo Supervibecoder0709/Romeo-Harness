@@ -1,0 +1,41 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260904-gate-fixture-coverage-q3wy",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260904-gate-fixture-coverage-q3wy/task/run_dd07b98f3f83-implementer.json",
+    "sha256": "518fb61d2389fa41dd93c25ac698769516b0d58844aab03476ead0c24681ad91"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_gate_coverage -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo route --fixtures fixtures/requests --report",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260904-gate-fixture-coverage-q3wy/evidence/run_dd07b98f3f83.yaml",
+  "notes": "검사 5건 전부 exit 0 (run_dd07b98f3f83 의 check-1~check-5). 가드는 계약에 0건이라 승인 기록이 없다.\n\nAC-2 (손 대조 결과 보고) — 어긋난 항목 0건이다. 5건의 expected 를 정책표(classification.yaml · packages.yaml · execution-guards.yaml)만 보고 손으로 먼저 적고(docs/work/feat-20260904-gate-fixture-coverage-q3wy/notes/hand-derived-expected.md 의 위쪽 표, route 실행 전에 기록), 그 뒤 bin/romeo route --classification 을 5건에 돌려 profile · package · reviewer · isolation · blocks · sections · guards · parts · warnings · gate_hints 를 대조했다. 전 항목이 일치해 route 출력을 보고 고친 값은 없다. 대조표와 fired_rules 는 같은 파일의 「대조」 절에 있다.\n\nAC-5 (양쪽 실측) — 검사 안의 네 가상 상태 외에, 작업 트리에서 fixture 5건을 실제로 치웠다가 되돌리며 두 상태를 측정했다. 이전 상태(33건)에서 check-1 은 exit 1 (failures=5, errors=1) 이고 지금 상태(38건)에서 exit 0 이다 — 판별 검사가 맞다. check-2 는 이전 상태 exit 0 (33/33) · 지금 상태 exit 0 (38/38) 로 양쪽에서 통과한다 — 검증 계획이 선언한 대로 회귀 방지 검사다. 이 실측은 evidence 기록 전에 했고 그 뒤 작업 트리를 원래대로 되돌렸다(run_dd07b98f3f83 의 changed_files 6건이 그 상태다).\n\n범위 밖에서 발견한 것 (§12 — 고치지 않고 보고만 한다):\n① fx-free-plan-retention-cut 의 분류(intent=write · facets=[policy] · gates=[irreversible-policy] · blast=large)에서 실행 가드가 0건 발동한다. core/policy/execution-guards.yaml 의 어떤 trigger 도 facets=[policy] 를 보지 않기 때문이다 — 「되돌리기 어려운 정책 변경」 게이트는 서는데 그 행동을 승인 대상으로 만드는 가드는 서지 않는다. 근거: run_dd07b98f3f83 의 check-2 가 이 fixture 의 expected guards: [] 를 일치로 판정한다(38/38).\n② fx-payment-metric-schema 는 반대 모양이다 — 돈을 쓰지 않는 지표 스키마 변경인데 payment-charge(비용 결제) 가드가 발동한다. trigger 가 facet(payment) × intent(write) 라 「결제 영역을 건드리는가」와 「지금 돈을 쓰는가」를 구분하지 않는다. 두 건 다 정책표 수정이 필요한 사안이라 이 단위(fixtures/requests/ · tests/test_gate_coverage.py 쓰기 상한)에서 고치지 않았고, 각 fixture 의 human_correction.followup 에도 같은 내용을 남겼다.\n\n요청 원문에 대한 메모 — fixture 1 의 request_text 는 세션 로그(f95922ee)의 문장 그대로다. 확인란 표의 인용은 그것을 줄인 것이고, 같은 요청이다. 나머지 4건은 source.kind: authored 이고 source.ref 에 왜 authored 인지 적혀 있다(AC-6)."
+}

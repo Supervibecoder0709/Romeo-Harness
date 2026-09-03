@@ -11,4 +11,13 @@ attempts:
     손으로 적은 표(notes/hand-derived-expected.md)는 항목별 근거까지 있고 대조 결과 어긋남 0건이지만, 「먼저」 자체가 관측 대상이 아니었다. 검사 5건은
     전부 exit 0, 방어 검사 유효.
   settled_at: '2026-09-04T02:20:11+09:00'
+- n: 2
+  run: run_60db3d61480b
+  base_sha: 528c7f1bf01b9685762e6677770bd52e48060cca
+  started_at: '2026-09-04T05:54:52+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS findings 0. required_checks 5/5 exit 0, 방어 검사 유효. AC-2 재승인 뒤 human_correction 5건으로 사람의
+    확인을 기록했다.
+  settled_at: '2026-09-04T06:06:04+09:00'
 reviews: []

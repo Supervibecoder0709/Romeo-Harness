@@ -1,0 +1,51 @@
+id: fx-ops-test-data-purge
+request_text: 테스트로 만든 계정·주문 데이터를 운영 DB 에서 지워줘.
+context:
+  project: internal-saas-analytics
+  kind: code
+  notes: 운영 중인 시스템의 실제 데이터를 지운다. 어느 행이 테스트 데이터인지 판별 기준이 확정되지 않아 불확실성이 medium 이다.
+classification:
+  unit: T1
+  mode: delivery
+  intent: delete
+  facets:
+  - ops-data
+  gates:
+  - ops-data-deletion
+  blast_radius: large
+  uncertainty: medium
+expected:
+  profile: deep
+  package:
+  - brief
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  blocks:
+  - spec-ready
+  - risk-plan-ready
+  sections:
+  - risk-backup-recovery
+  - environment-plan
+  guards:
+  - deletion
+  - ops-data-change
+  warnings:
+  - WORKTREE_ISOLATES_CODE_ONLY
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction:
+  reviewed_at: '2026-09-04'
+  reviewed_by: user
+  round: gate-coverage
+  verdict: confirmed
+  changes: []
+  note: 2026-09-04 승인 시점에 사용자가 이 요청을 ops-data-deletion 게이트 fixture 로 확정했다. fx-repo-archive-delete 와 대비되는 쪽이다 — 저장소 문서 삭제(docs
+    facet)는 실행 가드 deletion 만 발동하고 이 게이트는 발동하지 않는다. 운영 중인 시스템의 실제 데이터일 때만 게이트가 선다. 2026-09-04 사용자가 확인한 것은 이 분류 값과
+    notes/hand-derived-expected.md 의 항목별 expected 대조표(어긋난 항목 0건)이며, 그 확인 사실을 이 human_correction 이 기록한다.
+  followup: 요청 문장은 authored 다 — 세션 로그의 삭제 요청 8건은 전부 워크트리·코드·문서 삭제였고 운영 데이터 삭제 요청은 없다
+source:
+  kind: authored
+  ref: 세션 로그(68개 프로젝트, 597MB, 2회 훑음)에 운영 데이터 삭제 요청이 없다. 삭제 요청 8건은 전부 워크트리·코드·문서 삭제였다. 2026-09-04 에 새로 썼다
+  date: '2026-09-04'

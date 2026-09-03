@@ -1,0 +1,48 @@
+id: fx-free-plan-retention-cut
+request_text: 무료 플랜의 대화 기록 보존 기간을 30일에서 7일로 줄여줘.
+context:
+  project: internal-saas-analytics
+  kind: code
+  notes: 제품 정책의 기본값을 바꾼다. 줄인 뒤에는 이미 만료 처리된 기록을 되돌릴 수 없어 실질적으로 되돌리기 어렵다.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - policy
+  gates:
+  - irreversible-policy
+  blast_radius: large
+  uncertainty: low
+expected:
+  profile: deep
+  package:
+  - brief
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  blocks:
+  - spec-ready
+  - risk-plan-ready
+  sections:
+  - risk-backup-recovery
+  guards: []
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction:
+  reviewed_at: '2026-09-04'
+  reviewed_by: user
+  round: gate-coverage
+  verdict: confirmed
+  changes: []
+  note: 2026-09-04 승인 시점에 사용자가 이 요청을 irreversible-policy 게이트 fixture 로 확정했다. facet 카탈로그의 policy 설명이 「보존」 정책을 예로 들고 있어 그대로 맞는다.
+    profile=deep 은 게이트가 아니라 blast.large 가 올린 것이다 — gate.ops-boundary 의 gates_any 목록에 irreversible-policy 가 없기 때문이다.
+    2026-09-04 사용자가 확인한 것은 이 분류 값과 notes/hand-derived-expected.md 의 항목별 expected 대조표(어긋난 항목 0건)이며, 그 확인 사실을 이
+    human_correction 이 기록한다.
+  followup: 이 분류에서 실행 가드가 0건이다. 되돌리기 어려운 정책 변경인데 execution-guards.yaml 의 어떤 trigger 도 facets=[policy] 를 보지
+    않는다 — 게이트는 서고 가드는 서지 않는 자리다. 이 단위에서 고치지 않고 결과에 보고한다(AGENTS.core §12)
+source:
+  kind: authored
+  ref: 세션 로그(68개 프로젝트, 597MB, 2회 훑음)에 정책 기본값 변경 요청이 없다. 2026-09-04 에 새로 썼다
+  date: '2026-09-04'

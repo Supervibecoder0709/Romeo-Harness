@@ -1,0 +1,50 @@
+id: fx-public-kpi-endpoint
+request_text: KPI 대시보드 집계를 외부에서 조회할 수 있는 공개 API 엔드포인트를 하나 열어줘.
+context:
+  project: ordi-desktop-app
+  kind: code
+  notes: 외부에 공개되는 계약이 생긴다. 한 번 공개하면 소비자가 붙으므로 되돌리기 비용이 코드 변경보다 크다.
+classification:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - public-api
+  - analytics
+  actions:
+  - expose
+  gates:
+  - public-api
+  blast_radius: medium
+  uncertainty: low
+expected:
+  profile: standard
+  package:
+  - brief
+  - spec
+  reviewer: opposite-runtime-readonly
+  isolation: worktree
+  blocks:
+  - spec-ready
+  - risk-plan-ready
+  sections:
+  - risk-backup-recovery
+  guards:
+  - public-exposure
+  parts:
+  - superpowers
+acceptable_alternatives: []
+human_correction:
+  reviewed_at: '2026-09-04'
+  reviewed_by: user
+  round: gate-coverage
+  verdict: confirmed
+  changes: []
+  note: 2026-09-04 승인 시점에 사용자가 이 요청을 public-api 게이트 fixture 로 확정했다. actions=[expose] 를 적은 첫 fixture 다 — 게이트(public-api, 요청이 건드리는
+    영역)와 실행 가드(public-exposure, 지금 하려는 행동)가 다른 축이라는 것을 한 요청에서 함께 보인다. actions 를 빼면 가드가 한 건도 발동하지 않는다. 2026-09-04 사용자가 확인한 것은
+    이 분류 값과 notes/hand-derived-expected.md 의 항목별 expected 대조표(어긋난 항목 0건)이며, 그 확인 사실을 이 human_correction 이 기록한다.
+  followup: 요청 문장은 authored 다 — 세션 로그에 공개 API 요청이 없다
+source:
+  kind: authored
+  ref: 세션 로그(68개 프로젝트, 597MB, 2회 훑음)에 공개 API 개설 요청이 없다. 2026-09-04 에 새로 썼다
+  date: '2026-09-04'

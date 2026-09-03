@@ -1,0 +1,22 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260904-gate-fixture-coverage-q3wy",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260904-gate-fixture-coverage-q3wy/task/run_60db3d61480b-implementer.json",
+    "sha256": "d525d1b76441fd7f0c25675038eeffbd389621fb241be1be051a20a126f9647f"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest tests.test_gate_coverage -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo route --fixtures fixtures/requests --report", "exit_code": 0},
+    {"id": "check-3", "command": "python3 -m unittest discover -s tests", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-5", "command": "bin/romeo compile --check", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260904-gate-fixture-coverage-q3wy/evidence/run_60db3d61480b.yaml",
+  "notes": "2회차다. 1회차(run_dd07b98f3f83)는 검토자 FAIL(AC_UNMET)이었고 원인은 산출물이 아니라 AC-2 의 완료 정의였다 — 「route 실행 전에 손으로 적었다」는 시간 순서를 요구했는데 사전 봉인이 없으면 사후 관측이 불가능했다. 2026-09-04T05:53:23+09:00 재승인으로 AC-2 가 사람의 확인(human_correction)을 요구하도록 바뀌었다. 이 회차의 변경은 그 하나다: fixture 5건의 human_correction.note 에 사용자가 2026-09-04 에 확인한 것이 분류 값과 notes/hand-derived-expected.md 의 항목별 expected 대조표(어긋난 항목 0건)라는 사실을 한 줄 추가하고, 같은 사실을 notes/hand-derived-expected.md 의 「사용자 확인」 절에 남겼다. 1회차가 만든 fixture 5건 · tests/test_gate_coverage.py · notes/hand-derived-expected.md 본문 · 1회차의 evidence/result/review 는 그대로 두었다. required_checks 5건은 새 run(run_60db3d61480b)으로 전부 재실행했고 전부 exit 0 이다(evidence run_60db3d61480b 의 check-1~check-5). 수용 기준 6건의 근거: AC-1·AC-3·AC-4·AC-5 는 check-1(tests.test_gate_coverage — test_every_hard_gate_has_at_least_one_fixture · test_renaming_a_gate_in_the_policy_table_fails_the_coverage_check · test_injecting_an_unknown_gate_into_a_fixture_fails_the_validity_check · test_without_this_units_fixtures_the_coverage_check_fails 와 test_with_this_units_fixtures_the_coverage_check_passes 의 양쪽 실측 · test_a_hardcoded_implementation_passes_the_renamed_policy_table 의 그럴듯한 거짓 구현 반례), AC-2 는 fixture 5건의 human_correction(reviewed_at '2026-09-04' · reviewed_by user · verdict confirmed)과 notes/hand-derived-expected.md 의 항목별 근거·대조표·어긋난 항목 0건 보고, 그리고 check-2 의 38건 전부 일치 exit 0, AC-6 은 fixture 5건의 source.kind(session-log 1건 · authored 4건, 4건 모두 source.ref 에 근거)다. 범위 밖 발견 1건은 고치지 않고 fx-free-plan-retention-cut 의 human_correction.followup 에 남겼다 — irreversible-policy 게이트가 서는 분류에서 execution-guards.yaml 의 trigger 가 facets=[policy] 를 보지 않아 실행 가드가 0건이다(AGENTS.core §12)."
+}

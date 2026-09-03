@@ -1,0 +1,157 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_dd07b98f3f83
+task_id: task_b25284d95c44
+dispatch_id: ctx_0ce1d745f341
+unit_id: feat-20260904-gate-fixture-coverage-q3wy
+spec_ref:
+  path: docs/work/feat-20260904-gate-fixture-coverage-q3wy/spec.md
+  sha256: 89dd02dcfc1b8c4c4d6a1a0a53d62f57f43c9ec206a941f68e5a18869ef9b915
+base_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260904-gate-fixture-coverage-q3wy
+started_at: '2026-09-04T02:09:51+09:00'
+finished_at: '2026-09-04T02:19:45+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_gate_coverage -v
+  exit_code: 0
+  started_at: '2026-09-04T02:09:51+09:00'
+  finished_at: '2026-09-04T02:09:52+09:00'
+  seconds: 0.683
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/01-check-1.log
+  log_sha256: d2357e55210941fe4f69bff1612b79df64cb3d60caea702c1c51783e0ecf157b
+  stdout_tail: ''
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: check-2
+  command: bin/romeo route --fixtures fixtures/requests --report
+  exit_code: 0
+  started_at: '2026-09-04T02:09:52+09:00'
+  finished_at: '2026-09-04T02:09:52+09:00'
+  seconds: 0.133
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/02-check-2.log
+  log_sha256: f149b3d3c77ed8bfad4cd0f440c0bbac02273e26140529fb9f10dc8ffe998bc8
+  stdout_tail: 'inty.medium×9, overlay:facet.ui×7, overlay:facet.brand×6, profile:blast.large×5, profile:gate.ops-boundary×4,
+    overlay:gate.ops-boundary×4, warn:WORKTREE_ISOLATES_CODE_ONLY×4, overlay:facet.browser-automation×4,
+    warn:CAPABILITY_CHECK_REQUIRED×4
+
+    경고 빈도: PART_PENDING_GATE×25, WORKTREE_ISOLATES_CODE_ONLY×4, CAPABILITY_CHECK_REQUIRED×4, DOCS_ONLY_CHANGE×4,
+    OUT_OF_SCOPE_NON_CODE×2, UNIT_NONE_WITH_GATE×1'
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: check-3
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T02:09:52+09:00'
+  finished_at: '2026-09-04T02:12:58+09:00'
+  seconds: 186.432
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/03-check-3.log
+  log_sha256: dbbb12968c53f05af33cc73644d20bd6a6558d6c06531f848ab54218e6a1061a
+  stdout_tail: ''
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: check-4
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-04T02:12:58+09:00'
+  finished_at: '2026-09-04T02:12:59+09:00'
+  seconds: 0.279
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/04-check-4.log
+  log_sha256: 2936b3b65b2f712115e3adb165dee1e7a9135a56d44aa5fa8bf5b91b2d8ca946
+  stdout_tail: "rca/workspaces/Romeo-Harness/impl-feat-20260904-gate-fixture-coverage-q3wy/docs/work/feat-20260904-gate-fixture-coverage-q3wy/brief.md\
+    \ lines=60 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260904-gate-fixture-coverage-q3wy/docs/work/feat-20260904-gate-fixture-coverage-q3wy/spec.md\
+    \ lines=131 needs_input=0 unchecked_ac=6\n    WARN  UNCHECKED_AC 6개"
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-04T02:12:59+09:00'
+  finished_at: '2026-09-04T02:12:59+09:00'
+  seconds: 0.337
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/05-check-5.log
+  log_sha256: d3d671c21188585769e62d24beb30db0db969187a124b905dfc7090d226d8954
+  stdout_tail: compile 검사 PASS
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260904-gate-fixture-coverage-q3wy'
+  exit_code: 0
+  started_at: '2026-09-04T02:15:03+09:00'
+  finished_at: '2026-09-04T02:15:03+09:00'
+  seconds: 0.031
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/06-review-tree-before.log
+  log_sha256: ae23a8e816492a20d59f7b55f60273699710eb386466881f957b9e42c4977e14
+  stdout_tail: '?? fixtures/requests/fx-free-plan-retention-cut.yaml
+
+    ?? fixtures/requests/fx-landing-consent-copy.yaml
+
+    ?? fixtures/requests/fx-ops-test-data-purge.yaml
+
+    ?? fixtures/requests/fx-payment-metric-schema.yaml
+
+    ?? fixtures/requests/fx-public-kpi-endpoint.yaml
+
+    ?? tests/test_gate_coverage.py'
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260904-gate-fixture-coverage-q3wy/.harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-04T02:15:09+09:00'
+  finished_at: '2026-09-04T02:15:10+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/07-reviewer-brief.log
+  log_sha256: 64e0ad9e64e4e000fd0d072992b2c04d7efc43d6aeeae8de4958c4ddb71c0524
+  stdout_tail: ce950b0706dcdd2ed0beee5cece7dba257f1312ea46513dc83f3f193684f8547  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260904-gate-fixture-coverage-q3wy/.harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/reviewer-brief.md
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260904-gate-fixture-coverage-q3wy'
+  exit_code: 0
+  started_at: '2026-09-04T02:19:37+09:00'
+  finished_at: '2026-09-04T02:19:37+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/08-review-tree-after.log
+  log_sha256: ae23a8e816492a20d59f7b55f60273699710eb386466881f957b9e42c4977e14
+  stdout_tail: '?? fixtures/requests/fx-free-plan-retention-cut.yaml
+
+    ?? fixtures/requests/fx-landing-consent-copy.yaml
+
+    ?? fixtures/requests/fx-ops-test-data-purge.yaml
+
+    ?? fixtures/requests/fx-payment-metric-schema.yaml
+
+    ?? fixtures/requests/fx-public-kpi-endpoint.yaml
+
+    ?? tests/test_gate_coverage.py'
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260904-gate-fixture-coverage-q3wy/review/run_dd07b98f3f83-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-04T02:19:45+09:00'
+  finished_at: '2026-09-04T02:19:45+09:00'
+  seconds: 0.024
+  log: .harness/runs/feat-20260904-gate-fixture-coverage-q3wy/run_dd07b98f3f83/09-review-record.log
+  log_sha256: 10774c9a939110c1b1ba7506f43624176aafae5685a1aa5f72a9667d63402d02
+  stdout_tail: fe8c68783226ec4519cb29e0fc3b68181a78bf758cfef332e42c6669c6ca6431  docs/work/feat-20260904-gate-fixture-coverage-q3wy/review/run_dd07b98f3f83-reviewer.json
+  head_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  dirty_tree_hash: 364f1bee7372479c00505e6b4cd9cec3fa211bd3681441861055b3c61cbd6332
+changed_files:
+- fixtures/requests/fx-free-plan-retention-cut.yaml
+- fixtures/requests/fx-landing-consent-copy.yaml
+- fixtures/requests/fx-ops-test-data-purge.yaml
+- fixtures/requests/fx-payment-metric-schema.yaml
+- fixtures/requests/fx-public-kpi-endpoint.yaml
+- tests/test_gate_coverage.py
+artifact_hash: da06fc63d87d79a17f6da2128d2e1e2ce4c455e1393e098ac6698570b0669e80
+reviewer: null
+verdict: null
+approvals: []
