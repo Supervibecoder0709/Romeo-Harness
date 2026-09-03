@@ -272,6 +272,58 @@ def format_check(res):
     return "\n".join(lines)
 
 
+# --------------------------------------------------------------------------- 통합 직전 — 판정 손실 대조
+
+def compare_worktree_attempts(project_root, unit_id, worktree_root):
+    """통합 직전 대조 — 워커 워크트리 사본의 `attempts.yaml` 이 **이 체크아웃의 판정을 하나라도 잃는가**(Q-48).
+
+    `attempts.yaml` 의 정본은 **위임한 쪽**(`project_root`)이다. 워커는 자기 워크트리 안에서 `envelope build` 를 지나며
+    같은 파일에 `started` 를 남기지만, 그 회차의 판정(`pass`·`fail`)은 `run-unit record` 가 위임한 쪽에만 쓴다.
+    그래서 워크트리 사본을 그대로 통합하면 판정이 `started` 로 덮인다 — 2026-09-03 실측: 워크트리 「1: fail / 2: started」 vs
+    위임 쪽 「1: fail / 2: pass」. `compare_attempts`(§3.1 확인 4)는 `started` 를 대조하지 않으므로(Q-39) 이 손실을 보지 못한다.
+    이 함수가 보는 자리가 거기다 — `compare_attempts` 는 손대지 않는다.
+
+    **판정으로만 대조한다.** 이 체크아웃의 판정 중 워크트리 사본의 판정 집합에 없는 것이 차이다.
+    워크트리에만 있는 `started` 는 차이가 아니다 — 관통에서 언제나 나는 모양이고, 그것으로 막으면 어떤 통합도 서지 않는다.
+    워크트리에만 있는 판정도 차이가 아니다 — 통합하면 사라지는 것이 아니라 들어오는 것이다.
+    재검토(`reviews`)는 보지 않는다 — 그것은 §3.1 확인 4 의 몫이다.
+
+    아무것도 쓰지 않는다.
+    → {"unit_id", "worktree", "diffs": [사라지는 판정 줄…], "verdicts": 이 체크아웃의 판정 수,
+       "worktree_verdicts": 워크트리 사본의 판정 수, "attempts_path", "worktree_attempts_path"}"""
+    project_root = Path(project_root).resolve()
+    wt = Path(worktree_root).resolve()
+    if not wt.is_dir():
+        # 없는 경로를 빈 기록으로 접으면 오타 난 워크트리 경로가 「일치」 로 읽힌다 — `_attempts_at` 이 없는 커밋을 거부하는 것과 같다.
+        raise ValueError(f"워크트리 경로가 디렉터리가 아니다: {wt}")
+    local = load_attempts(project_root, unit_id)
+    try:
+        worktree = load_attempts(wt, unit_id)
+    except FileNotFoundError:
+        raise ValueError(f"그 워크트리에 이 작업 단위의 폴더가 없다: {wt} · 단위 {unit_id}") from None
+    lv, wv = _verdicts(local), _verdicts(worktree)
+    diffs = [f"판정이 워크트리 사본에 없다(그대로 통합하면 사라진다): 회차 {n} · run {run} · {result}"
+             for n, run, result in sorted(lv - wv)]
+    return {"unit_id": unit_id, "worktree": str(wt), "diffs": diffs,
+            "verdicts": len(lv), "worktree_verdicts": len(wv),
+            "attempts_path": str(attempts_path(project_root, unit_id)),
+            "worktree_attempts_path": str(wt / "docs" / "work" / unit_id / ATTEMPTS_FILE)}
+
+
+def format_merge_check(res):
+    head = f"romeo run-unit merge-check {res['unit_id']} · 워크트리 {res['worktree']}"
+    if not res["diffs"]:
+        return head + (f" → 판정 손실 없음 (이 체크아웃의 판정 {res['verdicts']}건 · 워크트리 {res['worktree_verdicts']}건 · "
+                       "워크트리에만 있는 started 는 손실이 아니다)")
+    lines = [head + f" → 사라지는 판정 {len(res['diffs'])}건 — attempts.yaml 의 정본은 **위임한 쪽**이다"]
+    lines += [f"  {d}" for d in res["diffs"]]
+    lines.append("  고치는 방법: 위임한 쪽의 판정을 정본으로 남긴다 — 워크트리 사본의 attempts.yaml 을 그대로 통합하지 않고, "
+                 "그 회차의 판정을 위임한 쪽 파일에서 가져와 통합 커밋에 담는다")
+    lines.append(f"  정본: {res['attempts_path']}")
+    lines.append(f"  사본: {res['worktree_attempts_path']}")
+    return "\n".join(lines)
+
+
 # --------------------------------------------------------------------------- 5단계
 
 def _stage(name, state, detail, commands=None):

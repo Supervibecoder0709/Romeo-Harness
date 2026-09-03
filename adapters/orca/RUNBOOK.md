@@ -501,6 +501,9 @@ bin/romeo envelope build --unit <작업 단위 id> --role reviewer    --base-sha
 `started` 는 보지 않으므로, 4번이 막 남긴 새 회차 때문에 실패하지 않는다 — 실패하면 커밋 밖에 있는 것은 정말 판정이나 재검토다.
 승인이 안 바뀌었어도 이 확인만은 회차마다 다시 본다.
 
+**그 커밋이 워크트리 사본을 정본으로 만들지 않는다.** 판정을 커밋해도 워커는 자기 워크트리에서 새 회차를 `started` 로 더 남기고,
+그 회차의 판정은 다시 이쪽에만 생긴다 — 통합 직전에 §3.10 의 `run-unit merge-check` 가 그 손실을 본다.
+
 **앞 회차의 산출물을 시작점으로 쓸지 정한다.** 새 워크트리를 만들면 앞 회차의 **미커밋** 산출물은 그 트리에 없다.
 이어 쓸 것이면 앞 회차의 워크트리를 그대로 쓰거나, 남길 것을 `<base-sha>` 커밋에 담고 그 커밋을 새 `<base-sha>` 로 삼는다
 (후자는 계약이 바뀌므로 §3.3 부터 다시 계산된다). 어느 쪽이든 앞 회차의 봉투·증거는 **지우지 않는다.**
@@ -723,11 +726,12 @@ bin/romeo evidence run --unit <id> --run <run-id> --root "$W" --label reviewer-b
 
 CMD="codex -s read-only -C '$W' \"\$(cat '$P'; cat '$T')\""
 
-orca terminal create \
+# 반환 JSON 을 잡아 둔다 — 아래 (a) 의 핸들과 워크트리 id 가 여기서 나온다. 흘려보내면 확인할 값이 없다.
+CREATED=$(orca terminal create \
   --worktree "path:$W" \
   --title "review-<작업 단위 id>-<run-id>" \
   --command "$CMD" \
-  --json
+  --json)
 ```
 
 `CMD` 의 샌드박스 플래그(`-s read-only`)는 `.harness/bindings.yaml` 의 `roles.reviewer.enforcement` 값(`codex exec -s read-only`)에서 옮긴 것이다 —
@@ -742,9 +746,50 @@ orca terminal create \
 **핸들은 `.result.terminal.handle` 이다(2026-08-29 실측).** 반환 JSON 은
 `{ok, result: {terminal: {handle, tabId, paneKey, ptyId, worktreeId, title, executionHostId, hostPlatform, surface}}}` 이고
 `handle` 이 `term_<uuid>` 형태다. 확인 절차는 그대로 둔다 — 판이 바뀌면 필드도 바뀔 수 있고, 짐작해 넣은 실패는
-"강제 없이 기동됨" 과 구분되지 않기 때문이다. (a) 그 값을 고른다. (b) `orca terminal show --terminal <값> --json` 에 넣어
-방금 만든 터미널(같은 `--title`, 같은 워크트리)이 종료 코드 0 으로 돌아오는지 본다. 돌아오지 않으면
-(c) `orca terminal list --worktree "path:$W" --json` 에서 같은 제목의 행을 찾아 다시 (b) 로 확인한다.
+"강제 없이 기동됨" 과 구분되지 않기 때문이다.
+
+**확인 기준은 핸들과 워크트리 id 둘이다 — 제목은 기준이 아니다.** 제목은 **그 터미널에서 도는 런타임이 소유하는 값**이라
+기동 직후 덮어써진다. **2026-09-03 실측 — codex TUI 가 `review-<id>-<run>` 제목을 `⠹ impl-<id>…` 로,
+구현자 터미널 제목을 `✳ <id> 구현` 으로 덮어썼다.** 자기 진행 표시를 제목에 그리기 때문이다.
+그래서 제목으로 대조하면 (b) 가 **정상 기동에서 실패하고**, 그 실패를 받아 (c) 로 가면 제목이 일치하는 행도 없다 — 막다른 길이다.
+런타임이 소유한 값을 하네스의 확인 기준으로 쓰지 않는다. 핸들(`term_<uuid>`)과 워크트리 id 는 Orca 가 소유하고
+그 터미널의 수명 동안 바뀌지 않으므로, 실제로 성립하는 확인은 이 둘이다.
+
+(a) `CREATED` 에서 **핸들과 워크트리 id 를 함께** 고른다.
+
+```bash
+HANDLE=$(printf '%s' "$CREATED" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["terminal"]["handle"])')
+WT_ID=$(printf '%s'  "$CREATED" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["terminal"]["worktreeId"])')
+echo "handle=$HANDLE worktreeId=$WT_ID"
+```
+
+(b) `orca terminal show --terminal "$HANDLE" --json` 이 종료 코드 0 이고, 그 응답의
+**`.result.terminal.worktreeId` 가 (a) 의 `WT_ID` 와 같은지** 본다 — 방금 `--worktree "path:$W"` 로 지정한 그 워크트리다.
+같은 응답의 `worktreePath` 도 함께 본다: 그 값이 `$W` 라는 것이 「방금 지정한 워크트리」 를 id 를 몰라도 직접 확인해 주는
+자리다(두 필드 모두 2026-09-04 `terminal show --json` 실측). 제목은 보지 않는다.
+
+```bash
+SHOW=$(orca terminal show --terminal "$HANDLE" --json)
+GOT_ID=$(printf   '%s' "$SHOW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["terminal"]["worktreeId"])')
+GOT_PATH=$(printf '%s' "$SHOW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["result"]["terminal"]["worktreePath"])')
+[ "$GOT_ID" = "$WT_ID" ] && [ "$GOT_PATH" = "$W" ] \
+  && echo "확인됨: 핸들 $HANDLE · 워크트리 $GOT_PATH" \
+  || { echo "불일치 — 이 핸들은 그 워크트리의 터미널이 아니다: $GOT_ID $GOT_PATH"; false; }
+```
+
+성공 신호: 종료 코드 0 과 `확인됨:` 한 줄. 워크트리가 다르면 그 핸들은 **다른 워크트리의 터미널**이므로
+(1) 을 다시 밟는다 — 강제 수단이 걸린 자리가 아니다.
+
+(c) (b) 가 종료 코드 0 으로 돌아오지 않으면 `orca terminal list --worktree "path:$W" --json` 에서
+**`handle` 이 (a) 의 값과 같은 행**을 찾아 다시 (b) 로 확인한다. 행을 제목으로 찾지 않는다 — 위 실측대로 그 제목은 이미 바뀌어 있다.
+
+```bash
+# 행은 .result.terminals[] 이고 각 행에 handle·worktreeId·worktreePath 가 있다(2026-09-04 실측).
+orca terminal list --worktree "path:$W" --json \
+  | python3 -c 'import json,sys; print("\n".join(r["handle"] for r in json.load(sys.stdin)["result"]["terminals"]))' \
+  | grep -qx "$HANDLE" && echo "그 워크트리의 터미널 목록에 $HANDLE 이 있다"
+```
+
 **확인되기 전에는 (2) 로 넘어가지 않는다.**
 
 TUI 는 기동에 시간이 걸리므로 (2) 전에 준비를 기다린다.
@@ -800,8 +845,7 @@ grep -o '"last_agent_message":"[^"]*"' ~/.codex/sessions/<YYYY>/<MM>/<DD>/rollou
 (2) 그 터미널을 워커로 채택한다. `HANDLE` 은 (1) 에서 **확인이 끝난** 값이다.
 
 ```bash
-HANDLE=<(1) 에서 확인한 핸들>
-
+# HANDLE 은 (1) 의 (a) 가 CREATED 에서 뽑고 (b) 가 워크트리 id 로 확인한 값이다 — 여기서 다시 정하지 않는다.
 orca orchestration worker-start \
   --run <run-id> \
   --task <reviewer-task-id> \
@@ -984,6 +1028,34 @@ orca orchestration worker-release --dispatch <dispatch-id> --json
 그 체크아웃이 살아 있고 트리가 그대로일 때만 판정이 성립한다. 해제 자체는 워크트리를 지우지 않지만(위 실측),
 워크트리 정리(§7 의 `orca worktree rm`, 승인 대상)까지 가 버리면 재실행할 자리가 없다.
 `worker-release` 는 setup 터미널·설정된 탭·재사용된 터미널·사람이 넘겨받은 터미널·신원이 증명되지 않은 터미널을 건드리지 않는다.
+
+해제 뒤 그 워크트리의 산출물을 통합한다면 **§3.10 을 먼저 밟는다** — 회차 판정이 조용히 사라지는 자리가 거기다.
+
+### 3.10 통합 직전 — `attempts.yaml` 의 정본은 위임한 쪽이다
+
+**회차 기록에는 정본이 하나다 — 위임한 쪽 체크아웃이다.** 판정(`pass`·`fail`)은 `run-unit record` 가 그 체크아웃에만 쓰고,
+워커는 자기 워크트리 안에서 `envelope build` 를 지나며 **같은 파일에 `started` 만** 남긴다(그 회차를 만드는 자리가 계약 생성이다 — AGENTS.core §10).
+그래서 두 파일은 관통마다 갈린다. 2026-09-03 실측 — 워크트리 「1: fail / 2: started」 vs 위임 쪽 「1: fail / 2: pass」.
+**워크트리 사본을 그대로 통합하면 `2: pass` 가 `started` 로 덮인다.** 그 손실은 조용하다: §3.1 확인 4(`run-unit check`)는
+`started` 를 대조하지 않으므로(Q-39) 이 어긋남을 보지 않고, 종료 검사도 회차 기록을 읽지 않는다.
+
+그래서 **통합 직전에** 이 명령을 밟는다. 아무것도 쓰지 않고 판정만 낸다 — 통합 자체를 수행하지 않는다.
+
+```bash
+bin/romeo run-unit merge-check --unit <작업 단위 id> --worktree "$W"
+```
+
+관찰 가능한 성공 신호: **종료 코드 0** 과 `→ 판정 손실 없음` 한 줄. 워크트리에만 있는 `started` 는 손실이 아니다 —
+관통에서 언제나 나는 모양이므로 정상 통합은 그대로 통과한다.
+
+**종료 코드 1 이면 무엇을 할지.** 인쇄된 줄이 어느 회차의 어느 판정이 사라지는지 말한다. 그때 하는 것은 하나다 —
+**위임한 쪽의 판정을 정본으로 남긴다.** 워크트리 사본의 `attempts.yaml` 을 통합 커밋에 담지 않고, 그 회차의 판정을
+위임한 쪽 파일에서 가져와(또는 위임한 쪽 파일을 그대로 써서) 통합 커밋에 담는다. 반대 방향으로 맞추지 않는다 —
+워크트리의 `started` 는 그 회차가 시작됐다는 사실일 뿐이고, 그 회차가 어떻게 끝났는지는 위임한 쪽만 안다.
+판정을 잃은 회차 기록은 반복 중단 판정(§10 의 연속 실패 수)을 **다음 관통에서** 틀리게 만든다 — 그때는 이미
+그 회차가 무엇이었는지 말할 자리가 없다.
+
+`--worktree` 를 빼면 exit 2 로 거부된다. `--run` 은 쓰지 않는다 — 이 명령은 봉투를 만들지 않는다.
 
 ## 4. 권한 상한을 실제로 거는 명령형
 

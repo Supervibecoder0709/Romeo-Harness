@@ -273,8 +273,8 @@ def cmd_close(args):
 
 
 def cmd_run_unit(args):
-    from .run_unit import (compare_attempts, format_check, format_record, format_review, format_run,
-                           record_result, record_review, run_unit)
+    from .run_unit import (compare_attempts, compare_worktree_attempts, format_check, format_merge_check,
+                           format_record, format_review, format_run, record_result, record_review, run_unit)
     if args.action == "check":
         # RUNBOOK §3.1 확인 4 — 커밋과 작업 트리의 attempts.yaml 을 **판정·재검토로만** 대조한다(Q-39). 아무것도 쓰지 않으므로
         # --run 도 요구하지 않는다. started 는 대조하지 않는다 — 계약 생성이 막 남긴 회차로 첫 관통을 막지 않는다.
@@ -284,6 +284,16 @@ def cmd_run_unit(args):
             return 2
         res = compare_attempts(_root(args), args.unit, args.base_sha)
         print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_check(res))
+        return 1 if res["diffs"] else 0
+    if args.action == "merge-check":
+        # 통합 직전 — 워크트리 사본이 이 체크아웃의 판정을 하나라도 잃는가(Q-48). 아무것도 쓰지 않으므로 --run 도 요구하지 않는다.
+        # `check`(§3.1 확인 4)와 다른 자리다: 저것은 커밋과 작업 트리를, 이것은 **정본과 워크트리 사본**을 대조한다.
+        if not args.worktree:
+            print("run-unit merge-check 는 --worktree <워커 워크트리 절대경로> 가 필요하다 — 그 사본의 attempts.yaml 과 "
+                  "이 체크아웃(정본)의 판정을 대조한다(RUNBOOK §3.10)", file=sys.stderr)
+            return 2
+        res = compare_worktree_attempts(_root(args), args.unit, args.worktree)
+        print(json.dumps(res, ensure_ascii=False, indent=1) if args.json else format_merge_check(res))
         return 1 if res["diffs"] else 0
     if args.action == "review":
         # 재검토를 **기록만** 한다(Q-25). 시도를 시작하지 않으므로 --run 도 요구하지 않는다 —
@@ -538,17 +548,23 @@ def build_parser():
 
     s = sub.add_parser("run-unit", help="관통 1회를 5단계로 엮는다 (계약 → 위임 명령 → 회수·앵커 → 증거 → 관측). "
                                         "기동은 기본이 dry-run 이고 --spawn 을 명시해야 실제로 띄운다")
-    s.add_argument("action", nargs="?", default="start", choices=["start", "record", "review", "check"],
+    s.add_argument("action", nargs="?", default="start",
+                   choices=["start", "record", "review", "check", "merge-check"],
                    help="start(기본) 관통 1회를 돌린다 · record 그 회차의 판정을 attempts.yaml 에 남긴다 · "
                         "review 재검토 결론만 남긴다(시도를 시작하지 않는다, Q-25) · "
                         "check 커밋과 작업 트리의 attempts.yaml 을 판정·재검토로만 대조한다(RUNBOOK §3.1 확인 4, Q-39) — "
-                        "차이 없으면 exit 0, 있으면 exit 1. started 는 대조하지 않는다")
+                        "차이 없으면 exit 0, 있으면 exit 1. started 는 대조하지 않는다 · "
+                        "merge-check 통합 직전에 --worktree 사본이 이 체크아웃(정본)의 판정을 하나라도 잃는지 본다"
+                        "(RUNBOOK §3.10, Q-48) — 사라지는 판정이 없으면 exit 0, 있으면 exit 1")
     s.add_argument("--unit", required=True)
     s.add_argument("--run", help="계약·증거·결과 봉투를 묶는 run id — RUNBOOK §3.2 의 Run id 를 그대로 쓴다. "
                                  "start·record 에는 필수이고 review·check 에는 쓰지 않는다")
     s.add_argument("--base-sha", dest="base_sha",
                    help="승인된 spec.md 가 들어 있는 커밋. start 에서 생략하면 이력에서 승인 커밋을 찾는다(D-a). "
                         "check 에는 필수다 — 그 커밋의 attempts.yaml 과 작업 트리의 것을 대조한다")
+    s.add_argument("--worktree",
+                   help="(merge-check) 워커 워크트리의 절대 경로. 그 사본의 attempts.yaml 과 이 체크아웃의 판정을 대조한다 — "
+                        "attempts.yaml 의 정본은 위임한 쪽이다")
     s.add_argument("--spawn", action="store_true",
                    help="위임 명령을 실제로 실행한다. 없으면 인쇄만 한다 — 기동은 비용이 드는 실행이다(K-66)")
     s.add_argument("--after-review", dest="after_review",

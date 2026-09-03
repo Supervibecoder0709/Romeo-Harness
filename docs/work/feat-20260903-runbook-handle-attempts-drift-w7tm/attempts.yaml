@@ -9,4 +9,12 @@ attempts:
   failure_class: goal
   note: null
   settled_at: '2026-09-04T00:32:53+09:00'
+- n: 2
+  run: run_cc106a316c68
+  base_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  started_at: '2026-09-04T00:34:32+09:00'
+  result: pass
+  failure_class: null
+  note: null
+  settled_at: '2026-09-04T00:43:36+09:00'
 reviews: []

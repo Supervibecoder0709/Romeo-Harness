@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260903-runbook-handle-attempts-drift-w7tm",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/task/run_72570c993392-reviewer.json",
+    "sha256": "d6cdcd9b34eb3e2b942a2b7c7e95755ca928b05287433239ae86939ef909dbcb"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-4가 요구한 ‘같은 회차에서 이 체크아웃은 판정까지 났고 워크트리는 started까지만 난’ 모양은 구현 테스트에서 판정 손실로 처리되어 exit != 0을 요구한다. 따라서 AC-4의 exit 0 요구를 충족하지 못한다.",
+      "file": "docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/spec.md",
+      "line": 45
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/evidence/run_72570c993392.yaml",
+  "notes": "두 작업 계약의 base_sha는 일치했다. 증거의 required_checks 9건은 모두 exit 0으로 기록되어 있고, 변경은 구현자 계약의 allowed_paths 안에 있다. 검사는 재실행하지 않았다."
+}

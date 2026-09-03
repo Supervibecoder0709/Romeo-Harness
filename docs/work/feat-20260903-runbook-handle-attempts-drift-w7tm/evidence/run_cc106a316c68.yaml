@@ -1,0 +1,375 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_cc106a316c68
+task_id: task_d6c207cb2403
+dispatch_id: ctx_91b09fd648a0
+unit_id: feat-20260903-runbook-handle-attempts-drift-w7tm
+spec_ref:
+  path: docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/spec.md
+  sha256: 98f84f7b337d571b886dc4cb198d05ec6434bf7c69af5b23ea00e078819aacd0
+base_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm
+started_at: '2026-09-04T00:37:22+09:00'
+finished_at: '2026-09-04T00:43:28+09:00'
+commands:
+- id: ac3-ac4-probe
+  command: 'D=$(mktemp -d); U=feat-20260903-runbook-handle-attempts-drift-w7tm; mkdir -p "$D/ok/docs/work/$U"
+    "$D/loss/docs/work/$U"; cp "docs/work/$U/attempts.yaml" "$D/ok/docs/work/$U/attempts.yaml"; sed "s/  result:
+    fail/  result: started/" "docs/work/$U/attempts.yaml" > "$D/loss/docs/work/$U/attempts.yaml"; bin/romeo
+    run-unit merge-check --unit "$U" --worktree "$D/ok"; OK=$?; bin/romeo run-unit merge-check --unit
+    "$U" --worktree "$D/loss"; LOSS=$?; rm -rf "$D"; echo "AC-4(정상 통합) exit=$OK · AC-3(판정 손실) exit=$LOSS";
+    [ "$OK" = 0 ] && [ "$LOSS" != 0 ]'
+  exit_code: 0
+  started_at: '2026-09-04T00:37:22+09:00'
+  finished_at: '2026-09-04T00:37:22+09:00'
+  seconds: 0.111
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/01-ac3-ac4-probe.log
+  log_sha256: 167a37063e9943fc8d2f13dbe680e7efb32096d3c47ffc5d7bc1adfa2e9eefd4
+  stdout_tail: "파일에서 가져와 통합 커밋에 담는다\n  정본: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/attempts.yaml\n\
+    \  사본: /private/var/folders/cz/6b68hs55753g47c9vbr4k14c0000gn/T/tmp.B8hEUoDVPJ/loss/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/attempts.yaml\n\
+    AC-4(정상 통합) exit=0 · AC-3(판정 손실) exit=1"
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-1
+  command: python3 -m unittest tests.test_attempts_integration_check -v
+  exit_code: 0
+  started_at: '2026-09-04T00:37:26+09:00'
+  finished_at: '2026-09-04T00:37:26+09:00'
+  seconds: 0.108
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/02-check-1.log
+  log_sha256: e7b4a4524a0571c2dc4b3100b3ae526ae850f8c555118301bc78e659b315cab9
+  stdout_tail: ''
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-2
+  command: '! grep -q ''같은 제목'' adapters/orca/RUNBOOK.md'
+  exit_code: 0
+  started_at: '2026-09-04T00:37:26+09:00'
+  finished_at: '2026-09-04T00:37:26+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/03-check-2.log
+  log_sha256: 9bdf4d452a6e5ff8c2022822479f36254151c94e08eac0e9386b953f51a54e4e
+  stdout_tail: ''
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-3
+  command: grep -q 'result.terminal.worktreeId' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-04T00:37:26+09:00'
+  finished_at: '2026-09-04T00:37:26+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/04-check-3.log
+  log_sha256: 76c00adcab4c00ca85bd67c56133cd33719e3e371de4c25922db2e53956f0b30
+  stdout_tail: ''
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-4
+  command: grep -q 'run-unit merge-check' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-04T00:37:26+09:00'
+  finished_at: '2026-09-04T00:37:26+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/05-check-4.log
+  log_sha256: 0cb79f254270fdd2dd4942d26d1b0fbfe3d65f2fc37aef186f03ba4d16bbc0ec
+  stdout_tail: ''
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T00:37:26+09:00'
+  finished_at: '2026-09-04T00:39:35+09:00'
+  seconds: 128.731
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/06-check-5.log
+  log_sha256: c885254cd04c882ac62f1344d5ecca8f3b9019826575d80fb91fc95f10d8c83c
+  stdout_tail: ''
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-6
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-04T00:39:35+09:00'
+  finished_at: '2026-09-04T00:39:35+09:00'
+  seconds: 0.146
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/07-check-6.log
+  log_sha256: 58d806805ee4c4ef3e41d7c7bb44fe55b785372f420824e27398947105b7adfe
+  stdout_tail: "l-feat-20260903-runbook-handle-attempts-drift-w7tm/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/brief.md\
+    \ lines=66 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/spec.md\
+    \ lines=135 needs_input=0 unchecked_ac=6\n    WARN  UNCHECKED_AC 6개"
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-04T00:39:35+09:00'
+  finished_at: '2026-09-04T00:39:35+09:00'
+  seconds: 0.174
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/08-check-7.log
+  log_sha256: f64cd67418308dbb6431c8f3a7cd191b238b2b20572062589035f61215032738
+  stdout_tail: compile 검사 PASS
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-8
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-04T00:39:35+09:00'
+  finished_at: '2026-09-04T00:39:36+09:00'
+  seconds: 0.478
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/09-check-8.log
+  log_sha256: c0e1d2e6aef20254d33b250a1df1130aee897887accda3c81956897ecc47d1da
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-9
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-04T00:39:36+09:00'
+  finished_at: '2026-09-04T00:39:36+09:00'
+  seconds: 0.125
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/10-check-9.log
+  log_sha256: ce134d6f8968524425522e2062732ef903e794ee3cfb9e21997f27ad04ba9fa0
+  stdout_tail: PASS 33 fixtures
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm'
+  exit_code: 0
+  started_at: '2026-09-04T00:40:40+09:00'
+  finished_at: '2026-09-04T00:40:41+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/11-review-tree-before.log
+  log_sha256: bd2755373c165cc1f458717782ed0dcfb0b5d6a71198c469391157c57850dee0
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/run_unit.py\n\
+    ?? tests/test_attempts_integration_check.py"
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/.harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-04T00:40:41+09:00'
+  finished_at: '2026-09-04T00:40:41+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/12-reviewer-brief.log
+  log_sha256: 8f513ece1ac8243ef7b87bb056f2171e7918c936fb41596dcbb235c938c616d3
+  stdout_tail: c2af8a29b74cad3dce603d8dfe4a06d34b6c57aa0eae5e9f9ecbcf05e39c014c  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/.harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/reviewer-brief.md
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm'
+  exit_code: 0
+  started_at: '2026-09-04T00:43:28+09:00'
+  finished_at: '2026-09-04T00:43:28+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/13-review-tree-after.log
+  log_sha256: bd2755373c165cc1f458717782ed0dcfb0b5d6a71198c469391157c57850dee0
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/run_unit.py\n\
+    ?? tests/test_attempts_integration_check.py"
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/review/run_cc106a316c68-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-04T00:43:28+09:00'
+  finished_at: '2026-09-04T00:43:28+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_cc106a316c68/14-review-record.log
+  log_sha256: 6a2e590ab830f027c31f2de5f387a7fc5dc0d843369f7d0e3dd9e30b94b5d533
+  stdout_tail: 2c44021df10ceeac37517921fd41d5bc34e8088b7637c9a48abb995077efc764  docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/review/run_cc106a316c68-reviewer.json
+  head_sha: 9cf0160cf8117efd3ebb0edc70e521747a5de1f1
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+changed_files:
+- adapters/orca/RUNBOOK.md
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/run_unit.py
+- tests/test_attempts_integration_check.py
+artifact_hash: 713b234b97bf8602530c13668964dbe87dc7bb49685234455108cc8e25b19e98
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-04T00:45:44+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-04T00:33:17+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_cc106a316c68 — 검증 계획 9건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 9cf0160cf811 vs 현재 9cf0160cf811
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence ff399099aefd vs 현재 ff399099aefd (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_attempts_integration_check -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — ! grep -q ''같은 제목'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — grep -q ''result.terminal.worktreeId'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — grep -q ''run-unit merge-check'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo fixtures check'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 14건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 6건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 9건이 승인 커밋 9cf0160cf811 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_attempts_integration_check -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — ! grep -q ''같은 제목'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — grep -q ''result.terminal.worktreeId'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — grep -q ''run-unit merge-check'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo fixtures check'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 9cf0160cf811 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'docs/planning/open-questions.md', 'romeo/cli.py',
+      'romeo/run_unit.py', 'tests/test_attempts_integration_check.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_72570c993392-reviewer.json: FAIL(findings 1건 — 첫째: AC-4가 요구한 ‘같은 회차에서 이 체크아웃은 판정까지 났고
+      워크트리는 started까지만 난’ 모양은 구) — 재승인 전 승인(approved_at 2026-09-04T00:06:33+09:00)으로 낸 판정 · 다른 산출물(f7e9dce+ff399099aefd)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 9cf0160+ff399099aefd 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_cc106a316c68-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

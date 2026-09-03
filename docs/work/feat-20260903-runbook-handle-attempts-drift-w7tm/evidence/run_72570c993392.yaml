@@ -1,0 +1,183 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_72570c993392
+task_id: task_3861bbda501b
+dispatch_id: ctx_59a782aa6346
+unit_id: feat-20260903-runbook-handle-attempts-drift-w7tm
+spec_ref:
+  path: docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/spec.md
+  sha256: a7f27d4c6e4d9dcda0ae369620a92bc70d73cca2b946d6d22ef5d57698eec41c
+base_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm
+started_at: '2026-09-04T00:24:54+09:00'
+finished_at: '2026-09-04T00:32:49+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attempts_integration_check -v
+  exit_code: 0
+  started_at: '2026-09-04T00:24:54+09:00'
+  finished_at: '2026-09-04T00:24:54+09:00'
+  seconds: 0.111
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/01-check-1.log
+  log_sha256: 25c58206423c92e1fa81d666eb06866af07cf6a905ad4187d83e1294c4f02a0f
+  stdout_tail: ''
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-2
+  command: '! grep -q ''같은 제목'' adapters/orca/RUNBOOK.md'
+  exit_code: 0
+  started_at: '2026-09-04T00:24:54+09:00'
+  finished_at: '2026-09-04T00:24:54+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/02-check-2.log
+  log_sha256: ecf9683622ce16680a6783239a74b4c985db6f94110c27f9dae17ec56a8f2806
+  stdout_tail: ''
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-3
+  command: grep -q 'result.terminal.worktreeId' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-04T00:24:54+09:00'
+  finished_at: '2026-09-04T00:24:54+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/03-check-3.log
+  log_sha256: 82bfb5b72261ade4bae2488b57d3e299befcbb55c9b994fab63544ae0a373588
+  stdout_tail: ''
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-4
+  command: grep -q 'run-unit merge-check' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-04T00:24:54+09:00'
+  finished_at: '2026-09-04T00:24:54+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/04-check-4.log
+  log_sha256: 8fe865a980c133734c4421c2aa48dc46e0ee902239392009cd2f11ce8ec2d124
+  stdout_tail: ''
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T00:24:54+09:00'
+  finished_at: '2026-09-04T00:27:03+09:00'
+  seconds: 128.679
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/05-check-5.log
+  log_sha256: 56bbe210197d13fce64239207016fce10c9826ec5fc6cf3d793961624449edfa
+  stdout_tail: ''
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-6
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-04T00:27:03+09:00'
+  finished_at: '2026-09-04T00:27:03+09:00'
+  seconds: 0.145
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/06-check-6.log
+  log_sha256: 90622561beab707643535a8447f79d09fe7beaa334b3c517de72c0df7007337a
+  stdout_tail: 'rkspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/brief.md
+    lines=66 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/spec.md
+    lines=131 needs_input=0 unchecked_ac=0'
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-04T00:27:03+09:00'
+  finished_at: '2026-09-04T00:27:04+09:00'
+  seconds: 0.18
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/07-check-7.log
+  log_sha256: d7c742f9ece30213926c2ef242df271b6d63157c92940617e991b33a90fd9b87
+  stdout_tail: compile 검사 PASS
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-8
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-04T00:27:04+09:00'
+  finished_at: '2026-09-04T00:27:04+09:00'
+  seconds: 0.607
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/08-check-8.log
+  log_sha256: 821891a1114cec22c6235d0efdca56eb1725979c8fc273c799d4fc8d362903c6
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: check-9
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-04T00:27:04+09:00'
+  finished_at: '2026-09-04T00:27:05+09:00'
+  seconds: 0.132
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/09-check-9.log
+  log_sha256: c3219fdb9fb3233bb109e79ce10d63fa12d51741070dfbf54e34bc0a148dbab9
+  stdout_tail: PASS 33 fixtures
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm'
+  exit_code: 0
+  started_at: '2026-09-04T00:29:14+09:00'
+  finished_at: '2026-09-04T00:29:14+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/10-review-tree-before.log
+  log_sha256: db1f10bdcbcd562f1131884aeb3ec4f6f840a4352c1548bcf754192840b2d08c
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/run_unit.py\n\
+    ?? tests/test_attempts_integration_check.py"
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/.harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-04T00:29:19+09:00'
+  finished_at: '2026-09-04T00:29:19+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/11-reviewer-brief.log
+  log_sha256: 8862abec4474d04d9ae694922f28faebd526c3c4e1ef9268ccdbd98a74d06e33
+  stdout_tail: 5bb1949bb4c36e65a462c50c7e9aa3bed6c2a784dc2cbf0130412e486f9f1bcd  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-runbook-handle-attempts-drift-w7tm/.harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/reviewer-brief.md
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm'
+  exit_code: 0
+  started_at: '2026-09-04T00:32:45+09:00'
+  finished_at: '2026-09-04T00:32:45+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/12-review-tree-after.log
+  log_sha256: db1f10bdcbcd562f1131884aeb3ec4f6f840a4352c1548bcf754192840b2d08c
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M docs/planning/open-questions.md\n M romeo/cli.py\n M romeo/run_unit.py\n\
+    ?? tests/test_attempts_integration_check.py"
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/review/run_72570c993392-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-04T00:32:49+09:00'
+  finished_at: '2026-09-04T00:32:49+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260903-runbook-handle-attempts-drift-w7tm/run_72570c993392/13-review-record.log
+  log_sha256: 028b9c30555db1299b66b31f9a3e97bfa7e46111a21073adc9deaabc10a27904
+  stdout_tail: 9fbbb466b02e1f8a67967460faee3bdcc8d4413cc508c7f2c3be07419c46b4d2  docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/review/run_72570c993392-reviewer.json
+  head_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  dirty_tree_hash: ff399099aefddfa1a31a62afa2bae4497fd9ead429b9d59b8868fe761798c998
+changed_files:
+- adapters/orca/RUNBOOK.md
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/run_unit.py
+- tests/test_attempts_integration_check.py
+artifact_hash: 713b234b97bf8602530c13668964dbe87dc7bb49685234455108cc8e25b19e98
+reviewer: null
+verdict: null
+approvals: []

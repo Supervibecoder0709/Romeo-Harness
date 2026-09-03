@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-04T00:33:17+09:00'
 approved_by: justjulliette0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-04T00:45:44+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_72570c993392.yaml, evidence/run_cc106a316c68.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -43,12 +43,12 @@ approval_history:
 - **왜 지금:** 다음 관통은 charter 를 쓰는 실제 T2 관통이고, 두 결함은 **그 관통이 반드시 지나는 위임 경로 위**에 있다(§3.7 검토자 기동 · 통합). §10 동결 규칙상 관통이 시작되면 하네스를 고칠 수 없으므로, 이 상태로 들어가면 §3.7 에서 막다른 길을 손으로 우회하고 통합에서 판정을 손으로 복사하게 된다 — 그렇게 나온 판정은 무엇이 만든 것인지 말하기 어렵다. 정비의 자리는 관통과 관통 사이다.
 - **기대 결과:** 코디네이터가 RUNBOOK §3.7 을 **글자 그대로 밟아도** 핸들 확인이 성립한다 — 제목이 무엇으로 바뀌어 있든 상관없다. 그리고 워커 워크트리의 회차 기록이 위임 쪽 판정을 하나라도 잃은 채로 통합되려 하면, 통합 전에 종료 코드가 0 이 아닌 명령이 그것을 막는다. 판정을 잃지 않은 정상 통합(워크트리에 `started` 만 더 있는 경우)은 그대로 통과한다.
 - **수용 기준:**
-  - [ ] AC-1 RUNBOOK §3.7 (1) 의 핸들 확인 절차 (b)·(c) 가 **제목을 확인 기준으로 쓰지 않는다.** (b) 는 `terminal show` 가 돌려준 워크트리 id 가 방금 지정한 워크트리와 같은지를 보고, (c) 는 `terminal list --worktree` 결과에서 **핸들** 로 행을 찾는다.
-  - [ ] AC-2 그 자리에 **왜 제목이 기준이 될 수 없는지**가 2026-09-03 실측(codex TUI 가 `review-<id>-<run>` 제목을 `⠹ impl-<id>…` 로, 구현자 터미널 제목을 `✳ <id> 구현` 으로 덮어썼다)과 함께 적혀 있다. 근거 없이 기준만 바꾸면 다음 사람이 제목으로 되돌린다.
-  - [ ] AC-3 워크트리 사본의 `attempts.yaml` 이 이 체크아웃의 판정(`pass`/`fail`)을 **하나라도 잃은** 상태에서, `bin/romeo run-unit merge-check --unit <id> --worktree <경로>` 가 **종료 코드 0 이 아니고** 어느 회차의 어느 판정이 사라지는지를 인쇄한다.
-  - [ ] AC-4 워크트리 사본이 **이 체크아웃의 판정을 전부 담은 채** `started` 가 하나 더 있는 상태 — 판정 난 회차는 양쪽에 같이 있고 워크트리에만 다음 회차의 `started` 가 붙은 모양 — 에서 같은 명령이 **종료 코드 0** 이다. 정상 통합을 막는 검사는 통합을 막을 뿐 아무것도 지키지 못한다. (1회차 검토자 FAIL 의 원인이 이 항목이었다 — 옛 문장은 「이 체크아웃에서는 판정까지, 워크트리에서는 `started` 까지」 를 정상이라 불렀는데 그것은 AC-3 이 막으라고 한 **판정 손실 그 자체**였다. 두 항목이 같은 상태를 반대로 판정했고, 무엇이 정상인지를 정하는 것은 Q-48 이 막으려던 사고다: 워크트리 것을 통합해 판정이 `started` 로 덮이는 것.)
-  - [ ] AC-5 RUNBOOK 의 위임 절차에 **`attempts.yaml` 의 정본이 위임한 쪽**이라는 것과 통합 직전에 `run-unit merge-check` 를 밟는 자리가 있다. 요구를 적는 자리와 그것을 보는 자리를 같은 커밋에 둔다(§11).
-  - [ ] AC-6 `docs/planning/open-questions.md` 의 Q-47·Q-48 이 닫히고, 무엇으로 닫혔는지가 적혀 있다.
+  - [x] AC-1 RUNBOOK §3.7 (1) 의 핸들 확인 절차 (b)·(c) 가 **제목을 확인 기준으로 쓰지 않는다.** (b) 는 `terminal show` 가 돌려준 워크트리 id 가 방금 지정한 워크트리와 같은지를 보고, (c) 는 `terminal list --worktree` 결과에서 **핸들** 로 행을 찾는다.
+  - [x] AC-2 그 자리에 **왜 제목이 기준이 될 수 없는지**가 2026-09-03 실측(codex TUI 가 `review-<id>-<run>` 제목을 `⠹ impl-<id>…` 로, 구현자 터미널 제목을 `✳ <id> 구현` 으로 덮어썼다)과 함께 적혀 있다. 근거 없이 기준만 바꾸면 다음 사람이 제목으로 되돌린다.
+  - [x] AC-3 워크트리 사본의 `attempts.yaml` 이 이 체크아웃의 판정(`pass`/`fail`)을 **하나라도 잃은** 상태에서, `bin/romeo run-unit merge-check --unit <id> --worktree <경로>` 가 **종료 코드 0 이 아니고** 어느 회차의 어느 판정이 사라지는지를 인쇄한다.
+  - [x] AC-4 워크트리 사본이 **이 체크아웃의 판정을 전부 담은 채** `started` 가 하나 더 있는 상태 — 판정 난 회차는 양쪽에 같이 있고 워크트리에만 다음 회차의 `started` 가 붙은 모양 — 에서 같은 명령이 **종료 코드 0** 이다. 정상 통합을 막는 검사는 통합을 막을 뿐 아무것도 지키지 못한다. (1회차 검토자 FAIL 의 원인이 이 항목이었다 — 옛 문장은 「이 체크아웃에서는 판정까지, 워크트리에서는 `started` 까지」 를 정상이라 불렀는데 그것은 AC-3 이 막으라고 한 **판정 손실 그 자체**였다. 두 항목이 같은 상태를 반대로 판정했고, 무엇이 정상인지를 정하는 것은 Q-48 이 막으려던 사고다: 워크트리 것을 통합해 판정이 `started` 로 덮이는 것.)
+  - [x] AC-5 RUNBOOK 의 위임 절차에 **`attempts.yaml` 의 정본이 위임한 쪽**이라는 것과 통합 직전에 `run-unit merge-check` 를 밟는 자리가 있다. 요구를 적는 자리와 그것을 보는 자리를 같은 커밋에 둔다(§11).
+  - [x] AC-6 `docs/planning/open-questions.md` 의 Q-47·Q-48 이 닫히고, 무엇으로 닫혔는지가 적혀 있다.
 - **위험과 되돌리기:** 문서와 하네스 코드만 바꾼다. 외부 상태·운영 데이터를 건드리지 않고 되돌리기는 `git revert <통합 커밋>` 이다. 실질적 위험은 하나 — AC-3 의 새 명령이 **정상 통합까지 막는 것**(거짓 양성)이다. 그러면 다음 관통의 통합이 서지 않는다. AC-4 가 그것을 겨누고, 검증 계획의 check-1(테스트)이 그 상태에서 종료 코드 0 을 실측한다. 그래도 막히면 그 명령을 밟는 RUNBOOK 문단만 되돌리면 통합은 즉시 가능하다(명령은 통합 자체를 수행하지 않고 판정만 낸다).
 - **결정 필요:** 없음
 
@@ -129,6 +129,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-04T00:45:44+09:00 · HEAD 9cf0160cf811 · 검사 기록 run_cc106a316c68
 
-- (없음)
+- [evidence/run_72570c993392.yaml](evidence/run_72570c993392.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_cc106a316c68.yaml](evidence/run_cc106a316c68.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

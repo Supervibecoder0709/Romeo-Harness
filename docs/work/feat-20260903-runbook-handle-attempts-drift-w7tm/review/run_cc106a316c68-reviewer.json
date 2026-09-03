@@ -1,0 +1,16 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260903-runbook-handle-attempts-drift-w7tm",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/task/run_cc106a316c68-reviewer.json",
+    "sha256": "0445fe4a5e6f341ea847e7a10fdd4547d36408896e6e2501c9e88c1bfa5a4095"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/evidence/run_cc106a316c68.yaml",
+  "notes": "검사를 재실행하지 않았다. 양쪽 작업 계약의 base_sha가 일치했고, 변경 파일은 구현자 allowed_paths 안이다. required_checks 9건은 증거와 원시 로그에서 모두 exit 0이며 같은 head/tree 식별에 묶여 있다. AC-1·2·5는 RUNBOOK §3.7·§3.10, AC-3·4는 ac3-ac4-probe와 check-1 원시 로그, AC-6은 Q-47·Q-48에서 확인했다."
+}
