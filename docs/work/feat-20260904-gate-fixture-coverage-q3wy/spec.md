@@ -11,7 +11,7 @@ profile: standard
 blast_radius: small
 uncertainty: medium
 status: active
-approved_at: '2026-09-04T02:01:26+09:00'
+approved_at: '2026-09-04T05:53:23+09:00'
 approved_by: julliettelee
 base_sha: null
 closed_at: null
@@ -24,6 +24,10 @@ routing:
   history: []
 created: '2026-09-04'
 updated: '2026-09-04'
+approval_history:
+- {approved_at: '2026-09-04T02:01:26+09:00', approved_by: julliettelee, superseded_at: '2026-09-04T05:53:23+09:00',
+  reason: AC-2 가 사후 관측이 불가능한 시간 순서(route 보다 먼저 적었다)를 요구해 1회차 검토자가 AC_UNMET 을 냈다. 자기참조를 끊는 자리를 시간 순서에서
+    사람의 확인(human_correction)으로 옮긴다. 5건의 분류·expected 는 2026-09-04 사용자가 확정했다.}
 ---
 
 # hard gate 8 커버리지를 fixture 와 검사로 채운다
@@ -51,7 +55,9 @@ updated: '2026-09-04'
   실제 로그 우선 탐색은 68개 프로젝트의 세션 로그(597MB)를 2회 훑어 수행했다. 5개 게이트 중 실제 요청이 **1건**뿐인 이유는 사용자의 프로젝트가 아직 운영 데이터·법무·공개 API 단계에 이르지 않았기 때문이다. authored 4건은 「라우터가 실제 사용에서 맞는가」를 증명하지 않는다 — `source.kind: authored` 가 그 한계를 파일에 남긴다.
 - **수용 기준:**
   - [ ] AC-1 `fixtures/requests/` 의 `classification.gates` 를 집계하면 `core/policy/classification.yaml` 의 `hard_gates[].id` 8개 각각에 대해 fixture 가 1건 이상이다.
-  - [ ] AC-2 추가한 5건의 `expected` 는 **요청 내용에서 먼저 손으로 적고** 그 뒤 `bin/romeo route --classification` 출력과 대조한다. 어긋난 항목은 조용히 맞추지 말고 결과에 보고한다 — 어느 쪽이 틀렸는지는 사람이 판정한다. 대조를 마친 뒤 `bin/romeo route --fixtures fixtures/requests --report` 가 38건 전부 일치로 exit 0 이다. (이 마지막 대조는 **회귀 방지 검사**다 — expected 를 route 출력으로 채우면 route 로 채점해도 항상 통과하는 자기참조가 되므로, 판별력은 앞의 손 대조와 보고에 있다.)
+  - [ ] AC-2 추가한 5건의 `expected` 는 `notes/hand-derived-expected.md` 에 **항목별 근거**(어느 정책 규칙이 그 값을 내는가)와 함께 적혀 있고, `bin/romeo route --classification` 출력과의 항목별 대조표와 어긋난 항목 보고가 같은 파일에 있다. 그리고 **사용자가 그 표를 확인한 사실이 각 fixture 의 `human_correction` 에 기록된다**(`reviewed_by: user` · `verdict` · 확인 날짜). 그 뒤 `bin/romeo route --fixtures fixtures/requests --report` 가 38건 전부 일치로 exit 0 이다.
+
+    (**1회차 재승인 사유 · D-80 경로.** 이 AC 는 처음에 「route 실행 **전에** 손으로 적었다」는 시간 순서를 요구했고 1회차 검토자가 `AC_UNMET` 을 냈다 — 그 순서는 사전에 봉인하지 않으면 사후 관측이 불가능한데 AC 가 봉인을 지시하지 않았다. 원인이 산출물이 아니라 완료 정의였다. 자기참조를 실제로 끊는 자리는 시간 순서가 아니라 **사람의 확인**이다 — 근거 열이 있는 표는 route 출력의 단순 복사와 이미 구별되고, 남은 것은 그 값이 옳은지를 사람이 판정하는 것이다. 기존 fixture 33건의 `human_correction` 이 그 자리다. `route --fixtures … --report` 는 **회귀 방지 검사**로 남는다 — expected 를 route 출력으로 채우면 그것으로 채점해도 항상 통과한다.)
   - [ ] AC-3 새 검사는 게이트 id 를 **정책표에서 읽는다** — 정책표의 게이트 id 하나를 개명한 가상 상태에서 커버리지 검사가 실패한다(id 를 하드코딩한 검사는 이 상태에서 통과해 버린다).
   - [ ] AC-4 새 검사는 fixture 의 `gates` 값이 정책표 id 집합 밖이면 실패한다 — 정책표에 없는 게이트 id 를 fixture 하나에 넣은 가상 상태에서 id 유효성 검사가 실패한다. (AC-3 과 다른 상태를 본다: AC-3 은 정책표를 바꾸고 fixture 를 그대로 두며, AC-4 는 fixture 를 바꾸고 정책표를 그대로 둔다.)
   - [ ] AC-5 새 검사는 **판별 검사**다 — fixture 5건을 뺀 가상 상태(= 이 단위 이전 상태)에서 커버리지 검사가 실패하고, 5건이 있는 상태에서 통과한다. 양쪽을 실행으로 보인다. 더해서 **게이트 id 를 하드코딩한 구현**을 개명된 정책표로 돌리면 통과해 버리는 것을 반례로 보인다 — 빈 값이 아니라 그럴듯한 거짓 구현에서 갈리는 것을 확인한다(§11).

@@ -1,0 +1,14 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260904-gate-fixture-coverage-q3wy
+attempts:
+- n: 1
+  run: run_dd07b98f3f83
+  base_sha: 4c4376cc2ec005dbc404f924eabfb08c02672ba9
+  started_at: '2026-09-04T02:02:17+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL(AC_UNMET) — AC-2 의 「route 실행 전에 손으로 먼저 적었다」는 시간 순서를 evidence 가 봉인하지 않아 사후 증명이 불가능했다.
+    손으로 적은 표(notes/hand-derived-expected.md)는 항목별 근거까지 있고 대조 결과 어긋남 0건이지만, 「먼저」 자체가 관측 대상이 아니었다. 검사 5건은
+    전부 exit 0, 방어 검사 유효.
+  settled_at: '2026-09-04T02:20:11+09:00'
+reviews: []
