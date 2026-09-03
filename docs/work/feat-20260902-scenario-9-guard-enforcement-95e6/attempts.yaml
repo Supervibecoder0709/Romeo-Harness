@@ -29,6 +29,14 @@ attempts:
   settled_at: '2026-09-02T23:27:25+09:00'
   base_sha_history:
   - 53fa8286698ea96fb52ed7dfdedb70f6d23bae78
+- n: 4
+  run: run_108f96346abc
+  base_sha: 5d4e00db5e9749ccc24de474fe17b79900d7ecc3
+  started_at: '2026-09-03T01:41:01+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS(findings 1 = 범위 밖 경고 Q-45). AC-10 base 재현이 ac10-base-repro 라벨로 봉인됐다
+  settled_at: '2026-09-03T01:53:48+09:00'
 reviews:
 - after_attempt: 3
   conclusion: '완료 정의는 달성 가능하다. AC-10 은 통과 불가능한 문장이 아니다 — 1회차(run_4f365ab79976)가 같은 AC 를 ac10-base-repro
