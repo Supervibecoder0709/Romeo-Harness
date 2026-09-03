@@ -1,0 +1,12 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260903-runbook-handle-attempts-drift-w7tm
+attempts:
+- n: 1
+  run: run_72570c993392
+  base_sha: f7e9dced63779958ce9462b0bc6932534ca3ecf3
+  started_at: '2026-09-04T00:07:28+09:00'
+  result: fail
+  failure_class: goal
+  note: null
+  settled_at: '2026-09-04T00:32:53+09:00'
+reviews: []
