@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260903-guard-guidance-vendor-drift-bvjz",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/task/run_52462dd28eae-reviewer.json",
+    "sha256": "a9ab45bba3a1e188b9a76b7660cb8b107dedcc84a6063454153fe4c37e72b3df"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/evidence/run_52462dd28eae.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. 기록된 필수 검사 9건은 모두 exit 0이며, 변경 파일은 구현자 allowed_paths 안이고 guards는 비어 있다."
+}

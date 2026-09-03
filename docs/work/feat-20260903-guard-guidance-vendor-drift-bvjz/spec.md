@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-09-03T10:08:41+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-03T11:02:49+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_6ddedfce1b19.yaml, evidence/run_52462dd28eae.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -39,15 +39,15 @@ updated: '2026-09-03'
 - **왜 지금:** 절차 문서를 **지시대로 따르면 `exit 2` 로 막힌다** — 규칙을 지킨 실행이 막히고 지시를 무시한 실행만 통과한다. M3 의 남은 조각인 실제 T2 관통이 시작되면 §10 동결 때문에 그 안에서 이 안내를 고칠 수 없으므로 관통 **전에** 닫는다.
 - **기대 결과:** 안내하는 자리와 요구하는 자리가 같은 형식을 말하고, 코어 정책 파일에 집행 수단이 남지 않는다. 그 일치가 검사로 유지되어 라벨이 바뀌면 검사가 먼저 깨진다.
 - **수용 기준:**
-  - [ ] AC-1 안내 3곳(`core/workflows/implement/SKILL.md` · `adapters/{claude,codex}/workflows/implement.md`)의 명령 예시가 `--note` 인자를 담는다. 지금은 셋 중 둘이 그 인자를 아예 빼고 안내한다.
-  - [ ] AC-2 그 `--note` 값이 설명 라벨을 **일부만** 나열하지 않는다 — 라벨이 하나라도 나타나면 `required_explanation` 의 네 개가 전부 나타난다. 지금 `SKILL.md:57` 은 넷 중 둘만 적는다.
-  - [ ] AC-3 그 검사가 라벨을 `core/policy/execution-guards.yaml` **에서 읽는다** — 검사 코드에 라벨 글자를 복사하지 않는다. 정책의 라벨을 바꾸면 검사가 그 즉시 새 라벨로 대조한다(§11).
-  - [ ] AC-4 그 검사의 반례가 **그럴듯한 거짓 값**이다 — 빈 `--note` 가 아니라 네 항목 중 셋만 적은 안내가 실패하는 것을 보인다(§11).
-  - [ ] AC-5 `core/policy/execution-guards.yaml` 에 최상위 `enforcement:` 키가 없고 그 파일 어디에도 런타임·도구 이름(claude·codex·orca·anthropic·openai·gemini)이 없다(C-C6). 걷어낸 값의 정본이 `.harness/bindings.yaml` 의 `permission_ceiling`·`roles[].enforcement` 임을 그 자리에 한 줄로 남긴다.
-  - [ ] AC-6 그 삭제가 무엇도 깨뜨리지 않았음을 보인다 — 그 블록을 읽는 코드가 저장소에 없다는 실측을 증거로 남긴다(`romeo/policy.py` 는 `guards` 키만 읽는다).
-  - [ ] AC-7 AC-1·AC-2·AC-5 를 겨누는 검사가 **고치기 전 트리에서 실패**하고 고친 뒤 통과하는 것을 양쪽으로 보인다(§11). 회귀 검사는 이 실측 대상이 아니며 검증 계획의 종류 표가 어느 쪽인지 적는다.
-  - [ ] AC-8 `bin/romeo compile --check` 가 통과한다 — 어댑터 원문을 고치면 두 런타임의 지침 산출물이 함께 움직여야 한다. 한쪽만 바뀐 상태로 닫히지 않는다.
-  - [ ] AC-9 `docs/planning/open-questions.md` 의 Q-44·Q-45 가 닫힌 것으로 갱신되고, 이 단위가 범위 밖으로 남긴 것(코어 나머지 6파일의 런타임 이름)이 새 항목으로 열린다(§12).
+  - [x] AC-1 안내 3곳(`core/workflows/implement/SKILL.md` · `adapters/{claude,codex}/workflows/implement.md`)의 명령 예시가 `--note` 인자를 담는다. 지금은 셋 중 둘이 그 인자를 아예 빼고 안내한다.
+  - [x] AC-2 그 `--note` 값이 설명 라벨을 **일부만** 나열하지 않는다 — 라벨이 하나라도 나타나면 `required_explanation` 의 네 개가 전부 나타난다. 지금 `SKILL.md:57` 은 넷 중 둘만 적는다.
+  - [x] AC-3 그 검사가 라벨을 `core/policy/execution-guards.yaml` **에서 읽는다** — 검사 코드에 라벨 글자를 복사하지 않는다. 정책의 라벨을 바꾸면 검사가 그 즉시 새 라벨로 대조한다(§11).
+  - [x] AC-4 그 검사의 반례가 **그럴듯한 거짓 값**이다 — 빈 `--note` 가 아니라 네 항목 중 셋만 적은 안내가 실패하는 것을 보인다(§11).
+  - [x] AC-5 `core/policy/execution-guards.yaml` 에 최상위 `enforcement:` 키가 없고 그 파일 어디에도 런타임·도구 이름(claude·codex·orca·anthropic·openai·gemini)이 없다(C-C6). 걷어낸 값의 정본이 `.harness/bindings.yaml` 의 `permission_ceiling`·`roles[].enforcement` 임을 그 자리에 한 줄로 남긴다.
+  - [x] AC-6 그 삭제가 무엇도 깨뜨리지 않았음을 보인다 — 그 블록을 읽는 코드가 저장소에 없다는 실측을 증거로 남긴다(`romeo/policy.py` 는 `guards` 키만 읽는다).
+  - [x] AC-7 AC-1·AC-2·AC-5 를 겨누는 검사가 **고치기 전 트리에서 실패**하고 고친 뒤 통과하는 것을 양쪽으로 보인다(§11). 회귀 검사는 이 실측 대상이 아니며 검증 계획의 종류 표가 어느 쪽인지 적는다.
+  - [x] AC-8 `bin/romeo compile --check` 가 통과한다 — 어댑터 원문을 고치면 두 런타임의 지침 산출물이 함께 움직여야 한다. 한쪽만 바뀐 상태로 닫히지 않는다.
+  - [x] AC-9 `docs/planning/open-questions.md` 의 Q-44·Q-45 가 닫힌 것으로 갱신되고, 이 단위가 범위 밖으로 남긴 것(코어 나머지 6파일의 런타임 이름)이 새 항목으로 열린다(§12).
 - **위험과 되돌리기:** 판정을 바꾸지 않는다 — 지금 막히는 것(빈 `--note`)은 그대로 막히고 안내가 요구를 따라올 뿐이다. 되돌리기는 커밋 되돌림 하나(`git revert <통합 커밋>`)이고, 지우는 `enforcement:` 블록은 읽는 코드가 없음을 AC-6 이 실측으로 보인다. 운영 데이터·외부 상태는 건드리지 않는다.
 - **결정 필요:** 없음
 
@@ -137,6 +137,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-03T11:02:49+09:00 · HEAD b7802b41d36f · 검사 기록 run_52462dd28eae
 
-- (없음)
+- [evidence/run_6ddedfce1b19.yaml](evidence/run_6ddedfce1b19.yaml) — exit codes [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_52462dd28eae.yaml](evidence/run_52462dd28eae.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

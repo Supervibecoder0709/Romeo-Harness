@@ -1,0 +1,235 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_6ddedfce1b19
+task_id: task_d125f6045aa5
+dispatch_id: ctx_12178df88b7c
+unit_id: feat-20260903-guard-guidance-vendor-drift-bvjz
+spec_ref:
+  path: docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/spec.md
+  sha256: b4c79c6d440cdda4650158060925d1d4da3ec31a5a52e43003b55258cad5fe75
+base_sha: a8bb36169576958a5be33a9decb84190a963547e
+head_sha: a8bb36169576958a5be33a9decb84190a963547e
+dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-guard-guidance-vendor-drift-bvjz
+started_at: '2026-09-03T10:30:15+09:00'
+finished_at: '2026-09-03T10:42:12+09:00'
+commands:
+- id: probe-base-tree
+  command: docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/probe-base-tree.sh
+  exit_code: 1
+  started_at: '2026-09-03T10:30:15+09:00'
+  finished_at: '2026-09-03T10:30:17+09:00'
+  seconds: 1.362
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/01-probe-base-tree.log
+  log_sha256: 70b6a26ec66f07d146403e1d3481acd172856463f8fa0ed5a864f1c9f17fdcd0
+  stdout_tail: "ork/Versions/3.9/lib/python3.9/pathlib.py\", line 1110, in _opener\n    return self._accessor.open(self,\
+    \ flags, mode)\nFileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/cz/6b68hs55753g47c9vbr4k14c0000gn/T/tmp.ycIWhISljE/tests/core/policy/execution-guards.yaml'\n\
+    \n----------------------------------------------------------------------\nRan 10 tests in 0.069s\n\
+    \nFAILED (errors=7)"
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: probe-base-tree
+  command: docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/probe-base-tree.sh
+  exit_code: 0
+  started_at: '2026-09-03T10:30:44+09:00'
+  finished_at: '2026-09-03T10:30:45+09:00'
+  seconds: 0.846
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/02-probe-base-tree.log
+  log_sha256: be80ee5a8994e0c6fd8a36290ea039f075348ea4b54f6d0ee2b6af0c7ea78889
+  stdout_tail: 'in [''policy_version'', ''updated'', ''required_explanation'', ''approval'', ''guards'',
+    ''enforcement''] : core/policy/execution-guards.yaml 에 최상위 enforcement 키가 있다 — 집행 수단의 정본은 .harness/bindings.yaml
+    이다
+
+
+    ----------------------------------------------------------------------
+
+    Ran 10 tests in 0.160s
+
+
+    FAILED (failures=4)
+
+    base 트리(a8bb36169576958a5be33a9decb84190a963547e)에서 판별 검사가 실패한다 — 기대: FAILED (failures=4)'
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: probe-no-enforcement-reader
+  command: '! grep -rnE ''(guards|gd|pol\[.guards.\])\[.enforcement.\]|guards.*\.get\(.enforcement.\)''
+    --include=*.py romeo bin tests'
+  exit_code: 0
+  started_at: '2026-09-03T10:30:49+09:00'
+  finished_at: '2026-09-03T10:30:50+09:00'
+  seconds: 0.056
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/03-probe-no-enforcement-reader.log
+  log_sha256: e9721edaff1760ecb464f86fb3a427d6eb0fade616826bb1079443d675a4db5a
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-1
+  command: python3 -m unittest tests.test_guard_guidance_alignment -v
+  exit_code: 0
+  started_at: '2026-09-03T10:30:56+09:00'
+  finished_at: '2026-09-03T10:30:56+09:00'
+  seconds: 0.335
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/04-check-1.log
+  log_sha256: 6147bd697a57228338e5158657c0ee207e73eab0f442718927e6e2fdfb7772b0
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-2
+  command: '! grep -qiE ''(claude|codex|orca|anthropic|openai|gemini)'' core/policy/execution-guards.yaml'
+  exit_code: 0
+  started_at: '2026-09-03T10:30:56+09:00'
+  finished_at: '2026-09-03T10:30:56+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/05-check-2.log
+  log_sha256: e3b251da47d88e25d4d25e78713a90cc4b677c3021923b909b7f090cfab98365
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-3
+  command: grep -q -- '--note' adapters/claude/workflows/implement.md
+  exit_code: 0
+  started_at: '2026-09-03T10:30:56+09:00'
+  finished_at: '2026-09-03T10:30:56+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/06-check-3.log
+  log_sha256: 7bbbb99b401a12583c2e82d314983ff9107de1e0518ad4db8f2cebf210908c68
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-4
+  command: grep -q -- '--note' adapters/codex/workflows/implement.md
+  exit_code: 0
+  started_at: '2026-09-03T10:30:56+09:00'
+  finished_at: '2026-09-03T10:30:56+09:00'
+  seconds: 0.008
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/07-check-4.log
+  log_sha256: 51238464d6817b59846817c4fc1f76f99e78b87ab1ef015006541a4a752fb6ea
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-03T10:30:57+09:00'
+  finished_at: '2026-09-03T10:35:23+09:00'
+  seconds: 266.286
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/08-check-5.log
+  log_sha256: ff2c1b4618f8cc3031ed8292a454e393418d8a5745aa70e54f2cbedc0cbc52a0
+  stdout_tail: ''
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-6
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-03T10:35:23+09:00'
+  finished_at: '2026-09-03T10:35:23+09:00'
+  seconds: 0.278
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/09-check-6.log
+  log_sha256: f4c82625ccba5373ca9af4288e31052bb1a1f8058b7892d89a5e3f254b063da7
+  stdout_tail: "ness/impl-feat-20260903-guard-guidance-vendor-drift-bvjz/docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/brief.md\
+    \ lines=71 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-guard-guidance-vendor-drift-bvjz/docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/spec.md\
+    \ lines=143 needs_input=0 unchecked_ac=9\n    WARN  UNCHECKED_AC 9개"
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-03T10:35:23+09:00'
+  finished_at: '2026-09-03T10:35:24+09:00'
+  seconds: 0.342
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/10-check-7.log
+  log_sha256: cfa85405c3c8014ef674a72c27fea225572a87d173a0180ed58bdcfaf81481bd
+  stdout_tail: compile 검사 PASS
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-8
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-03T10:35:24+09:00'
+  finished_at: '2026-09-03T10:35:25+09:00'
+  seconds: 1.015
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/11-check-8.log
+  log_sha256: 2b6787075a18f3dd11228e8b8c40c79e822bb5253d1c75ea00fbc818904734f6
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: check-9
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-03T10:35:25+09:00'
+  finished_at: '2026-09-03T10:35:25+09:00'
+  seconds: 0.247
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/12-check-9.log
+  log_sha256: 8bccb4298cf7787e1dede57d3dfb606305911392777fffc573868579f4e7685e
+  stdout_tail: PASS 33 fixtures
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz'
+  exit_code: 0
+  started_at: '2026-09-03T10:37:31+09:00'
+  finished_at: '2026-09-03T10:37:31+09:00'
+  seconds: 0.03
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/13-review-tree-before.log
+  log_sha256: 6591eded91b85efe87e36383018b79d7790e5cee0ca1a2ab0dc7a5c6845c3e9a
+  stdout_tail: "M .agents/skills/implement/SKILL.md\n M .claude/skills/implement/SKILL.md\n M adapters/claude/workflows/implement.md\n\
+    \ M adapters/codex/workflows/implement.md\n M core/policy/execution-guards.yaml\n M core/workflows/implement/SKILL.md\n\
+    \ M docs/planning/open-questions.md\n?? tests/test_guard_guidance_alignment.py"
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-guard-guidance-vendor-drift-bvjz/.harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-03T10:37:38+09:00'
+  finished_at: '2026-09-03T10:37:38+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/14-reviewer-brief.log
+  log_sha256: 58b8ae6b84e6c1ff2ba0d4a2b6496c55e74eb21c3a070f4a5819d63798bb60e6
+  stdout_tail: 0c1b9c335b461e2903f5f9d1cfc0e6d975c6d613a5f5ec0b817c719b65c5c38d  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260903-guard-guidance-vendor-drift-bvjz/.harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/reviewer-brief.md
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz'
+  exit_code: 0
+  started_at: '2026-09-03T10:42:05+09:00'
+  finished_at: '2026-09-03T10:42:05+09:00'
+  seconds: 0.033
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/15-review-tree-after.log
+  log_sha256: 6591eded91b85efe87e36383018b79d7790e5cee0ca1a2ab0dc7a5c6845c3e9a
+  stdout_tail: "M .agents/skills/implement/SKILL.md\n M .claude/skills/implement/SKILL.md\n M adapters/claude/workflows/implement.md\n\
+    \ M adapters/codex/workflows/implement.md\n M core/policy/execution-guards.yaml\n M core/workflows/implement/SKILL.md\n\
+    \ M docs/planning/open-questions.md\n?? tests/test_guard_guidance_alignment.py"
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/review/run_6ddedfce1b19-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-03T10:42:12+09:00'
+  finished_at: '2026-09-03T10:42:12+09:00'
+  seconds: 0.036
+  log: .harness/runs/feat-20260903-guard-guidance-vendor-drift-bvjz/run_6ddedfce1b19/16-review-record.log
+  log_sha256: 09f1b2fe824287b101e46039af967735c03becab8f4f84dc6e8a22f3c6a12854
+  stdout_tail: 61ebe78c1f40eb5bfc585f443a60f702daa760f4a219464087beaa5f669a1264  docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/review/run_6ddedfce1b19-reviewer.json
+  head_sha: a8bb36169576958a5be33a9decb84190a963547e
+  dirty_tree_hash: 8227f8cb27bc0f6c9617f308d280f02fd73646c1637d4309f39dc1fbb6fa3585
+changed_files:
+- .agents/skills/implement/SKILL.md
+- .claude/skills/implement/SKILL.md
+- adapters/claude/workflows/implement.md
+- adapters/codex/workflows/implement.md
+- core/policy/execution-guards.yaml
+- core/workflows/implement/SKILL.md
+- docs/planning/open-questions.md
+- tests/test_guard_guidance_alignment.py
+artifact_hash: b04a0cc18b6863b3067b689be2987492ea9e0051dd147d00a796041ddbcf3793
+reviewer: null
+verdict: null
+approvals: []

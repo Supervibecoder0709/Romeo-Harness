@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260903-guard-guidance-vendor-drift-bvjz",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/task/run_52462dd28eae-implementer.json",
+    "sha256": "57194ab0ef8ce0d8dd082c34ecfaea5204f8a1e215defed46113c744c34e283e"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_guard_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "! grep -qiE '(claude|codex|orca|anthropic|openai|gemini)' core/policy/execution-guards.yaml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q -- '--note' adapters/claude/workflows/implement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "grep -q -- '--note' adapters/codex/workflows/implement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/evidence/run_52462dd28eae.yaml",
+  "notes": "2회차 재작업 — run_6ddedfce1b19 검토(FAIL·AC_UNMET)가 지목한 자리만 고쳤다: tests/test_guard_guidance_alignment.py 의 violations() 에서 `if not found: continue` 예외(라벨이 note 안에서 발견되지 않으면 대조를 건너뛰는 분기)를 제거했다. 그 예외 때문에 정책의 라벨을 전면 개명하면 옛 라벨로 적힌 안내가 「라벨 없음」이 되어 대조에서 빠지고 검사가 통과([])했는데, 그것이 AC-3(정책 라벨을 바꾸면 검사가 즉시 새 라벨로 대조한다)이 실제로는 서지 않는 이유였다. 이제 모든 안내 줄의 --note 값은 예외 없이 parse_guard_explanation 을 통과해야 한다. 그 예외는 adapters/orca/RUNBOOK.md 처럼 라벨을 나열하지 않고 형식만 가리키는 안내를 통과시키려던 것이었는데, GUIDANCE_FILES 3곳(core/workflows/implement/SKILL.md · adapters/{claude,codex}/workflows/implement.md)은 RUNBOOK 을 포함하지 않고 셋 다 이미 라벨 4개를 직접 적으므로(grep 실측, 이번 run) 이 제거가 실제 안내 3곳의 판정을 바꾸지 않는다 — check-3·check-4·check-1(AC-1·AC-2 부분)이 그대로 exit 0 이다. 예외 제거의 결과로 TestLabelsComeFromPolicy.test_renaming_a_label_moves_the_verdict_with_it 을 뒤집었다 — 라벨 개명 뒤 옛 라벨 안내가 통과([])하는 것이 아니라 잡히는 것(len==1)을 확인하도록 고쳤다. 같은 이유로 TestCounterexamples.test_pointing_to_the_core_format_without_labels_passes 도 라벨을 가리키기만 한 안내가 이제는 잡히는 것으로 뒤집어 test_pointing_to_the_core_format_without_labels_fails 로 이름을 바꿨다 — 이 두 테스트는 별도로 발견한 결함이 아니라 violations() 예외 제거가 같은 파일 안에서 만드는 직접적 결과다. 부수적으로 wrapper 오류 문구를 '일부만 나열한다'에서 '채우지 못한다'로 일반화했고, 그로 인해 문자열이 어긋난 test_note_listing_three_of_four_labels_fails 의 assertIn 대상을 빠진 4번째 라벨명으로 바꿨다(동작은 그대로, 더 정밀해졌다) — 이 셋 모두 같은 커밋의 tests/test_guard_guidance_alignment.py 안에서 일어난 수정이다. run_6ddedfce1b19 의 증거·판정 봉투는 지우지 않았다. 검사 9건 전부 exit 0 (run_52462dd28eae 의 check-1~check-9, check-1 은 새 assertion 을 포함해 10개 테스트 전부 ok). spec.md 의 AC 문장·검증 계획은 고치지 않았고, 이번 run 에서 spec.md 를 쓰지 않았다(1회차 산출물 그대로). §12: 이번 재작업 범위 밖에서 새로 발견한 결함은 없다."
+}

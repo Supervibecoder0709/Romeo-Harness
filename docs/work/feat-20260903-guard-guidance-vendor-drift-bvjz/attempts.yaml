@@ -11,4 +11,13 @@ attempts:
     예외를 두어, 정책 라벨을 전면 개명하면 옛 라벨로 적힌 안내가 규칙 대상에서 빠지고 test_renaming_a_label_moves_the_verdict_with_it 이
     그 통과를 정상으로 못박는다. AC-3(정책 라벨을 바꾸면 그 즉시 새 라벨로 대조한다)이 서지 않는다. 안내 3곳은 모두 라벨 4개를 직접 적었으므로 그 예외 자체가 불필요하다
   settled_at: '2026-09-03T10:43:08+09:00'
+- n: 2
+  run: run_52462dd28eae
+  base_sha: b7802b41d36f9f1c827503a71fdb39e9b411fb16
+  started_at: '2026-09-03T10:45:14+09:00'
+  result: pass
+  failure_class: null
+  note: 2회차 close PASS — required_checks 9/9 · 재실행 9/9 · 앵커 양쪽 5/5 · 검토자 PASS findings 0. 1회차 FAIL(AC-3
+    미충족)이 지목한 violations() 예외 제거로 닫혔다
+  settled_at: '2026-09-03T11:03:00+09:00'
 reviews: []

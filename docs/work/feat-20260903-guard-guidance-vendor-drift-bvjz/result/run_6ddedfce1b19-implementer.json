@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260903-guard-guidance-vendor-drift-bvjz",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/task/run_6ddedfce1b19-implementer.json",
+    "sha256": "7de85432c5bdf1edf5495fe6ad5d14361aeb78a312db7e22bab4381c6e822c57"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_guard_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "! grep -qiE '(claude|codex|orca|anthropic|openai|gemini)' core/policy/execution-guards.yaml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q -- '--note' adapters/claude/workflows/implement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "grep -q -- '--note' adapters/codex/workflows/implement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/evidence/run_6ddedfce1b19.yaml",
+  "notes": "검사 9건 전부 exit 0 (run_6ddedfce1b19 의 check-1~check-9). AC-7 의 '고치기 전' 쪽은 같은 run 의 probe-base-tree (exit 0) 다 — 승인 base 커밋 a8bb361 의 트리를 임시 디렉터리에 펼치고 이 단위가 만든 검사 파일만 얹어 돌리면 FAILED (failures=4) 로 실패한다(AC-1 1건 · AC-2 1건 · AC-5 2건). 같은 검사가 지금 트리에서는 check-1 로 exit 0 이므로 양쪽이 실측됐다. 그 스크립트는 docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/probe-base-tree.sh 이고 작업 트리를 바꾸지 않는다. AC-6 의 '읽는 코드가 없다' 는 같은 run 의 probe-no-enforcement-reader (exit 0) 다 — romeo/policy.py:44 가 execution-guards.yaml 전체를 싣지만 읽는 것은 gd[\"guards\"] 목록뿐이고, 저장소의 다른 enforcement 참조는 .harness/bindings.yaml 의 역할 바인딩(romeo/compile.py)과 절 메타의 집행 지점(romeo/blocks.py)이라 이 블록과 무관하다. 삭제 뒤 check-5(804건) · check-6 · check-8 · check-9 가 전부 통과한다. check-1 은 승인 전 프로브를 돌릴 수 없었는데(검사 모듈 자체가 이 단위의 산출물이다) probe-base-tree 가 그 자리를 메운다 — spec 의 종류 표는 AC-8 이 대신한다고 적었지만, compile --check 는 어댑터와 산출물의 동기만 보므로 판별 실측으로는 base 트리 재현이 맞다. §12 로 남긴 것: 코어 나머지 6파일(core/policy/capabilities.yaml · classification.yaml · packages.yaml · core/principles/AGENTS.core.md · PROJECT.core.md · core/workflows/plan/SKILL.md)의 런타임 이름은 고치지 않고 Q-46 으로 열었다 — 정당한 언급과 C-C6 위반을 가르는 기준이 아직 없다. TestVendorNeutral 의 대상 목록도 그대로 뒀다."
+}
