@@ -37,7 +37,7 @@ orca worktree current --json
 | `allowed_paths: []` (검토자) | `roles.reviewer.enforcement` 의 명령형(`codex exec -s read-only`)을 `orca terminal create --command` 로 띄우고 그 핸들을 `worker-start --terminal` 로 채택한다(§3.7). `worker-start --agent` 에는 샌드박스 플래그도 명령 passthrough 도 없다(실측) | `codex exec --help`, `terminal create --help`, `worker-start --help`, D-68 |
 | `output_schema` | **넘기지 않는다.** 형식 검증은 §3.8 의 `envelope check` 가 원본 스키마로 한다 — 그쪽이 더 강한 강제다(앵커 검사 5개). 출력 회수는 Codex `-o <파일>` · Claude `--output-format json` 으로만 한다 | 2026-08-29 관통 실측 — 아래 경고 |
 | `required_checks` | 워커 안에서 `bin/romeo evidence checks --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>` 로 실행한다. 위임 계층이 대신 실행하지 않는다. **`<dispatch-id>` 는 §3.5 가 돌아온 뒤에야 존재한다** — 그 값을 돌고 있는 워커에게 넣는 자리는 §3.5.2 이고, 워커는 그 전에 증거 기록을 시작하지 않는다 | K-51, §3.5.2, §5 |
-| `guards` | §8. M2 는 `bin/romeo evidence approve` 로 기록한다 | `core/policy/execution-guards.yaml` |
+| `guards` | §8. M2 는 `bin/romeo evidence approve`·`reject` 로 기록한다 | `core/policy/execution-guards.yaml` |
 
 **`--output-schema` 를 쓰지 않는 이유 — 이 저장소의 스키마로는 실행이 거부된다(2026-08-29 실측).**
 `codex exec --output-schema core/schemas/result-envelope.json` 은 HTTP 400 으로 끝난다:
@@ -1115,12 +1115,13 @@ PY
 ## 5. evidence 에 남길 식별자
 
 `run_id` · `task_id` · `dispatch_id` 세 개만 남긴다. 실행 상태 자체(재시도·터미널 생존·큐)는 하네스가 저장하지 않는다 — 오케스트레이터가 소유한다(K-63).
-세 값을 넣는 플래그는 `evidence` 의 세 하위 명령에 모두 있다(`--help` 실측).
+세 값을 넣는 플래그는 `evidence` 의 네 하위 명령에 모두 있다(`--help` 실측).
 
 ```bash
 bin/romeo evidence run     --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id> --label <이름> -- <명령>
 bin/romeo evidence checks  --unit <id> --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>
-bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --note "<영향 범위·복구 방법>" --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>
+bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --note "<설명 네 항목 — §8.1>" --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>
+bin/romeo evidence reject  --unit <id> --guard <가드 id> --by <거부자> --note "<설명 네 항목 — §8.2>" --run <run-id> --task-id <task-id> --dispatch-id <dispatch-id>
 ```
 
 - `--run` 은 evidence 파일 이름이자 `run_id` 다. **위임 실행이면 §3.2 의 Run id 를 그대로 넣는다.**
@@ -1358,7 +1359,7 @@ orca worktree list --json
 M2 에서는 대화 승인을 증거로 기록한다.
 
 ```bash
-bin/romeo evidence approve --unit <작업 단위 id> --guard <가드 id> --by <승인자> --note "<영향 범위·복구 방법>" --run <run-id>
+bin/romeo evidence approve --unit <작업 단위 id> --guard <가드 id> --by <승인자> --note "<설명 네 항목 — §8.1>" --run <run-id>
 ```
 
 이 명령은 승인 항목을 evidence 의 `approvals` 에 적으면서 **원시 로그(`.harness/runs/<id>/<run>/approve-NN-<가드>.log`)와 그 sha256** 도 남긴다(체크리스트 45).
@@ -1373,15 +1374,56 @@ bin/romeo evidence approve --unit <작업 단위 id> --guard <가드 id> --by <�
 그 파일의 `approvals[]` 에 `guard`·`approved_at`·`approved_by`·`note` 가 들어간다.
 승인 없이 실행하면 `BLOCKED_APPROVAL` 로 끝내고 증거를 무효로 본다(`core/policy/execution-guards.yaml`).
 종료 검사의 `GUARD_APPROVED` 는 라우터가 건 가드마다 이 기록을 찾는다 — 없으면 close 가 FAIL 이다.
-설명해야 하는 네 가지는 영향 범위 · 사전 백업 · 복구 방법 · 확인할 내용이다.
 
-**M3 범위.** 승인을 오케스트레이션 상태로 올리는 경로는 다음이다. M2 에서는 쓰지 않는다.
+### 8.1 `--note` 는 비어 있을 수 없다
+
+설명해야 하는 네 가지는 **영향 범위 · 사전 백업 · 복구 방법 · 확인할 내용**이고, 그 목록의 정본은
+`core/policy/execution-guards.yaml` 의 `required_explanation` 이다. `--note` 를 `라벨: 값` 형태로 적는다.
 
 ```bash
-orca orchestration gate-create --task <task-id> --question "<설명>" --options '["approve","reject"]' --json
+bin/romeo evidence approve --unit <id> --guard <가드 id> --by <승인자> --run <run-id> \
+  --note "영향 범위: <무엇이 어디까지 바뀌는가> / 사전 백업: <되돌릴 수 있는 스냅샷이 있는가> / 복구 방법: <실패 시 정확한 명령·절차> / 확인할 내용: <승인자가 보고 판단할 사실>"
+```
+
+넷 중 하나라도 빠지거나 값이 자리표시자뿐이면(`TBD`·`해당 없음`·`없음` 단독 등) **기록을 만들지 않고 exit 2** 다 —
+기록되지 않았으므로 상태는 승인 전 그대로다. 막는 것은 빈 승인이지 정직한 답이 아니다:
+`사전 백업: 없음 — 아직 커밋 전이라 스냅샷이 없다` 처럼 **이유가 붙으면 유효한 답**이다.
+같은 대조를 종료 검사(`GUARD_APPROVED`)가 봉인된 로그의 note 로 **다시** 한다 — 승인·종료 두 지점이다.
+
+### 8.2 사람이 거부했을 때
+
+거부는 승인의 부재가 아니다. 기록하지 않으면 종료 검사가 "아직 안 물어봤다" 와 구별하지 못하고,
+재시도가 답인 것처럼 보인다. 거부도 같은 봉인으로 남긴다.
+
+```bash
+bin/romeo evidence reject --unit <id> --guard <가드 id> --by <거부자> --run <run-id> \
+  --note "영향 범위: … / 사전 백업: … / 복구 방법: … / 확인할 내용: …"
+```
+
+성공 신호: 종료 코드 0 과 `rejection recorded → …/evidence/<run-id>.yaml`, 그 파일의 `rejections[]`.
+설명 넷은 거부에도 요구한다 — 무엇을 왜 거부했는지가 남아야 재요청이 같은 것을 반복하지 않는다.
+
+그 뒤 `romeo close` 는 그 가드의 **가장 최근 결정**을 따른다. 마지막이 거부면 `GUARD_APPROVED` 가 FAIL 이되
+이유에 `BLOCKED_APPROVAL` 과 거부자·시각·사유가 인쇄된다 — 승인 기록 없음과 **다른 판정**이고, 같은 요청을
+다시 보내는 것이 답이 아니다. 무엇이 달라졌는지 적고 사람이 새로 승인하면 승인이 이긴다.
+
+구현자는 이 자리에서 `BLOCKED_APPROVAL` 로 끝낸다 — 거부된 행동을 우회하거나 더 작은 조각으로 나눠
+다시 시도하지 않는다(K-66). 자세한 판정은 `scenarios/9-guard-approval.md` 가 고정한다.
+
+### 8.3 승인을 오케스트레이션 게이트로 물을 때 (M3)
+
+코어는 **게이트를 어떤 명령으로 부르는지 모른다**(C-C6) — 결정 기록의 형식만 정한다. 게이트 호출과
+`gate id`·응답·시각의 흔적은 이 어댑터가 소유한다. M2 에서는 쓰지 않는다.
+
+```bash
+orca orchestration gate-create --task <task-id> --question "<설명 네 항목>" --options '["approve","reject"]' --json
 orca orchestration gate-resolve --id <gate-id> --resolution "<사람의 답>" --json
 orca orchestration gate-list --json
 ```
+
+사람의 답을 받으면 **그 답 그대로** 증거로 잇는다 — `approve` 면 8.1 의 명령, `reject` 면 8.2 의 명령이다.
+`--note` 에는 게이트에 물은 설명 네 항목을 그대로 옮기고, `gate id` 와 응답 시각을 함께 적는다:
+게이트는 오케스트레이션 상태이고 증거는 저장소 상태라, 잇지 않으면 종료 검사가 그 결정을 보지 못한다.
 
 ## 9. 승인 없이 실행하지 않는 명령
 

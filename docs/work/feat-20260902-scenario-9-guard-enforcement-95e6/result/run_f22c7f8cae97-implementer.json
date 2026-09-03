@@ -1,0 +1,77 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scenario-9-guard-enforcement-95e6",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/task/run_f22c7f8cae97-implementer.json",
+    "sha256": "687ba5894de884122db22ebf1ffc2e7af333923cf572a22a0832cc3e48807b06"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_scenario_9 -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "! bin/romeo route --fixtures fixtures/requests --report | grep -q '✗'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -q required_explanation romeo/evidence.py && grep -q required_explanation romeo/close.py",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo evidence reject --help > /dev/null",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "grep -q '9-guard-approval.md' scenarios/README.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -rq 'gate-create' core/",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "grep -q 'romeo evidence reject' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_f22c7f8cae97.yaml",
+  "notes": "2회차. 1회차(run_4f365ab79976)의 검토자 FAIL(AC_UNMET) 두 건만 고쳤다 — 처음부터 다시 만들지 않았다(§12). 뿌리는 하나였다: approval_log_state 가 원시 로그의 note:·seq: 줄을 yaml 항목과 대조하지 않아, 종료 시점의 설명 요구가 봉인되지 않은 yaml 을 읽었고(finding 1) yaml 의 seq 한 글자로 같은 시각 결정의 순서가 뒤집혔다(finding 2). 고친 방향: 쓰는 자리와 대조하는 자리가 같은 함수 decision_log_text() 를 쓰게 하고, approval_log_state 가 seq 를 로그의 seq: 줄과 대조한 뒤 항목에서 로그 전체를 다시 만들어 통째로 비교한다(여러 줄 note 도 그대로 복원된다). seq 나 head/tree 가 없는 옛 형식 기록은 False 가 아니라 None(미검증)으로 떨어진다(K-51). 검사도 함께 고쳤다(§11): 1회차 step7 은 로그와 yaml 이 둘 다 빈 값이라 그럴듯한 거짓 값이 아니었다. 새 판별 검사 두 건을 런북 13·14 단계와 tests/test_scenario_9.py 에 넣었다 — step13(로그는 빈 note · yaml 은 유효한 네 항목 · log_sha256 일치)과 step14(로그는 그대로 · yaml 의 seq 만 뒤집음). 양쪽 실측: 고치기 전 트리(evidence.py 미수정)에서 두 검사가 통과했다 — docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/probe/step13-14-before.txt (exit 1, AssertionError 'True is not false : ... 원시 로그와 일치하고 설명 요구를 채웠다' 2건). 고친 뒤 통과는 이 run 의 check-1(python3 -m unittest tests.test_scenario_9 -v, exit 0)이 보인다. 회귀 검사(check-3 fixture 리포트 등)는 양쪽에서 통과가 예상되므로 양쪽 실측 대상이 아니다. 재실행 여유: 이 run 의 check-2(python3 -m unittest discover -s tests)가 247.6초로 상한 600초의 41% 다 — 경고 임계(80%) 아래다. 범위 밖에서 새로 연 결함은 없다."
+}

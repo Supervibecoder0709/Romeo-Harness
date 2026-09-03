@@ -1,0 +1,30 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scenario-9-guard-enforcement-95e6",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/task/run_f22c7f8cae97-reviewer.json",
+    "sha256": "e86dfa16a59958a517e5e866a188fba87b5d0b7d8541d1d98e18356dc4a9c5e1"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET",
+    "EVIDENCE_NOT_RECORDED"
+  ],
+  "findings": [
+    {
+      "summary": "AC-10 미충족: 고치기 전 base 트리에서 step13·14가 실패했다는 근거가 기록 명령의 증거에 없다. 이 evidence run은 현재 산출물에서 실행한 check-1부터 기록하며, base 재현 명령·원시 로그·log_sha256·head/tree 앵커를 지목하지 않는다. 따라서 AC-10이 요구한 양쪽 실측의 ‘고치기 전’ 증거를 확인할 수 없다.",
+      "file": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_f22c7f8cae97.yaml",
+      "line": 20
+    },
+    {
+      "summary": "별도 probe는 테스트 실패 출력과 exit=1만 담고, 실행 명령·원시 로그 경로·log_sha256·head/tree 식별자가 없다. 기록 명령으로 봉인된 증거가 아니므로 AC-10의 base 재현 근거로 사용할 수 없다.",
+      "file": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/probe/step13-14-before.txt",
+      "line": 1
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_f22c7f8cae97.yaml",
+  "notes": "두 작업 계약의 base_sha는 일치했다. 구현자 증거의 required_checks 12건은 모두 exit 0으로 기록됐고, changed_files는 구현자 allowed_paths 안에 있다. 그러나 이는 현재 산출물의 통과만 보이며 AC-10의 base 재현 증거를 대체하지 않는다."
+}

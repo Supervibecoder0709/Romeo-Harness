@@ -10,20 +10,20 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-02T18:26:52+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-03T09:08:28+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_4f365ab79976.yaml, evidence/run_f22c7f8cae97.yaml, evidence/run_108f96346abc.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
   history: []
 created: '2026-09-02'
-updated: '2026-09-02'
+updated: '2026-09-03'
 ---
 
 # 승인 없이는 되돌리기 어려운 것을 실행하지 않는다 — 가드 설명 요구·거부 경로·시나리오 9
@@ -49,29 +49,29 @@ updated: '2026-09-02'
   승인으로 센다. 사람이 거부하면 그 사실이 봉인된 기록으로 남고, 종료 검사는 "아직 안 물어봤다"와
   "물어봤고 사람이 아니라고 했다"를 **다른 판정으로** 말한다. 후자는 재시도가 답이 아니다.
 - **수용 기준:**
-  - [ ] AC-1 `core/policy/execution-guards.yaml` 의 `required_explanation` 이 파싱 가능한 구조
+  - [x] AC-1 `core/policy/execution-guards.yaml` 의 `required_explanation` 이 파싱 가능한 구조
         (`key`·`label`·`why`)가 되고, **그 목록이 설명 요구의 단일 출처다** — 라벨을 코드에 복사하지 않는다.
-  - [ ] AC-2 `bin/romeo evidence approve` 가 `--note` 를 그 라벨로 대조한다. 네 항목 중 하나라도
+  - [x] AC-2 `bin/romeo evidence approve` 가 `--note` 를 그 라벨로 대조한다. 네 항목 중 하나라도
         없거나 값이 자리표시자(`TBD`·미완료 토큰·`해당 없음` 등 — 목록은 구현이 정한다)뿐이면 **승인 기록을 만들지 않고
         비0 으로 끝난다**. 승인이 기록되지 않았으므로 상태는 승인 전 그대로다.
-  - [ ] AC-3 `romeo close` 가 봉인된 승인 로그의 note 를 **다시** 대조한다 — 승인·종료 두 지점이다.
+  - [x] AC-3 `romeo close` 가 봉인된 승인 로그의 note 를 **다시** 대조한다 — 승인·종료 두 지점이다.
         봉인은 로그와 yaml 의 일치만 보므로 둘을 함께 손으로 만들면 지금은 통과한다.
-  - [ ] AC-4 `bin/romeo evidence reject --unit --guard --by --note` 가 거부 사건을 기록하고,
+  - [x] AC-4 `bin/romeo evidence reject --unit --guard --by --note` 가 거부 사건을 기록하고,
         승인과 **같은 방식으로 봉인한다**(원시 로그 + sha256 + head/tree). 설명 4항목은 거부에도 요구한다 —
         무엇을 왜 거부했는지가 남아야 재요청이 같은 것을 반복하지 않는다.
-  - [ ] AC-5 `romeo close` 는 한 가드의 **가장 최근 결정**을 따른다. 마지막이 거부면 `GUARD_APPROVED`
+  - [x] AC-5 `romeo close` 는 한 가드의 **가장 최근 결정**을 따른다. 마지막이 거부면 `GUARD_APPROVED`
         FAIL 이되 이유가 "승인 기록 없음"과 다르다 — `BLOCKED_APPROVAL` 로 종결됐음을 인쇄한다.
         거부 뒤 사람이 다시 승인하면 승인이 이긴다(사람이 다시 판단한 것이다).
-  - [ ] AC-6 그럴듯한 거짓 값이 **전부 막힌다**: ① note 없이 승인 ② 4항목 중 3개만 ③ 라벨은 넷 다
+  - [x] AC-6 그럴듯한 거짓 값이 **전부 막힌다**: ① note 없이 승인 ② 4항목 중 3개만 ③ 라벨은 넷 다
         있는데 값이 자리표시자 ④ 승인 로그와 yaml 을 함께 손으로 만들어 봉인을 맞춤(AC-3 이 잡는다)
         ⑤ 거부된 가드를 그대로 두고 close.
-  - [ ] AC-7 **사실대로 넷을 적으면 승인된다.** 설명 요구가 가드를 통과 불가능하게 만들지 않는다 —
+  - [x] AC-7 **사실대로 넷을 적으면 승인된다.** 설명 요구가 가드를 통과 불가능하게 만들지 않는다 —
         "사전 백업: 없음" 도 이유가 붙으면 유효한 답이다. 막는 것은 빈 승인이지 정직한 답이 아니다.
-  - [ ] AC-8 `gate-create` 는 **코어에 나타나지 않는다**(C-C6). 코어는 결정 기록의 형식만 정의하고,
+  - [x] AC-8 `gate-create` 는 **코어에 나타나지 않는다**(C-C6). 코어는 결정 기록의 형식만 정의하고,
         실제 게이트 호출과 gate id·응답·시각을 기록하는 절차는 `adapters/orca/RUNBOOK.md` 가 소유한다.
-  - [ ] AC-9 런북 `scenarios/9-guard-approval.md` 가 `scenarios/README.md` 목록에 등재되고, 통과만
+  - [x] AC-9 런북 `scenarios/9-guard-approval.md` 가 `scenarios/README.md` 목록에 등재되고, 통과만
         보이지 않는다 — AC-6 의 반례를 단계로 담고 구현자가 `BLOCKED_APPROVAL` 로 끝내야 하는 자리를 명시한다.
-  - [ ] AC-10 `tests/test_scenario_9.py` 가 런북의 단계를 그대로 실행하고, **고치기 전 상태에서 실패하는
+  - [x] AC-10 `tests/test_scenario_9.py` 가 런북의 단계를 그대로 실행하고, **고치기 전 상태에서 실패하는
         것**을 증거로 남긴다 — base 리비전 트리에 이 테스트만 얹어 재현한다. 고친 뒤 성공은 check-1 이
         보인다. **이 단위의 산출물인 검사를 승인 전에 실행할 수는 없다**(D-27) — 그래서 승인 전에는
         판별 검사 후보 5개가 현재 트리에서 실패하는 것을 프로브로 확인했다(P1 `required_explanation`
@@ -180,6 +180,8 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-03T09:08:28+09:00 · HEAD 5d4e00db5e97 · 검사 기록 run_108f96346abc
 
-- (없음)
+- [evidence/run_4f365ab79976.yaml](evidence/run_4f365ab79976.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_f22c7f8cae97.yaml](evidence/run_f22c7f8cae97.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_108f96346abc.yaml](evidence/run_108f96346abc.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

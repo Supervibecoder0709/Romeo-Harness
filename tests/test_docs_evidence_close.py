@@ -25,6 +25,12 @@ from romeo.validate import validate_doc
 SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
 SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
 
+#: 가드 결정의 `--note` 는 설명 요구 네 항목을 담아야 기록된다(`core/policy/execution-guards.yaml`
+#: 의 `required_explanation`). 그 요구 자체를 보는 것은 `tests/test_scenario_9.py` 이고,
+#: 여기서는 승인이 **기록되는 것**을 보는 테스트들이 쓰는 유효한 note 다.
+GUARD_NOTE = ("영향 범위: gone.txt 하나 / 사전 백업: 없음 — 커밋 전이라 스냅샷이 없다 / "
+              "복구 방법: git checkout HEAD -- gone.txt / 확인할 내용: 삭제 대상이 그 파일 하나뿐인지")
+
 
 
 def git(*args, cwd):
@@ -172,7 +178,7 @@ class TestVerticalSlice(unittest.TestCase):
     def test_approval_before_any_run_creates_approval_only_record(self):
         self._fill_spec(tick_ac=False)
         approve_unit(self.unit, "tester", project_root=self.root)
-        path = add_approval(self.unit, "deletion", "tester", note="영향 범위·복구",
+        path = add_approval(self.unit, "deletion", "tester", note=GUARD_NOTE,
                             run_name="run-test", project_root=self.root)
         rec = load_yaml(path)
         self.assertEqual(rec["commands"], [])          # 승인 시점에 상태 변경 0건이라는 사실 자체가 증거다
@@ -189,7 +195,7 @@ class TestVerticalSlice(unittest.TestCase):
         self._fill_spec(tick_ac=False)
         approve_unit(self.unit, "tester", project_root=self.root)
         run_command(self.unit, "true", run_name="run-test", project_root=self.root)
-        path = add_approval(self.unit, "deletion", "tester", project_root=self.root)
+        path = add_approval(self.unit, "deletion", "tester", note=GUARD_NOTE, project_root=self.root)
         rec = load_yaml(path)
         self.assertEqual(len(rec["commands"]), 1)
         self.assertEqual(len(rec["approvals"]), 1)
@@ -223,7 +229,7 @@ class TestVerticalSlice(unittest.TestCase):
         # 정식 기록은 로그와 함께 남고 통과한다
         rec["approvals"] = []
         path.write_text(dump_yaml(rec), encoding="utf-8")
-        add_approval(unit, "deletion", "tester", note="gone.txt 를 지운다", run_name="run-g", project_root=self.root)
+        add_approval(unit, "deletion", "tester", note=GUARD_NOTE, run_name="run-g", project_root=self.root)
         rec = load_yaml(path)
         self.assertTrue(rec["approvals"][0]["log"].startswith(".harness/runs/"))
         self.assertTrue((self.root / rec["approvals"][0]["log"]).is_file())
@@ -262,7 +268,7 @@ class TestVerticalSlice(unittest.TestCase):
         self.assertEqual((rec["task_id"], rec["dispatch_id"]), ("task_cli", "dis_cli"))
         with redirect_stdout(io.StringIO()):
             rc = main(["evidence", "approve", "--unit", self.unit, "--guard", "deletion",
-                       "--by", "tester", "--run", "run-ap", "--task-id", "task_cli",
+                       "--by", "tester", "--note", GUARD_NOTE, "--run", "run-ap", "--task-id", "task_cli",
                        "--root", str(self.root)])
         self.assertEqual(rc, 0)
         rec = load_yaml(self.spec.parent / "evidence" / "run-ap.yaml")

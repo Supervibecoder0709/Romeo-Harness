@@ -1,0 +1,76 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scenario-9-guard-enforcement-95e6",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/task/run_4f365ab79976-implementer.json",
+    "sha256": "61b5178bb85171978f2370b45f78f2bb8d114abba969e1340ec39cd5ba31fb0e"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_scenario_9 -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "! bin/romeo route --fixtures fixtures/requests --report | grep -q '✗'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -q required_explanation romeo/evidence.py && grep -q required_explanation romeo/close.py",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo evidence reject --help > /dev/null",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "grep -q '9-guard-approval.md' scenarios/README.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -rq 'gate-create' core/",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "grep -q 'romeo evidence reject' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_4f365ab79976.yaml",
+  "notes": "12건 전부 exit 0 (run_4f365ab79976 의 check-1~check-12). 계약의 guards 는 빈 목록이라 가드 승인 기록은 필요 없었다.\nAC-10 의 '고치기 전 상태에서 실패한다' 는 같은 run 의 cmd `ac10-base-repro` 가 실측했다 — base 리비전 53fa8286698e 의 트리를 git archive 로 꺼내 tests/test_scenario_9.py 하나만 얹고 돌렸다. A: 그 트리에서 이 테스트는 exit 1 로 실패한다(add_rejection 이 없다). B: 같은 트리에서 note 를 빈 문자열로 적은 가드 승인이 기록되고 close 의 GUARD_APPROVED 가 'deletion (삭제) 승인 기록 1건 — 원시 로그와 일치' 로 통과한다 — 고치기 전에 빈 승인이 통과했다는 실측이다. §11 이 요구하는 양쪽 실측(기존 상태에서 실패 · 완료 상태에서 성공)의 두 번째 절반은 check-1 이 보인다.\n판별 검사(check-1·8·9·10·11·12)는 승인 전 프로브에서 현재 트리 실패가 확인된 것들이고, 회귀 검사(check-2~7)는 양쪽에서 통과가 예상되는 것들이다(spec 검증 계획의 종류 표).\n§12 — 요청 범위 밖에서 발견한 것 2건은 고치지 않고 docs/planning/open-questions.md 에 열어 뒀다: Q-44(core/policy/execution-guards.yaml 의 enforcement 블록에 남은 런타임 이름 claude·codex — spec 의 비범위가 명시했다) · Q-45(가드 승인 명령을 안내하는 절차 문서 3곳 core/workflows/implement/SKILL.md·adapters/{claude,codex}/workflows/implement.md 이 --note 의 새 요구를 모른다 — 세 파일 다 「변경 범위」 밖이다. 지시대로 따르면 exit 2 로 막히므로 빈 승인이 통과하지는 않는다). 범위 안인 adapters/orca/RUNBOOK.md 는 §5·§8.1·§8.2·§8.3 을 새 형식으로 고쳤다.\ntests/test_docs_evidence_close.py 의 승인 기록 테스트 4곳은 구현 단위 7 이 예고한 대로 새 note 형식(GUARD_NOTE)으로 고쳤다 — 검증 계획은 고치지 않았다.\n설계 판단 1건: now_iso() 가 초 단위라 같은 초에 들어온 승인·거부의 순서를 시각만으로는 말할 수 없어, 결정 항목에 레코드 안 일련번호 seq 를 붙이고 원시 로그에도 적어 log_sha256 이 함께 봉인하게 했다. seq 가 없는 옛 기록은 배열 안 순서로 갈음한다."
+}

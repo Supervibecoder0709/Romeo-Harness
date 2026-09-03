@@ -1,0 +1,22 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scenario-9-guard-enforcement-95e6",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/task/run_108f96346abc-reviewer.json",
+    "sha256": "a5bc55399a30fab77df4fd05a995797cc4153fe2a85f3e8502e3495d4082c723"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [
+    {
+      "summary": "범위 밖 경고: 구현 절차 문서 3곳은 새 네 항목 --note 형식을 안내하지 않아, 지시대로 실행하면 승인 기록이 exit 2로 거부된다. 이 단위는 해당 파일을 고치지 않고 열린 질문으로 기록했다.",
+      "file": "docs/planning/open-questions.md",
+      "line": 108
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_108f96346abc.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. 수용 기준 AC-1~10은 현재 변경분과 원시 로그가 있는 증거 기록으로 지목했으며, required_checks 12건은 모두 exit 0이다. 현재 비산출물 작업 트리 목록은 증거의 review-tree-before 기록과 일치한다."
+}

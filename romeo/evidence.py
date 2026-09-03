@@ -33,6 +33,11 @@ HEAD_LINE = "--- head {sha} ---"
 TREE_LINE = "--- tree {hash} ---"
 HEAD_LINE_RE = re.compile(r"^--- head ([0-9a-f]{40}) ---$")
 TREE_LINE_RE = re.compile(r"^--- tree ([0-9a-f]{64}) ---$")
+# 가드 결정(승인·거부)의 원시 로그가 봉인하는 두 줄. `seq` 는 같은 시각에 들어온 결정의 순서를,
+# `note` 는 설명 요구가 읽는 값을 담는다 — 둘 다 yaml 한 글자로 판정을 뒤집을 수 있는 자리다.
+SEQ_LINE = "seq: {seq}"
+SEQ_LINE_RE = re.compile(r"^seq: (\d+)$")
+NOTE_LINE = "note: {note}"
 
 # 재실행 대조의 기본 상한(초). 검증 명령이 이보다 오래 걸리면 대조하지 못한 것으로 인쇄한다.
 # 상한은 재실행 **한 건**에 걸린다. 하네스 자신을 고치는 단위는 그 한 건에 전체 테스트를 넣는 것이
@@ -43,6 +48,93 @@ RERUN_TIMEOUT = 600
 # 재실행 한 건이 상한의 이 비율 이상을 쓰면 close 가 경고한다 — 막지 않고 **막히기 전에** 드러낸다.
 # 임계 아래에서는 인쇄하지 않는다: 늘 뜨는 경고는 아무것도 알리지 않는다.
 RERUN_NEAR_TIMEOUT_RATIO = 0.8
+
+
+# ── 가드 결정의 설명 요구 (AGENTS.core §11: 요구하는 자리와 보는 자리를 같게 둔다) ──────────────
+# 요구는 `core/policy/execution-guards.yaml` 의 `required_explanation` 이 소유한다. 여기에는 라벨을 적지 않는다 —
+# 적는 순간 정본이 둘이 되고, 한쪽만 고친 커밋이 "요구는 넷인데 검사는 셋" 을 만든다.
+GUARD_POLICY_REL = "core/policy/execution-guards.yaml"
+
+# 값이 이것뿐이면 적히지 않은 것과 같다. **자리표시자 단독**만 막는다 —
+# "사전 백업: 없음 — 커밋 전이라 스냅샷이 없다" 처럼 이유가 붙으면 정직한 답이고 통과한다(§AC-7).
+EXPLANATION_PLACEHOLDERS = (
+    "tbd", "todo", "t.b.d", "n/a", "na", "none", "null", "nil", "-", "--", "?", "??",
+    "later", "fixme", "xxx", "unknown", "pending", "채움", "미정", "나중에", "추후",
+    "해당 없음", "해당없음", "없음", "모름", "확인 필요", "확인필요", "미확인",
+)
+# 값에서 지워도 뜻이 남지 않는 글자. 자리표시자만 남았는지 볼 때 쓴다.
+_TRIVIAL_CHARS = " \t\n.,;:·…-—–_()[]{}\"'`~!*/|"
+
+
+def required_explanation(harness_root=None):
+    """설명 요구 네 항목을 정책표에서 읽는다 → [{key, label, why}].
+
+    이 함수가 정책표를 읽는 **유일한 자리**이고, 기록(`add_approval`·`add_rejection`)과
+    종료 검사(`romeo/close.py`)가 둘 다 이것을 통해 같은 목록을 본다."""
+    from . import HARNESS_ROOT
+    path = Path(harness_root or HARNESS_ROOT) / GUARD_POLICY_REL
+    data = load_yaml(path) or {}
+    items = data.get("required_explanation") or []
+    out = []
+    for it in items:
+        if not isinstance(it, dict) or not it.get("key") or not it.get("label"):
+            raise ValueError(f"{GUARD_POLICY_REL} 의 required_explanation 항목이 {{key, label, why}} 형태가 아니다: {it!r}")
+        out.append({"key": str(it["key"]), "label": str(it["label"]), "why": str(it.get("why") or "")})
+    if not out:
+        raise ValueError(f"{GUARD_POLICY_REL} 에 required_explanation 이 없다 — 설명 요구의 출처가 비어 있다")
+    return out
+
+
+def _label_re(label):
+    """라벨을 note 안에서 찾는 정규식. 라벨 안의 공백은 유연하게, 뒤의 구분자는 `:` 또는 `：`."""
+    parts = [re.escape(x) for x in str(label).split()]
+    return re.compile(r"(?:^|[\s·;,|/])(" + r"\s*".join(parts) + r")\s*[:：]", re.MULTILINE)
+
+
+def _is_placeholder(value):
+    """값이 자리표시자뿐인가. 자리표시자 토큰과 뜻 없는 글자를 걷어내고 남는 것이 있으면 답이다."""
+    v = (value or "").strip().lower()
+    if not v:
+        return True
+    for token in sorted(EXPLANATION_PLACEHOLDERS, key=len, reverse=True):
+        v = v.replace(token, " ")
+    return not v.strip(_TRIVIAL_CHARS).strip()
+
+
+def parse_guard_explanation(note, harness_root=None):
+    """가드 결정의 note 를 정책표의 라벨로 대조해 {key: 값} 으로 쪼갠다.
+
+    **네 항목 중 하나라도 없거나 값이 자리표시자뿐이면 `ValueError` 다.** 그 자리에 글자가 있는지가 아니라
+    그 문장이 답인지를 본다(AGENTS.core §11). 막는 것은 빈 승인이지 정직한 답이 아니다 —
+    "사전 백업: 없음 — 아직 커밋 전이다" 는 유효하다."""
+    items = required_explanation(harness_root)
+    text = note if isinstance(note, str) else ""
+    hits = []
+    for it in items:
+        m = _label_re(it["label"]).search(text)
+        if m:
+            hits.append((m.start(1), m.end(0), it))
+    hits.sort()
+    bounds = [h[0] for h in hits]
+    values = {}
+    for i, (_s, end, it) in enumerate(hits):
+        stop = bounds[i + 1] if i + 1 < len(hits) else len(text)
+        # 항목 사이 구분자(`/`·`·`·줄바꿈)는 값이 아니다 — 붙어 있으면 자리표시자 판정이 헛돈다.
+        values[it["key"]] = text[end:stop].strip().strip("/|·;,").strip()
+    missing = [it for it in items if it["key"] not in values]
+    empty = [it for it in items if it["key"] in values and _is_placeholder(values[it["key"]])]
+    if missing or empty:
+        why = []
+        if missing:
+            why.append("빠진 항목: " + ", ".join(f"{it['label']}({it['why']})" for it in missing))
+        if empty:
+            why.append("값이 자리표시자뿐인 항목: " + ", ".join(it["label"] for it in empty))
+        raise ValueError(
+            "가드 결정의 --note 가 설명 요구를 채우지 못했다 — 기록하지 않는다. "
+            + " / ".join(why)
+            + ". 형식: --note \"" + " / ".join(f"{it['label']}: <{it['why']}>" for it in items) + "\""
+        )
+    return values
 
 
 def exclusions(unit_id):
@@ -219,13 +311,48 @@ def run_command(unit_id, command, run_name=None, label=None, project_root=".", t
     return {"evidence": str(epath), "command": cmd_rec, "state": state}
 
 
-def add_approval(unit_id, guard, by, note=None, run_name=None, project_root=".", task_id=None, dispatch_id=None):
-    """실행 가드 승인 사건을 evidence 에 기록한다(M1: 대화 승인).
+DECISIONS = {
+    # 종류별로 다른 것: 레코드 키 · 시각/주체 필드 이름 · 원시 로그 파일 이름 · 로그 첫 줄.
+    # 승인과 거부를 **같은 봉인**으로 남기되 **다른 배열**에 넣는다 — 기존 종료 검사는 `approvals` 의
+    # 존재를 승인으로 세므로, 섞으면 거부가 승인으로 읽힌다.
+    "approve": {"array": "approvals", "at": "approved_at", "by": "approved_by", "prefix": "approve"},
+    "reject": {"array": "rejections", "at": "rejected_at", "by": "rejected_by", "prefix": "reject"},
+}
 
-    승인은 실행보다 **먼저** 온다 — 가드가 붙은 작업은 승인 전에 상태를 바꾸지 않기 때문이다.
-    그래서 선행 run 이 없으면 승인 전용 레코드(`commands: []`)를 새로 만든다:
-    승인 시점에 실행한 명령이 0건이라는 사실 자체가 '승인 전 상태 변경 0건' 의 증거다.
-    선행 run 이 있으면 지금까지처럼 거기에 붙인다."""
+
+def decision_log_text(spec, entry):
+    """가드 결정 하나의 원시 로그 본문을 그 yaml 항목에서 만든다.
+
+    **쓰는 자리와 대조하는 자리가 이 함수 하나를 쓴다.** 두 벌로 적으면 한쪽만 바뀐 커밋이
+    위조와 구별되지 않는 불일치를 만들고, 그때 막히는 것은 지시대로 쓴 사람이다(AGENTS.core §11).
+
+    `note` 는 여러 줄일 수 있다. 로그는 `note: ` 뒤부터 head·tree 두 줄 앞까지가 note 이므로
+    항목에서 로그 전체를 다시 만들어 통째로 비교하면 여러 줄도 그대로 복원된다 —
+    줄 단위로 잘라 맞추지 않는 것은 note 안의 개행 문자가 줄 경계로 읽혀 복원이 손실되기 때문이다.
+    손실된 복원은 위조와 구별되지 않는다."""
+    return mask_secrets(
+        f"{spec['prefix']} guard={entry.get('guard')} by={entry.get(spec['by'])} "
+        f"at={entry.get(spec['at'])}\n"
+        + SEQ_LINE.format(seq=entry.get("seq")) + "\n"
+        + NOTE_LINE.format(note=entry.get("note") or "") + "\n"
+        + HEAD_LINE.format(sha=entry.get("head_sha")) + "\n"
+        + TREE_LINE.format(hash=entry.get("dirty_tree_hash")) + "\n")
+
+
+def _add_decision(kind, unit_id, guard, by, note=None, run_name=None, project_root=".",
+                  task_id=None, dispatch_id=None, harness_root=None):
+    """가드 결정(승인·거부) 하나를 evidence 에 기록한다.
+
+    결정은 실행보다 **먼저** 온다 — 가드가 붙은 작업은 결정 전에 상태를 바꾸지 않기 때문이다.
+    그래서 선행 run 이 없으면 결정 전용 레코드(`commands: []`)를 새로 만든다:
+    결정 시점에 실행한 명령이 0건이라는 사실 자체가 '승인 전 상태 변경 0건' 의 증거다.
+    선행 run 이 있으면 지금까지처럼 거기에 붙인다.
+
+    **설명 요구를 기록 전에 본다.** 네 항목이 없으면 `ValueError` 를 내고 **아무것도 쓰지 않는다** —
+    반쪽 기록(로그는 남고 배열은 비었거나 그 반대)을 남기지 않기 위해서다. 기록되지 않았으므로
+    상태는 결정 전 그대로다."""
+    spec = DECISIONS[kind]
+    parse_guard_explanation(note, harness_root)   # 기록 전에 막는다. 통과한 값만 아래로 내려간다.
     project_root = Path(project_root).resolve()
     runs = list_runs(project_root, unit_id)
     if run_name:
@@ -236,55 +363,127 @@ def add_approval(unit_id, guard, by, note=None, run_name=None, project_root=".",
     else:
         path, rec = _open_record(project_root, unit_id, run_name or default_run_name())
     _stamp_ids(rec, task_id=task_id, dispatch_id=dispatch_id)
-    entry = {"guard": guard, "approved_at": now_iso(), "approved_by": by, "note": note}
-    # 승인 사건도 명령 기록과 같은 방식으로 봉인한다 — yaml 의 approvals 배열만 믿으면 한 항목을 손으로 써 넣는 것으로 가드가 열린다.
+    entry = {"guard": guard, spec["at"]: now_iso(), spec["by"]: by, "note": note}
+    # 결정 사건도 명령 기록과 같은 방식으로 봉인한다 — yaml 배열만 믿으면 한 항목을 손으로 써 넣는 것으로 가드가 열린다.
     run_name = rec.get("run_id") or path.stem
     log_dir = project_root / ".harness" / "runs" / unit_id / run_name
     log_dir.mkdir(parents=True, exist_ok=True)
-    n = len(rec.get("approvals") or []) + 1
-    log_path = log_dir / f"approve-{n:02d}-{guard}.log"
+    n = len(rec.get(spec["array"]) or []) + 1
+    # 결정 순서. `now_iso()` 는 초 단위라 승인과 거부가 같은 초에 들어오면 시각만으로는 순서를 말할 수 없다 —
+    # 그런데 "가장 최근 결정" 이 판정이므로 순서를 잃으면 거부가 승인으로 뒤집힌다. 이 레코드 안의 결정을
+    # 종류에 상관없이 세어 붙이고, 로그에도 적어 `log_sha256` 이 함께 봉인하게 한다.
+    seq = sum(len(rec.get(s["array"]) or []) for s in DECISIONS.values()) + 1
+    log_path = log_dir / f"{spec['prefix']}-{n:02d}-{guard}.log"
     state = tree_state(project_root, unit_id, rec.get("base_sha"))
-    log_text = mask_secrets(f"approve guard={guard} by={by} at={entry['approved_at']}\nnote: {note or ''}\n"
-                            + HEAD_LINE.format(sha=state["head_sha"]) + "\n"
-                            + TREE_LINE.format(hash=state["dirty_tree_hash"]) + "\n")
+    entry["seq"] = seq
+    entry["head_sha"], entry["dirty_tree_hash"] = state["head_sha"], state["dirty_tree_hash"]
+    # 로그 본문은 **이 항목에서** 만든다 — 대조하는 자리가 부르는 함수와 같은 것이다(AGENTS.core §11).
+    log_text = decision_log_text(spec, entry)
     log_path.write_text(log_text, encoding="utf-8")
     entry["log"] = rel(log_path, project_root)
     entry["log_sha256"] = sha256_bytes(log_text.encode("utf-8"))
-    entry["head_sha"], entry["dirty_tree_hash"] = state["head_sha"], state["dirty_tree_hash"]
-    rec.setdefault("approvals", []).append(entry)
+    rec.setdefault(spec["array"], []).append(entry)
     path.write_text(dump_yaml(rec), encoding="utf-8")
     return str(path)
 
 
-def approval_log_state(project_root, approval):
-    """가드 승인 항목 하나를 **원시 로그와 대조한다**. (상태, 이유) — True·False·None(대조 불가).
+def add_approval(unit_id, guard, by, note=None, run_name=None, project_root=".",
+                 task_id=None, dispatch_id=None, harness_root=None):
+    """실행 가드 **승인** 사건을 evidence 에 기록한다(M1: 대화 승인)."""
+    return _add_decision("approve", unit_id, guard, by, note=note, run_name=run_name,
+                         project_root=project_root, task_id=task_id, dispatch_id=dispatch_id,
+                         harness_root=harness_root)
 
-    로그가 없는 기록(이 봉인이 없던 시절, 또는 다른 체크아웃)은 None 이다 — 통과가 아니라 미검증이다."""
+
+def add_rejection(unit_id, guard, by, note=None, run_name=None, project_root=".",
+                  task_id=None, dispatch_id=None, harness_root=None):
+    """실행 가드 **거부** 사건을 evidence 에 기록한다.
+
+    거부는 승인의 부재가 아니다. "아직 안 물어봤다" 와 "물어봤고 사람이 아니라고 했다" 는 다른 상태이고,
+    후자는 재시도가 답이 아니다 — 종료 검사가 그 둘을 다른 판정으로 인쇄할 수 있으려면 거부가 **기록**돼야 한다.
+    설명 넷은 거부에도 요구한다: 무엇을 왜 거부했는지가 남아야 재요청이 같은 것을 반복하지 않는다."""
+    return _add_decision("reject", unit_id, guard, by, note=note, run_name=run_name,
+                         project_root=project_root, task_id=task_id, dispatch_id=dispatch_id,
+                         harness_root=harness_root)
+
+
+def guard_decisions(runs, guard_id):
+    """한 가드에 대한 승인·거부를 **시각순으로 병합**한다 → [{kind, entry, at, by}].
+
+    같은 시각이면 기록된 순서를 따른다(승인·거부가 같은 초에 들어오는 것은 사람의 결정이 아니라 기계의 동률이다).
+    마지막 항목이 그 가드의 **현재 결정**이다 — 거부 뒤 승인이 오면 승인이 이긴다(사람이 다시 판단한 것이다)."""
+    out = []
+    for seq, rec in enumerate(runs):
+        for kind, spec in DECISIONS.items():
+            for i, e in enumerate(rec.get(spec["array"]) or []):
+                if isinstance(e, dict) and e.get("guard") == guard_id:
+                    # `seq` 가 없는 옛 기록(거부가 없던 시절의 승인)은 배열 안 순서로 갈음한다.
+                    order = e["seq"] if isinstance(e.get("seq"), int) else i
+                    out.append({"kind": kind, "entry": e, "at": e.get(spec["at"]) or "",
+                                "by": e.get(spec["by"]), "note": e.get("note"), "_ord": (seq, order)})
+    out.sort(key=lambda d: (d["at"], d["_ord"]))
+    return out
+
+
+def approval_log_state(project_root, approval, kind="approve"):
+    """가드 결정 항목 하나를 **원시 로그와 대조한다**. (상태, 이유) — True·False·None(대조 불가).
+
+    로그가 없는 기록(이 봉인이 없던 시절, 또는 다른 체크아웃)은 None 이다 — 통과가 아니라 미검증이다.
+    승인과 거부는 같은 봉인을 쓰므로 같은 대조를 받는다 — `kind` 가 첫 줄의 낱말과 필드 이름만 바꾼다.
+
+    대조하는 것은 **로그 전체**다: 첫 줄·head·tree 뿐 아니라 `seq`(같은 시각에 들어온 결정의 순서)와
+    `note`(설명 요구가 읽는 값)까지 항목에서 다시 만들어 비교한다. 봉인해 놓고 대조하지 않는 줄은
+    yaml 한 글자로 판정을 뒤집을 수 있는 자리이고, 그 자리는 규칙이 아니라 장식이다(AGENTS.core §11)."""
+    spec = DECISIONS[kind]
+    label = "승인" if kind == "approve" else "거부"
     ref = approval.get("log")
     if not isinstance(ref, str) or not ref.strip():
-        return None, f"{approval.get('guard')}: 승인 기록에 원시 로그가 없다 — 봉인 없이 적힌 승인이다"
+        return None, f"{approval.get('guard')}: {label} 기록에 원시 로그가 없다 — 봉인 없이 적힌 {label}이다"
     root = Path(project_root).resolve()
     path = Path(ref)
     path = path if path.is_absolute() else root / path
     try:
         path.resolve().relative_to(root)
     except ValueError:
-        return False, f"{approval.get('guard')}: 승인 로그 경로가 저장소 밖이다 ({ref})"
+        return False, f"{approval.get('guard')}: {label} 로그 경로가 저장소 밖이다 ({ref})"
     if not path.is_file():
-        return None, f"{approval.get('guard')}: 승인 로그가 없다 ({ref}) — 다른 체크아웃에서는 대조할 수 없다"
+        return None, f"{approval.get('guard')}: {label} 로그가 없다 ({ref}) — 다른 체크아웃에서는 대조할 수 없다"
     data = path.read_bytes()
     if sha256_bytes(data) != approval.get("log_sha256"):
-        return False, f"{approval.get('guard')}: 승인 로그가 기록 이후 바뀌었다 (log_sha256 불일치)"
+        return False, f"{approval.get('guard')}: {label} 로그가 기록 이후 바뀌었다 (log_sha256 불일치)"
     text = data.decode("utf-8", "replace")
     first = text.splitlines()[0] if text else ""
-    want = f"approve guard={approval.get('guard')} by={approval.get('approved_by')} at={approval.get('approved_at')}"
+    want = (f"{spec['prefix']} guard={approval.get('guard')} by={approval.get(spec['by'])} "
+            f"at={approval.get(spec['at'])}")
     if first != want:
-        return False, f"{approval.get('guard')}: 승인 기록({want!r})이 원시 로그의 첫 줄({first!r})과 다르다 — 손으로 고쳐졌다"
+        return False, f"{approval.get('guard')}: {label} 기록({want!r})이 원시 로그의 첫 줄({first!r})과 다르다 — 손으로 고쳐졌다"
     lines = text.splitlines()
     for key, regex in (("head_sha", HEAD_LINE_RE), ("dirty_tree_hash", TREE_LINE_RE)):
         recorded, in_log = approval.get(key), _last_match(regex, lines)
         if isinstance(recorded, str) and recorded and in_log != recorded:
-            return False, f"{approval.get('guard')}: 승인 시점의 {key} 가 원시 로그와 다르다"
+            return False, f"{approval.get('guard')}: {label} 시점의 {key} 가 원시 로그와 다르다"
+    # ── seq·note 도 같은 대조를 받는다 ──────────────────────────────────────
+    # head_sha·dirty_tree_hash 를 대조하는 이유가 그대로 이 둘에도 걸린다: 로그에 적어 봉인해 놓고
+    # 대조하지 않으면 yaml 한 글자로 판정이 뒤집힌다. `seq` 는 같은 시각에 들어온 승인·거부의 순서를,
+    # `note` 는 종료 시점의 설명 요구가 읽는 값을 정한다.
+    recorded_seq = approval.get("seq")
+    in_log_seq = SEQ_LINE_RE.match(lines[1]) if len(lines) > 1 else None
+    if in_log_seq is None or not isinstance(recorded_seq, int):
+        return None, (f"{approval.get('guard')}: {label} 기록이나 그 로그에 seq 가 없다 — "
+                      "결정 순서를 봉인하지 않던 옛 형식이라 대조할 수 없다")
+    if int(in_log_seq.group(1)) != recorded_seq:
+        return False, (f"{approval.get('guard')}: {label} 의 seq 가 원시 로그와 다르다 "
+                       f"(기록 {recorded_seq} vs 로그 {in_log_seq.group(1)}) — 결정 순서가 기록 이후 바뀌었다")
+    if not all(isinstance(approval.get(k), str) and approval.get(k)
+               for k in ("head_sha", "dirty_tree_hash")):
+        return None, (f"{approval.get('guard')}: {label} 기록에 head_sha·dirty_tree_hash 가 없다 — "
+                      "로그를 항목에서 다시 만들어 대조할 수 없다")
+    # 남은 차이는 note 뿐이다. 항목에서 로그를 통째로 다시 만들어 비교한다 — 여러 줄 note 도 그대로다.
+    # 이 대조가 없으면 종료 시점의 설명 요구가 **봉인되지 않은 yaml 을 읽는다**:
+    # 로그에는 빈 note 를 두고 yaml 에만 네 항목을 적는 것으로 승인·종료 두 지점이 한 지점이 된다.
+    if text != decision_log_text(spec, approval):
+        return False, (f"{approval.get('guard')}: {label} 의 note 가 원시 로그와 다르다 — "
+                       "설명이 기록 이후 바뀌었다. 종료 시점이 읽는 것은 봉인된 note 여야 한다")
     return True, ""
 
 

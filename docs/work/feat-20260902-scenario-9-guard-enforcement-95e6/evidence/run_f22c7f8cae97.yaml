@@ -1,0 +1,223 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_f22c7f8cae97
+task_id: task_80ddfce7aa99
+dispatch_id: ctx_3affa6148e02
+unit_id: feat-20260902-scenario-9-guard-enforcement-95e6
+spec_ref:
+  path: docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/spec.md
+  sha256: de572c675e66b1819e586ed5d91c90719a494418f4d198a4abe861aac05f6f12
+base_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scenario-9-guard-enforcement-95e6
+started_at: '2026-09-02T20:56:30+09:00'
+finished_at: '2026-09-02T23:27:19+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_scenario_9 -v
+  exit_code: 0
+  started_at: '2026-09-02T20:56:30+09:00'
+  finished_at: '2026-09-02T20:56:39+09:00'
+  seconds: 9.07
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/01-check-1.log
+  log_sha256: b36f6d9ff19402b7ac5a74bc7d184882fcb7c1d878af070c257a86c86dd7d66c
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-2
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-02T20:56:39+09:00'
+  finished_at: '2026-09-02T21:00:47+09:00'
+  seconds: 247.637
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/02-check-2.log
+  log_sha256: 3da717fbd11ba22ebb3e5ad79805bf26090ce423d3c681a10f6f25e339ce9b0d
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-3
+  command: '! bin/romeo route --fixtures fixtures/requests --report | grep -q ''✗'''
+  exit_code: 0
+  started_at: '2026-09-02T21:00:47+09:00'
+  finished_at: '2026-09-02T21:00:47+09:00'
+  seconds: 0.237
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/03-check-3.log
+  log_sha256: 987650d892a862ccadf9e17f73f25ebff85da12af5a36b44439f33c73ff1e19c
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-4
+  command: bin/romeo fixtures check
+  exit_code: 0
+  started_at: '2026-09-02T21:00:47+09:00'
+  finished_at: '2026-09-02T21:00:48+09:00'
+  seconds: 0.237
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/04-check-4.log
+  log_sha256: c4461651db26e2b454980d313bb6f279e89ecc4bddcbe641b688fc78b279e3f1
+  stdout_tail: PASS 33 fixtures
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-02T21:00:48+09:00'
+  finished_at: '2026-09-02T21:00:48+09:00'
+  seconds: 0.264
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/05-check-5.log
+  log_sha256: dcff18af6d5fea729231382a0023c054268acb47c84a755cc854ce640d8b5ca3
+  stdout_tail: 'workspaces/Romeo-Harness/impl-feat-20260902-scenario-9-guard-enforcement-95e6/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/brief.md
+    lines=85 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scenario-9-guard-enforcement-95e6/docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/spec.md
+    lines=148 needs_input=0 unchecked_ac=0'
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-02T21:00:48+09:00'
+  finished_at: '2026-09-02T21:00:49+09:00'
+  seconds: 0.327
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/06-check-6.log
+  log_sha256: 9ee7eb71ef47df94793ef58f23636d62d476dae92db89663da1aedff1a6533c9
+  stdout_tail: compile 검사 PASS
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-7
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-02T21:00:49+09:00'
+  finished_at: '2026-09-02T21:00:50+09:00'
+  seconds: 0.929
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/07-check-7.log
+  log_sha256: 471610ed719edd0555583ffcb7608898d3f5e4c78f2bdc7d19de7322a44ba910
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-8
+  command: grep -q required_explanation romeo/evidence.py && grep -q required_explanation romeo/close.py
+  exit_code: 0
+  started_at: '2026-09-02T21:00:50+09:00'
+  finished_at: '2026-09-02T21:00:50+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/08-check-8.log
+  log_sha256: 64edda626ec62bbb62c74d0e9b1f93003537fb1d84db42dfb7c7560be25acd17
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-9
+  command: bin/romeo evidence reject --help > /dev/null
+  exit_code: 0
+  started_at: '2026-09-02T21:00:50+09:00'
+  finished_at: '2026-09-02T21:00:50+09:00'
+  seconds: 0.092
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/09-check-9.log
+  log_sha256: 7e8aa18ff25042154687056c77e67c74cf2374a61010cbe894203aad05f7f6e6
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-10
+  command: grep -q '9-guard-approval.md' scenarios/README.md
+  exit_code: 0
+  started_at: '2026-09-02T21:00:50+09:00'
+  finished_at: '2026-09-02T21:00:50+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/10-check-10.log
+  log_sha256: 718dab571b621c1a93b0c09439721b8a7a55c60516b3ade437e7c06a6bc4f292
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-11
+  command: '! grep -rq ''gate-create'' core/'
+  exit_code: 0
+  started_at: '2026-09-02T21:00:50+09:00'
+  finished_at: '2026-09-02T21:00:51+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/11-check-11.log
+  log_sha256: 7f8351e91cc85a75a87be8c4b6c0f13ce351bfa6586344b9a367020be12d064a
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: check-12
+  command: grep -q 'romeo evidence reject' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-02T21:00:51+09:00'
+  finished_at: '2026-09-02T21:00:51+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/12-check-12.log
+  log_sha256: 8fb22fcf0c9f68207fae9bf4e836583d53f92ab558cbe78909931253a7ec06fc
+  stdout_tail: ''
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260902-scenario-9-guard-enforcement-95e6'
+  exit_code: 0
+  started_at: '2026-09-02T23:23:33+09:00'
+  finished_at: '2026-09-02T23:23:33+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/13-review-tree-before.log
+  log_sha256: 8bdcb4592c2c181604a82b324e81a050966711ed4456173b0e7b2c3f41a75f7a
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/policy/execution-guards.yaml\n M docs/planning/open-questions.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/evidence.py\n M scenarios/README.md\n M tests/test_docs_evidence_close.py\n\
+    ?? scenarios/9-guard-approval.md\n?? tests/test_scenario_9.py"
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scenario-9-guard-enforcement-95e6/.harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-02T23:23:34+09:00'
+  finished_at: '2026-09-02T23:23:34+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/14-reviewer-brief.log
+  log_sha256: 9e2ab528864e1f7bfdf1fed61385c95dc4a43b2c75bc70989d37cc36bce4f7a9
+  stdout_tail: 981324e7c7898bbee59f2c367c367e7059fc45d77abb2e8d9a7e7a63ff47e1f0  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260902-scenario-9-guard-enforcement-95e6/.harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/reviewer-brief.md
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260902-scenario-9-guard-enforcement-95e6'
+  exit_code: 0
+  started_at: '2026-09-02T23:27:19+09:00'
+  finished_at: '2026-09-02T23:27:19+09:00'
+  seconds: 0.031
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/15-review-tree-after.log
+  log_sha256: 8bdcb4592c2c181604a82b324e81a050966711ed4456173b0e7b2c3f41a75f7a
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/policy/execution-guards.yaml\n M docs/planning/open-questions.md\n\
+    \ M romeo/cli.py\n M romeo/close.py\n M romeo/evidence.py\n M scenarios/README.md\n M tests/test_docs_evidence_close.py\n\
+    ?? scenarios/9-guard-approval.md\n?? tests/test_scenario_9.py"
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/review/run_f22c7f8cae97-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-02T23:27:19+09:00'
+  finished_at: '2026-09-02T23:27:19+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260902-scenario-9-guard-enforcement-95e6/run_f22c7f8cae97/16-review-record.log
+  log_sha256: 794161f6e6cfbfb476d2fc32f6672ce4334b6b12e5a1bc9107441c573c86f6b0
+  stdout_tail: bcfde54ed2c57d2130f8ddc99861ab12becf97cd61e574561bb2862e4eb96c12  docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/review/run_f22c7f8cae97-reviewer.json
+  head_sha: d16c7a2513487ba96b687cb491d47d3ecab3dbf5
+  dirty_tree_hash: 40f1f2bf8707cb0dea67ce04a2c3d56ae1849afac6287d20e321f2568a58e564
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/policy/execution-guards.yaml
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/evidence.py
+- scenarios/9-guard-approval.md
+- scenarios/README.md
+- tests/test_docs_evidence_close.py
+- tests/test_scenario_9.py
+artifact_hash: bff4b82044c4bb60d132614f5dde34daead11fe3d2c31c9bcb16978961937507
+reviewer: null
+verdict: null
+approvals: []

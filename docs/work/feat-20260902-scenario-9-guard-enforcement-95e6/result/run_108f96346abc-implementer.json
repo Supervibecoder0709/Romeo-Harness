@@ -1,0 +1,77 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260902-scenario-9-guard-enforcement-95e6",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/task/run_108f96346abc-implementer.json",
+    "sha256": "4f0ebf523024b1178149e691cd83eeee3c1a9c51844495a3a20a14d58b677f2a"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_scenario_9 -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "! bin/romeo route --fixtures fixtures/requests --report | grep -q '✗'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo fixtures check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -q required_explanation romeo/evidence.py && grep -q required_explanation romeo/close.py",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo evidence reject --help > /dev/null",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "grep -q '9-guard-approval.md' scenarios/README.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "! grep -rq 'gate-create' core/",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "grep -q 'romeo evidence reject' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/evidence/run_108f96346abc.yaml",
+  "notes": "3회차. 2회차(run_f22c7f8cae97)의 검토자 FAIL(AC_UNMET · EVIDENCE_NOT_RECORDED)이 지목한 것은 코드가 아니라 증거의 형태 하나였다 — AC-10 이 요구한 「고치기 전 상태에서 실패하는 것」을 손으로 쓴 텍스트 파일(docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/probe/step13-14-before.txt)로 남겼고, 그 파일에는 실행 명령·원시 로그 경로·log_sha256·head/tree 앵커가 없어 증거로 세지 않는다(K-51). 그래서 이 회차는 코드·테스트·런북·정책표를 하나도 고치지 않았다(§12): 바꾼 것은 docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/probe/ 안의 두 파일뿐이다. ① base-repro.sh 에 C 절을 더했다 — 13·14 단계가 겨누는 구멍이 그 두 단계가 더해지기 전 트리에서 열려 있는 것을 재현한다. base 리비전(53fa828) 트리에는 romeo.evidence.add_rejection 이 없어 그 두 단계를 실행할 수조차 없으므로(A 절의 실패가 ImportError 인 이유다), C 절은 지금 트리에서 2회차가 더한 대조 블록 하나만(approval_log_state 안의 「seq·note 도 같은 대조를 받는다」 주석부터 그 함수의 return True 앞까지, 22줄) 기계적으로 들어낸 트리를 만들고 블록을 찾지 못하면 프로브 자체가 실패한다 — 아무것도 들어내지 않고 통과하는 것과 구별하기 위해서다. ② step13-14-before.txt 머리에 '이 파일은 증거가 아니라 사람이 읽는 사본' 이라고 적었다(지우지 않았다 — 사람의 승인 대상이다). 증거: 이 run 의 ac10-base-repro (sh docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/probe/base-repro.sh, exit 0). 그 출력이 A(base 트리에서 이 테스트 모듈이 실패한다) · B(base 트리에서 빈 승인이 GUARD_APPROVED 를 통과한다) · C(대조 블록을 들어낸 트리에서 13·14 단계가 'True is not false : ... 원시 로그와 일치하고 설명 요구를 채웠다' 로 실패한다 — 위조된 승인이 승인으로 세어졌다는 뜻이다) 셋을 한 봉인 안에 담는다. 고친 뒤의 통과는 이 run 의 check-1(python3 -m unittest tests.test_scenario_9 -v, exit 0)이 보인다 — §11 의 양쪽 실측이 둘 다 기록 명령을 거쳤다. 회귀 검사(check-2~7)는 양쪽에서 통과가 예상되므로 양쪽 실측 대상이 아니다. required_checks 12건은 코드가 안 바뀌었어도 이 run 에서 다시 기록했다 — 전부 exit 0 이다. 재실행 여유: 이 run 의 check-2(python3 -m unittest discover -s tests)가 245.5초로 상한 600초의 41% 다 — 경고 임계(80%) 아래다. 범위 밖에서 새로 연 결함은 없다."
+}

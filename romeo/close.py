@@ -10,6 +10,7 @@ from .blocks import evaluate as evaluate_blocks
 from .blocks import required_checks
 from .docs import approval_chain_warnings, approval_commit, approval_key, approval_key_at, find_unit_dir
 from .evidence import (RERUN_NEAR_TIMEOUT_RATIO, RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
+                       guard_decisions, parse_guard_explanation, required_explanation,
                        list_runs, replay, review_record_state, sealed_product)
 from .gitinfo import head_sha
 from .parity import (_envelope_defects, _evidence_product, _product_of, _product_text, evidence_ref_error,
@@ -352,22 +353,49 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
             check("BLOCK_SATISFIED", ok, f"{bid}: {why}")
     unapproved = []
     for g in out["guards"]:
-        entries = [a for r in runs for a in (r.get("approvals") or []) if isinstance(a, dict) and a.get("guard") == g["id"]]
-        if not entries:
-            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}) 승인 기록 없음")
+        # 한 가드의 판정은 **가장 최근 결정**이다(execution-guards.yaml 의 approval.last_decision).
+        # 거부 뒤 승인이 오면 승인이 이긴다 — 사람이 다시 판단한 것이다.
+        decisions = guard_decisions(runs, g["id"])
+        if not decisions:
+            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}) 승인 기록 없음 — 아직 묻지 않았다")
             unapproved.append(g["id"])
             continue
-        # 승인 항목은 yaml 배열이라 손으로 써 넣을 수 있다 — 기록 명령이 남긴 원시 로그와 봉인이 맞을 때만 승인으로 센다.
-        states = [approval_log_state(project_root, a) for a in entries]
-        if any(s is False for s, _ in states):
-            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}): " + "; ".join(w for s, w in states if s is False))
+        last = decisions[-1]
+        # 결정 항목은 yaml 배열이라 손으로 써 넣을 수 있다 — 기록 명령이 남긴 원시 로그와 봉인이 맞을 때만 결정으로 센다.
+        sealed, why = approval_log_state(project_root, last["entry"], kind=last["kind"])
+        if sealed is False:
+            check("GUARD_APPROVED", False, f"{g['id']} ({g['name']}): {why}")
             unapproved.append(g["id"])
-        elif all(s is None for s, _ in states):
-            check("GUARD_APPROVED", UNVERIFIED, f"{g['id']} ({g['name']}): " + "; ".join(w for s, w in states if w)
-                  + " — 승인 기록을 로그로 확인하지 못했다(K-51)")
+            continue
+        if sealed is None:
+            check("GUARD_APPROVED", UNVERIFIED, f"{g['id']} ({g['name']}): {why} — 결정 기록을 로그로 확인하지 못했다(K-51)")
             unapproved.append(g["id"])
-        else:
-            check("GUARD_APPROVED", True, f"{g['id']} ({g['name']}) 승인 기록 {len(entries)}건 — 원시 로그와 일치")
+            continue
+        if last["kind"] == "reject":
+            # "아직 안 물어봤다" 와 "물어봤고 사람이 아니라고 했다" 는 다른 상태다. 후자는 재시도가 답이 아니다.
+            check("GUARD_APPROVED", False,
+                  f"{g['id']} ({g['name']}) BLOCKED_APPROVAL — 사람이 거부했다 "
+                  f"({last['by']} · {last['at']}): {last['note']}. "
+                  "승인 기록 없음과 다르다 — 같은 요청을 다시 보내는 것이 답이 아니다. "
+                  "무엇이 달라졌는지 적고 사람이 새로 승인해야 한다")
+            unapproved.append(g["id"])
+            continue
+        # 여기서 읽는 note 는 **봉인된 로그의 note 다** — `approval_log_state` 가 yaml 항목에서 로그를
+        # 다시 만들어 통째로 대조했으므로, 이 자리에 온 값은 log_sha256 이 봉인한 값과 같다.
+        # 그 대조가 없으면 종료 시점이 봉인되지 않은 yaml 을 읽게 되고, 승인 자리와 종료 자리가
+        # **같은 값을 두 번 읽는 한 지점**이 된다. 봉인 자체는 로그와 yaml 의 일치만 보므로
+        # 둘을 함께 손으로 만들면 통과한다 — 그것을 잡는 것이 아래의 설명 요구다(승인·종료 두 지점).
+        try:
+            parse_guard_explanation(last["note"], harness_root)
+        except ValueError as exc:
+            labels = " · ".join(it["label"] for it in required_explanation(harness_root))
+            check("GUARD_APPROVED", False,
+                  f"{g['id']} ({g['name']}): 봉인은 맞지만 승인의 note 가 설명 요구({labels})를 채우지 못했다 — {exc}")
+            unapproved.append(g["id"])
+            continue
+        check("GUARD_APPROVED", True,
+              f"{g['id']} ({g['name']}) 승인 ({last['by']} · {last['at']}, 결정 {len(decisions)}건 중 최신) "
+              "— 원시 로그와 일치하고 설명 요구를 채웠다")
     if plan:
         _check_plan_committed(check, project_root, spec, plan, unit_id)
         if unapproved:

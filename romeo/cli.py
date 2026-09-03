@@ -176,7 +176,7 @@ def cmd_approve(args):
 
 
 def cmd_evidence(args):
-    from .evidence import add_approval, run_command
+    from .evidence import add_approval, add_rejection, run_command
     ids = {"task_id": args.task_id, "dispatch_id": args.dispatch_id}
     if args.action == "run":
         command = " ".join(args.command)
@@ -203,10 +203,17 @@ def cmd_evidence(args):
             rc = rc or (0 if c["exit_code"] == 0 else 1)
         print(f"  → {res['evidence']}  head {res['state']['head_sha'][:12]} changed {res['state']['changed_files']}")
         return rc
-    if args.action == "approve":
-        path = add_approval(args.unit, args.guard, args.by, note=args.note, run_name=args.run,
-                            project_root=_root(args), **ids)
-        print(f"approval recorded → {path}")
+    if args.action in ("approve", "reject"):
+        # 설명 요구를 채우지 못하면 기록 자체가 만들어지지 않는다 — 비0 으로 끝내고 무엇이 빠졌는지 인쇄한다.
+        # 기록되지 않았으므로 상태는 결정 전 그대로다(승인 전 상태 변경 0건).
+        record = add_approval if args.action == "approve" else add_rejection
+        try:
+            path = record(args.unit, args.guard, args.by, note=args.note, run_name=args.run,
+                          project_root=_root(args), **ids)
+        except ValueError as exc:
+            print(f"{args.action} 를 기록하지 않았다: {exc}", file=sys.stderr)
+            return 2
+        print(f"{'approval' if args.action == 'approve' else 'rejection'} recorded → {path}")
         return 0
     return 2
 
@@ -469,15 +476,24 @@ def build_parser():
     _delegation_flags(e_chk)
     e_chk.add_argument("--root")
     e_chk.set_defaults(fn=cmd_evidence)
-    e_ap = es.add_parser("approve", help="실행 가드 승인 사건 기록 (선행 run 이 없으면 승인 전용 레코드를 만든다)")
-    e_ap.add_argument("--unit", required=True)
-    e_ap.add_argument("--guard", required=True)
-    e_ap.add_argument("--by", required=True)
-    e_ap.add_argument("--note")
-    e_ap.add_argument("--run")
-    _delegation_flags(e_ap)
-    e_ap.add_argument("--root")
-    e_ap.set_defaults(fn=cmd_evidence)
+    # 승인과 거부는 같은 인자를 받는다 — 같은 봉인으로 남고, 설명 넷을 똑같이 요구한다.
+    # 거부에도 설명을 요구하는 이유: 무엇을 왜 거부했는지가 남아야 재요청이 같은 것을 반복하지 않는다.
+    _NOTE_HELP = ("설명 요구 네 항목을 `라벨: 값` 으로 적는다 — 목록의 정본은 "
+                  "core/policy/execution-guards.yaml 의 required_explanation 이다. "
+                  '예: --note "영향 범위: … / 사전 백업: … / 복구 방법: … / 확인할 내용: …". '
+                  "빠지거나 자리표시자뿐이면 기록하지 않고 비0 으로 끝난다")
+    for action, helptext in (("approve", "실행 가드 승인 사건 기록 (선행 run 이 없으면 승인 전용 레코드를 만든다)"),
+                             ("reject", "실행 가드 **거부** 사건 기록 — 승인과 같은 봉인으로 남는다. "
+                                        "종료 검사는 '아직 안 물어봤다' 와 '사람이 거부했다' 를 다른 판정으로 말한다")):
+        e_d = es.add_parser(action, help=helptext)
+        e_d.add_argument("--unit", required=True)
+        e_d.add_argument("--guard", required=True)
+        e_d.add_argument("--by", required=True)
+        e_d.add_argument("--note", help=_NOTE_HELP)
+        e_d.add_argument("--run")
+        _delegation_flags(e_d)
+        e_d.add_argument("--root")
+        e_d.set_defaults(fn=cmd_evidence)
 
     s = sub.add_parser("envelope", help="작업 계약(TaskEnvelope) 생성 · 결과 계약(ResultEnvelope) 검증")
     vs = s.add_subparsers(dest="action", required=True)
