@@ -16,7 +16,7 @@ approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
 parent: init-20260904-attach-payload-manual-rreq
-inputs: [../init-20260904-attach-payload-manual-rreq/charter.md]
+inputs: [../init-20260904-attach-payload-manual-rreq/charter.md, observations.md]
 evidence: []
 routing:
   policy_version: 0.1.0
