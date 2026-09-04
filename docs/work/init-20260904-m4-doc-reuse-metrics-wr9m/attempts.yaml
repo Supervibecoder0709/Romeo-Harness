@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: init-20260904-m4-doc-reuse-metrics-wr9m
+attempts:
+- n: 1
+  run: run_a6cdabfd04f4
+  base_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  started_at: '2026-09-04T07:14:34+09:00'
+  result: pass
+  failure_class: null
+  note: 1회차 close PASS · required_checks 5/5 · 재실행 5/5 · 검토자 PASS findings 0 · 승인 전 프로브가 AC-5 결함을 잡아 승인
+    전에 고쳤다
+  settled_at: '2026-09-04T11:29:41+09:00'
+reviews: []

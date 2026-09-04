@@ -1,0 +1,16 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260904-m4-doc-reuse-metrics-wr9m",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/task/run_a6cdabfd04f4-reviewer.json",
+    "sha256": "3983a9335e90ac8fdde735195a6f711ac6354997eb32ea951f0981945cbf70ef"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/evidence/run_a6cdabfd04f4.yaml",
+  "notes": "AC-1~AC-5는 현재 소스와 check-1 원시 로그의 11개 성공 테스트로 지목했다. 나머지 required_checks도 같은 head_sha·dirty_tree_hash에서 종료 코드 0으로 기록됐고, 범위·가드·계획 변경·재실행 가능성 위반 근거는 발견하지 못했다."
+}

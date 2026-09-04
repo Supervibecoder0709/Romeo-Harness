@@ -19,8 +19,10 @@ provenance: [anthropics-skills-skill-format]
 
 ## 절차
 
-1. **재사용 검색.** `docs/work/` 와 `docs/current/` 에서 같은 slug·제목·핵심어를 검색한다. 이미 있는 단위가 있으면
-   새로 만들지 말고 그 id 를 카드 `reuse_hits` 에 넣고 "재개 / 재분류 / 새 단위" 중 하나를 제안한다.
+1. **재사용 검색.** `romeo find <핵심어…>` 로 `docs/work/` 와 `docs/current/` 에서 같은 slug·제목·핵심어를
+   검색한다. 이미 있는 단위가 있으면 새로 만들지 말고 그 id 를 카드 `reuse_hits` 에 넣고
+   "재개 / 재분류 / 새 단위" 중 하나를 제안한다. 여기서 빠뜨려도 카드가 같은 검색을 스스로 한 번 더
+   돌려 인쇄하므로 확정 전에 드러난다 — 이 단계는 사람이 판단할 시간을 앞당길 뿐 유일한 관문이 아니다.
 2. **제안 작성.** `core/schemas/proposal.json` 형식으로 채운다.
    - 사실은 요청·저장소에서 확인한 것만. 가정은 확인하지 않은 전제. 미확인은 확인이 필요한 것.
    - `candidate.unit` 은 `none / T0 / T1 / T2`, `mode` 는 `delivery / discovery / experiment`,

@@ -1,5 +1,6 @@
 """제안 카드 렌더링(≤ 30줄). 깊이와 이유를 먼저, 단위·모드·영역은 한 줄로. 사람이 1클릭으로 확정하는 화면."""
 from .doctor import probe_capabilities
+from .find import proposal_terms, search_units
 from .policy import load_policy, profile_reasons
 
 GATE_SHORT = {
@@ -98,6 +99,27 @@ def _capabilities_detail(cap_ids, root=None, harness_root=None):
     return lines
 
 
+def _reuse_line(said, found, width=96):
+    """재사용 후보 줄 — 제안이 적어 준 것과 카드가 **스스로 찾은** 것을 한 줄에 둔다.
+
+    id 는 자르지 않는다. 잘린 id 는 그 단위를 지목하지 못하므로 인쇄해도 아무것도 드러내지
+    못한다 — 폭이 모자라면 뒤쪽 후보를 개수로 접는다. 카드가 찾은 것에는 `(검색)` 을 붙인다:
+    사람이 적어 넣은 것과 기계가 찾은 것을 구별하지 못하면, 제안자가 1단계를 빠뜨렸다는 사실
+    자체가 보이지 않는다.
+    """
+    items = list(said) + [f"{i}(검색)" for i in found]
+    shown, sep = [], " · "
+    used = 0
+    for item in items:
+        need = len(item) + (len(sep) if shown else 0)
+        if shown and used + need > width:
+            break
+        shown.append(item)
+        used += need
+    rest = len(items) - len(shown)
+    return "재사용 후보: " + sep.join(shown) + (f" 외 {rest}건" if rest else "")
+
+
 def render_card(proposal, route_out, policy=None, root=None, harness_root=None):
     pol = policy or load_policy()
     pk = pol["packages"]
@@ -148,12 +170,19 @@ def render_card(proposal, route_out, policy=None, root=None, harness_root=None):
     if proposal.get("needs_decision"):
         lines.append("결정 필요:")
         lines.extend(_list(proposal["needs_decision"], 2))
-    if proposal.get("reuse_hits"):
-        lines.append("재사용 후보: " + _clip(", ".join(proposal["reuse_hits"]), 90))
-    lines.append("확정: [그대로 진행] 또는 단위·깊이·게이트를 고쳐 주세요 → human_correction 에 기록")
+    # 재사용 후보는 제안이 적어 준 것과 **카드가 직접 찾은 것**을 함께 인쇄한다.
+    # 제안자가 1단계(재사용 검색)를 빠뜨려 `reuse_hits` 가 비어 있어도 중복이 보여야 한다 —
+    # 요구를 절차에 적고 확인을 카드에 두지 않으면, 빠뜨린 것과 겹치는 것이 없는 것이 같은 화면이 된다.
+    said = [str(x) for x in (proposal.get("reuse_hits") or [])]
+    found = [h["id"] for h in search_units(root or ".", proposal_terms(proposal)) if h["id"] not in said]
+    # 이 두 줄은 예산 축소에서 제외한다. 축소로 사라지면 이 요구는 인쇄만 되고 아무것도 드러내지 못한다.
+    tail = []
+    if said or found:
+        tail.append(_reuse_line(said, found))
+    tail.append("확정: [그대로 진행] 또는 단위·깊이·게이트를 고쳐 주세요 → human_correction 에 기록")
     limit = pk["budgets"]["card_max_lines"]
-    if len(lines) > limit:
+    if len(lines) + len(tail) > limit:
         # 사실·가정·미확인 부터 줄인다 (게이트·문서·실행 줄은 유지)
         keep = [ln for ln in lines if not ln.startswith("  - ")]
-        lines = keep[:limit]
-    return "\n".join(lines)
+        lines = keep[:limit - len(tail)]
+    return "\n".join(lines + tail)

@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · find · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -6,6 +6,7 @@ from pathlib import Path
 
 from . import HARNESS_ROOT, __version__
 from .evidence import RERUN_TIMEOUT
+from .find import DEFAULT_LIMIT
 from .util import load_any, project_root as _project_root, dump_yaml
 
 
@@ -69,6 +70,20 @@ def cmd_card(args):
     if args.out:
         Path(args.out).write_text(text + "\n", encoding="utf-8")
     print(text)
+    return 0
+
+
+def cmd_find(args):
+    """재사용 검색 — 겹치는 기존 단위를 인쇄한다. 없음은 오류가 아니다(exit 0)."""
+    from .find import search_units
+    hits = search_units(_root(args), args.terms, limit=args.limit)
+    if args.json:
+        print(json.dumps({"terms": args.terms, "hits": hits}, ensure_ascii=False, indent=1))
+    elif not hits:
+        print("재사용 후보 없음")
+    else:
+        for h in hits:
+            print(f"{h['id']}  score {h['score']} ({', '.join(h['matched'])})  {h['title']}")
     return 0
 
 
@@ -427,6 +442,13 @@ def build_parser():
     s.add_argument("--out")
     s.add_argument("--root", help="부착 상태(.harness/romeo.project.yaml)를 찾을 프로젝트 루트")
     s.set_defaults(fn=cmd_card)
+
+    s = sub.add_parser("find", help="재사용 검색 — 핵심어와 겹치는 기존 작업 단위 (/plan 1단계)")
+    s.add_argument("terms", nargs="+", help="핵심어 (slug·제목의 낱말)")
+    s.add_argument("--root", help="검색할 프로젝트 루트")
+    s.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help=f"인쇄할 후보 수 (기본 {DEFAULT_LIMIT})")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_find)
 
     s = sub.add_parser("new", help="docs/work/<id>/ 문서 패키지 생성")
     g = s.add_mutually_exclusive_group(required=True)

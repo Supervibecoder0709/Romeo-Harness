@@ -1,0 +1,274 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_a6cdabfd04f4
+task_id: task_abb065ccef31
+dispatch_id: ctx_b161228deedb
+unit_id: init-20260904-m4-doc-reuse-metrics-wr9m
+spec_ref:
+  path: docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+  sha256: 3992285de828179aff8a268fe01c67e948da1e633b7e2850e174ffd07cd50b36
+base_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-m4-doc-reuse-metrics-wr9m
+started_at: '2026-09-04T07:23:20+09:00'
+finished_at: '2026-09-04T11:20:03+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_find_reuse -v
+  exit_code: 0
+  started_at: '2026-09-04T07:23:20+09:00'
+  finished_at: '2026-09-04T07:23:22+09:00'
+  seconds: 1.266
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/01-check-1.log
+  log_sha256: 09ac84653d53be55f4ab6810b504cf1b29a6b5c4287a656262e02248709a1d19
+  stdout_tail: ''
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: check-2
+  command: bin/romeo find gate-fixture-coverage --json | grep -q 'feat-20260904-gate-fixture-coverage-q3wy'
+  exit_code: 0
+  started_at: '2026-09-04T07:23:22+09:00'
+  finished_at: '2026-09-04T07:23:22+09:00'
+  seconds: 0.164
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/02-check-2.log
+  log_sha256: c78af52fee72399f7b0292f78b674c114c6b80e65b820a98a65664f384975f5e
+  stdout_tail: ''
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: check-3
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T07:23:22+09:00'
+  finished_at: '2026-09-04T07:27:40+09:00'
+  seconds: 257.564
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/03-check-3.log
+  log_sha256: 356a6ee7f37434c669ce775d78195d7b7d78079845d1df9ae0cf1fc2962dc51d
+  stdout_tail: ''
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: check-4
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-04T07:27:40+09:00'
+  finished_at: '2026-09-04T07:27:40+09:00'
+  seconds: 0.28
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/04-check-4.log
+  log_sha256: 7febc195d2ca5a9450688254da3e6cc803e0c2b10ef7e63b8eaed7ad87d4e917
+  stdout_tail: "/orca/workspaces/Romeo-Harness/impl-init-20260904-m4-doc-reuse-metrics-wr9m/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md\
+    \ lines=83 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-m4-doc-reuse-metrics-wr9m/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md\
+    \ lines=127 needs_input=0 unchecked_ac=5\n    WARN  UNCHECKED_AC 5개"
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-04T07:27:40+09:00'
+  finished_at: '2026-09-04T07:27:40+09:00'
+  seconds: 0.326
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/05-check-5.log
+  log_sha256: 65d9695e5fa3b8cca5221d3bb01cc4884c84c77805cf3aa282e01a17808bf554
+  stdout_tail: compile 검사 PASS
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/init-20260904-m4-doc-reuse-metrics-wr9m'
+  exit_code: 0
+  started_at: '2026-09-04T07:29:01+09:00'
+  finished_at: '2026-09-04T07:29:01+09:00'
+  seconds: 0.032
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/06-review-tree-before.log
+  log_sha256: 63eff693b11195743e0d9f76d2a3cb410b9bd40bd8eb53b55472df72052d1246
+  stdout_tail: "M core/workflows/plan/SKILL.md\n M romeo/card.py\n M romeo/cli.py\n?? romeo/find.py\n\
+    ?? tests/test_find_reuse.py"
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-m4-doc-reuse-metrics-wr9m/.harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-04T07:29:06+09:00'
+  finished_at: '2026-09-04T07:29:07+09:00'
+  seconds: 0.021
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/07-reviewer-brief.log
+  log_sha256: 00dca886a6da11c162a68ad0ef40bf1a829fbbc318381ed5afb16cd86a9474b9
+  stdout_tail: 5ab2e36f9ced5668f325bad420965512cddcf3950541b76668affa9eba2f9834  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-m4-doc-reuse-metrics-wr9m/.harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/reviewer-brief.md
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: review-record
+  command: shasum -a 256 docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/review/run_a6cdabfd04f4-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-04T11:20:02+09:00'
+  finished_at: '2026-09-04T11:20:03+09:00'
+  seconds: 0.042
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/08-review-record.log
+  log_sha256: 786469a4bc7243517ed64554d8629b33010d1a90627380e3aad27cc9bd65782b
+  stdout_tail: df35869422c483f82a3861d0733e2021074b674b2c932402217d43e9a7e6128e  docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/review/run_a6cdabfd04f4-reviewer.json
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/init-20260904-m4-doc-reuse-metrics-wr9m'
+  exit_code: 0
+  started_at: '2026-09-04T11:20:03+09:00'
+  finished_at: '2026-09-04T11:20:03+09:00'
+  seconds: 0.029
+  log: .harness/runs/init-20260904-m4-doc-reuse-metrics-wr9m/run_a6cdabfd04f4/09-review-tree-after.log
+  log_sha256: 63eff693b11195743e0d9f76d2a3cb410b9bd40bd8eb53b55472df72052d1246
+  stdout_tail: "M core/workflows/plan/SKILL.md\n M romeo/card.py\n M romeo/cli.py\n?? romeo/find.py\n\
+    ?? tests/test_find_reuse.py"
+  head_sha: 54790e14c44190f3e980a1f9a8e4c53ab241c3ce
+  dirty_tree_hash: 20d964b3d1ecb20e6478cbd8801c183417d0214fccd0d0890ea347d45a2f2237
+changed_files:
+- core/workflows/plan/SKILL.md
+- romeo/card.py
+- romeo/cli.py
+- romeo/find.py
+- tests/test_find_reuse.py
+artifact_hash: 725edd0d0bc1af0c40ecd9f1cbee8a2a27cfa7f6942635c900597ffca1654396
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-04T11:24:48+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-04T07:13:40+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_a6cdabfd04f4 — 검증 계획 5건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 54790e14c441 vs 현재 54790e14c441
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 20d964b3d1ec vs 현재 20d964b3d1ec (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_find_reuse -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — bin/romeo find gate-fixture-coverage --json | grep -q ''feat-20260904-gate-fixture-coverage-q3wy'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo compile --check'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 9건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 5건'
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'milestone-plan: charter.md 의 「마일스톤 계획」 절이 채워졌다'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 5건이 승인 커밋 54790e14c441 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_find_reuse -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — bin/romeo find gate-fixture-coverage --json | grep -q ''feat-20260904-gate-fixture-coverage-q3wy'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 54790e14c441 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['core/workflows/plan/SKILL.md', 'romeo/card.py', 'romeo/cli.py', 'romeo/find.py',
+      'tests/test_find_reuse.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_a6cdabfd04f4-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

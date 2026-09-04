@@ -1,0 +1,41 @@
+{
+ "schema": "romeo/result-envelope@0.1.0",
+ "unit_id": "init-20260904-m4-doc-reuse-metrics-wr9m",
+ "role": "implementer",
+ "task_envelope_ref": {
+  "path": "docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/task/run_a6cdabfd04f4-implementer.json",
+  "sha256": "4e1231d2cd0c40e6c303cbc3e8586969327eb18f9275936d14296f6f0f4cfb68"
+ },
+ "checks": [
+  {
+   "id": "check-1",
+   "command": "python3 -m unittest tests.test_find_reuse -v",
+   "exit_code": 0
+  },
+  {
+   "id": "check-2",
+   "command": "bin/romeo find gate-fixture-coverage --json | grep -q 'feat-20260904-gate-fixture-coverage-q3wy'",
+   "exit_code": 0
+  },
+  {
+   "id": "check-3",
+   "command": "python3 -m unittest discover -s tests",
+   "exit_code": 0
+  },
+  {
+   "id": "check-4",
+   "command": "bin/romeo validate",
+   "exit_code": 0
+  },
+  {
+   "id": "check-5",
+   "command": "bin/romeo compile --check",
+   "exit_code": 0
+  }
+ ],
+ "gate_verdict": "PASS",
+ "blocked_reason": null,
+ "findings": [],
+ "evidence_ref": "docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/evidence/run_a6cdabfd04f4.yaml",
+ "notes": "구현 3건: romeo/find.py(신규 — search_units·proposal_terms) · romeo/cli.py(find 하위 명령) · romeo/card.py(render_card 가 제안의 reuse_hits 와 무관하게 스스로 검색하고, 그 줄과 확정 줄을 30줄 예산 축소에서 제외) · core/workflows/plan/SKILL.md 1단계가 `romeo find <핵심어…>` 를 지정 · tests/test_find_reuse.py(신규, 11건).\n검사 5건 전부 exit 0 (run_a6cdabfd04f4 의 check-1~check-5, head 54790e14c441). check-3 은 257.564초로 재실행 상한 600초의 43% 다 — 승인 전 프로브 실측(249초)과 같은 구간이고 경고 임계 80% 아래다.\n판별력 실측(§11, 증거 아님 — 스크래치 사본에서 돌린 참고 실행이다). (가) base 54790e1 트리 + 새 검사만: romeo.find 가 없어 모듈 import 단계에서 실패한다. (나) base 트리 + find.py·CLI 등록만(카드·절차 미구현): 11건 중 5건 실패 — AC-2 2건·AC-3 2건·AC-5 1건이 떨어지고 AC-1 5건과 AC-4 1건은 통과한다. AC-4 가 양쪽에서 통과하는 것은 그것이 회귀 방지 검사이기 때문이고(검증 계획의 구분과 같다), AC-3 의 축소 2단계 검사가 (나)에서 낸 실패 메시지가 이 요구의 자리를 그대로 보여준다 — 고치기 전 구현은 남은 줄을 뒤에서부터 잘라 재사용 후보 줄 자리에 능력 줄이 와 있었다.\n범위 밖으로 두고 고치지 않은 것 2건(§12): (1) 형태소 분석기가 없어 한국어 조사가 붙은 낱말(`재사용` vs `재사용을`)은 서로 다른 토큰이라 회수율이 낮다 — find.py 의 모듈 docstring 에 그 사실을 적어 두었다. (2) 카드의 사실·가정·미확인 목록이 예산 축소로 사라지는 것은 Tech Spec 이 비범위로 명시한 별개 결함이다. 둘 다 docs/planning/open-questions.md 에 여는 것이 §12 의 처리이지만 그 파일은 이 계약의 allowed_paths 밖이라 여기와 worker_done 보고로만 남긴다."
+}
