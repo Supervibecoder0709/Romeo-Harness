@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260904-attach-payload-manual-rreq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260904-attach-payload-manual-rreq/task/run_1b6546d3394e-reviewer.json",
+    "sha256": "4a238d097b4969aede1828bf96a541c7e7fbb3d08d07ef956a253c39f63a590a"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260904-attach-payload-manual-rreq/evidence/run_1b6546d3394e.yaml",
+  "notes": "수용 기준 6개는 증거의 원시 로그와 현재 파일 상태로 지목했다. 두 계약의 base_sha와 검증 계획은 같고, 현재 변경은 구현자 allowed_paths 안이며, 증거 최종 head_sha는 현재 HEAD와 같다. Orca 앱이 실행 중이지 않아 worker_done 전달은 실패했으며, 파일 변경이나 검사 재실행은 하지 않았다."
+}

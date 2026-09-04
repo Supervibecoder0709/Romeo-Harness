@@ -1,0 +1,505 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_1b6546d3394e
+task_id: task_7a244341c82d
+dispatch_id: ctx_6351b101eb0e
+unit_id: init-20260904-attach-payload-manual-rreq
+spec_ref:
+  path: docs/work/init-20260904-attach-payload-manual-rreq/spec.md
+  sha256: c03891c1a3bc309e9442ca2767a0698cb472a9fbaf0f261e39f2767270307b0f
+base_sha: 9af85f36015c84237040fb7799e78af5adaef267
+head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-attach-payload-manual-rreq
+started_at: '2026-09-04T17:40:58+09:00'
+finished_at: '2026-09-04T18:04:50+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_runbook -v
+  exit_code: 0
+  started_at: '2026-09-04T17:40:58+09:00'
+  finished_at: '2026-09-04T17:40:59+09:00'
+  seconds: 0.665
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/01-check-1.log
+  log_sha256: 66c492c99aa2d50c904a740ecbab17baefd1ce4e502c2232ce46d1ef3f013605
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: check-2
+  command: for h in '## 부착 전 확인' '## 놓는 것' '## 덮는 것과 보존' '## 검증' '## 되돌리기'; do grep -qF "$h" scenarios/10-attach-payload.md
+    || exit 1; done
+  exit_code: 0
+  started_at: '2026-09-04T17:40:59+09:00'
+  finished_at: '2026-09-04T17:40:59+09:00'
+  seconds: 0.016
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/02-check-2.log
+  log_sha256: 43b36bec875a3112c01dd7c36928cbb1ae305bd9346ee6cacf4160a48f5f0822
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: check-3
+  command: test $(grep -cE '^\| Q-[0-9]+ \|.*init-20260904-attach-payload-manual-rreq' docs/planning/open-questions.md)
+    -ge 2
+  exit_code: 0
+  started_at: '2026-09-04T17:40:59+09:00'
+  finished_at: '2026-09-04T17:40:59+09:00'
+  seconds: 0.006
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/03-check-3.log
+  log_sha256: 9b4dd6f68766cbda9a54023cf1914beee7255497c80ff64f25fb9f4221196bd7
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: check-4
+  command: bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq
+  exit_code: 0
+  started_at: '2026-09-04T17:40:59+09:00'
+  finished_at: '2026-09-04T17:40:59+09:00'
+  seconds: 0.088
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/04-check-4.log
+  log_sha256: ae64748c48fc83cff1b1a25b5ab62bb9ddec1aeff13e0aa33ea86d8ab0423e12
+  stdout_tail: "[PASS] docs/work/init-20260904-attach-payload-manual-rreq/brief.md lines=61 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/init-20260904-attach-payload-manual-rreq/charter.md lines=83 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/init-20260904-attach-payload-manual-rreq/spec.md lines=137 needs_input=0\
+    \ unchecked_ac=6\n    WARN  UNCHECKED_AC 6개"
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T17:40:59+09:00'
+  finished_at: '2026-09-04T17:43:03+09:00'
+  seconds: 123.494
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/05-check-5.log
+  log_sha256: ad90708a175ac05c452689f45ec0e2f1b5cd92c54013d0c31f32528e8a9ca37b
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: check-6
+  command: grep -qF 'Write(~/.coupang-auto/**)' scenarios/10-attach-payload.md
+  exit_code: 0
+  started_at: '2026-09-04T17:43:03+09:00'
+  finished_at: '2026-09-04T17:43:03+09:00'
+  seconds: 0.005
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/06-check-6.log
+  log_sha256: 4b1313f3e1fe93d78f330b7e9b412ac85f83896fe457d15a50ce27572e7065f2
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: attach-target-claude-md
+  command: P=/Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender; grep -q "<!--
+    romeo:managed start" "$P/CLAUDE.md" && test "$(git -C "$P" show HEAD:CLAUDE.md | wc -l | tr -d " ")"
+    = 106 && test "$(git -C "$P" show HEAD:CLAUDE.md)" = "$(sed -n "/<!-- romeo:managed start/q;p" "$P/CLAUDE.md")"
+  exit_code: 0
+  started_at: '2026-09-04T17:54:06+09:00'
+  finished_at: '2026-09-04T17:54:06+09:00'
+  seconds: 0.025
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/07-attach-target-claude-md.log
+  log_sha256: 4d2d1758e67b424b594837ec3f6ede02d814af3774e1e493f7eb8cf2f957ab06
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: attach-target-payload
+  command: python3 -c "import sys; from tests.test_attach_runbook import RUNBOOK, required_paths, check;
+    m = check(\"/Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender\", required_paths(RUNBOOK));
+    print(\"missing:\", m); sys.exit(1 if m else 0)"
+  exit_code: 0
+  started_at: '2026-09-04T17:54:17+09:00'
+  finished_at: '2026-09-04T17:54:18+09:00'
+  seconds: 0.031
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/08-attach-target-payload.log
+  log_sha256: 13a458c7dc70c168d960c1f6258db9d1e82bc28a161c77a43307b174c08e424c
+  stdout_tail: 'missing: []'
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: attach-target-settings-deny
+  command: P=/Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender; git -C "$P"
+    show HEAD:.claude/settings.json | grep -qF "Write(~/.coupang-auto/**)" && ! grep -qF "Write(~/.coupang-auto/**)"
+    "$P/.claude/settings.json" && ! grep -qF "Edit(~/.coupang-auto/**)" "$P/.claude/settings.json" &&
+    grep -qF "~/.coupang-auto" "$P/.claude/settings.json" && grep -qF "Write(~/.coupang-auto/**)" scenarios/10-attach-payload.md
+    && grep -qF "Edit(~/.coupang-auto/**)" scenarios/10-attach-payload.md
+  exit_code: 0
+  started_at: '2026-09-04T17:54:25+09:00'
+  finished_at: '2026-09-04T17:54:25+09:00'
+  seconds: 0.019
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/09-attach-target-settings-deny.log
+  log_sha256: d1a653559219a6e7430e091f3b12112aea6cc10c675a3b01c8a8aafc3f2b5dee
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 988d87a67bdc26bb87b00e726222cfadff7323800c70ca6216d09439e8cf911d
+- id: doctor-inverted-verdict
+  command: T=$(mktemp -d); bin/romeo compile --root "$T" >/dev/null 2>&1; bin/romeo notices --root "$T"
+    >/dev/null 2>&1; bin/romeo doctor --strict --scope repository --root "$T" >/dev/null 2>&1; E0=$?;
+    bin/romeo doctor --strict --scope repository --root /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+    >/dev/null 2>&1; E1=$?; rm -rf "$T"; echo "unattached=$E0 attached=$E1"; test "$E0" = 0 -a "$E1" =
+    1
+  exit_code: 0
+  started_at: '2026-09-04T17:55:12+09:00'
+  finished_at: '2026-09-04T17:55:12+09:00'
+  seconds: 0.659
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/10-doctor-inverted-verdict.log
+  log_sha256: ada7c7cedd990866658480e04ae0c02ff91a3262a8978a9d7647752f5fd570fb
+  stdout_tail: unattached=0 attached=1
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: 233e034d3e842726bc1d8df1020cee8b77520e0671ce23c6d5e2992b7ab43816
+- id: check-1
+  command: python3 -m unittest tests.test_attach_runbook -v
+  exit_code: 0
+  started_at: '2026-09-04T17:55:35+09:00'
+  finished_at: '2026-09-04T17:55:35+09:00'
+  seconds: 0.579
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/11-check-1.log
+  log_sha256: 0be72e3b14dfc67b6cc75e1debd165ac37996b33f5a33cc6bd8cb52a4219b1db
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-2
+  command: for h in '## 부착 전 확인' '## 놓는 것' '## 덮는 것과 보존' '## 검증' '## 되돌리기'; do grep -qF "$h" scenarios/10-attach-payload.md
+    || exit 1; done
+  exit_code: 0
+  started_at: '2026-09-04T17:55:35+09:00'
+  finished_at: '2026-09-04T17:55:35+09:00'
+  seconds: 0.01
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/12-check-2.log
+  log_sha256: a961a3ad973d1bad118c6625ebab891f0325536fac643b27ab6086abdfad2729
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-3
+  command: test $(grep -cE '^\| Q-[0-9]+ \|.*init-20260904-attach-payload-manual-rreq' docs/planning/open-questions.md)
+    -ge 2
+  exit_code: 0
+  started_at: '2026-09-04T17:55:35+09:00'
+  finished_at: '2026-09-04T17:55:36+09:00'
+  seconds: 0.006
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/13-check-3.log
+  log_sha256: 243d9503ac10b48b9b687626e926170c79cc144b4aa81f1b2402256174ba97ff
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-4
+  command: bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq
+  exit_code: 0
+  started_at: '2026-09-04T17:55:36+09:00'
+  finished_at: '2026-09-04T17:55:36+09:00'
+  seconds: 0.076
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/14-check-4.log
+  log_sha256: 9900ed8ab0420eb5b68915c30e15be3f9624ae63ddf146d4e3c7581be39ed941
+  stdout_tail: '[PASS] docs/work/init-20260904-attach-payload-manual-rreq/brief.md lines=61 needs_input=0
+    unchecked_ac=0
+
+    [PASS] docs/work/init-20260904-attach-payload-manual-rreq/charter.md lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] docs/work/init-20260904-attach-payload-manual-rreq/spec.md lines=137 needs_input=0 unchecked_ac=0'
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T17:55:36+09:00'
+  finished_at: '2026-09-04T17:57:43+09:00'
+  seconds: 127.573
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/15-check-5.log
+  log_sha256: ca192bf8e5a6e8ec9027a58f6b86072191a00f5ccb063d04307567933299b66a
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-6
+  command: grep -qF 'Write(~/.coupang-auto/**)' scenarios/10-attach-payload.md
+  exit_code: 0
+  started_at: '2026-09-04T17:57:43+09:00'
+  finished_at: '2026-09-04T17:57:43+09:00'
+  seconds: 0.006
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/16-check-6.log
+  log_sha256: c6735b67a9778b2d054917f1a2696356d13bc5e752ecbc22f150bef551082737
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/init-20260904-attach-payload-manual-rreq'
+  exit_code: 0
+  started_at: '2026-09-04T17:59:00+09:00'
+  finished_at: '2026-09-04T17:59:00+09:00'
+  seconds: 0.018
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/17-review-tree-before.log
+  log_sha256: ed88de8845e30dbd1ac2d29a8f0099a1591e9e160e0b98fac6a42b8999478cb0
+  stdout_tail: 'M docs/planning/open-questions.md
+
+    ?? scenarios/10-attach-payload.md
+
+    ?? tests/test_attach_runbook.py'
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-attach-payload-manual-rreq/.harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-04T17:59:00+09:00'
+  finished_at: '2026-09-04T17:59:00+09:00'
+  seconds: 0.012
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/18-reviewer-brief.log
+  log_sha256: 8a633cc8f32dd13261b635f0edfe592c06ecbbaeebcf030081442e7e205ca64d
+  stdout_tail: a69fbfab2aa861223f64aba030da81cb0691dab4ecf6f3951eab1611144bb529  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-init-20260904-attach-payload-manual-rreq/.harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/reviewer-brief.md
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/init-20260904-attach-payload-manual-rreq'
+  exit_code: 0
+  started_at: '2026-09-04T18:02:05+09:00'
+  finished_at: '2026-09-04T18:02:05+09:00'
+  seconds: 0.02
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/19-review-tree-after.log
+  log_sha256: ed88de8845e30dbd1ac2d29a8f0099a1591e9e160e0b98fac6a42b8999478cb0
+  stdout_tail: 'M docs/planning/open-questions.md
+
+    ?? scenarios/10-attach-payload.md
+
+    ?? tests/test_attach_runbook.py'
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: review-record
+  command: shasum -a 256 docs/work/init-20260904-attach-payload-manual-rreq/review/run_1b6546d3394e-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-04T18:02:19+09:00'
+  finished_at: '2026-09-04T18:02:19+09:00'
+  seconds: 0.017
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/20-review-record.log
+  log_sha256: efdd99d6873bd6641e86cfe5d15a7fbd5b849f9ad20d607ddfb4721b8e06ee6e
+  stdout_tail: 1437fbd466606606438b5f665c0ec7c95828520865f9724714d976c208ca3f66  docs/work/init-20260904-attach-payload-manual-rreq/review/run_1b6546d3394e-reviewer.json
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-1
+  command: python3 -m unittest tests.test_attach_runbook -v
+  exit_code: 0
+  started_at: '2026-09-04T18:02:30+09:00'
+  finished_at: '2026-09-04T18:02:31+09:00'
+  seconds: 0.78
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/21-check-1.log
+  log_sha256: 8d115a036b5df134356e2c63e2a0ef6319a66ccec3d2b58980756d18fee72446
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-2
+  command: for h in '## 부착 전 확인' '## 놓는 것' '## 덮는 것과 보존' '## 검증' '## 되돌리기'; do grep -qF "$h" scenarios/10-attach-payload.md
+    || exit 1; done
+  exit_code: 0
+  started_at: '2026-09-04T18:02:31+09:00'
+  finished_at: '2026-09-04T18:02:31+09:00'
+  seconds: 0.012
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/22-check-2.log
+  log_sha256: a961a3ad973d1bad118c6625ebab891f0325536fac643b27ab6086abdfad2729
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-3
+  command: test $(grep -cE '^\| Q-[0-9]+ \|.*init-20260904-attach-payload-manual-rreq' docs/planning/open-questions.md)
+    -ge 2
+  exit_code: 0
+  started_at: '2026-09-04T18:02:31+09:00'
+  finished_at: '2026-09-04T18:02:31+09:00'
+  seconds: 0.01
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/23-check-3.log
+  log_sha256: 243d9503ac10b48b9b687626e926170c79cc144b4aa81f1b2402256174ba97ff
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-4
+  command: bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq
+  exit_code: 0
+  started_at: '2026-09-04T18:02:31+09:00'
+  finished_at: '2026-09-04T18:02:31+09:00'
+  seconds: 0.087
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/24-check-4.log
+  log_sha256: 9900ed8ab0420eb5b68915c30e15be3f9624ae63ddf146d4e3c7581be39ed941
+  stdout_tail: '[PASS] docs/work/init-20260904-attach-payload-manual-rreq/brief.md lines=61 needs_input=0
+    unchecked_ac=0
+
+    [PASS] docs/work/init-20260904-attach-payload-manual-rreq/charter.md lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] docs/work/init-20260904-attach-payload-manual-rreq/spec.md lines=137 needs_input=0 unchecked_ac=0'
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-04T18:02:31+09:00'
+  finished_at: '2026-09-04T18:04:50+09:00'
+  seconds: 138.701
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/25-check-5.log
+  log_sha256: 0a5cb0e5fd4be17ffae3935946be4d7b0dfaf8107e846e4a4141192544fb6d04
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+- id: check-6
+  command: grep -qF 'Write(~/.coupang-auto/**)' scenarios/10-attach-payload.md
+  exit_code: 0
+  started_at: '2026-09-04T18:04:50+09:00'
+  finished_at: '2026-09-04T18:04:50+09:00'
+  seconds: 0.005
+  log: .harness/runs/init-20260904-attach-payload-manual-rreq/run_1b6546d3394e/26-check-6.log
+  log_sha256: c6735b67a9778b2d054917f1a2696356d13bc5e752ecbc22f150bef551082737
+  stdout_tail: ''
+  head_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  dirty_tree_hash: de2e36d4aa7bf708118c86eebb70231e10017a2fa42d5ba01b41ae31eae446ac
+changed_files:
+- docs/planning/open-questions.md
+- scenarios/10-attach-payload.md
+- tests/test_attach_runbook.py
+artifact_hash: e75c17b015560edfbe49bdba32083b9b60aa9b0712b971ccb6906dcfc7c28607
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-04T18:12:29+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-04T17:29:01+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_1b6546d3394e — 검증 계획 6건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 9af85f36015c vs 현재 9af85f36015c
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence de2e36d4aa7b vs 현재 de2e36d4aa7b (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_attach_runbook -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — for h in ''## 부착 전 확인'' ''## 놓는 것'' ''## 덮는 것과 보존'' ''## 검증'' ''## 되돌리기'';
+      do grep -qF "$h" scenarios/10-attach-payload.md || exit 1; done'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — test $(grep -cE ''^\| Q-[0-9]+ \|.*init-20260904-attach-payload-manual-rreq''
+      docs/planning/open-questions.md) -ge 2'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — grep -qF ''Write(~/.coupang-auto/**)'' scenarios/10-attach-payload.md'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 26건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 6건'
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'milestone-plan: charter.md 의 「마일스톤 계획」 절이 채워졌다'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 6건이 승인 커밋 9af85f36015c 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_attach_runbook -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — for h in ''## 부착 전 확인'' ''## 놓는 것'' ''## 덮는 것과 보존'' ''## 검증'' ''##
+      되돌리기''; do grep -qF "$h" scenarios/10-attach-payload.md || exit 1; done'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — test $(grep -cE ''^\| Q-[0-9]+ \|.*init-20260904-attach-payload-manual-rreq''
+      docs/planning/open-questions.md) -ge 2'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — grep -qF ''Write(~/.coupang-auto/**)'' scenarios/10-attach-payload.md'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 9af85f36015c 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['docs/planning/open-questions.md', 'scenarios/10-attach-payload.md', 'tests/test_attach_runbook.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_1b6546d3394e-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

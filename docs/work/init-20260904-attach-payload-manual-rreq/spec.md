@@ -10,14 +10,14 @@ gates: []
 profile: deep
 blast_radius: medium
 uncertainty: high
-status: active
+status: done
 approved_at: '2026-09-04T17:29:01+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-04T18:12:29+09:00'
 parent: null
 inputs: [../feat-20260831-bmad-attach-probe-tgnb/spec.md]
-evidence: []
+evidence: [evidence/run_1b6546d3394e.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T2=deep', 'profile:uncertainty.high=kept', 'overlay:unit.t2.parts', 'overlay:profile.standard-or-deeper',
@@ -40,12 +40,12 @@ updated: '2026-09-04'
 - **왜 지금:** 작업 단위 24건이 전부 하네스 자신을 겨눈 `tooling`·`docs` 라, 하네스는 자기 저장소 밖에서 한 번도 돈 적이 없다. `attach` 명령(M5)을 만들기 전에 손으로 한 번 밟아야 그 명령이 상상한 절차가 아니라 실측 위에 선다. **승인 전 프로브가 이미 다섯 가지를 잡았고**(그중 하나는 대상 저장소의 보안 규칙을 지운다), 그것들은 손으로 밟지 않았으면 M5 를 다 만든 뒤에야 드러났을 것들이다.
 - **기대 결과:** 대상 저장소(`My-Automated-Worker/instagram-dm-sender`)에 하네스가 부착돼 그 저장소에서 라우터가 돌 수 있다. 부착이 **무엇을 놓고 무엇을 덮고 무엇을 되살려야 하는지**가 런북 하나에 적힌다. 그리고 부착 여부를 **부재를 통과로 읽지 않고** 판정하는 검사가 선다 — 지금 `doctor` 는 아무것도 부착하지 않은 빈 저장소도 통과시킨다.
 - **수용 기준:**
-  - [ ] AC-1 런북 `scenarios/10-attach-payload.md` 가 서고 다섯 절 — 「부착 전 확인」·「놓는 것」·「덮는 것과 보존」·「검증」·「되돌리기」 — 을 전부 담는다.
-  - [ ] AC-2 부착 판정 검사가 런북의 「놓는 것」 목록을 **파일에서 읽어** 대조한다. 목록에서 한 항목을 빼면 검사는 그 항목을 조용히 건너뛰는 것이 아니라 **바뀐 목록으로 대조한다** — 검사 안에서 목록을 바꿔 넣어 그 사실을 매번 재확인한다.
-  - [ ] AC-3 그 검사가 **부착되지 않은 경로에서 실패하고 부착된 경로에서 통과한다** — 두 경로를 검사 안에서 각각 만들어 양쪽을 판정한다.
-  - [ ] AC-4 부착이 대상의 `.claude/settings.json` 에서 **지운 항목이 런북 「덮는 것과 보존」 절에 실제 값으로 적힌다** — 최소한 `Write(~/.coupang-auto/**)`. **복원하지 않는다**: 사용자가 「기존 프로젝트 규칙은 다 무시하고 부착을 우선한다」로 확정했다(2026-09-04). 기록만 남기는 이유는 그것이 M5 `attach` 가 반드시 다뤄야 할 실측이기 때문이다.
-  - [ ] AC-5 대상 저장소 `CLAUDE.md` 의 부착 전 106줄이 managed block **밖에** 그대로 남는다 — 부착 전 파일과 부착 후 marker 앞부분을 대조해 판정한다 (증거 `attach-target-claude-md`). **회귀 방지 검사다** — 프로브에서 이미 참이었고, 부착이 그것을 깨지 않는지만 본다.
-  - [ ] AC-6 이 부착이 낸 관측이 `docs/planning/open-questions.md` 에 Q 항목으로 열린다 — 최소한 「`doctor` 가 부재를 통과로 읽는다」와 「부착이 하네스 소스 트리를 복제한다」 두 건. 고치지 않고 열어만 둔다(§12).
+  - [x] AC-1 런북 `scenarios/10-attach-payload.md` 가 서고 다섯 절 — 「부착 전 확인」·「놓는 것」·「덮는 것과 보존」·「검증」·「되돌리기」 — 을 전부 담는다.
+  - [x] AC-2 부착 판정 검사가 런북의 「놓는 것」 목록을 **파일에서 읽어** 대조한다. 목록에서 한 항목을 빼면 검사는 그 항목을 조용히 건너뛰는 것이 아니라 **바뀐 목록으로 대조한다** — 검사 안에서 목록을 바꿔 넣어 그 사실을 매번 재확인한다.
+  - [x] AC-3 그 검사가 **부착되지 않은 경로에서 실패하고 부착된 경로에서 통과한다** — 두 경로를 검사 안에서 각각 만들어 양쪽을 판정한다.
+  - [x] AC-4 부착이 대상의 `.claude/settings.json` 에서 **지운 항목이 런북 「덮는 것과 보존」 절에 실제 값으로 적힌다** — 최소한 `Write(~/.coupang-auto/**)`. **복원하지 않는다**: 사용자가 「기존 프로젝트 규칙은 다 무시하고 부착을 우선한다」로 확정했다(2026-09-04). 기록만 남기는 이유는 그것이 M5 `attach` 가 반드시 다뤄야 할 실측이기 때문이다.
+  - [x] AC-5 대상 저장소 `CLAUDE.md` 의 부착 전 106줄이 managed block **밖에** 그대로 남는다 — 부착 전 파일과 부착 후 marker 앞부분을 대조해 판정한다 (증거 `attach-target-claude-md`). **회귀 방지 검사다** — 프로브에서 이미 참이었고, 부착이 그것을 깨지 않는지만 본다.
+  - [x] AC-6 이 부착이 낸 관측이 `docs/planning/open-questions.md` 에 Q 항목으로 열린다 — 최소한 「`doctor` 가 부재를 통과로 읽는다」와 「부착이 하네스 소스 트리를 복제한다」 두 건. 고치지 않고 열어만 둔다(§12).
 - **위험과 되돌리기:** 부착은 대상 저장소의 `.claude/settings.json` 의 `deny` 배열을 통째로 덮어 그 저장소가 갖고 있던 보호 규칙 두 건(`~/.coupang-auto` 쓰기 금지)을 **지운다**. JSON 이라 managed marker 를 넣을 수 없어 병합이 아니라 대체다. **사용자가 그 저장소를 지금 쓰지 않으므로 복원하지 않고 부착을 우선하기로 확정했다(2026-09-04)** — 그래서 이것은 이 단위에서 **감수하는 결과**이고, 위험으로 남는 것은 「그 사실이 기록되지 않는 것」뿐이다(AC-4 가 그것을 막는다). 부착은 **대상이 `git status` clean 인 것을 먼저 확인한다** — 그러면 부착분이 `git status` 만으로 갈리고 아래 두 명령이 완전한 복구가 된다.
   되돌리기 — 대상 저장소: `git checkout -- .claude/settings.json CLAUDE.md && git clean -fd .agents .claude/agents .claude/skills .harness adapters core provenance vendor skills/repo-archive AGENTS.md THIRD_PARTY_NOTICES.md` (부착 전 clean 이었으므로 이 두 명령이 부착 전 상태로 되돌린다). Romeo-Harness: `git revert <구현 커밋>`. 운영 상태·외부 상태·비용은 건드리지 않는다.
 - **결정 필요:** 없음 — 대상 저장소 쓰기는 그 저장소를 작업 공간으로 삼는 별도 실행에서 한다(사용자 확정 2026-09-04). 이 단위의 `allowed_paths` 는 이 저장소 안에 머문다.
@@ -131,6 +131,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-04T18:12:29+09:00 · HEAD 9af85f36015c · 검사 기록 run_1b6546d3394e
 
-- (없음)
+- [evidence/run_1b6546d3394e.yaml](evidence/run_1b6546d3394e.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: init-20260904-attach-payload-manual-rreq
+attempts:
+- n: 1
+  run: run_1b6546d3394e
+  base_sha: 9af85f36015c84237040fb7799e78af5adaef267
+  started_at: '2026-09-04T17:31:50+09:00'
+  result: pass
+  failure_class: null
+  note: 부착 관통 1회차 — 구현자 PASS(checks 6/6) · 검토자 PASS findings 0 · 방어 검사 유효(before/after log_sha256 동일)
+    · 대상 저장소 부착은 코디네이터가 런북대로 별도 실행
+  settled_at: '2026-09-04T18:04:55+09:00'
+reviews: []

@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260904-attach-payload-manual-rreq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260904-attach-payload-manual-rreq/task/run_1b6546d3394e-implementer.json",
+    "sha256": "0e0dcb5a9bb8269a961b338131957f733bfd2e9230e4fbbdce18c352c061aa43"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_runbook -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "for h in '## 부착 전 확인' '## 놓는 것' '## 덮는 것과 보존' '## 검증' '## 되돌리기'; do grep -qF \"$h\" scenarios/10-attach-payload.md || exit 1; done",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "test $(grep -cE '^\\| Q-[0-9]+ \\|.*init-20260904-attach-payload-manual-rreq' docs/planning/open-questions.md) -ge 2",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate docs/work/init-20260904-attach-payload-manual-rreq",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -qF 'Write(~/.coupang-auto/**)' scenarios/10-attach-payload.md",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260904-attach-payload-manual-rreq/evidence/run_1b6546d3394e.yaml",
+  "notes": "구현 단위 1·2·4 를 이 저장소에서 구현했다. 단위 3(대상 저장소 부착)은 spec 「결정 필요」와 「변경 범위」가 별도 실행으로 못박은 대로 이 계약의 allowed_paths 밖이라 코디네이터가 실행했고(2026-09-04), 이 실행은 그 결과를 읽어 증거로만 기록했다 — 대상 저장소에 쓰지 않았다.\nAC 를 뒷받침하는 증거(전부 run_1b6546d3394e): AC-1 check-2 · AC-2 check-1(TestListComesFromTheRunbook·TestTheListIsWhatIsCompared) · AC-3 check-1(TestAttachedAndUnattachedRoots) 과 attach-target-payload(실제 대상 루트에서 missing 0) · AC-4 check-6 과 attach-target-settings-deny · AC-5 attach-target-claude-md(부착 전 git show HEAD:CLAUDE.md 106줄 = 부착 후 managed marker 앞부분, exit 0) · AC-6 check-3(Q-53·Q-54·Q-55).\n관측 3건을 고치지 않고 open-questions 에 열어 두었다(§12): Q-53 doctor 가 부재를 통과로 읽는다 · Q-54 부착이 하네스 소스 트리를 복제한다 · Q-55 doctor 가 부착 여부와 거꾸로 판정한다(빈 저장소 exit 0 / 부착된 대상 exit 1 — 근거 run_1b6546d3394e 의 doctor-inverted-verdict). Q-55 를 만든 exit 1 은 대상이 원래 갖고 있던 심링크 스킬 8건이 세어진 것이고 부착 상태 3건은 전부 일치였다 — 부착 실패가 아니다.\ncheck-5 는 852건 127초로 상한 600초 안이다(승인 전 실측 237초)."
+}
