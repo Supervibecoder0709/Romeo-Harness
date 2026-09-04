@@ -35,7 +35,7 @@ authority: derived
   `tooling`·`docs` — 하네스가 하네스만 시험한다. `attach`(M5)보다 손으로 한 번이 먼저다.
   M4 의 나머지(`context`·승격·`metrics`)는 그 charter 의 계획표에 있다.
 - **blocker:** 없음. 워크트리 `impl-init-2026090…-wr9m`·`probe-m4-find` 는 정리 대상(`rm` 은 승인 대상).
-- **최신 CI:** `ef62a9b` run `33807880515` success. `ec4f97c` 는 푸시 뒤 확인한다.
+- **최신 CI:** `1a757a0` run `33829892904` success (2026-09-04). 원격과 로컬이 같다 — 미푸시 커밋 없음.
 - **열린 park:** Q-12·13·15·16·17·19·23·24·26·32·33·34·35·43·46·49·50·**51·52** (`open-questions.md`).
 - **다음 정비 후보 (1순위 Q-46):** 코어 6파일의 런타임·도구 이름 — 정당한 언급과 C-C6 위반을 가르는
   기준이 없어 `TestVendorNeutral` 대상을 넓히지 못한다. 그 다음은 느린 테스트(`discover` 258초).
