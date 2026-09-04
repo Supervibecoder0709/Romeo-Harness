@@ -2,7 +2,7 @@
 id: progress
 type: planning
 status: active
-updated: 2026-09-03
+updated: 2026-09-05
 authority: derived
 ---
 
@@ -17,31 +17,30 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `HEAD` · 2026-09-04)
+## 지금 상태 (기준 `HEAD` · 2026-09-05)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
-- **마일스톤:** M2 완료(D-76). **M3 완료** — §10 #13 의 두 조건이 `8eee897` 로, 마지막 조각인
-  **charter 를 쓰는 실제 T2 관통**이 `ec4f97c` 로 닫혔다. 그 관통이 **M4 를 열고 첫 마일스톤까지 닫았다.**
-- **활성 작업 단위:** 없음. 마지막 완료는 `init-20260904-attach-payload-manual-rreq`
-  (**하네스가 처음으로 자기 저장소 밖에서 돌았다** · T2 4마일스톤 중 M1 · 런북이 「부착」을 파일 목록과
-  종료 코드로 고정하고 검사가 그 목록을 파일에서 읽어 대조한다 · **1회차 close PASS** · 6/6 ·
-  재실행 6/6 · 검토자 PASS findings 0 · 통합 `9c846b8`).
-  **대상 `My-Automated-Worker/instagram-dm-sender` 는 실제로 부착돼 있다**(미커밋 · 되돌리기는 런북).
-  **`doctor` 는 부착을 판정하지 않는다** — 빈 저장소를 통과시키고(Q-53) 부착한 저장소를 막는다(Q-55).
-  §10 #14 의 「`doctor` 부착 검증 완료」는 그 판정을 한 적이 없다. **BMad 공존은 참으로 관측됐다.**
-- **다음 행동:** 그 charter 의 **M2 — 대상 저장소에서 `/plan` 을 돌린다**. 한 `CLAUDE.md` 안의
-  두 라우팅 규칙(BMad·Romeo)이 갈리는지가 거기서 처음 관측된다. M4 의 나머지(`context`·승격·`metrics`)는
-  그 charter 의 계획표에 있다.
-- **blocker:** 없음. 워커 워크트리 `impl-init-20260904-attach-payload-manual-rreq` 는 **아직 살아 있다**.
-  `orca worktree rm --force` 는 **그 워크트리의 브랜치도 함께 지운다**(2026-09-04 관측).
-- **최신 CI:** `c1e4630` run `33872603463` success (2026-09-04). 원격과 로컬이 같다 — 미푸시 커밋 없음.
-  새 검사 `test_attach_runbook` 도 다른 머신에서 통과했다.
-- **열린 park:** Q-12·13·15·16·17·19·23·24·26·32·33·34·35·43·46·49·50·51·52·**53~57** (`open-questions.md`).
-  이번 관통이 연 것은 **Q-53·54·55**(부착 절차)와 **Q-56·57**(RUNBOOK 위임 절차)다.
-- **다음 정비 후보 (1순위 Q-46):** 코어 6파일의 런타임·도구 이름 — 정당한 언급과 C-C6 위반을 가르는
-  기준이 없어 `TestVendorNeutral` 대상을 넓히지 못한다.
+- **마일스톤:** M2·M3 완료. 부착 charter(`init-20260904-attach-payload-manual-rreq`)의 **M1·M2 완료**.
+- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260904-m2-router-foreign-repo-ct5h`
+  (**라우터가 처음으로 남의 저장소에서 돌았다** · 대상에 `feat-20260904-claude-md-rule-conflicts-bbn8` 가
+  `status: active` · `facets: [docs, security]` — 처음으로 `tooling`·`docs` 아닌 영역을 분류했다 ·
+  **3회차 close PASS** · 5/5 · 재실행 5/5 · 검토자 PASS findings 0).
+- **§10 브레이크 두 번째 작동.** 1회차 FAIL(완료 정의) → 2회차 FAIL(산출물) → 연속 2회에서 멈춤 →
+  사람 재검토 「달성 가능」 → 3회차 PASS. 재승인 2회는 D-80 정상 경로.
+- **BMad·Romeo 는 공존하지 않는다.** G-M3 §6.1 의 결론은 파일이 안 깨진다는 뜻이었다. 실제 라우팅은
+  세 지점에서 갈리고(부품 자동 활성화 · 산출물 경로 · **승인 없이 착수**) §번호 7개가 겹치며
+  Romeo 블록이 **없는 문서 5종**을 읽으라 한다. 인용은 `scenarios/11-router-foreign-repo.md` 소유.
+- **다음 행동:** charter 의 **M3 — 대상 저장소에서 그 단위를 구현·검토·close**.
+- **blocker:** 없음. 워커 워크트리 4개가 살아 있다(`impl-init-…rreq` · `impl`·`impl2`·`impl3-feat-…ct5h`).
+  `orca worktree rm --force` 는 **브랜치도 함께 지운다**(2026-09-04 관측).
+- **최신 CI:** `c1e4630` run `33872603463` success. 그 뒤 커밋 4건은 **미푸시**.
+- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·**58~61**(`open-questions.md`).
+  이번 것은 Q-58~61 — 부착이 `permissions.allow` 를 안 놓는다 · 외부 워크트리가 안 잡힌다 ·
+  없는 인덱스를 투영한다 · `validate` 가 `NEEDS_INPUT` 을 통과시킨다.
+- **다음 정비 후보 (1순위 Q-61):** 요구(§3 확인란)와 보는 자리(`validate`)가 어긋나 있다 —
+  이 관통이 §11 위반을 두 번 겪었다(AC-5 와 이것).
 
 ## 마일스톤
 

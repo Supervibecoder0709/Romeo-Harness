@@ -1,0 +1,41 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260904-m2-router-foreign-repo-ct5h",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260904-m2-router-foreign-repo-ct5h/task/run_2d9f8a17e34d-implementer.json",
+    "sha256": "2c3cc5df90630f312de3a11878f63d77770e812aaa573d4b5528a1024af25e22"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_foreign_router -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "for h in '## 어디서 실행하는가' '## 무엇이 대상 저장소에 서는가' '## 두 라우팅 규칙이 만나는 자리' '## 검증' '## 되돌리기'; do grep -qF \"$h\" scenarios/11-router-foreign-repo.md || exit 1; done",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "test $(grep -cE '^\\| Q-[0-9]+ \\|.*feat-20260904-m2-router-foreign-repo-ct5h' docs/planning/open-questions.md) -ge 1",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate docs/work/feat-20260904-m2-router-foreign-repo-ct5h",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260904-m2-router-foreign-repo-ct5h/evidence/run_2d9f8a17e34d.yaml",
+  "notes": "3회차(run_2d9f8a17e34d · base 7d94b0f). 2회차 검토자 FAIL(AC_UNMET)의 원인은 런북 인용과 증거 명령의 sed 범위가 서로를 모른 채 각각 하드코딩된 것이었다(§11). D-80 재승인으로 AC-5 를 AC-2 와 같은 「런북에서 읽어 대조」 패턴으로 다시 썼고, 이 회차는 그 AC-5 만 고쳤다 — 시딩된 나머지 산출물(런북 다섯 절 골격 · 기존 12건 테스트 · Q-58~Q-61)은 그대로다.\n\n고친 것 셋. ① 런북 「두 라우팅 규칙이 만나는 자리」의 인용 14건을 전부 `> L<줄번호>: <원문>` 문법으로 다시 적고, 그 문법을 같은 절의 「인용의 문법」 단락에 적었다(AC-2 의 「목록의 문법」이 본보기다). ② `tests/test_foreign_router.py` 에 `quotes()`(런북에서 (줄번호, 원문, 소절) 목록을 읽는다) · `check_quotes()`(대상 CLAUDE.md 의 같은 줄과 글자로 대조한다) · `managed_block()`(두 블록 경계를 마커에서 계산한다)을 더하고, 합성 fixture 를 그 인용 목록에서 생성해 일치·불일치 양쪽을 판정하는 테스트 12건을 더했다(기존 12건 유지 · 총 24건). 불일치 반례는 빈 값이 아니라 줄 번호는 맞고 텍스트가 한 글자 다른 값이다(§11) — `test_one_character_difference_fails` · `test_every_quoted_line_is_individually_load_bearing`(인용 14건을 한 줄씩 전부 바꿔 본다) · `test_a_line_past_the_end_of_file_fails`. 목록 조작 재확인은 `TestTheQuoteListIsWhatIsCompared` 3건(더하기·지우기·옮기기)이다. ③ 증거 `foreign-router-claude-md` 를 `sed` 인쇄에서 `--claude-md <파일>` 대조로 바꿨다 — 두 블록 경계(마커에서 계산: BMad 1-107 · Romeo 108-381)와 충돌 소절 6건(C-1~C-5 · 「어느 쪽을 먼저 따랐는가」) 인쇄는 유지하고, 인용 14건을 실제 줄과 대조해 한 줄씩 인쇄한다. 이 run 에서 rc=0 · 「PASS — 인용 14건 전부 실제 줄과 글자로 일치」.\n\nrequired_checks 5건 전부 exit 0(check-5 는 251.5초 · 재실행 상한 600초의 42%). 증거 2건도 이 run 에 있다 — `foreign-router-verdict` 는 실제 대상 루트에서 `feat-20260904-claude-md-rule-conflicts-bbn8` 가 세 조건(unit-exists · unit-active · unit-foreign-facet = facets ['docs','security'])을 전부 만족해 PASS, `foreign-router-claude-md` 는 위와 같다. AC 6개를 전부 채웠다 — AC-1은 check-2, AC-2·AC-3·AC-5(합성 fixture 부분)는 check-1, AC-4 는 `foreign-router-verdict`, AC-5(실제 대상 부분)는 `foreign-router-claude-md`, AC-6 은 check-3 이 지목하는 증거다.\n\n범위 밖으로 고치지 않은 것(§12): Q-58(부착이 permissions.allow 를 놓지 않는다) · Q-59(외부 워크트리가 Orca 에 안 보인다) · Q-60(하네스 문서 인덱스가 대상에 그대로 투영된다) · Q-61(`romeo validate` 가 NEEDS_INPUT 을 통과시킨다) 는 열어만 뒀다. 대상 저장소에는 이 회차에서 아무것도 쓰지 않았다 — 읽어서 판정만 했다."
+}

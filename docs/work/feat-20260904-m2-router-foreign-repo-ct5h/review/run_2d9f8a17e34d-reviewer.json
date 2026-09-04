@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260904-m2-router-foreign-repo-ct5h",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260904-m2-router-foreign-repo-ct5h/task/run_2d9f8a17e34d-reviewer.json",
+    "sha256": "9af015545d32fe8938b8891889cdf4bf84c73645d29b9dcf430031725b3d914b"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260904-m2-router-foreign-repo-ct5h/evidence/run_2d9f8a17e34d.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. AC-1은 check-2, AC-2·AC-3 및 AC-5의 합성 fixture 부분은 check-1, AC-4는 foreign-router-verdict, AC-5의 실제 대상 부분은 foreign-router-claude-md, AC-6은 check-3의 기록으로 지목된다. required_checks는 작업 계약과 현재 검증 계획에서 일치하고 모두 재실행 가능한 읽기·합성 검사이며, 증거의 종료 코드는 모두 0이다. changed_files는 구현자 계약의 allowed_paths 안에 있고 guards는 비어 있으며, 기록된 명령들은 같은 head_sha와 dirty_tree_hash에 묶여 있다."
+}
