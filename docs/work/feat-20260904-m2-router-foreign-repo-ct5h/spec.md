@@ -11,7 +11,7 @@ profile: deep
 blast_radius: medium
 uncertainty: high
 status: active
-approved_at: '2026-09-04T22:46:10+09:00'
+approved_at: '2026-09-05T00:07:30+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -23,7 +23,11 @@ routing:
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.high->deep', 'overlay:profile.standard-or-deeper']
   history: []
 created: '2026-09-04'
-updated: '2026-09-04'
+updated: '2026-09-05'
+approval_history:
+- {approved_at: '2026-09-04T22:46:10+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-05T00:07:30+09:00',
+  reason: '검토자 FAIL AC_UNMET — 확인란이 GitHub issue 14번을 관통 대상으로 고정했으나, 그 이슈의 산출물 4종이 이미 실재하는 것을 실행이 실측해
+    사용자가 CLAUDE.md 라우팅 충돌 해소로 대상을 바꿔 확정했다(2026-09-04). 원인이 산출물이 아니라 완료 정의여서 확인란과 AC-4 만 고쳤다 — 산출물은 그대로다'}
 ---
 
 # 라우터가 남의 저장소에서 돈다 — 대상 저장소의 실제 요청 1건을 승인까지
@@ -35,7 +39,7 @@ updated: '2026-09-04'
 
 사용자는 이 절만 읽고 승인한다. 기술 절은 검토자 런타임과 evidence가 책임진다.
 
-- **무엇을:** 부착된 대상 저장소(`My-Automated-Worker/instagram-dm-sender`)에서 Romeo 라우터를 실제로 돌려, 그 저장소의 실제 요청 1건(GitHub issue 14번 — 커밋 전 시크릿 스캔 게이트)을 분류하고 사람 승인까지 세운다. charter `init-20260904-attach-payload-manual-rreq` 의 M2 다.
+- **무엇을:** 부착된 대상 저장소(`My-Automated-Worker/instagram-dm-sender`)에서 Romeo 라우터를 실제로 돌려, 그 저장소의 실제 요청 1건을 분류하고 사람 승인까지 세운다. **어느 요청인지는 실행 중에 정해진다** — 승인 시점에 고른 후보(GitHub issue 14번)가 이미 구현돼 있으면 다른 요청으로 바꾸고, 그 사실을 실측으로 적는다(아래 「결정 필요」). charter `init-20260904-attach-payload-manual-rreq` 의 M2 다.
 - **왜 지금:** M1 이 부착을 파일 목록과 종료 코드로 고정했지만 **그 부착 위에서 라우터가 돈 적은 없다**. 부착이 성립했다는 것과 라우터가 그 저장소에서 일한다는 것은 다른 주장이고, 지금 참인 것은 앞의 것뿐이다. 그리고 대상 저장소에 `bin/`·`romeo/` 가 없다는 것은 이미 런북에 적혀 있다(Q-54) — 그것이 실제로 무엇을 막는지는 돌려 봐야 안다.
 - **기대 결과:** 대상 저장소에 `docs/work/<id>/` 가 서고 `status: active` 로 승인되며, 그 단위의 `facets` 에 `tooling`·`docs` 아닌 값이 하나 이상 있다 — 하네스가 처음으로 자기 도구·문서가 아닌 영역(`security`)의 일을 분류한다. 라우터를 남의 저장소에서 돌리는 절차가 런북 하나에 적히고, 그 세 조건을 **문서에서 읽어** 판정하는 검사가 선다. 한 `CLAUDE.md` 안의 BMad·Romeo 두 라우팅 규칙이 만나는 자리가 실제 인용으로 기록된다 — **충돌이 없다는 관측도 결과다**(K-51).
 - **수용 기준:**
@@ -47,7 +51,7 @@ updated: '2026-09-04'
   - [ ] AC-6 이 관통이 낸 관측이 `docs/planning/open-questions.md` 에 이 단위 id 를 가리키는 Q 항목으로 **한 건 이상** 열린다. 고치지 않고 열어만 둔다(§12).
 - **위험과 되돌리기:** 이 관통은 대상 저장소에 **문서만** 만든다 — `docs/work/<id>/` 하나이고 그 저장소의 코드·설정·운영 상태를 건드리지 않는다. 대상 저장소는 지금 부착분이 미커밋인 상태라 새 폴더도 미추적으로 남고, `git status` 만으로 갈린다. 실제 위험은 하나다 — 라우터가 그 저장소에서 돌면서 **BMad 산출물 경로(`_bmad-output/`)나 기존 문서를 건드리는 것**. 그래서 별도 실행의 쓰기 상한은 그 저장소의 `docs/work/` 하나로 둔다.
   되돌리기 — 대상 저장소: `rm -rf ~/orca/workspaces/My-Automated-Worker/instagram-dm-sender/docs/work/<id>` (미추적이므로 `git status --porcelain` 이 부착 전 목록으로 돌아가는 것으로 확인한다). Romeo-Harness: `git revert <구현 커밋>`. 운영 상태·외부 상태·비용은 이 단위가 건드리지 않는다.
-- **결정 필요:** 없음 — 관통 대상은 사용자가 GitHub issue 14번으로 확정했고(2026-09-04), 대상 저장소 쓰기는 그 저장소를 작업 공간으로 삼는 별도 실행이 한다(charter 제약 · 사용자 확정 2026-09-04). 다만 **대상 저장소 단위의 승인은 구현 도중 사용자에게 한 번 더 간다** — 그 단위의 확인란을 읽고 승인하는 것은 사람의 몫이다(D-27).
+- **결정 필요:** **관통 대상은 실행 중에 한 번 더 사용자에게 간다.** 승인 시점의 후보는 GitHub issue 14번이었으나, 실행이 그 이슈의 산출물 4종이 **전부 이미 실재**하는 것을 실측했고(정책 문서·`scripts/scan-secrets.sh` 16,793B·`skills/secrets-policy/` + 심볼릭 링크·BMad override 2개 · 대체 후보 #36·#15·#51·#52 도 같은 상태), 사용자가 **대상 저장소 `CLAUDE.md` 의 BMad·Romeo 라우팅 충돌 해소**로 바꿔 확정했다(2026-09-04). charter 의 가정 「대상 저장소에 관통시킬 실제 작업이 있다」가 틀렸다는 것이 이 단위의 실측 중 하나다. 대상 저장소 쓰기는 그 저장소를 작업 공간으로 삼는 별도 실행이 한다(charter 제약 · 사용자 확정 2026-09-04). 다만 **대상 저장소 단위의 승인은 구현 도중 사용자에게 한 번 더 간다** — 그 단위의 확인란을 읽고 승인하는 것은 사람의 몫이다(D-27).
 
 
 ## 변경 범위
@@ -56,7 +60,7 @@ updated: '2026-09-04'
 
 - 바뀌는 파일·모듈: `scenarios/11-router-foreign-repo.md` · `tests/test_foreign_router.py` · `docs/planning/open-questions.md` · `docs/work/feat-20260904-m2-router-foreign-repo-ct5h/`
 - 영향을 받는 부분: 대상 저장소 `~/orca/workspaces/My-Automated-Worker/instagram-dm-sender` — **이 저장소 밖이라 쓰기 상한에 넣지 않는다.** 그 저장소에 작업 단위를 세우는 것은 그것을 작업 공간으로 삼는 별도 실행이 하고, 이 단위는 그 결과를 **읽어** 판정하고 증거로 기록한다(사용자 확정 2026-09-04). 그 별도 실행의 쓰기 상한은 대상 저장소의 `docs/work/` 하나다.
-- 바꾸지 않는 것(비범위): `romeo/` 전부 — 대상 저장소에 `bin/`·`romeo/` 가 없다는 것(Q-54)을 **이 단위에서 고치지 않는다**. 그것을 푸는 것이 M5 `attach` 다(§12·charter 중단 조건 ③). `scenarios/10-attach-payload.md` 도 고치지 않는다 — 부착은 이미 닫혔다. issue 14번을 **구현하지 않는다**(M3). 대상 저장소의 BMad·`_bmad-output/`·기존 문서·`.claude/settings.json` 을 건드리지 않는다.
+- 바꾸지 않는 것(비범위): `romeo/` 전부 — 대상 저장소에 `bin/`·`romeo/` 가 없다는 것(Q-54)을 **이 단위에서 고치지 않는다**. 그것을 푸는 것이 M5 `attach` 다(§12·charter 중단 조건 ③). `scenarios/10-attach-payload.md` 도 고치지 않는다 — 부착은 이미 닫혔다. 관통 대상으로 고른 요청 자체를 **구현하지 않는다**(M3). 대상 저장소의 BMad·`_bmad-output/`·기존 문서·`.claude/settings.json` 을 건드리지 않는다.
 
 ## 구현 단위
 
@@ -70,7 +74,7 @@ updated: '2026-09-04'
 | --- | --- | --- | --- | --- | --- |
 | 1 | 라우터를 남의 저장소에서 돌리는 절차를 다섯 절로 고정하고, 「검증」 절이 완료 조건을 조건 id 로 적는다 | `scenarios/11-router-foreign-repo.md` 신설 | 소비: `scenarios/10-attach-payload.md` 의 「놓는 것」 목록 문법 → 생산: 조건 id `unit-exists` · `unit-active` · `unit-foreign-facet` 와 그 목록을 읽는 문법 | check-2 (다섯 절 전부 존재) | 파일 삭제 |
 | 2 | 그 조건 id 목록을 런북에서 읽어 주어진 루트를 판정하는 검사를 만든다. 목록을 바꾸면 대조가 함께 바뀌고, 판정 코드가 없는 id 를 더하면 막힌다 | `tests/test_foreign_router.py` 신설 | 소비: 1 의 조건 id 와 목록 문법 → 생산: `conditions()` · `check(root)` | check-1 (합성 루트 양쪽 + 목록 조작 재확인이 전부 통과) | 파일 삭제 |
-| 3 | 대상 저장소에서 별도 실행으로 라우터를 돌려 issue 14번을 분류하고 사람 승인까지 세운다 | 대상 저장소 `docs/work/<id>/` (이 저장소 밖 — 쓰기 상한 아님) | 소비: 1 의 「어디서 실행하는가」 절 → 생산: 대상 저장소의 승인된 작업 단위 1건 | 증거 `foreign-router-verdict` (2 의 검사를 실제 대상 루트에 대해 돌려 exit 0) | 대상 저장소에서 `rm -rf docs/work/<id>` — 미추적이라 `git status` 가 부착 전 목록으로 돌아간다 |
+| 3 | 대상 저장소에서 별도 실행으로 라우터를 돌려 **그 시점에 사용자가 확정한 요청 1건**을 분류하고 사람 승인까지 세운다 | 대상 저장소 `docs/work/<id>/` (이 저장소 밖 — 쓰기 상한 아님) | 소비: 1 의 「어디서 실행하는가」 절 → 생산: 대상 저장소의 승인된 작업 단위 1건 | 증거 `foreign-router-verdict` (2 의 검사를 실제 대상 루트에 대해 돌려 exit 0) | 대상 저장소에서 `rm -rf docs/work/<id>` — 미추적이라 `git status` 가 부착 전 목록으로 돌아간다 |
 | 4 | 두 라우팅 규칙이 만나는 자리를 실제 인용으로 런북에 적고, 이 관통이 낸 관측을 열어 둔다 | `scenarios/11-router-foreign-repo.md` (「두 라우팅 규칙이 만나는 자리」 절) · `docs/planning/open-questions.md` | 소비: 증거 `foreign-router-claude-md` → 생산: 인용 2건 이상과 Q 항목 | check-3 (이 단위 id 를 가리키는 Q 행 ≥ 1) · 인용 자체는 검토자와 증거가 본다 | `git revert` |
 
 ## 검증 계획

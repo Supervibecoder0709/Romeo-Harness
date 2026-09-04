@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260904-m2-router-foreign-repo-ct5h
+attempts:
+- n: 1
+  run: run_f8fe6159f875
+  base_sha: 9967a046dbf160589feb0a687fce5444d4917f68
+  started_at: '2026-09-04T23:46:48+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL AC_UNMET — 승인된 확인란은 GitHub issue 14번을 고정했는데 실제 관통 대상은 CLAUDE.md 규칙 충돌이었다. 대상 변경은 사용자가
+    확정했으나 spec 이 갱신되지 않았다
+  settled_at: '2026-09-05T00:06:39+09:00'
+reviews: []
