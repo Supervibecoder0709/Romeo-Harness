@@ -33,8 +33,7 @@ authority: derived
   세 지점에서 갈리고(부품 자동 활성화 · 산출물 경로 · **승인 없이 착수**) §번호 7개가 겹치며
   Romeo 블록이 **없는 문서 5종**을 읽으라 한다. 인용은 `scenarios/11-router-foreign-repo.md` 소유.
 - **다음 행동:** charter 의 **M3 — 대상 저장소에서 그 단위를 구현·검토·close**.
-- **blocker:** 없음. 워커 워크트리 4개가 살아 있다(`impl-init-…rreq` · `impl`·`impl2`·`impl3-feat-…ct5h`).
-  `orca worktree rm --force` 는 **브랜치도 함께 지운다**(2026-09-04 관측).
+- **blocker:** 없음. 워커 워크트리는 전부 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
 - **최신 CI:** `c1e4630` run `33872603463` success. 그 뒤 커밋 4건은 **미푸시**.
 - **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·**58~61**(`open-questions.md`).
   이번 것은 Q-58~61 — 부착이 `permissions.allow` 를 안 놓는다 · 외부 워크트리가 안 잡힌다 ·
