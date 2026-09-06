@@ -27,6 +27,17 @@ attempts:
     요구한 것」이 observations.md 의 요약 표에만 대응하고 그 close 실행의 명령·종료 코드·출력을 담은 증거로 연결되지 않는다(K-51 — 증거는 손으로 쓰지 않는다).
     대상 저장소의 close 3회는 코디네이터가 라벨 없이 돌려 evidence 에 남지 않았다'
   settled_at: '2026-09-06T12:18:04+09:00'
+- n: 3
+  run: run_63bbd145a5ba
+  base_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  started_at: '2026-09-06T12:40:27+09:00'
+  result: pass
+  failure_class: null
+  note: 3회차 — D-80 재승인(base e2f71d6) 뒤 첫 회차. 구현자 PASS(checks 5/5) · 검토자 PASS(비차단 finding 1건 — 재현 스크립트의
+    met 분기가 세 검사의 PASS 인쇄를 개별 확인하지 않는다) · 방어 검사 유효 · 증거 11건이 전부 같은 지문 ff2efc78bf21 에서 기록됐다(2회차에 깨진 자리).
+    AC-5 를 재현으로 채웠다 — reproduce-close-demands.sh 가 임시 루트에 요구 미충족 상태를 재구성하고 close 를 다시 걸어 HAS_EVIDENCE·AC_ALL_CHECKED·REVIEW_VERDICT
+    를 인쇄한다
+  settled_at: '2026-09-06T12:59:59+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 달성 가능하다. 연속 실패 2회의 원인이 서로 다르다. 1회차는 산출물(표의 열 이름과 칸 내용이 갈렸다)이었고 2회차는 둘이 겹쳤다 — (a) 코디네이터가

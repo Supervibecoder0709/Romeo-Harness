@@ -30,11 +30,32 @@ close 가 **스스로** 인쇄한 것만 담는다. 충족한 명령을 요구�
 갈리고, 그러면 「close 가 무엇을 요구했나」를 이 문서로는 답할 수 없다(§11). 이 관통에서 `close` 를 남의 루트에
 대해 부른 것은 세 번이고, 그 셋이 인쇄한 요구가 전부다.
 
-| 언제 | 요구를 인쇄한 명령 | rc | close 가 인쇄한 **요구** |
-| --- | --- | --- | --- |
-| 착수 전 (증거 0건) | `bin/romeo close --unit <id> --root <대상> --dry-run` | 1 | `[FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다` |
-| 3회차 뒤 (검토자 PASS) | `bin/romeo close --unit <id> --root <대상>` | 1 | `[FAIL] AC_ALL_CHECKED — 미체크 5개` · `[FAIL] REVIEW_VERDICT — run_bbn8m3a1c14b-reviewer.json: FAIL (findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (findings 1건)` |
-| 4회차 뒤 (D-80 재승인) | `bin/romeo close --unit <id> --root <대상>` | 0 | 없음 — `PASS` |
+**그리고 그 요구는 지금 다시 인쇄할 수 있다.** 아래 「지금 다시 인쇄하는 명령」 열은 **과거 출력을 옮겨 적은 것이
+아니다** — 그 명령을 지금 돌리면 close 가 같은 검사 이름을 FAIL 로 다시 인쇄한다. 과거 실행의 출력은 소급해
+증거가 되지 못하므로(K-51 — 증거는 손으로 쓰지 않는다), 이 절의 기준은 **기록이 아니라 재현**이다.
+대상 저장소의 그 단위는 이미 `status: done` 이라 그 상태를 되돌리지 않고는 같은 출력을 낼 수 없고,
+**닫힌 단위를 다시 열지 않는다** — 그래서 재현은 단위 폴더와 그 원시 로그를 **임시 루트로 복사해** 거기서 한다.
+재현 스크립트는 `docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh` 이고,
+`mktemp -d` 아래에만 쓰고 끝나면 지운다 — 이 저장소의 작업 트리도 대상 저장소도 바꾸지 않는다.
+
+| 언제 | close 를 부른 명령 | rc | close 가 인쇄한 **요구** | 지금 다시 인쇄하는 명령 |
+| --- | --- | --- | --- | --- |
+| 착수 전 (증거 0건) | `bin/romeo close --unit <id> --root <대상> --dry-run` | 1 | `[FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다` | `docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh before-evidence <대상 루트>` |
+| 3회차 뒤 (검토자 PASS) | `bin/romeo close --unit <id> --root <대상>` | 1 | `[FAIL] AC_ALL_CHECKED — 미체크 5개` · `[FAIL] REVIEW_VERDICT — run_bbn8m3a1c14b-reviewer.json: FAIL (findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (findings 1건)` | `docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh after-round3 <대상 루트>` |
+| 4회차 뒤 (D-80 재승인) | `bin/romeo close --unit <id> --root <대상>` | 0 | 없음 — `PASS` | `docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh met <대상 루트>` — 요구를 아무것도 되돌리지 않은 루트에서 그 세 이름이 FAIL 로 인쇄되지 **않는** 것을 본다 |
+
+세 줄의 재현 명령은 각각 이 단위의 증거 `close-demand-before-evidence` · `close-demand-after-round3` ·
+`close-demand-met` 으로 남았다. 앞의 둘은 기대한 검사 이름이 FAIL 로 인쇄되면 exit 0 이고, 셋째는 그 반대다 —
+**셋째가 이 재현의 반례다.** 요구를 되돌리지 않은 루트에서도 FAIL 이 나온다면 앞의 두 FAIL 은 「요구를 되돌렸기
+때문」이 아니라 임시 루트라서 나온 것이 되므로, 그 반례가 참일 때만 앞의 둘이 요구를 증명한다(§11 —
+반례는 빈 값이 아니라 **그럴듯한 거짓 값**이어야 한다. 여기서 그것은 빈 루트가 아니라 **요구가 전부 충족된 루트**다).
+
+**재현이 원본과 다른 점 하나를 지우지 않고 적는다.** 임시 루트는 `git init` + 커밋 1건으로 만들므로 HEAD 와
+트리 지문이 대상 저장소의 것과 다르고, 그래서 `FRESH_HEAD`·`FRESH_TREE`·`REQUIRED_CHECK_RERUN`·
+`REVIEW_TASK_ANCHORED` 는 원본과 달리 FAIL 로 인쇄된다(재현 루트에 `CLAUDE.md` 가 없기 때문이다).
+이 절이 주장하는 것은 그 검사들이 아니라 **위 표의 세 이름**이고, 그 셋은 원본과 같은 detail 까지 그대로 나온다.
+`git init` 이 필요하다는 것 자체가 이 관통의 관측이다 — 커밋이 없으면 close 는 `HAS_EVIDENCE` 를 지나
+`head_sha` 를 읽는 자리에서 예외로 죽는다(Q-67).
 
 세 번째 줄이 이 표의 요점이다: **`REVIEW_VERDICT` 는 증거를 더해서 풀리지 않았다.** 1·2회차 FAIL 이
 「같은 산출물의 판정」으로 살아 있었고, 재승인으로 그것들이 `REVIEW_SUPERSEDED` 가 된 뒤에야 rc=0 이 됐다

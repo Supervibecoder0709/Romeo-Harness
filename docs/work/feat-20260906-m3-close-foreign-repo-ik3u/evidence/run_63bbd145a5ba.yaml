@@ -1,0 +1,357 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_63bbd145a5ba
+task_id: task_d8e15e454e14
+dispatch_id: ctx_c2bf0f217632
+unit_id: feat-20260906-m3-close-foreign-repo-ik3u
+spec_ref:
+  path: docs/work/feat-20260906-m3-close-foreign-repo-ik3u/spec.md
+  sha256: f47514781f8f728face09262875528ab35e4caf4dfd5a46e7a5f76a378dc2bf3
+base_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl3-feat-20260906-m3-close-foreign-repo-ik3u
+started_at: '2026-09-06T12:48:23+09:00'
+finished_at: '2026-09-06T12:59:49+09:00'
+commands:
+- id: close-demand-before-evidence
+  command: docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh before-evidence
+    /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+  exit_code: 0
+  started_at: '2026-09-06T12:48:23+09:00'
+  finished_at: '2026-09-06T12:48:23+09:00'
+  seconds: 0.192
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/01-close-demand-before-evidence.log
+  log_sha256: de599873c6cd3ec80344124e6e5397bfb7b3b683c92a8d8a42b2ae70fe380aad
+  stdout_tail: "close rc=1\nromeo close feat-20260904-claude-md-rule-conflicts-bbn8 → FAIL (dry-run)\n\
+    \  [PASS] FRONTMATTER_VALID\n  [PASS] APPROVED — status=active approved_at=2026-09-06T11:42:14+09:00\n\
+    \  [FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다\n\n── 기대한 요구가 인쇄됐는가 ──\nOK\
+    \   [FAIL] HAS_EVIDENCE  —   [FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다"
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: close-demand-after-round3
+  command: docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh after-round3
+    /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+  exit_code: 0
+  started_at: '2026-09-06T12:48:23+09:00'
+  finished_at: '2026-09-06T12:48:24+09:00'
+  seconds: 0.595
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/02-close-demand-after-round3.log
+  log_sha256: d754b896c2463bf1a90c408cf440d2907482123c4d26b98b189c2540cd810fb6
+  stdout_tail: 'FAIL (blocked_reason=None, findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (blocked_reason=None,
+    findings 1건)
+
+
+    ── 기대한 요구가 인쇄됐는가 ──
+
+    OK   [FAIL] AC_ALL_CHECKED  —   [FAIL] AC_ALL_CHECKED — 미체크 5개
+
+    OK   [FAIL] REVIEW_VERDICT  —   [FAIL] REVIEW_VERDICT — run_bbn8m3a1c14b-reviewer.json: FAIL (blocked_reason=None,
+    findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (blocked_reason=None, findings 1건)'
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: close-demand-met
+  command: docs/work/feat-20260906-m3-close-foreign-repo-ik3u/reproduce-close-demands.sh met /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+  exit_code: 0
+  started_at: '2026-09-06T12:48:24+09:00'
+  finished_at: '2026-09-06T12:48:24+09:00'
+  seconds: 0.703
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/03-close-demand-met.log
+  log_sha256: 613ade0516733d56177b592583c3b9397b71b092e50d5a0970339abf04d46bcc
+  stdout_tail: '[WARN] REVIEW_SAMPLE — 현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정:
+    1건으로 닫는다. 표본 2건은 요구하지 않으며, 같은 산출물을 다시 검토해 PASS 를 기다리지 않는다
+
+
+    ── 기대한 요구가 인쇄됐는가 ──
+
+    OK   HAS_EVIDENCE 은 FAIL 로 인쇄되지 않았다 —   [PASS] HAS_EVIDENCE
+
+    OK   AC_ALL_CHECKED 은 FAIL 로 인쇄되지 않았다 —   [PASS] AC_ALL_CHECKED — 미체크 0개
+
+    OK   REVIEW_VERDICT 은 FAIL 로 인쇄되지 않았다 —   [PASS] REVIEW_VERDICT — run_bbn8m3r4d80-reviewer.json: PASS'
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: foreign-close-verdict
+  command: python3 tests/test_foreign_close.py --verdict /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+  exit_code: 0
+  started_at: '2026-09-06T12:48:31+09:00'
+  finished_at: '2026-09-06T12:48:31+09:00'
+  seconds: 0.159
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/04-foreign-close-verdict.log
+  log_sha256: b69216c3d2f2c28ea1688f899edfac91a71495a9c18bad23bc8416852029f221
+  stdout_tail: "2026-09-06T11:45:44+09:00' · 검증 계획 9건 · evidence run 4건 · review 봉투 4건\n      run: 계획\
+    \ 9/9건 기록 · 비0 0건\n      run: 계획 9/9건 기록 · 비0 0건\n      run: 계획 9/9건 기록 · 비0 0건\n      run: 계획 9/9건\
+    \ 기록 · 비0 0건\n      review: role='reviewer' gate_verdict='FAIL'\n      review: role='reviewer' gate_verdict='FAIL'\n\
+    \      review: role='reviewer' gate_verdict='PASS'\n      review: role='reviewer' gate_verdict='PASS'\n\
+    판정: PASS"
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: check-1
+  command: python3 -m unittest tests.test_foreign_close -v
+  exit_code: 0
+  started_at: '2026-09-06T12:48:38+09:00'
+  finished_at: '2026-09-06T12:48:38+09:00'
+  seconds: 0.091
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/05-check-1.log
+  log_sha256: 0c6e9f457064abe300f24743c3fc0f4d76c6cfd1b77c5e1ee52da56c473be314
+  stdout_tail: ''
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: check-2
+  command: for h in '## 무엇이 더 필요한가' '## 어디서 구현하는가' '## 검토자를 어떻게 붙이는가' '## 검증' '## 되돌리기'; do grep -qF "$h"
+    scenarios/12-close-foreign-repo.md || exit 1; done
+  exit_code: 0
+  started_at: '2026-09-06T12:48:38+09:00'
+  finished_at: '2026-09-06T12:48:38+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/06-check-2.log
+  log_sha256: 4885fcaa59657a29f6d2e64e139e09082913ee13c009674eae5f264345afff5c
+  stdout_tail: ''
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: check-3
+  command: test $(grep -cE '^\| Q-[0-9]+ \|.*feat-20260906-m3-close-foreign-repo-ik3u' docs/planning/open-questions.md)
+    -ge 1
+  exit_code: 0
+  started_at: '2026-09-06T12:48:38+09:00'
+  finished_at: '2026-09-06T12:48:38+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/07-check-3.log
+  log_sha256: 186a780eb16da86c32ff1192dfe4b77ffee080273f4bf381f54fed4c9c241493
+  stdout_tail: ''
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: check-4
+  command: bin/romeo validate docs/work/feat-20260906-m3-close-foreign-repo-ik3u
+  exit_code: 0
+  started_at: '2026-09-06T12:48:38+09:00'
+  finished_at: '2026-09-06T12:48:38+09:00'
+  seconds: 0.078
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/08-check-4.log
+  log_sha256: 42e71cb9ece66892fee5555b86b07f159305d302a093d07acbb1fc9be68b0041
+  stdout_tail: "[PASS] docs/work/feat-20260906-m3-close-foreign-repo-ik3u/brief.md lines=62 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/feat-20260906-m3-close-foreign-repo-ik3u/spec.md lines=157 needs_input=0\
+    \ unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 157 > 150"
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-06T12:48:38+09:00'
+  finished_at: '2026-09-06T12:50:46+09:00'
+  seconds: 127.881
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/09-check-5.log
+  log_sha256: 9fe25719aa5f74ebc4b7ca368117bd0ac1c7c400a5540d1a1d7d75244b1717f4
+  stdout_tail: ''
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl3-feat-20260906-m3-close-foreign-repo-ik3u/.harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-06T12:57:24+09:00'
+  finished_at: '2026-09-06T12:57:24+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/10-reviewer-brief.log
+  log_sha256: 59b05071df316345eaed36f0ef58f31cfbfe88e340e6e6972157f410db8ff17e
+  stdout_tail: dee9cf1c3afc6c104f38ed222b20da08aea5fb054886d9466f1f6054670fa4fa  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl3-feat-20260906-m3-close-foreign-repo-ik3u/.harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/reviewer-brief.md
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  exit_code: 0
+  started_at: '2026-09-06T12:57:24+09:00'
+  finished_at: '2026-09-06T12:57:24+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/11-review-tree-before.log
+  log_sha256: f7de693cbc9be928e8acdac621a46f7feb32553c8c6d1ada5686773f99e86174
+  stdout_tail: "M docs/planning/open-questions.md\n M scenarios/12-close-foreign-repo.md"
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  exit_code: 0
+  started_at: '2026-09-06T12:59:49+09:00'
+  finished_at: '2026-09-06T12:59:49+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/12-review-tree-after.log
+  log_sha256: f7de693cbc9be928e8acdac621a46f7feb32553c8c6d1ada5686773f99e86174
+  stdout_tail: "M docs/planning/open-questions.md\n M scenarios/12-close-foreign-repo.md"
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_63bbd145a5ba-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-06T12:59:49+09:00'
+  finished_at: '2026-09-06T12:59:49+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_63bbd145a5ba/13-review-record.log
+  log_sha256: a97aca972efc609a03b03d0b417067da724ba594d01c7bc86894f96e4787e6ea
+  stdout_tail: bedb088033f1189a2cd8c0a2033851ccb278a7067869ad475604bf9e50283100  docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_63bbd145a5ba-reviewer.json
+  head_sha: e2f71d6eb0b1a65f1695ea9d9f350dd7968e7683
+  dirty_tree_hash: ff2efc78bf21360c8e6dccaff1f5a8ddcc5eaf02e9ea980ce9e99c97f0c6bfce
+changed_files:
+- docs/planning/open-questions.md
+- scenarios/12-close-foreign-repo.md
+artifact_hash: 6a28385fd9c8caec14c4359b534281a6435d2333f409bd1b125c6ab20df90265
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-06T14:30:27+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 157 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-06T12:39:25+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_63bbd145a5ba — 검증 계획 5건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/3건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence e2f71d6eb0b1 vs 현재 e2f71d6eb0b1
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence ff2efc78bf21 vs 현재 ff2efc78bf21 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_foreign_close -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — for h in ''## 무엇이 더 필요한가'' ''## 어디서 구현하는가'' ''## 검토자를 어떻게 붙이는가'' ''## 검증''
+      ''## 되돌리기''; do grep -qF "$h" scenarios/12-close-foreign-repo.md || exit 1; done'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — test $(grep -cE ''^\| Q-[0-9]+ \|.*feat-20260906-m3-close-foreign-repo-ik3u''
+      docs/planning/open-questions.md) -ge 1'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo validate docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest discover -s tests'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 13건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 6건'
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'risk-plan-ready: 게이트 privacy-security — 「위험·백업·복구」 절이 채워졌다'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 5건이 승인 커밋 e2f71d6eb0b1 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_foreign_close -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — for h in ''## 무엇이 더 필요한가'' ''## 어디서 구현하는가'' ''## 검토자를 어떻게 붙이는가'' ''##
+      검증'' ''## 되돌리기''; do grep -qF "$h" scenarios/12-close-foreign-repo.md || exit 1; done'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — test $(grep -cE ''^\| Q-[0-9]+ \|.*feat-20260906-m3-close-foreign-repo-ik3u''
+      docs/planning/open-questions.md) -ge 1'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo validate docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 e2f71d6eb0b1 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['docs/planning/open-questions.md', 'scenarios/12-close-foreign-repo.md']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_cc685a7dfa45-reviewer.json: FAIL(findings 2건 — 첫째: AC-5 미충족: 추가 요구 네 가지의 근거로 제시한 명령은
+      git commit·envelope build·) — 재승인 전 승인(approved_at 2026-09-06T07:09:32+09:00)으로 낸 판정 · 다른 산출물(b18eddb+5202683dd873)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 e2f71d6+ff2efc78bf21 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_63bbd145a5ba-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

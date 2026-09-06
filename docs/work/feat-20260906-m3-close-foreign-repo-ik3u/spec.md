@@ -10,14 +10,14 @@ gates: [privacy-security]
 profile: deep
 blast_radius: medium
 uncertainty: high
-status: active
+status: done
 approved_at: '2026-09-06T12:39:25+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-06T14:30:27+09:00'
 parent: init-20260904-attach-payload-manual-rreq
 inputs: [../init-20260904-attach-payload-manual-rreq/charter.md, ../feat-20260904-m2-router-foreign-repo-ct5h/spec.md]
-evidence: []
+evidence: [evidence/run_cc685a7dfa45.yaml, evidence/run_3e1b612799e2.yaml, evidence/run_63bbd145a5ba.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:gate.any=kept', 'profile:uncertainty.high->deep',
@@ -51,7 +51,7 @@ approval_history:
   - [x] AC-2 그 런북의 「검증」 절이 M3 의 완료 조건을 **조건 id 로** 고정하고, `tests/test_foreign_close.py` 가 그 목록을 **런북 파일에서 읽어** 자기 판정과 대조한다. 목록에서 한 항목을 빼면 검사는 그것을 조용히 건너뛰는 것이 아니라 **바뀐 목록으로 대조하고**, 판정 코드가 없는 조건 id 를 더하면 **그 자리에서 막힌다** — 검사 안에서 목록을 양쪽으로 바꿔 넣어 그 사실을 매번 재확인한다(M2 의 AC-2 와 같은 패턴 · Romeo §11).
   - [x] AC-3 그 검사가 **조건을 만족하지 않는 합성 루트에서 실패하고 만족하는 합성 루트에서 통과한다**. 반례는 빈 루트가 아니라 **그럴듯한 거짓 루트**여야 한다: ① `status: done` 까지 갔는데 증거의 종료 코드 하나가 `1` 인 것 · ② 닫혔는데 `review/` 에 검토자 봉투가 **없는** 것(자기 검토) · ③ 봉투는 있는데 판정이 `FAIL` 인 것. 빈 루트만으로 통과한 검사는 고치기 전 상태와 구별되지 않는다.
   - [x] AC-4 그 검사를 **실제 대상 저장소에 대해 돌려 통과**시킨다 — 세 조건이 전부 참인 것을 증거 `foreign-close-verdict` 로 남긴다. 그 단위의 구현·검토·close 는 **대상 저장소를 작업 공간으로 삼는 별도 실행**이 한다(charter 제약).
-  - [ ] AC-5 런북 「무엇이 더 필요한가」 절이, close 가 이 관통에서 **추가로 요구한 것**을 각각 **지금 다시 돌려 그 요구를 인쇄하는 명령**과 함께 적고, 그 명령을 실제로 돌린 것이 이 단위의 증거로 남는다. **과거 실행의 출력은 소급해 증거로 만들 수 없다**(K-51 — 증거는 손으로 옮겨 적지 않고 증거 기록 명령이 만든다) — 그래서 기준은 기록이 아니라 **재현**이다: 대상 단위 폴더를 임시 루트로 복사해 그 요구가 아직 충족되지 않은 상태를 만들고 `bin/romeo close --unit <대상 단위> --root <임시 루트> --dry-run` 을 돌리면 같은 검사 이름이 FAIL 로 인쇄된다. **임시 루트를 쓰는 이유는 대상 저장소가 이미 `done` 이라 그 상태를 되돌리지 않고는 같은 출력을 낼 수 없기 때문이다** — 닫힌 단위를 다시 열지 않는다. 요구한 것이 없었으면 「없었다」를 근거와 함께 적는 것이 결과다. 2회차 검토자가 이 자리를 잡았다 — 런북이 적은 요구가 `observations.md` 의 요약 표에만 대응하고 증거로 연결되지 않았다(D-80 재승인 2026-09-06).
+  - [x] AC-5 런북 「무엇이 더 필요한가」 절이, close 가 이 관통에서 **추가로 요구한 것**을 각각 **지금 다시 돌려 그 요구를 인쇄하는 명령**과 함께 적고, 그 명령을 실제로 돌린 것이 이 단위의 증거로 남는다. **과거 실행의 출력은 소급해 증거로 만들 수 없다**(K-51 — 증거는 손으로 옮겨 적지 않고 증거 기록 명령이 만든다) — 그래서 기준은 기록이 아니라 **재현**이다: 대상 단위 폴더를 임시 루트로 복사해 그 요구가 아직 충족되지 않은 상태를 만들고 `bin/romeo close --unit <대상 단위> --root <임시 루트> --dry-run` 을 돌리면 같은 검사 이름이 FAIL 로 인쇄된다. **임시 루트를 쓰는 이유는 대상 저장소가 이미 `done` 이라 그 상태를 되돌리지 않고는 같은 출력을 낼 수 없기 때문이다** — 닫힌 단위를 다시 열지 않는다. 요구한 것이 없었으면 「없었다」를 근거와 함께 적는 것이 결과다. 2회차 검토자가 이 자리를 잡았다 — 런북이 적은 요구가 `observations.md` 의 요약 표에만 대응하고 증거로 연결되지 않았다(D-80 재승인 2026-09-06).
   - [x] AC-6 이 관통이 낸 관측이 `docs/planning/open-questions.md` 에 이 단위 id 를 가리키는 Q 항목으로 **한 건 이상** 열린다. 고치지 않고 열어만 둔다(§12).
 - **위험과 되돌리기:** 이 관통이 대상 저장소에서 바꾸는 것은 **`CLAUDE.md` 의 마커 밖 영역 한 절**과 그 단위 폴더뿐이다. 코드·설정·봇 동작·운영 상태·외부 상태·비용에는 닿지 않는다. 실제 위험은 하나다 — 그 절의 **C-3 판정을 뒤집어 적으면** 그 저장소에서 승인 없는 착수가 **문서로 정당화된다**. 그래서 C-3 은 이미 그 저장소의 승인에서 「Romeo §3(D-27) 우선」으로 확정돼 있고(2026-09-04), 이 단위는 그 확정을 **바꾸지 않는다**.
   되돌리기 — 대상 저장소: `git -C <대상> checkout -- CLAUDE.md` (미커밋 시) 또는 `git -C <대상> revert <커밋>` · `rm -rf <대상>/docs/work/feat-20260904-claude-md-rule-conflicts-bbn8`. Romeo-Harness: `git revert <구현 커밋>`. 부착분은 미커밋이므로 `git status --porcelain` 이 부착 직후 목록으로 돌아가는 것으로 확인한다.
@@ -151,6 +151,8 @@ hard gate 가 발동했다. 승인 전 상태 변경 0건.
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-06T14:30:27+09:00 · HEAD e2f71d6eb0b1 · 검사 기록 run_63bbd145a5ba
 
-- (없음)
+- [evidence/run_cc685a7dfa45.yaml](evidence/run_cc685a7dfa45.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_3e1b612799e2.yaml](evidence/run_3e1b612799e2.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_63bbd145a5ba.yaml](evidence/run_63bbd145a5ba.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
