@@ -1,0 +1,31 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260906-m4-attach-requirements-3mcv",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260906-m4-attach-requirements-3mcv/task/run_58822306294d-implementer.json",
+    "sha256": "555e7309be0fd4851b1551dd91374fc1e239275e2ddb701400112b4b85343ee9"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_requirements.TestAttachRequirementsProvenance -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260906-m4-attach-requirements-3mcv/evidence/run_58822306294d.yaml",
+  "notes": "세 검사 전부 exit 0 (run_58822306294d 의 check-1·check-2·check-3). 판별 검사는 check-1 하나이고, 그 판별력을 밖에서 한 번 더 흔들었다 — 목록에서 Q-62 행 한 줄을 지우자 check-1 이 FAILED(failures=1), 되돌리자 6/6 OK. 이것은 증거 run 밖의 손 실측이라 판정 근거가 아니라 맥락이다. 올림·뺌은 spec 의 「올림·뺌의 기준」으로 16건을 하나씩 갈랐고 9올림·7뺌이다. 경계에 걸린 두 건을 기록해 둔다: Q-66(`envelope`)·Q-67(`close`) 은 기준의 「뺀다」 괄호에 이름이 있는 명령이지만, 정의절(「부착과 무관하게 자기 저장소에서도 같은 모양으로 나는 것」)을 만족하지 않는다 — Q-66 은 `--root` 를 주는 실행에서만, Q-67 은 git 이력이 없는 루트에서만 난다. 둘 다 자기 저장소에서는 나지 않으므로 「경계에 걸리면 올린다」에 따라 올렸고, 그 판정 근거를 목록 문서의 해당 행과 「올림·뺌의 기준」 절에 적어 검토자가 다시 밟을 수 있게 했다. progress.md 「지금 상태」는 예산(30줄·2KB)을 지키려고 M3 회차 서사를 줄였다 — 고치기 전 24줄·2716바이트, 고친 뒤 19줄·2099바이트. 그 축약은 K-63(회차 서사는 작업 단위가 소유한다)과 같은 방향이고 이 단위의 「변경 범위」 안이다. 요청 범위 밖에서 고친 것은 없다(§12)."
+}

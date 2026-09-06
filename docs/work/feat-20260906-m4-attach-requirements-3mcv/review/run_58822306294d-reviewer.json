@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260906-m4-attach-requirements-3mcv",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260906-m4-attach-requirements-3mcv/task/run_58822306294d-reviewer.json",
+    "sha256": "127dc8c2d49f46a07e4850c3048125311c8998d846002d3416d864d9289dc3e0"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-4의 없는 단위 주입 검사가 실제 출처 검사의 실패를 확인하지 않는다. 변조된 문서를 파싱한 뒤 주입한 단위가 SOURCE_UNITS와 파일시스템에 없다는 사실만 확인한다. 실제 출처 검사(103~116행)는 정상 문서에서 읽은 self.included만 검사하므로 변조 데이터를 받지 않는다. 실제 검사의 단위 존재 확인을 제거해도 이 가상 검사는 그대로 통과하는 구조여서, check-1 로그의 성공은 AC-4가 요구한 실패 판별의 근거가 되지 못한다.",
+      "file": "tests/test_attach_requirements.py",
+      "line": 153
+    },
+    {
+      "summary": "AC-1의 '정확히 한 번'을 검사하기 전에 같은 Q의 중복 행을 덮어쓴다. Q id를 사전 키로 저장하므로 같은 표 안의 앞선 행이 사라지고, 92~101행은 남은 키의 집합과 두 표 사이의 중복만 확인한다. 예를 들어 「뺀 것」에 Q-56 행을 반복해도 검사 입력이 같아진다. 현재 문서에는 중복이 없지만, required_checks는 AC-1의 단일 출현 조건을 검사하지 못한다.",
+      "file": "tests/test_attach_requirements.py",
+      "line": 55
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260906-m4-attach-requirements-3mcv/evidence/run_58822306294d.yaml",
+  "notes": "두 작업 계약의 base_sha와 현재 HEAD가 일치한다. 승인 커밋 대비 spec 변경은 AC 체크 표시뿐이며 required_checks 변경은 없다. 현재 표의 Q-53~Q-68은 9건 포함·7건 제외로 정확히 한 번씩 나타나고, 출처·제외 사유와 progress.md의 M4 종료 조건도 확인했다. 변경은 구현자 allowed_paths 안이다. 원시 로그에는 check-1 6건, check-2 903건, check-3의 종료 코드 0과 증거에 동일한 head_sha·dirty_tree_hash가 기록되어 있다. findings는 정적 코드 분석 결과이며, 검사 실행·해시 재계산·파일 수정은 하지 않았다."
+}

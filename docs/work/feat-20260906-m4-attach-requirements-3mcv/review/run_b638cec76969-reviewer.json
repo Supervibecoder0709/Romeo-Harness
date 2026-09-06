@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260906-m4-attach-requirements-3mcv",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260906-m4-attach-requirements-3mcv/task/run_b638cec76969-reviewer.json",
+    "sha256": "ba1e4719bc666228fdd10f98027779493a33c488cfc6fab13477f51dd6cb205e"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260906-m4-attach-requirements-3mcv/evidence/run_b638cec76969.yaml",
+  "notes": "AC-1: open-questions.md의 해당 출처 Q 집합은 Q-53~Q-68이며, attach-requirements.md:44~52·61~67에 포함 9건·제외 7건으로 정확히 한 번씩 나타난다. tests/test_attach_requirements.py:115~126은 중복을 보존한 행 목록에서 출현 횟수까지 검사한다. AC-2: 포함 행의 Q·단위·마일스톤이 원문과 일치하고 단위 폴더도 실재한다. 검사 근거는 check-1의 test_included_rows_point_at_existing_sources다. AC-3: 제외 7건의 사유를 원문 및 승인된 분류 기준과 대조했고, 부착과 무관한 하네스·런북 결함이라는 제외 근거가 성립한다. AC-4: tests/test_attach_requirements.py:199~253의 세 가상 상태가 실제 검사와 동일한 함수를 호출하고 해당 위반을 요구한다. check-1 원시 로그에는 이 세 검사와 중복 행 검사 등 7건의 성공이 기록되어 있다. AC-5: progress.md:25~29에 부모 이니셔티브와 M4 완료 = 이니셔티브 종료가 명시되어 있다. 두 역할 계약의 base_sha와 현재 HEAD가 일치한다. 승인 기준 대비 spec 변경은 체크 표시뿐이며 required_checks는 유지됐다. 현재 변경 경로는 구현자 allowed_paths 안이다. check-1·2·3 원시 로그의 종료 코드는 모두 0이고 head_sha·dirty_tree_hash는 증거 기록과 일치한다. 새 검사는 파일 읽기와 메모리 내 변조를 사용하며 재실행을 막는 동작은 확인되지 않았다. 구현자 notes의 별도 프로브 주장은 판정 근거로 사용하지 않았다. 검사 실행·해시 재계산·파일 변경은 하지 않았으며 검토 전후 방어 검사는 위임한 쪽의 몫으로 남는다."
+}

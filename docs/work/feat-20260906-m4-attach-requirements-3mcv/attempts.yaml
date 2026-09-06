@@ -10,4 +10,14 @@ attempts:
   note: 검토자 FAIL findings 2건 — ① AC-4 의 없는 단위 주입 검사가 실제 출처 검사의 실패를 확인하지 않는다(변조 데이터가 실제 검사에 도달하지 않아, 존재
     확인을 지워도 통과한다) ② AC-1 의 「정확히 한 번」을 Q id dict 키가 덮어써 중복 행을 잡지 못한다. 둘 다 산출물(테스트 코드) 결함이다
   settled_at: '2026-09-06T22:14:51+09:00'
+- n: 2
+  run: run_b638cec76969
+  base_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  started_at: '2026-09-06T22:15:45+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS findings 0 · required_checks 3/3 · 재실행 3/3 · 방어 검사 유효 · close 통과(status done)
+  settled_at: '2026-09-06T22:30:37+09:00'
+  base_sha_history:
+  - 0693765e63fd0064603ba2300444b7b67b3c9f92
 reviews: []

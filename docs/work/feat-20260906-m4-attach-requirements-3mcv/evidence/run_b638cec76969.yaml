@@ -1,0 +1,249 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_b638cec76969
+task_id: task_a50d59980758
+dispatch_id: ctx_06cd106cef55
+unit_id: feat-20260906-m4-attach-requirements-3mcv
+spec_ref:
+  path: docs/work/feat-20260906-m4-attach-requirements-3mcv/spec.md
+  sha256: 35b5642fb805854626d4d9086d0842700d6acb11240e09a2a022123720f4a040
+base_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv
+started_at: '2026-09-06T22:20:39+09:00'
+finished_at: '2026-09-06T22:26:07+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_requirements.TestAttachRequirementsProvenance -v
+  exit_code: 0
+  started_at: '2026-09-06T22:20:39+09:00'
+  finished_at: '2026-09-06T22:20:40+09:00'
+  seconds: 0.036
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/01-check-1.log
+  log_sha256: 1ba419daa46f1fde7a31a413cdba92c9aa4c7c5c0d33d29210dc2640d770e27c
+  stdout_tail: ''
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: check-2
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-06T22:20:40+09:00'
+  finished_at: '2026-09-06T22:22:47+09:00'
+  seconds: 126.896
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/02-check-2.log
+  log_sha256: 8b6f07f7251c5280c6aa14299ceff7501ea039d2e354a348f9f525c1a8c391a3
+  stdout_tail: ''
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: check-3
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-06T22:22:47+09:00'
+  finished_at: '2026-09-06T22:22:47+09:00'
+  seconds: 0.16
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/03-check-3.log
+  log_sha256: 3e3eb44666cb2c34a559dc2a96906f13be03928998839190932f57ff4a05d384
+  stdout_tail: 'S] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m4-attach-requirements-3mcv'
+  exit_code: 0
+  started_at: '2026-09-06T22:24:00+09:00'
+  finished_at: '2026-09-06T22:24:00+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/04-review-tree-before.log
+  log_sha256: 825ec1dd9aaa50e6c43c1f5484cf9e750fbb7e8dcd5b9f145ad68637954f5458
+  stdout_tail: 'M docs/planning/progress.md
+
+    ?? docs/requirements/attach-requirements.md
+
+    ?? tests/test_attach_requirements.py'
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/.harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-06T22:24:00+09:00'
+  finished_at: '2026-09-06T22:24:00+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/05-reviewer-brief.log
+  log_sha256: 02cc20a8413fd22d5cb48c73d5417606940d14e9e08870f337fc5567c1191625
+  stdout_tail: 01475267b79d52838d8ba142b4ed726cc9e6945ddd962c345e35d97bbeab8209  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/.harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/reviewer-brief.md
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m4-attach-requirements-3mcv'
+  exit_code: 0
+  started_at: '2026-09-06T22:25:59+09:00'
+  finished_at: '2026-09-06T22:25:59+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/06-review-tree-after.log
+  log_sha256: 825ec1dd9aaa50e6c43c1f5484cf9e750fbb7e8dcd5b9f145ad68637954f5458
+  stdout_tail: 'M docs/planning/progress.md
+
+    ?? docs/requirements/attach-requirements.md
+
+    ?? tests/test_attach_requirements.py'
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260906-m4-attach-requirements-3mcv/review/run_b638cec76969-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-06T22:26:07+09:00'
+  finished_at: '2026-09-06T22:26:07+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_b638cec76969/07-review-record.log
+  log_sha256: 5a9779d065826bf12605112ad980628845dbc1e4844ec71239e38b9500170ee7
+  stdout_tail: c3da0b9da2855a7ccf060edb0b3bdd494f604d464e04b909412ffddaa6f92ace  docs/work/feat-20260906-m4-attach-requirements-3mcv/review/run_b638cec76969-reviewer.json
+  head_sha: 9a102867985f68269c08d88422a03bddb230f9b4
+  dirty_tree_hash: 65e2c5744fc88ed682cfb102cecc928d9d2dac3bde5f472382a108898ce46c9b
+changed_files:
+- docs/planning/progress.md
+- docs/requirements/attach-requirements.md
+- tests/test_attach_requirements.py
+artifact_hash: 1d8c6a365d4559a651d1aba17f66e0472d67d2502098c4fd98081f4f68804cc2
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-06T22:30:31+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 165 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-06T21:59:12+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_b638cec76969 — 검증 계획 3건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 9a102867985f vs 현재 9a102867985f
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 65e2c5744fc8 vs 현재 65e2c5744fc8 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_attach_requirements.TestAttachRequirementsProvenance
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo validate'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 7건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 5건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 3건이 승인 커밋 0693765e63fd 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_attach_requirements.TestAttachRequirementsProvenance
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo validate'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 0693765e63fd 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['docs/planning/progress.md', 'docs/requirements/attach-requirements.md', 'tests/test_attach_requirements.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_58822306294d-reviewer.json: FAIL(findings 2건 — 첫째: AC-4의 없는 단위 주입 검사가 실제 출처 검사의 실패를 확인하지
+      않는다. 변조된 문서를 파싱한 뒤 주입한) — 다른 산출물(0693765+e134c5bf5297)을 본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 9a10286+65e2c5744fc8
+      이다(검사 기록 run 의 head_sha+dirty_tree_hash, D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_b638cec76969-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

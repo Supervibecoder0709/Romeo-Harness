@@ -1,0 +1,117 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_58822306294d
+task_id: task_bd474eb8792c
+dispatch_id: ctx_eddb4c769e66
+unit_id: feat-20260906-m4-attach-requirements-3mcv
+spec_ref:
+  path: docs/work/feat-20260906-m4-attach-requirements-3mcv/spec.md
+  sha256: 35b5642fb805854626d4d9086d0842700d6acb11240e09a2a022123720f4a040
+base_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv
+started_at: '2026-09-06T22:07:28+09:00'
+finished_at: '2026-09-06T22:14:37+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_requirements.TestAttachRequirementsProvenance -v
+  exit_code: 0
+  started_at: '2026-09-06T22:07:28+09:00'
+  finished_at: '2026-09-06T22:07:28+09:00'
+  seconds: 0.033
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/01-check-1.log
+  log_sha256: 09053d1b897edf0a9ec44987a274d77ff2ddf0778a62e42000de869635cd634a
+  stdout_tail: ''
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: check-2
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-06T22:07:28+09:00'
+  finished_at: '2026-09-06T22:09:35+09:00'
+  seconds: 127.286
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/02-check-2.log
+  log_sha256: 4c4089a1699801e5a742f445bc751de5edd155274e9d035c3bc4a3ec034d0833
+  stdout_tail: ''
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: check-3
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-06T22:09:35+09:00'
+  finished_at: '2026-09-06T22:09:36+09:00'
+  seconds: 0.16
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/03-check-3.log
+  log_sha256: 422f5a3eb41b5c2a0da38e1e987ceda07c1c20c269e6a7e901364f4e41d24c9e
+  stdout_tail: 'S] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m4-attach-requirements-3mcv'
+  exit_code: 0
+  started_at: '2026-09-06T22:11:33+09:00'
+  finished_at: '2026-09-06T22:11:33+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/04-review-tree-before.log
+  log_sha256: de34a7b6169c85ba9b12051aea83b0db05822109ef252987facd829d5d73bd84
+  stdout_tail: 'M docs/planning/progress.md
+
+    ?? docs/requirements/attach-requirements.md
+
+    ?? tests/test_attach_requirements.py'
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/.harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-06T22:11:41+09:00'
+  finished_at: '2026-09-06T22:11:41+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/05-reviewer-brief.log
+  log_sha256: 26a9cfea0a344409fe649d9a74014d7ff78b8260c34b2ed0fee60872a9eba40c
+  stdout_tail: d48fc3ba803654e7df019b5f69f671ca3bb1f7d617c3b911980975781f1d5634  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m4-attach-requirements-3mcv/.harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/reviewer-brief.md
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m4-attach-requirements-3mcv'
+  exit_code: 0
+  started_at: '2026-09-06T22:14:12+09:00'
+  finished_at: '2026-09-06T22:14:12+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/06-review-tree-after.log
+  log_sha256: de34a7b6169c85ba9b12051aea83b0db05822109ef252987facd829d5d73bd84
+  stdout_tail: 'M docs/planning/progress.md
+
+    ?? docs/requirements/attach-requirements.md
+
+    ?? tests/test_attach_requirements.py'
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260906-m4-attach-requirements-3mcv/review/run_58822306294d-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-06T22:14:36+09:00'
+  finished_at: '2026-09-06T22:14:37+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260906-m4-attach-requirements-3mcv/run_58822306294d/07-review-record.log
+  log_sha256: 2133fdd0122bfe9aad4f1ad4e729c7b35914eccf79ee36cb49a269d68db26ead
+  stdout_tail: 6d39ecfc1f7b65852d0432342f5765245e588ace47e7085ab1d20dba54d25ada  docs/work/feat-20260906-m4-attach-requirements-3mcv/review/run_58822306294d-reviewer.json
+  head_sha: 0693765e63fd0064603ba2300444b7b67b3c9f92
+  dirty_tree_hash: e134c5bf5297f48b7852fbaf8b6611ba2a6b459db79456bc142342b77fb01b37
+changed_files:
+- docs/planning/progress.md
+- docs/requirements/attach-requirements.md
+- tests/test_attach_requirements.py
+artifact_hash: 071fd87677a4be49f4fa49eb1311b506bcc2e4d4047cee8bf6d488d133703f2e
+reviewer: null
+verdict: null
+approvals: []

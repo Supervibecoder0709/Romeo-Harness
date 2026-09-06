@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-06T21:59:12+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-06T22:30:31+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_58822306294d.yaml, evidence/run_b638cec76969.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -45,16 +45,16 @@ updated: '2026-09-06'
   **16건 전부**가 그 문서의 「올린 것」이나 「뺀 것」 어느 한쪽에 이유와 함께 나타난다. 목록에서 무언가가 빠지거나
   출처가 없는 것을 가리키면 `python3 -m unittest` 가 실패한다 — 문서가 조용히 낡지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 `docs/requirements/attach-requirements.md` 가 서고, **`open-questions.md` 에서 M1~M3 세 단위를
+  - [x] AC-1 `docs/requirements/attach-requirements.md` 가 서고, **`open-questions.md` 에서 M1~M3 세 단위를
         출처로 가진 Q 전부**(2026-09-06 실측 Q-53~Q-68 16건)가 「올린 것」 표 또는 「뺀 것」 표
         어느 한쪽에 정확히 한 번 나타난다 — 개수가 아니라 그 집합이 판정 기준이다
-  - [ ] AC-2 「올린 것」의 각 행이 출처로 **Q id · 작업 단위 id · 마일스톤 번호(M1|M2|M3)** 셋을 적고,
+  - [x] AC-2 「올린 것」의 각 행이 출처로 **Q id · 작업 단위 id · 마일스톤 번호(M1|M2|M3)** 셋을 적고,
         그 Q id 가 `docs/planning/open-questions.md` 에 실재하며 그 단위 id 가 `docs/work/` 에 실재한다
-  - [ ] AC-3 「뺀 것」의 각 행에 **왜 attach 요구사항이 아닌지**가 한 줄로 적히고,
+  - [x] AC-3 「뺀 것」의 각 행에 **왜 attach 요구사항이 아닌지**가 한 줄로 적히고,
         그 판정이 아래 「올림·뺌의 기준」을 따른다
-  - [ ] AC-4 대조 검사가 세 가상 상태에서 **실패한다** — ① 없는 Q id 를 출처로 주입 ② 없는 단위 id 를 출처로 주입
+  - [x] AC-4 대조 검사가 세 가상 상태에서 **실패한다** — ① 없는 Q id 를 출처로 주입 ② 없는 단위 id 를 출처로 주입
         ③ M1~M3 출처 Q 하나를 두 표에서 모두 제거. 그 세 상태를 검사 안에서 매번 재확인한다
-  - [ ] AC-5 `docs/planning/progress.md` 「지금 상태」에 부모 이니셔티브
+  - [x] AC-5 `docs/planning/progress.md` 「지금 상태」에 부모 이니셔티브
         `init-20260904-attach-payload-manual-rreq` 의 **M4 완료 = 이니셔티브 종료**가 반영된다
 - **위험과 되돌리기:** 문서 2건·검사 1건을 더하고 `progress.md` 를 고칠 뿐이다. 코드·운영 상태·외부 상태·비용에 닿지 않는다.
   되돌리기는 `git revert <구현 커밋>` 1회. 가장 큰 위험은 **목록이 실제 구멍을 좁게 잡아 다음 이니셔티브가 같은 벽에 다시 부딪히는 것**이고,
@@ -159,6 +159,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-06T22:30:31+09:00 · HEAD 9a102867985f · 검사 기록 run_b638cec76969
 
-- (없음)
+- [evidence/run_58822306294d.yaml](evidence/run_58822306294d.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_b638cec76969.yaml](evidence/run_b638cec76969.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0] (검사 기록)
