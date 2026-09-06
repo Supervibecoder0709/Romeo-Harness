@@ -17,30 +17,30 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `HEAD` · 2026-09-05)
+## 지금 상태 (기준 `HEAD` · 2026-09-06)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
-- **마일스톤:** M2·M3 완료. 부착 charter(`init-20260904-attach-payload-manual-rreq`)의 **M1·M2 완료**.
-- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260904-m2-router-foreign-repo-ct5h`
-  (**라우터가 처음으로 남의 저장소에서 돌았다** · 대상에 `feat-20260904-claude-md-rule-conflicts-bbn8` 가
-  `status: active` · `facets: [docs, security]` — 처음으로 `tooling`·`docs` 아닌 영역을 분류했다 ·
-  **3회차 close PASS** · 5/5 · 재실행 5/5 · 검토자 PASS findings 0).
-- **§10 브레이크 두 번째 작동.** 1회차 FAIL(완료 정의) → 2회차 FAIL(산출물) → 연속 2회에서 멈춤 →
-  사람 재검토 「달성 가능」 → 3회차 PASS. 재승인 2회는 D-80 정상 경로.
-- **BMad·Romeo 는 공존하지 않는다.** G-M3 §6.1 의 결론은 파일이 안 깨진다는 뜻이었다. 실제 라우팅은
-  세 지점에서 갈리고(부품 자동 활성화 · 산출물 경로 · **승인 없이 착수**) §번호 7개가 겹치며
-  Romeo 블록이 **없는 문서 5종**을 읽으라 한다. 인용은 `scenarios/11-router-foreign-repo.md` 소유.
-- **다음 행동:** charter 의 **M3 — 대상 저장소에서 그 단위를 구현·검토·close**.
+- **마일스톤:** M2·M3 완료. 부착 charter(`init-20260904-attach-payload-manual-rreq`)의 **M1·M2·M3 완료**. 남은 것은 **M4**(구멍을 M5 요구사항으로 정리).
+- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260906-m3-close-foreign-repo-ik3u`
+  (**하네스가 처음으로 자기 도구·문서가 아닌 영역을 판정했다** · 대상 단위 `feat-20260904-claude-md-rule-conflicts-bbn8`
+  가 `facets: [docs, security]` 로 **`status: done`** · **3회차 close PASS** · 5/5 · 재실행 5/5 · 검토자 PASS).
+- **§10 브레이크가 한 관통에서 두 번 작동했다** — 대상 저장소 단위(회차 `fail·fail·pass·pass`)와 하네스 단위
+  (회차 `fail·fail·pass`) 각각 한 번. 둘 다 사람 재검토 「달성 가능」 뒤 풀렸다. D-80 재승인 2회는 정상 경로다.
+- **두 저장소의 관통이 무엇을 드러냈나.** 뿌리는 하나다 — **부착이 미커밋이면 「이 단위가 무엇을 바꿨는가」를
+  커밋 이력으로 가를 수 없다.** 검토자 FAIL 3건 중 2건이 거기서 나왔다. 답한 방법은 **재생성 대조**다
+  (`compile --check` · `notices --check` · 소스 트리 `filecmp`) — 경로 목록 대조는 변경 주체를 말하지 못한다.
+- **다음 행동:** charter 의 **M4 — M1~M3 이 낸 구멍을 M5 `attach` 요구사항 목록으로 정리한다.**
 - **blocker:** 없음. 워커 워크트리는 전부 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
-- **최신 CI:** `c1e4630` run `33872603463` success. 그 뒤 커밋 4건은 **미푸시**.
-- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·**58~61**(`open-questions.md`).
-  이번 것은 Q-58~61 — 부착이 `permissions.allow` 를 안 놓는다 · 외부 워크트리가 안 잡힌다 ·
-  없는 인덱스를 투영한다 · `validate` 가 `NEEDS_INPUT` 을 통과시킨다.
-- **다음 정비 후보 (1순위 Q-61):** 요구(§3 확인란)와 보는 자리(`validate`)가 어긋나 있다 —
-  이 관통이 §11 위반을 두 번 겪었다(AC-5 와 이것).
-
+- **최신 CI:** `c1e4630` run `33872603463` success. 그 뒤 커밋 **12건은 미푸시**.
+- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·58~61·**62~68**(`open-questions.md`).
+  이번 것은 Q-62~68 — 시나리오 11 의 줄 번호 인용이 밀렸다 · `run-unit` 이 금지된 `--output-schema` 를 인쇄한다 ·
+  **close 가 검토 판정을 산출물만의 함수로 본다** · 부착 미커밋이 `changed_files` 를 못 가른다 ·
+  `envelope check` 가 `--root` 를 안 따른다 · `close` 가 git 아닌 루트에서 예외로 죽는다 ·
+  **방어 검사가 깨진 봉투는 재승인으로도 안 걷힌다**.
+- **다음 정비 후보 (1순위 Q-68, 2순위 Q-64):** 둘 다 `close` 의 검토 판정 자리다. Q-68 은 무효한 검토가
+  유효한 검토를 막아 단위를 영원히 닫지 못하게 하므로 먼저다.
 ## 마일스톤
 
 | 마일스톤 | 상태 | 근거 |
