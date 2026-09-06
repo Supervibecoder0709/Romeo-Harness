@@ -1,0 +1,12 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260906-m3-close-foreign-repo-ik3u
+attempts:
+- n: 1
+  run: run_cc685a7dfa45
+  base_sha: 77809a4c4601e757f7f32fb0ac80c61d60df967f
+  started_at: '2026-09-06T07:11:11+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []
