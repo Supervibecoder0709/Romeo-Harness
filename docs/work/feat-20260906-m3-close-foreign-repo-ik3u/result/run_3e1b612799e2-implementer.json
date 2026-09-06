@@ -1,0 +1,42 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260906-m3-close-foreign-repo-ik3u",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260906-m3-close-foreign-repo-ik3u/task/run_3e1b612799e2-implementer.json",
+    "sha256": "bb5dae77eb26f7e7eec5426ceda43abc91c5cde8f07a6365f98997fc245418b1"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_foreign_close -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "for h in '## 무엇이 더 필요한가' '## 어디서 구현하는가' '## 검토자를 어떻게 붙이는가' '## 검증' '## 되돌리기'; do grep -qF \"$h\" scenarios/12-close-foreign-repo.md || exit 1; done",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "test $(grep -cE '^\\| Q-[0-9]+ \\|.*feat-20260906-m3-close-foreign-repo-ik3u' docs/planning/open-questions.md) -ge 1",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate docs/work/feat-20260906-m3-close-foreign-repo-ik3u",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260906-m3-close-foreign-repo-ik3u/evidence/run_3e1b612799e2.yaml",
+  "notes": "2회차다. 1회차 검토자(run_cc685a7dfa45-reviewer.json)의 FAIL(AC_UNMET)은 scenarios/12-close-foreign-repo.md 「무엇이 더 필요한가」 절이 close 가 추가로 요구한 것을 적으면서 요구를 인쇄한 명령이 아니라 그 요구를 충족한 명령을 지목했다는 것이었다. 이번 실행은 그 절을 둘로 갈랐다 — close 가 스스로 인쇄한 요구는 close 를 남의 루트에 대해 부른 세 번의 실행(dry-run rc=1 HAS_EVIDENCE · 3회차 뒤 rc=1 AC_ALL_CHECKED·REVIEW_VERDICT · 4회차 뒤 rc=0)과 그 명령·rc·인쇄 문구로 적고, close 가 인쇄하지 않았는데 필요했던 넷은 요구한 자리(RUNBOOK §3.1·§3.3·§3.7 · romeo/close.py:87-100·633 · core/schemas/result-envelope.json)와 그것을 갖춘 명령을 나눠 별도 표에 적었다. 근거는 docs/work/feat-20260906-m3-close-foreign-repo-ik3u/observations.md 「close 가 실제로 인쇄한 요구 — 세 번의 실행 전문」이다. 산출물(scenarios/12-close-foreign-repo.md)이 바뀌었으므로 1회차 FAIL 은 옛 산출물의 판정이다.\n1회차 검토자의 두 번째 findings(비차단 경고 — c3b9eae 전체 revert 가 managed block 275줄까지 지우므로 「check-9 는 마커가 남아 통과한다」가 성립하지 않는다)도 「되돌리기」 절에서 고쳤다. 되돌리는 범위를 둘로 나누고(부착을 남기는 경로 · 부착까지 되돌리는 경로) 각 경로에서 check-9 가 어떻게 갈리는지 적었다. check-9 가 grep 하는 문자열 sha=08dc14bf 가 마커 시작 줄(대상 CLAUDE.md:168)에만 있다는 것과, compile 재주입이 같은 마커를 다시 만든다는 것(bin/romeo compile --check --root <대상> = rc 0 · 'compile 검사 PASS')을 이 실행에서 확인하고 적었다.\n검사 5건은 run_3e1b612799e2 에 기록했고 전부 exit 0 이다(check-5 는 126.38s — 재실행 상한 600초 아래). AC-4 의 실제 대상 판정은 같은 run 의 라벨 foreign-close-verdict 로 다시 남겼다 — python3 tests/test_foreign_close.py --verdict <대상 루트> 가 rc=0 이고 세 조건(unit-done·unit-checks-passed·unit-reviewed)이 전부 참이다. 이번 실행이 바꾼 파일은 scenarios/12-close-foreign-repo.md 하나이고 allowed_paths 안이다. 계약의 guards 는 비어 있다. spec.md 는 손대지 않았다(git diff fee21ae -- spec.md 가 비어 있다) — 확인란 문장도 수용 기준 체크박스도 1회차 상태 그대로다. 발견했으나 고치지 않은 것은 없다(§12) — 이번 두 수정은 전부 이 단위의 산출물인 런북 안이다."
+}

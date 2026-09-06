@@ -15,4 +15,24 @@ attempts:
   settled_at: '2026-09-06T12:04:22+09:00'
   base_sha_history:
   - 77809a4c4601e757f7f32fb0ac80c61d60df967f
-reviews: []
+- n: 2
+  run: run_3e1b612799e2
+  base_sha: fee21aed8662fac5c954536ed9f6070fcca200f5
+  started_at: '2026-09-06T12:06:16+09:00'
+  result: fail
+  failure_class: harness
+  note: '2회차 — 구현자 PASS(checks 5/5) · 검토자 FAIL [AC_UNMET] 2건 · **방어 검사 깨짐**(review-tree-before 27f60fcf
+    vs after 927ea9b5). 원인 둘. ① 코디네이터 절차 오류: 워커 완료를 worker_done 이 아니라 result 봉투 **파일 존재**로 판정해 검토자를 일찍
+    띄웠다 — 워커가 그 뒤에도 검사를 한 세트 더 기록해 증거에 두 지문이 섞였고 검토자가 그것을 지문 불일치로 잡았다. ② 실제 결함: AC-5 가 적은 「close 가 추가로
+    요구한 것」이 observations.md 의 요약 표에만 대응하고 그 close 실행의 명령·종료 코드·출력을 담은 증거로 연결되지 않는다(K-51 — 증거는 손으로 쓰지 않는다).
+    대상 저장소의 close 3회는 코디네이터가 라벨 없이 돌려 evidence 에 남지 않았다'
+  settled_at: '2026-09-06T12:18:04+09:00'
+reviews:
+- after_attempt: 2
+  conclusion: 달성 가능하다. 연속 실패 2회의 원인이 서로 다르다. 1회차는 산출물(표의 열 이름과 칸 내용이 갈렸다)이었고 2회차는 둘이 겹쳤다 — (a) 코디네이터가
+    worker_done 이 아니라 result 봉투 파일 존재로 워커 완료를 판정해 검토자를 일찍 띄웠고, 그래서 증거에 트리 지문 두 개가 섞이고 방어 검사가 깨졌다(절차 오류)
+    · (b) AC-5 가 요구한 「요구를 인쇄한 명령」이 증거로 연결되지 않았다(완료 정의). (b)를 D-80 으로 고쳐 기준을 기록에서 재현으로 옮겼다 — 임시 루트에 요구
+    미충족 상태를 만들고 close 를 돌리면 같은 검사 이름이 FAIL 로 인쇄된다. 소급이 아니라 재현이므로 K-51 을 지킨다. (a)는 3회차에서 worker_done 을
+    기다려 고친다. 사용자 확정 2026-09-06
+  by: Supervibecoder0709
+  at: '2026-09-06T12:39:37+09:00'

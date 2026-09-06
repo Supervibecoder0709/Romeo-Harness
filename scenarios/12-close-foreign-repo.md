@@ -25,14 +25,32 @@ bin/romeo close --unit feat-20260904-claude-md-rule-conflicts-bbn8 --root <대�
 rc=1 · `FRONTMATTER_VALID` PASS · `APPROVED` PASS · **`HAS_EVIDENCE` FAIL 에서 멈춘다.**
 **남의 루트에서도 close 기계는 그대로 돈다** — 막힌 것은 `--root` 가 아니라 그 저장소에 증거가 없다는 사실이다.
 
-그 뒤로 close 가 **추가로 요구한 것**은 넷이고, 전부 그것을 인쇄한 명령과 종료 코드로 확인했다.
+**요구를 인쇄한 명령과 그 요구를 충족한 명령은 다르다.** 이 절이 적는 것은 **전자**다 —
+close 가 **스스로** 인쇄한 것만 담는다. 충족한 명령을 요구한 자리에 적으면 요구하는 자리와 인쇄하는 자리가
+갈리고, 그러면 「close 가 무엇을 요구했나」를 이 문서로는 답할 수 없다(§11). 이 관통에서 `close` 를 남의 루트에
+대해 부른 것은 세 번이고, 그 셋이 인쇄한 요구가 전부다.
 
-| # | 무엇이 더 필요했나 | 요구를 인쇄한 명령 | rc |
+| 언제 | 요구를 인쇄한 명령 | rc | close 가 인쇄한 **요구** |
 | --- | --- | --- | --- |
-| 1 | **승인된 spec 의 커밋.** `docs/work/<id>/` 가 미추적이면 `CHECK_PLAN_COMMITTED`·`TASK_ANCHORED` 가 대조할 원본이 이력에 없다 | `git -C <대상> add docs/work/<id>/ && git -C <대상> commit` → `33a1c14` | 0 |
-| 2 | **작업 계약 2종**(구현자·검토자). `docs/work/<id>/task/` 는 `envelope build` 만 만든다 — 손으로 쓰지 않는다 | `bin/romeo envelope build --unit <id> --role implementer --base-sha 33a1c14 --run <run> --root <대상>` (검토자도 같은 형태) | 0 |
-| 3 | **구현자 결과 계약.** `result/<run>-implementer.json` 은 구현한 쪽이 스스로 쓴다 — 회수해 주는 쪽이 없다(K-62) | `bin/romeo envelope check --unit <id> --role implementer --root <대상> <절대경로>` | 0 |
-| 4 | **검토자 절차 파일과 그 출력.** 대상에 `core/workflows/review/SKILL.md` 와 `core/roles/reviewer.yaml` 이 부착돼 있어야 검토자가 자기 루트에서 절차를 찾는다 | `bin/romeo review record --unit <id> --run <run> --root <대상>` | 0 |
+| 착수 전 (증거 0건) | `bin/romeo close --unit <id> --root <대상> --dry-run` | 1 | `[FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다` |
+| 3회차 뒤 (검토자 PASS) | `bin/romeo close --unit <id> --root <대상>` | 1 | `[FAIL] AC_ALL_CHECKED — 미체크 5개` · `[FAIL] REVIEW_VERDICT — run_bbn8m3a1c14b-reviewer.json: FAIL (findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (findings 1건)` |
+| 4회차 뒤 (D-80 재승인) | `bin/romeo close --unit <id> --root <대상>` | 0 | 없음 — `PASS` |
+
+세 번째 줄이 이 표의 요점이다: **`REVIEW_VERDICT` 는 증거를 더해서 풀리지 않았다.** 1·2회차 FAIL 이
+「같은 산출물의 판정」으로 살아 있었고, 재승인으로 그것들이 `REVIEW_SUPERSEDED` 가 된 뒤에야 rc=0 이 됐다
+(아래 「검토자를 어떻게 붙이는가」의 마지막 문단이 그 자리다).
+
+**close 가 요구하지 않았는데 필요했던 것이 넷 있다.** 이 넷을 위 표에 섞지 않는다 —
+요구한 것은 `close` 의 실패 메시지가 아니라 **`adapters/orca/RUNBOOK.md` §3.1·§3.3·§3.7 과 결과 계약 스키마**이고,
+이 관통은 그것을 미리 읽고 갖춰 두었기 때문에 `close` 가 그 자리에서 멈춘 적이 **없다**.
+갖추지 않았다면 close 가 무엇을 인쇄했을지는 **돌려 보지 않았으므로 적지 않는다**(K-51).
+
+| # | 무엇이 더 필요했나 | 요구한 자리 | 그것을 갖춘 명령 | rc |
+| --- | --- | --- | --- | --- |
+| 1 | **승인된 spec 의 커밋.** `docs/work/<id>/` 가 미추적이면 `CHECK_PLAN_COMMITTED`·`TASK_ANCHORED` 가 대조할 원본이 이력에 없다 | RUNBOOK §3.1 · `romeo/close.py:87-100`·`633` | `git -C <대상> add docs/work/<id>/ && git -C <대상> commit` → `33a1c14` | 0 |
+| 2 | **작업 계약 2종**(구현자·검토자). `docs/work/<id>/task/` 는 `envelope build` 만 만든다 — 손으로 쓰지 않는다 | RUNBOOK §3.1 | `bin/romeo envelope build --unit <id> --role implementer --base-sha 33a1c14 --run <run> --root <대상>` (검토자도 같은 형태) | 0 |
+| 3 | **구현자 결과 계약.** `result/<run>-implementer.json` 은 구현한 쪽이 스스로 쓴다 — 회수해 주는 쪽이 없다(K-62) | `core/schemas/result-envelope.json` | `bin/romeo envelope check --unit <id> --role implementer --root <대상> <절대경로>` | 0 |
+| 4 | **검토자 절차 파일과 그 출력.** 대상에 `core/workflows/review/SKILL.md` 와 `core/roles/reviewer.yaml` 이 부착돼 있어야 검토자가 자기 루트에서 절차를 찾는다 | RUNBOOK §3.3·§3.7 | `bin/romeo review record --unit <id> --run <run> --root <대상>` | 0 |
 
 **`bin/`·`romeo/` 는 끝까지 필요하지 않았다.** 모든 명령을 하네스 저장소의 `bin/romeo` 를 `--root <대상>` 으로 불러 돌렸다.
 정책표·역할 계약·스키마는 `HARNESS_ROOT`(돌고 있는 `romeo` 패키지의 저장소)에서 읽고, 부착 상태와 문서는 `--root` 에서 읽는다.
@@ -166,15 +184,37 @@ python3 tests/test_foreign_close.py --verdict <대상 루트>
 | `c3b9eae` | 구현 — `CLAUDE.md` 에 「규칙 충돌 해소」 절 (managed block 275줄이 딸려 들어갔다 · 위 「어디서 구현하는가」) |
 | `3738240` | AC-5 재승인과 수용 기준 체크 (D-80) |
 
+**되돌리기에 조건이 하나 붙는다 — `c3b9eae` 를 통째로 revert 하면 부착까지 지워진다.** 그 커밋은 이 단위의 60줄과
+**부착이 넣은 managed block 275줄을 함께** 담았기 때문이다(위 「어디서 구현하는가」의 범위 이탈).
+그래서 세 커밋을 그대로 revert 하는 것은 **부착 직후 상태로 돌아가는 것이 아니라 부착 전 상태로 돌아가는 것**이고,
+그 뒤에는 `CLAUDE.md` 에 마커가 없으므로 `check-9`(`grep -q "sha=08dc14bf"` — 그 문자열은 마커 **시작 줄** 안에만 있다 ·
+대상 `CLAUDE.md:168`)도 통과하지 않는다. 「되돌리면 `check-9` 만 마커가 남아 통과한다」는 성립하지 않는다.
+그래서 되돌리기는 **두 단계**다 — 세 커밋을 되돌리는 것은 같고, 부착을 다시 세우는 한 줄이 붙느냐로 갈린다.
+
 ```
 git -C <대상> revert 3738240 c3b9eae 33a1c14
-rm -rf <대상>/docs/work/feat-20260904-claude-md-rule-conflicts-bbn8
+rm -rf <대상>/docs/work/feat-20260904-claude-md-rule-conflicts-bbn8   # revert 는 추적된 것만 지운다
 ```
 
+여기까지가 **부착 전**이다 — `CLAUDE.md` 106줄 · 마커 없음 · `git status` 에서 `CLAUDE.md` 는 깨끗하다.
+**부착 직후**로 돌아가려면 한 줄을 더한다.
+
+```
+bin/romeo compile --root <대상>
+```
+
+그러면 `CLAUDE.md` 가 381줄(106 + managed block 275)이 되고, 부착이 미커밋이던 시절과 같이
+` M CLAUDE.md` 로 남는다. `compile` 이 **같은** 마커를 다시 만든다는 것은 재생성 대조가 말한다 —
+지금 대상 루트에서 `bin/romeo compile --check --root <대상>` 이 rc=0(`compile 검사 PASS`)이고,
+그 명령이 하는 일이 **지금 다시 만들어 바이트 비교**하는 것이다(위 「어디서 구현하는가」).
+
 되돌린 뒤 그 단위의 `check-1`~`check-8` 이 다시 rc=1 로 돌아오는 것으로 복구를 확인한다 —
-`CLAUDE.md` 에 그 절이 없으면 아홉 grep 중 여덟이 실패하고, `check-9`(`sha=08dc14bf`)만 마커가 남아 통과한다.
-부착분은 이 관통 전에도 미커밋이었고 되돌린 뒤에도 미커밋이므로,
-`git -C <대상> status --porcelain` 이 **부착 직후 목록**(시나리오 10 의 「놓는 것」)으로 돌아가는 것으로 확인한다.
+`CLAUDE.md` 에 「규칙 충돌 해소」 절이 없으면 그 여덟 grep 이 전부 실패한다.
+`check-9` 는 **어디까지 되돌렸는지에 따라 갈린다**: `compile` 까지 돌렸으면 마커가 있으므로 통과하고,
+부착 전에서 멈췄으면 마커가 없어 rc=1 이 되어 아홉 전부가 실패한다.
+부착분(`core/`·`adapters/` 등)은 이 관통 전에도 미커밋이었고 되돌린 뒤에도 미커밋이므로,
+`git -C <대상> status --porcelain` 이 **부착 직후 목록**(시나리오 10 의 「놓는 것」)으로 돌아가는 것으로 확인한다 —
+그 목록에 ` M CLAUDE.md` 가 들어 있는지가 위 두 단계 중 어디에 있는지를 가른다.
 
 부착 자체를 되돌리는 것은 이 런북이 아니라 시나리오 10 의 「되돌리기」다 — 두 절차는 겹치지 않는다.
 하네스 저장소 쪽은 `git revert <구현 커밋>` 이다. 운영 상태·외부 상태·비용은 이 절차가 건드리지 않는다.
