@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260906-m3-close-foreign-repo-ik3u",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260906-m3-close-foreign-repo-ik3u/task/run_cc685a7dfa45-reviewer.json",
+    "sha256": "6d8e874cc8e7be85b40244c836a9f0354db4eedfbd2e896bb93610e6dd853a41"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5 미충족: 추가 요구 네 가지의 근거로 제시한 명령은 git commit·envelope build·envelope check·review record의 성공 명령이다. 이것들은 작업 수행을 보여주지만, close가 무엇을 추가로 요구했는지 출력한 명령과 근거를 지목하지 못한다. 이 절에서 요구 출력과 연결된 close 명령은 승인 전에 이미 확인한 HAS_EVIDENCE 실패뿐이다. observations.md:139~142에는 이후 AC_ALL_CHECKED·REVIEW_VERDICT 실패가 기록돼 있으나 이 절의 요구 표에는 연결되지 않았다. 승인된 spec.md:47이 요구한 추가 요구와 그것을 인쇄한 명령의 대응을 확인할 수 없다.",
+      "file": "scenarios/12-close-foreign-repo.md",
+      "line": 32
+    },
+    {
+      "summary": "비차단 경고: 되돌리기 명령에 c3b9eae 전체 revert가 포함돼 있다. 이 커밋은 같은 문서 60~62행에 명시된 managed block 275줄도 추가했으므로, revert가 적용되면 그 블록까지 제거된다. 실제 기준 커밋 33a1c14의 CLAUDE.md에도 마커가 없다. 따라서 175~177행의 'check-9는 마커가 남아 통과하고 부착 직후 상태로 돌아간다'는 설명과 맞지 않는다. 수용 기준은 되돌리기 절의 존재만 요구하므로 이 경고 자체는 FAIL 사유로 삼지 않는다.",
+      "file": "scenarios/12-close-foreign-repo.md",
+      "line": 170
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260906-m3-close-foreign-repo-ik3u/evidence/run_cc685a7dfa45.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD는 b18eddbc268f73773ce8adf0c32b0de2e4d5efe8로 일치한다. 승인본 대비 spec 변경은 AC 체크 표시뿐이며 required_checks 5건은 유지됐다.\nAC-1은 런북의 다섯 절과 check-2 로그, AC-2·3은 tests/test_foreign_close.py의 목록 변경·합성 루트 검사와 check-1의 21건 성공 로그로 확인했다. AC-4는 foreign-close-verdict 원시 로그에서 지정된 대상 단위의 세 조건이 모두 참이며, 대상의 현재 spec·run_bbn8m3r4d80 증거의 close 기록·검토자 PASS 봉투도 읽어 확인했다. AC-6은 open-questions.md:125~129의 Q-62~Q-66과 check-3 로그가 뒷받침한다.\n검사 5건의 원시 로그는 모두 exit 0이며 check-5는 897건 성공을 기록한다. 검사들은 재실행 가능한 형태이고 rerun:false 선언은 없다. 현재 변경 경로는 구현자 allowed_paths 안이다. 현재 계약의 guards는 비어 있고 이번 구현 실행의 승인 대상 행동 위반은 확인되지 않았다.\n증거와 원시 로그의 명령·종료 코드·HEAD·기록된 트리 지문을 대조했다. 파일 수정, 검사 재실행, 해시 계산은 하지 않았다. 지문 재계산과 검토 전후 방어 검사는 위임한 쪽의 책임으로 남는다."
+}

@@ -3,10 +3,16 @@ unit_id: feat-20260906-m3-close-foreign-repo-ik3u
 attempts:
 - n: 1
   run: run_cc685a7dfa45
-  base_sha: 77809a4c4601e757f7f32fb0ac80c61d60df967f
+  base_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
   started_at: '2026-09-06T07:11:11+09:00'
-  result: started
-  failure_class: null
-  note: null
-  settled_at: null
+  result: fail
+  failure_class: outputs
+  note: '1회차 — 구현자 PASS(checks 5/5) · 방어 검사 유효 · 검토자 FAIL [AC_UNMET]. 런북 「무엇이 더 필요한가」 표의 「요구를 인쇄한 명령」
+    열이 실제로는 **그 요구를 충족한 명령**(git commit·envelope build·envelope check·review record 의 성공)을 적었다. close
+    가 그 넷을 요구하며 인쇄한 적이 없다 — 실제로 close 가 인쇄한 요구는 HAS_EVIDENCE(착수 전 dry-run) 와 AC_ALL_CHECKED·REVIEW_VERDICT(3회차
+    뒤) 이고 뒤의 둘은 표에 연결되지 않았다. 비차단 지적 1건: 되돌리기 절의 c3b9eae 전체 revert 는 managed block 275줄도 지우므로 「check-9
+    는 마커가 남아 통과」 설명과 맞지 않는다'
+  settled_at: '2026-09-06T12:04:22+09:00'
+  base_sha_history:
+  - 77809a4c4601e757f7f32fb0ac80c61d60df967f
 reviews: []

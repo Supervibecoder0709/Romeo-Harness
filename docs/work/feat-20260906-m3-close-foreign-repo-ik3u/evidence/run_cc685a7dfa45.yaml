@@ -1,0 +1,154 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_cc685a7dfa45
+task_id: task_656b90783b3c
+dispatch_id: ctx_156193523087
+unit_id: feat-20260906-m3-close-foreign-repo-ik3u
+spec_ref:
+  path: docs/work/feat-20260906-m3-close-foreign-repo-ik3u/spec.md
+  sha256: 6de33dc5dd8058d37b5b8953cdd9398c21d928c5ba51b538fb4cf6bc48e73cc3
+base_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m3-close-foreign-repo-ik3u
+started_at: '2026-09-06T11:57:18+09:00'
+finished_at: '2026-09-06T12:04:00+09:00'
+commands:
+- id: foreign-close-verdict
+  command: python3 tests/test_foreign_close.py --verdict /Users/julliettelee/orca/workspaces/My-Automated-Worker/instagram-dm-sender
+  exit_code: 0
+  started_at: '2026-09-06T11:57:18+09:00'
+  finished_at: '2026-09-06T11:57:18+09:00'
+  seconds: 0.153
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/01-foreign-close-verdict.log
+  log_sha256: 299c4941971a2ca3f0ab09f7d5faff25a43635a2256dd5bb00e931f829fd9429
+  stdout_tail: "2026-09-06T11:45:44+09:00' · 검증 계획 9건 · evidence run 4건 · review 봉투 4건\n      run: 계획\
+    \ 9/9건 기록 · 비0 0건\n      run: 계획 9/9건 기록 · 비0 0건\n      run: 계획 9/9건 기록 · 비0 0건\n      run: 계획 9/9건\
+    \ 기록 · 비0 0건\n      review: role='reviewer' gate_verdict='FAIL'\n      review: role='reviewer' gate_verdict='FAIL'\n\
+    \      review: role='reviewer' gate_verdict='PASS'\n      review: role='reviewer' gate_verdict='PASS'\n\
+    판정: PASS"
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: check-1
+  command: python3 -m unittest tests.test_foreign_close -v
+  exit_code: 0
+  started_at: '2026-09-06T11:57:27+09:00'
+  finished_at: '2026-09-06T11:57:27+09:00'
+  seconds: 0.099
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/02-check-1.log
+  log_sha256: b86e6fec6e96828ba12adf1f028bfcfdcef5b408b33aa1e68469c94b5cf726cd
+  stdout_tail: ''
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: check-2
+  command: for h in '## 무엇이 더 필요한가' '## 어디서 구현하는가' '## 검토자를 어떻게 붙이는가' '## 검증' '## 되돌리기'; do grep -qF "$h"
+    scenarios/12-close-foreign-repo.md || exit 1; done
+  exit_code: 0
+  started_at: '2026-09-06T11:57:27+09:00'
+  finished_at: '2026-09-06T11:57:27+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/03-check-2.log
+  log_sha256: 0385a943bddd22e3d871f93564fdbf891577954bec45b8b35720810f26298182
+  stdout_tail: ''
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: check-3
+  command: test $(grep -cE '^\| Q-[0-9]+ \|.*feat-20260906-m3-close-foreign-repo-ik3u' docs/planning/open-questions.md)
+    -ge 1
+  exit_code: 0
+  started_at: '2026-09-06T11:57:27+09:00'
+  finished_at: '2026-09-06T11:57:27+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/04-check-3.log
+  log_sha256: 3b3d90be895c3cf8e32513b54522a4569f10b7457b9e965ea99fc2c077c4f293
+  stdout_tail: ''
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: check-4
+  command: bin/romeo validate docs/work/feat-20260906-m3-close-foreign-repo-ik3u
+  exit_code: 0
+  started_at: '2026-09-06T11:57:27+09:00'
+  finished_at: '2026-09-06T11:57:27+09:00'
+  seconds: 0.084
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/05-check-4.log
+  log_sha256: 0e6f201202846d14579f9a945fb7217f387f20ee05f572a5a4877bac7ab47fee
+  stdout_tail: "[PASS] docs/work/feat-20260906-m3-close-foreign-repo-ik3u/brief.md lines=62 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/feat-20260906-m3-close-foreign-repo-ik3u/spec.md lines=150 needs_input=0\
+    \ unchecked_ac=6\n    WARN  UNCHECKED_AC 6개"
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-06T11:57:27+09:00'
+  finished_at: '2026-09-06T11:59:32+09:00'
+  seconds: 124.488
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/06-check-5.log
+  log_sha256: a237761fc5af4b83dbb96e932e8bfb7bfb3506ef3aaecdba2a4980f86ef4bd33
+  stdout_tail: ''
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m3-close-foreign-repo-ik3u/.harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-06T12:00:54+09:00'
+  finished_at: '2026-09-06T12:00:54+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/07-reviewer-brief.log
+  log_sha256: da28247fd78be321b3523586deb0c74e6b62ea3456e9921b305283ff33d2bdb0
+  stdout_tail: f4f9020649ad296cfc04e0b74f9b3dee8d8097514ac67a7a059751a0970404df  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260906-m3-close-foreign-repo-ik3u/.harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/reviewer-brief.md
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  exit_code: 0
+  started_at: '2026-09-06T12:00:54+09:00'
+  finished_at: '2026-09-06T12:00:54+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/08-review-tree-before.log
+  log_sha256: 2584507407987bff6e5ff3a72f3e4da63717ada59745316311f0c7da45c50a13
+  stdout_tail: 'M docs/planning/open-questions.md
+
+    ?? scenarios/12-close-foreign-repo.md
+
+    ?? tests/test_foreign_close.py'
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260906-m3-close-foreign-repo-ik3u'
+  exit_code: 0
+  started_at: '2026-09-06T12:04:00+09:00'
+  finished_at: '2026-09-06T12:04:00+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/09-review-tree-after.log
+  log_sha256: 2584507407987bff6e5ff3a72f3e4da63717ada59745316311f0c7da45c50a13
+  stdout_tail: 'M docs/planning/open-questions.md
+
+    ?? scenarios/12-close-foreign-repo.md
+
+    ?? tests/test_foreign_close.py'
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_cc685a7dfa45-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-06T12:04:00+09:00'
+  finished_at: '2026-09-06T12:04:00+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260906-m3-close-foreign-repo-ik3u/run_cc685a7dfa45/10-review-record.log
+  log_sha256: 4adca10bc7b7d2eda80f7d5c4582c15127300a3852d55fd7e140b8d40110173c
+  stdout_tail: 08f4e4383a491e57bff0a0b8eee8336d44519efc1c7421d09f9319273aa1460f  docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_cc685a7dfa45-reviewer.json
+  head_sha: b18eddbc268f73773ce8adf0c32b0de2e4d5efe8
+  dirty_tree_hash: 5202683dd87341bc5b6a04c5eb63e994e6a2b18f7a38a71b0d02fb5ac999282c
+changed_files:
+- docs/planning/open-questions.md
+- scenarios/12-close-foreign-repo.md
+- tests/test_foreign_close.py
+artifact_hash: 886ed6d57aa7c52c7e4d8e080a3a16df59281abb3936d016824a4f2a068e8707
+reviewer: null
+verdict: null
+approvals: []

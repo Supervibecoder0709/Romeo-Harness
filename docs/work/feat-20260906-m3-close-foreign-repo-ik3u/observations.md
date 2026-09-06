@@ -196,3 +196,37 @@ close 까지 가는 데 **추가로 필요했던 것**은 다음이다. 전부 �
 
 되돌리기: `git -C <대상> revert 3738240 c3b9eae 33a1c14` + `rm -rf <대상>/docs/work/feat-20260904-claude-md-rule-conflicts-bbn8`
 
+## close 가 실제로 인쇄한 요구 — 세 번의 실행 전문
+
+1회차 검토자가 잡은 자리가 여기다. 「무엇이 더 필요했나」를 적을 때 **요구를 인쇄한 명령**과
+**그 요구를 충족한 명령**은 다르다. 아래가 전자다 — `close` 가 스스로 인쇄한 것만 담는다.
+
+| 언제 | 명령 | rc | close 가 인쇄한 **요구** |
+| --- | --- | --- | --- |
+| 착수 전 (증거 0건) | `bin/romeo close --unit <id> --root <대상> --dry-run` | 1 | `[FAIL] HAS_EVIDENCE — evidence/*.yaml 없음 — romeo evidence run 으로 만든다` |
+| 3회차 뒤 (검토자 PASS) | `bin/romeo close --unit <id> --root <대상>` | 1 | `[FAIL] AC_ALL_CHECKED — 미체크 5개` · `[FAIL] REVIEW_VERDICT — run_bbn8m3a1c14b-reviewer.json: FAIL (findings 2건); run_bbn8m3c3b9ea2-reviewer.json: FAIL (findings 1건)` |
+| 4회차 뒤 (D-80 재승인) | `bin/romeo close --unit <id> --root <대상>` | 0 | 없음 — `PASS` |
+
+**close 가 요구하지 않은 것도 있다.** 승인 spec 의 커밋 · 작업 계약 2종 · 구현자 결과 계약 · 검토자 절차 파일은
+`close` 의 실패 메시지가 아니라 **RUNBOOK §3.1·§3.3·§3.7 과 결과 계약 스키마**가 요구한 것이고,
+이 관통에서는 그것을 미리 읽고 갖춰 두었기 때문에 close 가 그 자리에서 멈춘 적이 없다.
+그 넷을 「close 가 요구했다」로 적으면 요구한 자리와 인쇄한 자리가 갈린다 — 그것이 1회차 FAIL 의 내용이다.
+
+세 번째 줄이 이 관통의 요점이다: **`REVIEW_VERDICT` 는 증거를 더해서 풀리지 않았다.**
+1·2회차 FAIL 이 「같은 산출물의 판정」이라 살아 있었고, D-80 재승인으로 그 셋이 `REVIEW_SUPERSEDED` 가 된 뒤에야 rc=0 이 됐다.
+
+## 되돌리기에 붙는 조건
+
+`c3b9eae` 를 통째로 `revert` 하면 **부착의 managed block 275줄까지 지워진다** — 그 커밋이 이 단위의 60줄과
+부착 블록을 함께 담았기 때문이다(코디네이터 범위 이탈). 그래서 「되돌린 뒤 check-9(`sha=08dc14bf`)가 마커가 남아
+통과한다」는 성립하지 않는다. 부착 상태까지 되돌리지 않으려면 revert 대신 그 절만 지운다:
+
+```
+python3 - <대상>/CLAUDE.md <<'EOF'
+# 「## 규칙 충돌 해소」 절부터 romeo:managed 마커 시작 줄 직전까지를 지운다
+EOF
+```
+
+또는 `git -C <대상> show 33a1c14:CLAUDE.md > <대상>/CLAUDE.md` 로 **부착 전** 106줄로 되돌린 뒤
+`bin/romeo compile --root <대상>` 으로 마커를 다시 주입한다 — 그 편이 부착 직후 상태를 정확히 재현한다.
+
