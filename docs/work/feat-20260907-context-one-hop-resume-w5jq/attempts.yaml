@@ -1,0 +1,14 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260907-context-one-hop-resume-w5jq
+attempts:
+- n: 1
+  run: run_02812052acd8
+  base_sha: 94a635ac7f5fb81d9f77b8a98fff99f3d58d6766
+  started_at: '2026-09-08T00:01:04+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL findings 2 — ① romeo/context.py: 정본 frontmatter 가 깨지면 그 줄에 「읽을 수 없다」가 붙지 않고 parent·inputs
+    가 조용히 사라진다(AC-5 미충족 · check-5 가 이 조항을 안 본다) ② AC-8: 코디네이터가 브리프에 context 를 다시 돌린 출력을 붙여 증거의 기록(13-context-resume.log
+    · 명령 12건)과 달랐다(그대로 넣지 않았다). ①은 산출물, ②는 코디네이터 절차 오류 — 2회차는 같은 워크트리에서 ① 수정 + 브리프를 기록된 stdout 으로 재구성'
+  settled_at: '2026-09-08T00:20:53+09:00'
+reviews: []
