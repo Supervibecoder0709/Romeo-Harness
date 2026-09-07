@@ -1,0 +1,450 @@
+diff --git a/core/workflows/plan/SKILL.md b/core/workflows/plan/SKILL.md
+index a93052e..d8e1ca0 100644
+--- a/core/workflows/plan/SKILL.md
++++ b/core/workflows/plan/SKILL.md
+@@ -23,6 +23,8 @@ provenance: [anthropics-skills-skill-format]
+    검색한다. 이미 있는 단위가 있으면 새로 만들지 말고 그 id 를 카드 `reuse_hits` 에 넣고
+    "재개 / 재분류 / 새 단위" 중 하나를 제안한다. 여기서 빠뜨려도 카드가 같은 검색을 스스로 한 번 더
+    돌려 인쇄하므로 확정 전에 드러난다 — 이 단계는 사람이 판단할 시간을 앞당길 뿐 유일한 관문이 아니다.
++   **재개**를 제안하거나 고를 때는 `romeo context <id>` 가 인쇄한 목록 — 그 단위의 정본 문서·상위 문서·입력·회차·계약·증거·결과·검토 —
++   을 읽는 범위로 삼는다. 그 밖의 파일은 목록의 파일이 가리킬 때만 연다(K-31 · 1-hop). 목록의 `[없음]` 은 깨진 참조다 — 숨기지 않고 카드에 적는다.
+ 2. **제안 작성.** `core/schemas/proposal.json` 형식으로 채운다.
+    - 사실은 요청·저장소에서 확인한 것만. 가정은 확인하지 않은 전제. 미확인은 확인이 필요한 것.
+    - `candidate.unit` 은 `none / T0 / T1 / T2`, `mode` 는 `delivery / discovery / experiment`,
+diff --git a/romeo/cli.py b/romeo/cli.py
+index 778564f..9c5d3e4 100644
+--- a/romeo/cli.py
++++ b/romeo/cli.py
+@@ -1,4 +1,4 @@
+-"""romeo CLI — route · card · find · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
++"""romeo CLI — route · card · find · context · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
+ import argparse
+ import json
+ import sys
+@@ -87,6 +87,17 @@ def cmd_find(args):
+     return 0
+ 
+ 
++def cmd_context(args):
++    """1-hop 재개 — 한 단위 id 로 다음 세션이 읽을 파일 목록을 인쇄한다. 없는 참조는 [없음] 으로 남기고 exit 0 이다."""
++    from .context import format_context, unit_context
++    res = unit_context(_root(args), args.unit)
++    if args.json:
++        print(json.dumps(res, ensure_ascii=False, indent=1))
++    else:
++        print(format_context(res))
++    return 0
++
++
+ def cmd_new(args):
+     from .docs import create_unit
+     from .policy import load_project_state, route
+@@ -450,6 +461,12 @@ def build_parser():
+     s.add_argument("--json", action="store_true")
+     s.set_defaults(fn=cmd_find)
+ 
++    s = sub.add_parser("context", help="1-hop 재개 — 한 단위 id 로 다음 세션이 읽을 파일 목록 (/plan 1단계의 재개)")
++    s.add_argument("unit", help="작업 단위 id (docs/work/<id>)")
++    s.add_argument("--root", help="프로젝트 루트")
++    s.add_argument("--json", action="store_true")
++    s.set_defaults(fn=cmd_context)
++
+     s = sub.add_parser("new", help="docs/work/<id>/ 문서 패키지 생성")
+     g = s.add_mutually_exclusive_group(required=True)
+     g.add_argument("--classification")
+diff --git a/romeo/context.py b/romeo/context.py
+new file mode 100644
+index 0000000..bfafe98
+--- /dev/null
++++ b/romeo/context.py
+@@ -0,0 +1,187 @@
++"""1-hop 재개 — 한 단위 id 로 다음 세션이 읽어야 할 파일 목록을 낸다.
++
++`/plan` 절차 1단계는 겹치는 단위를 찾으면 「재개」를 제안한다(M1 · `romeo find`). 그런데 재개하는 세션이
++**무엇을 읽어야 하는지**는 어디에도 없었다 — 사람은 단위 폴더를 눈으로 훑고, 상위 문서를 찾아 올라가고,
++어느 증거가 검사 기록인지 종료 검사의 출력을 다시 읽어야 했다. 이 명령이 그 목록을 낸다.
++
++**1-hop 만 간다(K-31).** 목록은 단위 폴더 안의 파일 전부와, frontmatter 가 가리키는 것 — `parent` 의
++charter(없으면 spec)와 `inputs` 의 각 경로 — 까지다. 부모의 부모, 입력 단위의 다른 파일, 계획·결정 문서는
++넣지 않는다. 저장소 수준의 진입점(progress 블록·git log·CI)은 따로 있고, 그 너머는 목록의 파일이
++가리킬 때 연다.
++
++**드러내되 판정하지 않는다.** 파일마다 역할 한 낱말과 그 파일에 적힌 사실(status·회차 결과·gate_verdict·
++findings 수·등록 여부)만 붙인다. 다음 행동을 추천하지 않는다 — 그것은 사람과 라우터의 몫이다(K-61).
++없는 참조는 숨기지 않고 `[없음]` 으로 인쇄하되 종료 코드는 0 이다 — 드러내기가 차단으로 자라지 않게 한다.
++없는 단위 id 만 오류다(exit 1, 스택 트레이스 아님 — `romeo.docs.find_unit_dir` 의 FileNotFoundError 를
++CLI 가 한 줄로 인쇄한다).
++"""
++from pathlib import Path
++
++from .docs import find_unit_dir
++from .frontmatter import read as _read_frontmatter
++from .util import load_json, load_yaml
++
++#: 인쇄 순서. 정본이 먼저다 — 승인·수용 기준·검증 계획이 거기 있다.
++ROLES = ("정본", "상위", "입력", "회차", "계약", "증거", "결과", "검토", "기타")
++#: 정본 문서. spec 이 앞이다 — id·title·승인의 정본이고, 나머지는 같은 분류의 다른 면이다.
++UNIT_DOCS = ("spec.md", "brief.md", "charter.md")
++UNIT_DOC_NOTES = {
++    "spec.md": "Tech Spec(승인·수용 기준·검증 계획)",
++    "brief.md": "Compact Brief",
++    "charter.md": "Charter(마일스톤 계획)",
++}
++#: 단위 폴더의 하위 디렉터리와 그 역할. 여기 없는 디렉터리의 파일은 「기타」다.
++SUBDIR_ROLES = {"task": "계약", "evidence": "증거", "result": "결과", "review": "검토"}
++ATTEMPTS = "attempts.yaml"
++
++
++def _short(value, n=12):
++    return str(value)[:n] if value else "-"
++
++
++def _read(fn, path):
++    """파일 하나가 깨졌다고 목록 전체가 멈추지 않는다 — 그 파일의 사실만 비운다."""
++    try:
++        return fn(path)
++    except Exception:
++        return None
++
++
++def _note_attempts(data):
++    if not isinstance(data, dict):
++        return "읽을 수 없다"
++    attempts = data.get("attempts") or []
++    parts = []
++    for a in attempts:
++        if not isinstance(a, dict):
++            continue
++        fc = a.get("failure_class")
++        parts.append(f"{a.get('n')} {a.get('result')}" + (f"({fc})" if fc else ""))
++    note = f"회차 {len(attempts)}" + (" · " + " · ".join(parts) if parts else "")
++    reviews = data.get("reviews") or []
++    if reviews:
++        note += f" · 재검토 {len(reviews)}"
++    return note
++
++
++def _note_task(data):
++    if not isinstance(data, dict):
++        return "읽을 수 없다"
++    return f"{data.get('role') or '?'} · base {_short(data.get('base_sha'))}"
++
++
++def _note_result(data):
++    if not isinstance(data, dict):
++        return "읽을 수 없다"
++    note = f"{data.get('role') or '?'} · {data.get('gate_verdict') or '?'}"
++    if data.get("blocked_reason"):
++        note += f" · blocked {data['blocked_reason']}"
++    return note
++
++
++def _note_review(data):
++    if not isinstance(data, dict):
++        return "읽을 수 없다"
++    return f"{data.get('gate_verdict') or '?'} · findings {len(data.get('findings') or [])}"
++
++
++def _note_evidence(data, registered):
++    if not isinstance(data, dict):
++        return ("등록됨(검사 기록)" if registered else "미등록") + " · 읽을 수 없다"
++    n = len(data.get("commands") or [])
++    return (f"등록됨(검사 기록)" if registered else "미등록") + f" · 명령 {n}건 · head {_short(data.get('head_sha'))}"
++
++
++def _rel(path, root):
++    try:
++        return Path(path).resolve().relative_to(Path(root).resolve()).as_posix()
++    except ValueError:
++        return Path(path).resolve().as_posix()
++
++
++def unit_context(project_root=".", unit_id=""):
++    """한 단위의 1-hop 파일 목록. 단위 폴더가 없으면 FileNotFoundError(CLI 가 exit 1 로 인쇄한다).
++
++    반환은 `unit`(id·title·status·승인·종료·parent·dir) · `files`(path·role·exists·note 목록, 인쇄 순서) ·
++    `missing`(files 중 exists 가 거짓인 path) 이다. 없는 참조는 목록에 남는다 — 지우면 왜 재개가 막히는지 사라진다.
++    """
++    root = Path(project_root).resolve()
++    udir = find_unit_dir(root, unit_id)
++    fm = {}
++    for name in UNIT_DOCS:
++        doc = udir / name
++        if doc.is_file():
++            got = _read(_read_frontmatter, doc)
++            fm = (got[0] if got else None) or {}
++            break
++
++    files, seen = [], set()
++
++    def add(path, role, note="", order=0):
++        rel = _rel(path, root)
++        if rel in seen:
++            return
++        seen.add(rel)
++        files.append({"path": rel, "role": role, "exists": Path(path).is_file(), "note": note, "_order": order})
++
++    # 정본 — 있는 것만, spec 이 앞.
++    for i, name in enumerate(UNIT_DOCS):
++        if (udir / name).is_file():
++            add(udir / name, "정본", UNIT_DOC_NOTES[name], order=i)
++
++    # 상위 — parent 의 charter, 없으면 spec. 둘 다 없으면 charter 자리를 [없음] 으로 남긴다.
++    parent = fm.get("parent")
++    if parent:
++        pdir = root / "docs" / "work" / str(parent)
++        target = next((pdir / n for n in ("charter.md", "spec.md") if (pdir / n).is_file()), pdir / "charter.md")
++        add(target, "상위", f"parent {parent} · " + ("Charter(마일스톤 계획)" if target.name == "charter.md" else "Tech Spec"))
++
++    # 입력 — 단위 폴더 기준 상대 경로(K-62 의 등록 방식 그대로).
++    for raw in fm.get("inputs") or []:
++        add(udir / str(raw), "입력", f"inputs: {raw}")
++
++    # 회차
++    if (udir / ATTEMPTS).is_file():
++        add(udir / ATTEMPTS, "회차", _note_attempts(_read(load_yaml, udir / ATTEMPTS)))
++
++    # 계약·증거·결과·검토·기타 — 폴더 안 파일 전부. 위에서 이미 넣은 것은 그 역할을 지킨다.
++    registered = {str(x) for x in (fm.get("evidence") or [])}
++    for p in sorted(x for x in udir.rglob("*") if x.is_file()):
++        rel_u = p.relative_to(udir).as_posix()
++        if rel_u in UNIT_DOCS or rel_u == ATTEMPTS:
++            continue
++        top = rel_u.split("/", 1)[0] if "/" in rel_u else None
++        role = SUBDIR_ROLES.get(top, "기타")
++        if role == "계약":
++            note = _note_task(_read(load_json, p))
++        elif role == "증거":
++            note = _note_evidence(_read(load_yaml, p), rel_u in registered)
++        elif role == "결과":
++            note = _note_result(_read(load_json, p))
++        elif role == "검토":
++            note = _note_review(_read(load_json, p))
++        else:
++            note = "frontmatter 에 등록되지 않은 산출물" if top == "inputs" else ""
++        add(p, role, note)
++
++    files.sort(key=lambda f: (ROLES.index(f["role"]), f["_order"], f["path"]))
++    for f in files:
++        del f["_order"]
++    unit = {
++        "id": str(fm.get("id") or unit_id), "title": str(fm.get("title") or ""),
++        "status": fm.get("status"), "approved_at": fm.get("approved_at"), "closed_at": fm.get("closed_at"),
++        "parent": parent, "dir": _rel(udir, root),
++    }
++    return {"unit": unit, "files": files, "missing": [f["path"] for f in files if not f["exists"]]}
++
++
++def format_context(res):
++    u = res["unit"]
++    lines = [f"romeo context {u['id']} — {u['title']}",
++             f"status {u['status'] or '-'} · 승인 {_short(u['approved_at'], 10)} · 종료 {_short(u['closed_at'], 10)}"
++             f" · parent {u['parent'] or '-'} · 파일 {len(res['files'])} · 없음 {len(res['missing'])}"]
++    for f in res["files"]:
++        tag = f"[{f['role']}]" if f["exists"] else "[없음]"
++        note = (f["role"] + " · " if not f["exists"] else "") + (f["note"] or "")
++        lines.append(f"{tag} {f['path']}" + (f" — {note}" if note else ""))
++    return "\n".join(lines)
+diff --git a/tests/test_context_resume.py b/tests/test_context_resume.py
+new file mode 100644
+index 0000000..cf04e47
+--- /dev/null
++++ b/tests/test_context_resume.py
+@@ -0,0 +1,197 @@
++"""M4 두 번째 마일스톤 — 「1-hop 재개」 요구가 실제로 집행되는가(§11).
++
++`/plan` 절차 1단계는 겹치는 단위가 있으면 「재개」를 제안하라고 **요구**하지만, 재개하는 세션이 무엇을
++읽어야 하는지는 어디에도 없었다 — 요구만 있고 집행이 없는 모양이다. 이 검사가 셋을 같은 자리에서 본다.
++
++| # | 어느 사건에서 보는가 | 어느 문서를 읽는가 | 무엇이 참이어야 충족인가 |
++| --- | --- | --- | --- |
++| AC-1 | `romeo context` 실행 | 단위 폴더의 파일 전부 | 폴더 안 파일 누락 0 · 역할은 정해진 어휘 · 정본(spec)이 먼저 |
++| AC-2 | 같은 실행 | frontmatter 의 `parent`·`inputs` | 부모의 charter 와 입력의 각 경로는 있고, 그 너머(입력 단위의 다른 파일·부모의 증거)는 없다 |
++| AC-3 | 없는 id 로 실행 | — | exit 1 · 한 줄 오류 · 스택 트레이스 없음 |
++| AC-4 | git 이력 없는 루트에서 실행 | 없는 파일을 가리키는 frontmatter | `[없음]` 으로 인쇄하고 exit 0 — 숨기지도 막지도 않는다 |
++| AC-5 | 같은 실행 | attempts·review·evidence 파일 | 회차 결과·판정·findings 수·등록 여부가 파일에 적힌 값 그대로다. 추천 문장은 없다 |
++| AC-6 | 저장소의 모든 단위 | 31개 단위 폴더 | 전부 exit 0 이고 깨진 참조 0 |
++| AC-7 | 절차 문서 로드 | `core/workflows/plan/SKILL.md` 의 **1단계 본문만** | 거기 적힌 이름으로 **실제로 실행해** 단위의 spec 경로가 목록에 나온다 |
++
++**반례는 빈 값이 아니라 그럴듯한 거짓 값이다.** 여기서 그것은 「단위 폴더를 `ls` 한 목록」이다 — 형태는 파일
++목록이지만 상위 문서와 입력이 없고(재개하는 세션이 charter 를 못 찾는다), 어느 증거가 검사 기록인지·어느
++회차가 어떻게 끝났는지 말하지 않는다. AC-2·AC-5 가 겨누는 것이 그 상태다. AC-7 이 「이름이 CLI 에 있는가」로
++만족되지 않는 이유는 M1 과 같다 — 1단계 본문에는 `romeo find` 도 있고, 그것은 폴더 경로까지만 낸다.
++
++**전부 판별 검사다** — 명령이 없던 상태에서는 모듈 import 부터 실패한다.
++"""
++import json
++import re
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from romeo.context import ROLES, unit_context
++
++ROOT = Path(__file__).resolve().parents[1]
++
++#: 회차 2·검토 봉투 2·계약 4·증거 2·등록된 입력 1 을 가진 닫힌 단위 — 목록이 무엇을 담아야 하는지의 기준점.
++CLOSED_UNIT = "feat-20260907-judge-revision-base-sha-pwt8"
++#: parent 와 inputs 를 둘 다 가진 단위 — 1-hop 의 경계를 가른다.
++LINKED_UNIT = "feat-20260906-m3-close-foreign-repo-ik3u"
++LINKED_PARENT = "init-20260904-attach-payload-manual-rreq"
++LINKED_INPUT_UNIT = "feat-20260904-m2-router-foreign-repo-ct5h"
++NO_SUCH_UNIT = "feat-20260101-no-such-unit-zzzz"
++ORPHAN = "chg-20260101-orphan-abcd"
++ORPHAN_PARENT = "init-20260101-gone-zzzz"
++
++
++def _romeo(*argv, cwd=ROOT):
++    return subprocess.run([sys.executable, str(ROOT / "bin" / "romeo"), *argv],
++                          capture_output=True, text=True, cwd=str(cwd))
++
++
++def _paths(res):
++    return [f["path"] for f in res["files"]]
++
++
++class TestContextCommand(unittest.TestCase):
++
++    def test_lists_every_file_in_the_unit_folder_with_a_role(self):
++        """AC-1 — 폴더 안 파일 누락 0, 역할은 정해진 어휘, 정본이 먼저."""
++        res = unit_context(ROOT, CLOSED_UNIT)
++        udir = ROOT / "docs" / "work" / CLOSED_UNIT
++        on_disk = {p.relative_to(ROOT).as_posix() for p in udir.rglob("*") if p.is_file()}
++        self.assertGreater(len(on_disk), 5, "기준 단위의 폴더가 비어 있으면 이 검사는 아무것도 확인하지 않는다")
++        self.assertEqual(on_disk - set(_paths(res)), set(), "폴더 안 파일이 목록에서 빠졌다")
++        self.assertTrue(all(f["role"] in ROLES for f in res["files"]), [f["role"] for f in res["files"]])
++        self.assertEqual(res["files"][0]["path"], f"docs/work/{CLOSED_UNIT}/spec.md")
++        self.assertEqual(res["files"][0]["role"], "정본")
++        roles = {f["path"]: f["role"] for f in res["files"]}
++        self.assertEqual(roles[f"docs/work/{CLOSED_UNIT}/attempts.yaml"], "회차")
++        self.assertEqual(roles[f"docs/work/{CLOSED_UNIT}/inputs/probe-2026-09-07.patch"], "입력",
++                         "frontmatter inputs 에 등록된 파일은 「기타」가 아니라 「입력」이다")
++        self.assertEqual({roles[p] for p in roles if f"/{CLOSED_UNIT}/review/" in p}, {"검토"})
++        # `docs/work/*/task/` 는 git 에 없다(.gitignore) — 새 체크아웃에는 없고 워커 트리에만 있으므로
++        # 「계약」역할은 AC-4 의 합성 단위에서 본다. 여기서는 있으면 그 역할이어야 한다는 것만 본다.
++        self.assertLessEqual({roles[p] for p in roles if f"/{CLOSED_UNIT}/task/" in p}, {"계약"})
++        self.assertEqual(res["missing"], [])
++        text = _romeo("context", CLOSED_UNIT)
++        self.assertEqual(text.returncode, 0, text.stderr)
++        self.assertEqual(text.stdout.splitlines()[2].split(" ")[1], f"docs/work/{CLOSED_UNIT}/spec.md",
++                         "인쇄 첫 파일 줄은 spec 이어야 한다")
++
++    def test_follows_parent_and_inputs_exactly_one_hop(self):
++        """AC-2 — 부모의 charter 와 입력의 각 경로는 있고, 그 너머는 없다."""
++        res = unit_context(ROOT, LINKED_UNIT)
++        paths = _paths(res)
++        roles = {f["path"]: f["role"] for f in res["files"]}
++        parent_charter = f"docs/work/{LINKED_PARENT}/charter.md"
++        input_spec = f"docs/work/{LINKED_INPUT_UNIT}/spec.md"
++        self.assertIn(parent_charter, paths)
++        self.assertIn(input_spec, paths)
++        self.assertEqual(roles[parent_charter], "상위")
++        self.assertEqual(roles[input_spec], "입력")
++        beyond = [p for p in paths
++                  if (p.startswith(f"docs/work/{LINKED_INPUT_UNIT}/") and p != input_spec)
++                  or (p.startswith(f"docs/work/{LINKED_PARENT}/") and p != parent_charter)]
++        self.assertEqual(beyond, [], "1-hop 을 넘었다 — 입력 단위의 다른 파일이나 부모의 증거가 목록에 있다")
++        # 그 너머가 실제로 존재해야 위 단언이 무엇인가를 가른다.
++        self.assertTrue((ROOT / "docs/work" / LINKED_INPUT_UNIT / "evidence").is_dir())
++        self.assertTrue((ROOT / "docs/work" / LINKED_PARENT / "evidence").is_dir())
++        self.assertEqual(res["missing"], [])
++
++    def test_unknown_unit_is_refused_with_exit_1_and_no_traceback(self):
++        """AC-3 — 없는 id 는 한 줄 오류와 exit 1 이다."""
++        r = _romeo("context", NO_SUCH_UNIT)
++        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
++        self.assertIn("ERROR", r.stderr)
++        self.assertIn(NO_SUCH_UNIT, r.stderr)
++        self.assertNotIn("Traceback", r.stdout + r.stderr)
++
++    def test_missing_reference_is_printed_not_hidden(self):
++        """AC-4 — git 이력 없는 루트에서, parent·inputs 가 가리키는 파일이 없으면 [없음] 으로 인쇄하고 exit 0."""
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp)
++            udir = root / "docs" / "work" / ORPHAN
++            udir.mkdir(parents=True)
++            (udir / "spec.md").write_text(
++                f"---\nid: {ORPHAN}\ntype: spec\ntitle: 고아 단위\nstatus: active\n"
++                f"parent: {ORPHAN_PARENT}\ninputs: [../{ORPHAN_PARENT}/charter.md, notes/missing.md]\n"
++                f"evidence: [evidence/run_reg.yaml]\n---\n# 고아\n",
++                encoding="utf-8")
++            # 워커 트리에만 있는 것들 — 계약(git 에 없다)·등록되지 않은 증거·결과 계약.
++            (udir / "task").mkdir()
++            (udir / "task" / "run_reg-implementer.json").write_text(
++                json.dumps({"role": "implementer", "base_sha": "0123456789abcdef0123456789abcdef01234567"}), encoding="utf-8")
++            (udir / "evidence").mkdir()
++            (udir / "evidence" / "run_reg.yaml").write_text("head_sha: abcdef0123456789\ncommands: [{id: c1}, {id: c2}]\n", encoding="utf-8")
++            (udir / "evidence" / "run_stray.yaml").write_text("head_sha: abcdef0123456789\ncommands: []\n", encoding="utf-8")
++            (udir / "result").mkdir()
++            (udir / "result" / "run_reg-implementer.json").write_text(
++                json.dumps({"role": "implementer", "gate_verdict": "FAIL", "blocked_reason": None}), encoding="utf-8")
++            self.assertFalse((root / ".git").exists(), "이 검사는 git 이력이 없는 루트를 겨눈다")
++            r = _romeo("context", ORPHAN, "--root", str(root), "--json", cwd=root)
++            self.assertEqual(r.returncode, 0, r.stderr)
++            res = json.loads(r.stdout)
++            self.assertEqual(set(res["missing"]),
++                             {f"docs/work/{ORPHAN_PARENT}/charter.md", f"docs/work/{ORPHAN}/notes/missing.md"})
++            self.assertTrue([f for f in res["files"] if f["path"].endswith("/spec.md") and f["exists"]])
++            by = {f["path"].split(f"{ORPHAN}/", 1)[-1]: f for f in res["files"] if f["path"].startswith(f"docs/work/{ORPHAN}/")}
++            self.assertEqual(by["task/run_reg-implementer.json"]["role"], "계약")
++            self.assertIn("base 0123456789ab", by["task/run_reg-implementer.json"]["note"])
++            self.assertIn("등록됨", by["evidence/run_reg.yaml"]["note"])
++            self.assertIn("명령 2건", by["evidence/run_reg.yaml"]["note"])
++            self.assertIn("미등록", by["evidence/run_stray.yaml"]["note"])
++            self.assertEqual(by["result/run_reg-implementer.json"]["role"], "결과")
++            self.assertIn("FAIL", by["result/run_reg-implementer.json"]["note"])
++            text = _romeo("context", ORPHAN, "--root", str(root), cwd=root)
++            self.assertEqual(text.returncode, 0, text.stderr)
++            self.assertEqual(text.stdout.count("[없음]"), 2, text.stdout)
++            self.assertIn("notes/missing.md", text.stdout)
++
++    def test_facts_come_from_the_files_not_from_judgment(self):
++        """AC-5 — 회차 결과·판정·findings 수·등록 여부는 파일에 적힌 값 그대로고, 추천 문장은 없다."""
++        res = unit_context(ROOT, CLOSED_UNIT)
++        notes = {f["path"]: f["note"] for f in res["files"]}
++        base = f"docs/work/{CLOSED_UNIT}"
++        self.assertIn("1 fail", notes[f"{base}/attempts.yaml"])
++        self.assertIn("2 pass", notes[f"{base}/attempts.yaml"])
++        self.assertIn("FAIL", notes[f"{base}/review/run_4db4be703188-reviewer.json"])
++        self.assertIn("PASS", notes[f"{base}/review/run_ae9a7eac2c66-reviewer.json"])
++        self.assertIn("findings 1", notes[f"{base}/review/run_ae9a7eac2c66-reviewer.json"])
++        self.assertIn("등록됨", notes[f"{base}/evidence/run_ae9a7eac2c66.yaml"])
++        self.assertIn("등록됨", notes[f"{base}/evidence/run_4db4be703188.yaml"])
++        self.assertIn("head 3363f8d3005e", notes[f"{base}/evidence/run_ae9a7eac2c66.yaml"])
++        self.assertEqual(res["unit"]["status"], "done")
++        text = _romeo("context", CLOSED_UNIT).stdout
++        self.assertIn("status done", text)
++        for word in ("추천", "다음 행동"):
++            self.assertNotIn(word, text)
++
++    def test_every_unit_in_this_repo_resolves_without_a_missing_reference(self):
++        """AC-6 — 저장소의 모든 단위에서 깨진 참조 0 (전수)."""
++        units = sorted(p.name for p in (ROOT / "docs" / "work").iterdir() if p.is_dir())
++        self.assertGreater(len(units), 20)
++        broken = {u: unit_context(ROOT, u)["missing"] for u in units}
++        self.assertEqual({u: m for u, m in broken.items() if m}, {})
++
++
++class TestProcedureNamesTheCommandThatListsTheUnit(unittest.TestCase):
++    """AC-7 — 요구하는 자리(절차 1단계)와 실제로 목록을 내는 것이 같은가."""
++
++    def _step1(self):
++        text = (ROOT / "core/workflows/plan/SKILL.md").read_text(encoding="utf-8")
++        self.assertIn("## 절차", text)
++        body = text.split("## 절차", 1)[1]
++        # 1단계 본문만 읽는다 — 앞부분을 함께 읽으면 역할 분담 표의 다른 명령이 잡힌다(M1 AC-5 의 실측).
++        return re.split(r"\n2\. ", body, maxsplit=1)[0]
++
++    def test_step1_names_a_command_that_lists_the_units_spec(self):
++        names = sorted(set(re.findall(r"`romeo ([a-z][a-z0-9-]*)", self._step1())))
++        self.assertTrue(names, "1단계가 재개할 때 읽을 목록을 내는 명령을 지정해야 한다")
++        target = f"docs/work/{CLOSED_UNIT}/spec.md"
++        worked = [n for n in names
++                  if (lambda r: r.returncode == 0 and target in r.stdout)(_romeo(n, CLOSED_UNIT, "--json"))]
++        self.assertTrue(worked, f"1단계가 지정한 명령 {names} 중 어느 것도 단위의 spec 경로를 목록으로 내지 못한다")
++
++
++if __name__ == "__main__":
++    unittest.main()
