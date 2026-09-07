@@ -2,7 +2,7 @@
 id: progress
 type: planning
 status: active
-updated: 2026-09-05
+updated: 2026-09-07
 authority: derived
 ---
 
@@ -17,14 +17,16 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `HEAD` · 2026-09-06)
+## 지금 상태 (기준 `HEAD` · 2026-09-07)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
 - **마일스톤:** M2·M3 완료. 부착 이니셔티브 `init-20260904-attach-payload-manual-rreq` 는 M1·M2·M3 이 닫혔고
   **M4 가 마지막이다 — M4 완료 = 이니셔티브 종료.**
-- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260906-m4-attach-requirements-3mcv`(M4 · **2회차 close PASS** ·
+- **활성 작업 단위:** `feat-20260907-close-review-reapproval-reach-bjec`(정비 · Q-68 · **3회차** — 1·2회차 검토자
+  FAIL findings 3건이 전부 AC 문장의 결함이라 AC-1·2·7 과 AC-8 을 차례로 좁혀 재승인했다, D-80 · §10 재검토는
+  `attempts.yaml` 의 `reviews`). 직전 완료는 `feat-20260906-m4-attach-requirements-3mcv`(M4 · **2회차 close PASS** ·
   3/3 · 재실행 3/3 · 검토자 PASS findings 0 · 통합 `affb8ad`) — **이 이니셔티브가 닫혔다.** 세 관통이 낸
   Q-53~Q-68 **16건 전부**가 `docs/requirements/attach-requirements.md` 의 「올린 것」 9·「뺀 것」 7로 갈렸고,
   그 목록은 `open-questions.md` 에서 출처 집합을 **읽어** 대조하는 검사(`tests/test_attach_requirements.py`)가 지킨다 —
@@ -36,12 +38,13 @@ authority: derived
   그 전에 **관통 사이 정비 1회**를 권한다(아래 후보).
 - **blocker:** 없음. 워커·프로브 워크트리는 전부 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
 - **최신 CI:** `654ad5a` run `34038564931` **success**. 미푸시 없음 — 여기까지 전부 푸시됐다.
-- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·58~61·62~68·**69~70**(`open-questions.md`).
+- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·43·46·49~57·58~61·62~67·69~70·**71~77**(`open-questions.md`).
+  Q-68 은 위 활성 단위가 닫고, 그 단위가 §12 로 남긴 것이 Q-71~Q-77 이다.
   Q-53~Q-68 은 위 목록이 갈랐다 — 「올린 것」은 M5 가, 「뺀 것」은 정비가 가져간다.
   이번 관통이 낸 것은 **Q-69·Q-70** — 재작업 위임에 이전 회차 findings 를 넘기는 자리가 없다 ·
   판정 커밋으로 `<base-sha>` 를 올릴 때 워크트리의 `attempts.yaml` 사본이 병합을 막는다(두 자리에서 났다).
-- **다음 정비 후보:** Q-68 → Q-64 → Q-69. 앞 둘은 `close` 의 검토 판정 자리이고 Q-68 은 무효한 검토가
-  유효한 검토를 막는다. Q-69 는 재작업 위임에서 사람이 잊으면 그대로 새는 자리다.
+- **다음 정비 후보:** Q-64 → Q-69(Q-68 은 위 활성 단위가 가져갔다). Q-64 도 `close` 의 검토 판정 자리이고,
+  Q-69 는 재작업 위임에서 사람이 잊으면 그대로 새는 자리다.
 - **진단 (2026-09-07):** 자가봉착의 뿌리는 **판정하는 하네스와 판정받는 하네스가 같은 리비전**이라는 것 —
   자기참조 9건·드리프트 11건·단위당 Q 2.4건. 권고 3건과 근거는 `docs/reviews/2026-09-07-self-application-diagnosis/`
   (권고 1 「판정 리비전 분리」가 위 후보보다 앞선다 · 선행 Q-66·Q-67).

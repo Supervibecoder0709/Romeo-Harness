@@ -664,7 +664,10 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
     `product` 는 지금 닫으려는 산출물(검사 기록 run 의 것)이고, 다른 산출물을 본 판정은 PASS 든 FAIL 이든 이 close 의 대상이
     아니다 — 낡은 PASS 로 새 산출물이 닫히지 않고, 낡은 FAIL 이 새 산출물을 막지 않는다(체크리스트 41). 그런 봉투는 지우지
     않고 `REVIEW_SUPERSEDED` 로 인쇄한다(동등성 게이트의 관측 표본이다). 산출물을 식별하지 못하는 봉투는 미검증이다 — PASS 로도
-    지나간 것으로도 세지 않는다. 검사만 다시 기록해도 산출물이 같으면 같은 판정 대상이다. 앵커 검사 5개는 산출물과 무관하게 모든 봉투에 걸린다.
+    지나간 것으로도 세지 않는다. **예외는 재승인 하나뿐이다** — 승인 키는 봉투가 가리킨 계약에서 읽으므로 산출물과 무관하고,
+    기록된 그대로인 봉투가 재승인 전 승인으로 낸 판정이면 산출물을 확인하지 못해도 낡은 것으로 분류한다. 지금 승인의 봉투는
+    산출물을 확인할 수 없으면 그대로 미검증이다 — 차단을 걷는 것은 사람의 재승인뿐이다.
+    검사만 다시 기록해도 산출물이 같으면 같은 판정 대상이다. 앵커 검사 5개는 산출물과 무관하게 모든 봉투에 걸린다.
     현재 산출물의 봉투는 그 run 의 증거에 **기록된 그대로**여야 한다(`romeo review record` 가 남긴 sha256 봉인) — 판정 문자열은
     다른 어떤 앵커에도 묶이지 않는다.
 
@@ -718,6 +721,20 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
                 # 미봉인 값임을 인쇄한다. 지금 HEAD 를 가리키는 미봉인 봉투는 그대로 미검증이다(위조 방향을 막는다).
                 stale.append((n, e, f"봉인 이전 형식의 기록이라 산출물을 증명하지 못했지만 증거의 head_sha {head[:7]} 가 지금 HEAD 가 아니다 — {why}"))
                 continue
+            # 승인 키는 봉투가 가리킨 **계약**에서 읽으므로 산출물 식별과 무관하다. 사람이 재승인한 뒤에는 이전 승인으로 낸 판정이
+            # 지금의 수용 기준을 본 적이 없으므로 이 close 의 대상이 아니다 — 그 봉투의 방어 검사가 깨져 있어도 마찬가지다.
+            # 이 분기가 없으면 그런 봉투가 먼저 미검증으로 걸려 재승인을 보는 자리에 닿지 못하고, 사람의 재승인이 듣지 않는다.
+            # 다만 '재승인 전' 이라는 것도 봉투가 **기록된 그대로**일 때만 성립한다 — 계약 포인터를 옛 계약으로 돌리면 지금 승인의
+            # FAIL 이 낡은 것으로 보이기 때문이다. 그 편집은 기록 명령이 남긴 sha256 봉인이 되막는다(K-51).
+            approval = _envelope_approval_key(project_root, unit_id, e)
+            if now_key is not None and approval is not None and approval != now_key:
+                recorded, seal = _review_record_sealed(project_root, udir, e, n)
+                if recorded is True:
+                    stale.append((n, e, f"산출물을 확인하지 못했지만({why}) "
+                                        f"재승인 전 승인(approved_at {approval[0]})으로 낸 판정"))
+                    continue
+                # 재승인이 왜 듣지 않았는지가 차단 사유에 남아야 한다 — 봉인이 서지 않은 봉투는 낡은 것으로도 세지 않는다.
+                why = f"{why} · 봉인 대조: {seal or '봉투 기록을 대조할 수 없다'}"
             unknown.append((n, e, why))
             continue
         approval = _envelope_approval_key(project_root, unit_id, e)
@@ -855,6 +872,27 @@ def _reviewed_product(project_root, udir, unit_id, env):
         return None, None, (f"evidence_ref 가 지목한 산출물({_product_text(seen)})이 검토 run {run} 이 기록한 산출물"
                             f"({_product_text(own)})과 다르다 — 판정이 본 것과 다른 증거를 가리킨다")
     return own, own_rec, None
+
+
+def _review_record_sealed(project_root, udir, env, name):
+    """봉투가 그 검토 run 의 증거에 **기록된 그대로**인가 — 산출물 식별과 무관하게 본다. (상태, 이유)
+
+    `_reviewed_product` 는 방어 검사가 성립할 때만 그 run 의 증거를 함께 돌려준다. 재승인 전 판정을 가려내는 데는
+    산출물이 필요 없고 봉인만 필요하므로 여기서 그 증거를 따로 로드한다 — 산출물을 확인하지 못한 봉투에도
+    '기록된 그대로인가' 는 물을 수 있다. 산출물 대조(`product`)는 걸지 않는다: 그 값이 바로 여기서 읽을 수 없는 것이다."""
+    run = _run_of_envelope(env)
+    if run is None:
+        return None, "작업 계약 경로가 <run>-<role>.json 규약이 아니라 검토 run 의 증거를 찾을 수 없다"
+    own_path = Path(udir) / "evidence" / f"{run}.yaml"
+    if not own_path.is_file():
+        return None, f"검토 run {run} 의 증거({run}.yaml)가 없어 봉투 기록을 찾을 수 없다"
+    try:
+        own_rec = load_yaml(own_path)
+    except Exception as exc:
+        return None, f"검토 run {run} 의 증거를 읽을 수 없다 ({exc})"
+    if not isinstance(own_rec, dict):
+        return None, f"검토 run {run} 의 증거가 증거 기록(YAML 매핑)이 아니다"
+    return review_record_state(project_root, own_rec, Path(udir) / "review" / name)
 
 
 def _legacy_head(project_root, udir, unit_id, env):

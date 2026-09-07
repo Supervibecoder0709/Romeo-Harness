@@ -1,0 +1,186 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_1668ac8bf26e
+task_id: task_a315a9eda7dc
+dispatch_id: ctx_319891377683
+unit_id: feat-20260907-close-review-reapproval-reach-bjec
+spec_ref:
+  path: docs/work/feat-20260907-close-review-reapproval-reach-bjec/spec.md
+  sha256: 8148e1824cd9be8a555e2d7aff4c78e36e2402d62bf58b06946e65ff9318d4fc
+base_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-close-review-reapproval-reach-bjec
+started_at: '2026-09-07T10:29:38+09:00'
+finished_at: '2026-09-07T10:38:56+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_recorded_verdict_under_a_superseded_approval_is_superseded_even_when_its_product_is_unreadable
+  exit_code: 0
+  started_at: '2026-09-07T10:29:38+09:00'
+  finished_at: '2026-09-07T10:29:40+09:00'
+  seconds: 1.656
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/01-check-1.log
+  log_sha256: a4b554bee3b35f48dc8f74d93431bf8637a6434b36dc646327eb99e5a44c69bb
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-2
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_reapproval_alone_does_not_close_a_unit_whose_only_verdict_is_unidentifiable
+  exit_code: 0
+  started_at: '2026-09-07T10:29:40+09:00'
+  finished_at: '2026-09-07T10:29:41+09:00'
+  seconds: 1.254
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/02-check-2.log
+  log_sha256: b4d223d4e90c04d0c5cb29ecfe233e12a148ad7f1efb5a0f2ff194bf51ce08e5
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-3
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unidentifiable_verdict_of_the_current_approval_still_blocks
+  exit_code: 0
+  started_at: '2026-09-07T10:29:41+09:00'
+  finished_at: '2026-09-07T10:29:43+09:00'
+  seconds: 1.196
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/03-check-3.log
+  log_sha256: 20901496fea0ffc5bac9b67a9adf8ba3a05cdfbf80a22064903e3001b97f8dda
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-4
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_retargeting_the_task_ref_cannot_make_a_current_fail_look_superseded
+  exit_code: 0
+  started_at: '2026-09-07T10:29:43+09:00'
+  finished_at: '2026-09-07T10:29:44+09:00'
+  seconds: 1.423
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/04-check-4.log
+  log_sha256: f13b730647a3d4d06261ab8c1b4e01103fd7c1072cae0b145c71e2d1343eb72a
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-5
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unrecorded_verdict_under_a_superseded_approval_stays_unverified
+  exit_code: 0
+  started_at: '2026-09-07T10:29:44+09:00'
+  finished_at: '2026-09-07T10:29:46+09:00'
+  seconds: 1.302
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/05-check-5.log
+  log_sha256: 9a0c634d6bcb51f330da30a4c6433fb33c0ba91319d982c9b3cbcfe37592e9e7
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-6
+  command: grep -q 'REVIEW_SUPERSEDED' core/workflows/plan-close/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-07T10:29:46+09:00'
+  finished_at: '2026-09-07T10:29:46+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/06-check-6.log
+  log_sha256: 43f6aada61866f9b17ae51f4ac928567e56f8fd9340dc451382857323496eb8e
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-07T10:29:46+09:00'
+  finished_at: '2026-09-07T10:29:46+09:00'
+  seconds: 0.195
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/07-check-7.log
+  log_sha256: 89ec43ec5203c608bf2fcee3541ded093f0cee8bd110d8c6d0eb18a4802dde35
+  stdout_tail: compile 검사 PASS
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-8
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-07T10:29:46+09:00'
+  finished_at: '2026-09-07T10:32:14+09:00'
+  seconds: 147.928
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/08-check-8.log
+  log_sha256: d6f2ba2a74ccc9e6b877a0b27ba5dfb1c2099ef301e7a26cb943fcc203ca2478
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-9
+  command: python3 -m unittest tests.test_attach_requirements tests.test_enforce_points
+  exit_code: 0
+  started_at: '2026-09-07T10:32:14+09:00'
+  finished_at: '2026-09-07T10:32:18+09:00'
+  seconds: 3.526
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/09-check-9.log
+  log_sha256: f234ae9a105f28fee0c94c414cfe4d7068705e7e3cefaabc2a62c15f8340a239
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: check-10
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_the_real_2026_09_06_envelope_is_superseded_after_a_reapproval
+  exit_code: 0
+  started_at: '2026-09-07T10:32:18+09:00'
+  finished_at: '2026-09-07T10:32:19+09:00'
+  seconds: 1.723
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/10-check-10.log
+  log_sha256: 83cded91cd6b43528cb5705b1e9bf28ef52e72439ed1ef93f4d2678067265150
+  stdout_tail: ''
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-close-review-reapproval-reach-bjec'
+  exit_code: 0
+  started_at: '2026-09-07T10:34:14+09:00'
+  finished_at: '2026-09-07T10:34:14+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/11-review-tree-before.log
+  log_sha256: 8a325a76971e49876b9421d0581d2a63bec241834e2adeaf8f151e6dcab2b7c1
+  stdout_tail: "M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    \ M romeo/close.py\n M tests/test_docs_evidence_close.py"
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-close-review-reapproval-reach-bjec/.harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-07T10:34:19+09:00'
+  finished_at: '2026-09-07T10:34:20+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/12-reviewer-brief.log
+  log_sha256: 19c3a27948f5057d10b705638d22adaf90b0d84c21db4d41edbba96875446fc8
+  stdout_tail: 0c12e534a5e0488233b0f751f1b4ed760418b72b31687e602755be48aa82846e  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-close-review-reapproval-reach-bjec/.harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/reviewer-brief.md
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-close-review-reapproval-reach-bjec'
+  exit_code: 0
+  started_at: '2026-09-07T10:38:21+09:00'
+  finished_at: '2026-09-07T10:38:21+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/13-review-tree-after.log
+  log_sha256: 8a325a76971e49876b9421d0581d2a63bec241834e2adeaf8f151e6dcab2b7c1
+  stdout_tail: "M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    \ M romeo/close.py\n M tests/test_docs_evidence_close.py"
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260907-close-review-reapproval-reach-bjec/review/run_1668ac8bf26e-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-07T10:38:56+09:00'
+  finished_at: '2026-09-07T10:38:56+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_1668ac8bf26e/14-review-record.log
+  log_sha256: 3e9addde001d1bf1b27dbe20cc04eb0724446533de5b8e69d2f2b6a3d80bbdbe
+  stdout_tail: b35e0da822f3d98f897933156701de3d490622b0a7b59c1ccdaea395b231c8b8  docs/work/feat-20260907-close-review-reapproval-reach-bjec/review/run_1668ac8bf26e-reviewer.json
+  head_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  dirty_tree_hash: 80c3c68c8160af9c69ed904191e699cbc8d26739d8e8d4c19ccbb52a96ebf2f1
+changed_files:
+- core/workflows/plan-close/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/close.py
+- tests/test_docs_evidence_close.py
+artifact_hash: ed28e26beefb647e44cbcfa7dc7d0e49a30ed514c700199f85987cb3d98f64ea
+reviewer: null
+verdict: null
+approvals: []

@@ -1,0 +1,66 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-close-review-reapproval-reach-bjec",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/task/run_1668ac8bf26e-implementer.json",
+    "sha256": "6782dc8bcb1bfff6f21f14b1469e4a30ab38b0676458a8b1956330d526da43fa"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_recorded_verdict_under_a_superseded_approval_is_superseded_even_when_its_product_is_unreadable",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_reapproval_alone_does_not_close_a_unit_whose_only_verdict_is_unidentifiable",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unidentifiable_verdict_of_the_current_approval_still_blocks",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_retargeting_the_task_ref_cannot_make_a_current_fail_look_superseded",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unrecorded_verdict_under_a_superseded_approval_stays_unverified",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -q 'REVIEW_SUPERSEDED' core/workflows/plan-close/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_attach_requirements tests.test_enforce_points",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_the_real_2026_09_06_envelope_is_superseded_after_a_reapproval",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/evidence/run_1668ac8bf26e.yaml",
+  "notes": "검사 10건 전부 exit 0(증거 run_1668ac8bf26e). 판별 검사 3건(check-1·check-2·check-10)은 §11 대로 양쪽 상태에서 실측했다 — HEAD(dc044fc)의 romeo/close.py 로 되돌린 트리에서 셋 다 실패하고(check-1: verdict FAIL != PASS · check-2: 「검토가 아직 없다」 미출현 · check-10: 같은 모양), 이 변경이 든 트리에서 셋 다 통과한다. check-4·check-5 가 빈 검사가 아니라는 증거는 봉인 조건을 뺀/느슨하게 잡은 중간 상태에서의 실패이고 그것은 승인 전 프로브가 실측했다. AC-7 의 괄호 숫자는 재승인이 만든 어긋남이다 — 확인란은 「수정 전 904건 → 추가 후 909건」 이라고 적는데 재승인(dc044fc)이 check-10 을 더해 실측은 910건이다(이 run 의 check-8 · Ran 910 tests · OK). AC-7 의 본문 주장(기존 검사 무수정·전부 통과)은 참이다: tests/test_docs_evidence_close.py 의 diff 는 145 insertions / 0 deletions 로 순수 추가다. 확인란 문장은 구현자가 고칠 수 없어(AC_TEXT_UNCHANGED) 코디네이터에게 물었고 900초 안에 답이 오지 않아 요구는 충족된 것으로 보고 숫자 어긋남을 여기 남긴다(스레드 msg_be6df2b0ad49). 이번 조사가 발견했으나 고치지 않은 것은 Q-71~Q-77 로 docs/planning/open-questions.md 에 열었다(§12). 그 중 Q-71 은 이 단위의 프로브가 실측한 것이다 — envelope build 의 D-a 거부 메시지가 두 승인을 approved_at 하나로만 구별해 같은 초에 난 재승인에서는 「X 는 X 가 아니다」로 인쇄된다."
+}

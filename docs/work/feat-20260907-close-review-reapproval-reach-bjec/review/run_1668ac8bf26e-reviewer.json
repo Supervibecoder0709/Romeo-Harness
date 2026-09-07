@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-close-review-reapproval-reach-bjec",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/task/run_1668ac8bf26e-reviewer.json",
+    "sha256": "21c99f2cd4d6e696ca843cc65537e39e88f0315dbc1e31c8b70909d4c5099b5a"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-1의 실물 포인터 통과 근거가 없다. check-10은 실물 JSON을 읽지만 carried에서 unit_id·task_envelope_ref·evidence_ref를 제외하고, _broken_review_run → _envelope를 통해 새 단위·계약 해시·증거 포인터를 만든다(tests/test_docs_evidence_close.py:707–727, 1325). 따라서 분류되는 것은 실물 내용을 일부 옮긴 새 봉투다. spec.md:51–55가 요구한 실물 봉투의 바이트·포인터가 분류를 통과했다는 주장은 check-10의 성공 기록으로 입증되지 않는다.",
+      "file": "tests/test_docs_evidence_close.py",
+      "line": 1428
+    },
+    {
+      "summary": "AC-2가 요구한 findings 건수가 빈 배열에서는 출력되지 않는다. REVIEW_SUPERSEDED는 _findings_gist의 반환값을 붙이는데(romeo/close.py:757), 이 함수는 findings가 없으면 빈 문자열을 반환한다. check-2가 만드는 재승인 전 PASS 봉투도 findings가 빈 배열이므로 'findings 0건'이 빠진다. check-1과 check-10은 각각 1건·2건만 확인하고, check-2는 건수 출력을 확인하지 않아 이 미달을 잡지 못한다.",
+      "file": "romeo/close.py",
+      "line": 953
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/evidence/run_1668ac8bf26e.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD는 dc044fc42d401d0cc4a3921337a252a5bce901b1로 일치한다. 승인 커밋 대비 spec 변경은 체크박스뿐이며 required_checks 10건은 유지됐다. 증거와 원시 로그의 명령·종료 코드·head/tree 표기는 일치하고 모두 exit 0이다. 현재 변경 경로는 allowed_paths 안이며 guards는 비어 있다. 검사들은 임시 저장소 또는 읽기 대조를 사용하며 rerun:false 선언은 없다. AC-7의 기존 검사 무수정은 추가만 있는 diff로 확인했지만, 실행 건수는 확인란의 909건과 달리 910건이다. 문서·집행은 같은 작업 트리에 있으며 동일 커밋 반영은 아직 미검증이다. Q-71~Q-77 등록을 확인했다. 파일 수정·검사 재실행·해시 계산은 하지 않았으며 검토 후 방어 검사는 위임자의 몫이다."
+}

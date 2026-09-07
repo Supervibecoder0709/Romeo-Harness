@@ -22,6 +22,14 @@ attempts:
   note: 검토자 FAIL findings 1건 — AC-8 이 「요구가 사는 문서와 집행이 같은 커밋에 있다」를 요구하는데, 통합 커밋은 검토 뒤에 위임한 쪽이 만든다. 구현자가
     워크트리에서 참으로 만들 수 없는 순환이고, 어느 회차를 더 돌려도 같은 자리에서 막힌다. 산출물은 문제없다 — AC-1~AC-7·AC-9 를 검토자가 전부 확인했다.
   settled_at: '2026-09-07T10:53:24+09:00'
+- n: 3
+  run: run_b504479075a9
+  base_sha: d35cc0b6ecaccd4779a6f5a02b1ef8de4659db59
+  started_at: '2026-09-07T10:55:10+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS findings 0 — AC-1~AC-9 전부 확인. 검사 10/10 exit 0 · 910 tests OK · tests 삭제 0줄
+  settled_at: '2026-09-07T11:03:16+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 달성 가능하다 — 단, AC-8 을 좁힌 뒤에만. 2회차 검토자는 AC-1~AC-7·AC-9 를 전부 확인했고 findings 는 AC-8 하나뿐이다. AC-8

@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-close-review-reapproval-reach-bjec",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/task/run_f05203fad6a8-reviewer.json",
+    "sha256": "fd2401503264519662da25bd632e197fb5a3ef1c0f289a1e76722f8080d68f65"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-8은 문서와 집행 변경이 같은 커밋에 있어야 하지만, 현재 두 변경은 모두 미커밋 상태다. 현재 HEAD와 증거의 head_sha는 승인 커밋 95b34ebbde808431a420a09dd2fb093f11f38f6c이고, git diff 및 11-review-tree-before.log는 core/workflows/plan-close/SKILL.md와 romeo/close.py가 작업 트리 변경임을 보여 준다. check-6은 문구 존재, check-7은 컴파일 일치만 확인하므로 같은 커밋에 반영됐다는 근거가 되지 않는다. 문서에 예외가 추가된 것은 확인했지만, AC-8 전체를 충족했다는 체크 표시를 뒷받침할 커밋 근거는 없다.",
+      "file": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/spec.md",
+      "line": 75
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/evidence/run_f05203fad6a8.yaml",
+  "notes": "두 작업 계약의 base_sha와 현재 HEAD가 일치한다. 승인 커밋 대비 spec 변경은 수용 기준 체크 표시뿐이며 required_checks는 유지됐다. AC-1·2는 check-1·10의 코드와 원시 로그, 실물 봉투 원문 대조로 확인했다. AC-3·4·5는 각각 check-3·2·4, AC-6은 check-5와 review_record_state의 기록·원시 로그 대조 및 실패 사유 전달 코드로 확인했다. AC-7은 기존 테스트 삭제 0줄과 check-8의 910건 OK 기록, AC-9는 open-questions.md의 Q-71~Q-77 및 check-9 기록으로 확인했다. 검사 10건의 원시 로그는 모두 exit 0이며 기록된 head_sha·dirty_tree_hash가 일치한다. 관측한 변경 경로는 allowed_paths 안이고 guards는 비어 있다. 검사들은 임시 작업 공간 등을 사용하는 재실행 가능한 형태이며 rerun:false 선언은 없다. 파일 수정, 검사 재실행, 해시 계산은 하지 않았다. 현재 트리 지문의 직접 대조와 검토 전후 방어 검사 확정은 위임한 쪽에 남아 있다."
+}

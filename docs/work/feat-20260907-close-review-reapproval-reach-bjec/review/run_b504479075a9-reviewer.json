@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-close-review-reapproval-reach-bjec",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/task/run_b504479075a9-reviewer.json",
+    "sha256": "166ffaa1848976c91dba4bfbf58b1467dbd0015483c9e023643fdd585db9b537"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/evidence/run_b504479075a9.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD가 d35cc0b6ecaccd4779a6f5a02b1ef8de4659db59로 일치한다. 승인 커밋 대비 spec.md 변경은 수용 기준 체크 표시뿐이며 required_checks 10건은 유지됐다. AC-1·2는 check-1·check-10의 원시 로그와 검사 본문으로 확인했다. 실제 봉투 fixture는 지목된 과거 커밋의 원문과 대조했고, 검사는 포인터 세 값만 치환하며 판정 본문 보존·경고 출력·파일 보존을 확인한다. AC-3은 check-3, AC-4는 check-2, AC-5는 check-4로 확인했다. AC-6은 check-5와 romeo/close.py의 recorded is True 조건 및 봉인 대조 사유 추가, romeo/evidence.py의 review_record_state가 원시 로그 불일치·부재를 False·None으로 반환하는 경로를 대조했다. AC-7은 기존 테스트 삭제·수정 없이 162줄 추가된 diff와 check-8 원시 로그의 910건 OK로 확인했다. AC-8은 core/workflows/plan-close/SKILL.md의 예외 설명과 romeo/close.py가 현재 변경에 함께 포함된 diff, check-6·7 기록으로 확인했다. AC-9는 docs/planning/open-questions.md:150~156의 Q-71~Q-77과 check-9 기록으로 확인했다. 현재 변경 경로는 구현자 allowed_paths 안이며 guards는 비어 있다. 필수 검사와 원시 로그의 종료 코드는 모두 0이고 head_sha·dirty_tree_hash 기록도 일관된다. 검사는 임시 저장소 또는 읽기 전용 검사 방식으로 재실행 가능하며 rerun:false 선언은 없다. 파일 변경·검사 재실행·해시 계산은 하지 않았다. 현재 트리 해시 재계산과 검토 전후 방어 검사 대조는 위임한 쪽의 책임으로 남는다."
+}

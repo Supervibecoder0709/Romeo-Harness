@@ -1,0 +1,67 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-close-review-reapproval-reach-bjec",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/task/run_b504479075a9-implementer.json",
+    "sha256": "e4a42b22ad24d7da7da5f93f7cb93e05b4e8c9b186f2308b701d04ccb088f7de"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_recorded_verdict_under_a_superseded_approval_is_superseded_even_when_its_product_is_unreadable",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_a_reapproval_alone_does_not_close_a_unit_whose_only_verdict_is_unidentifiable",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unidentifiable_verdict_of_the_current_approval_still_blocks",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_retargeting_the_task_ref_cannot_make_a_current_fail_look_superseded",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_an_unrecorded_verdict_under_a_superseded_approval_stays_unverified",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -q 'REVIEW_SUPERSEDED' core/workflows/plan-close/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_attach_requirements tests.test_enforce_points",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_the_real_2026_09_06_envelope_is_superseded_after_a_reapproval",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-close-review-reapproval-reach-bjec/evidence/run_b504479075a9.yaml",
+  "notes": "3회차(D-80 재승인 뒤). 2회차 검토자 FAIL 은 AC-8 의 「같은 커밋」이 구현자가 검토 시점에 참으로 만들 수 없는 명제라는 목표 결함이었고(attempts.yaml n:2 · review/run_f05203fad6a8-reviewer.json), §10 재검토 결론에 따라 AC-8 을 좁혀 재승인했다. 산출물은 2회차에서 검토자가 AC-1~AC-7·AC-9 를 전부 확인한 것을 그대로 이어받았고, 이 회차가 더한 변경은 docs/planning/progress.md 「지금 상태」 의 회차 표기(2회차→3회차)와 수용 기준 체크박스뿐이다. 검사 10건 전부 exit 0 — 근거는 이 봉투의 evidence_ref(run_b504479075a9) 의 check-1~check-10 이다. AC-7 의 개수 주장 근거: check-8 의 원시 로그 .harness/runs/feat-20260907-close-review-reapproval-reach-bjec/run_b504479075a9/08-check-8.log 가 'Ran 910 tests ... OK' 이고(904+6), tests/test_docs_evidence_close.py 의 numstat 은 162 추가·0 삭제다. AC-8 의 「두 파일이 이 단위의 변경에 함께 있다」는 이 워크트리의 미커밋 diff 에 core/workflows/plan-close/SKILL.md 와 romeo/close.py 가 함께 있는 것으로 보인다 — 통합 커밋은 검토 뒤에 오므로 이 단위의 기계 검사로 두지 않는다(재승인된 AC-8). 증거 기록 시점 이후 바꾼 파일은 docs/work/<id>/ 안(spec.md 체크박스·result 봉투)뿐이고 그 경로는 romeo/evidence.py 의 exclusions(unit_id) 가 dirty_tree_hash 에서 제외한다 — 실측으로 기록값과 현재값이 a10870a26f94 로 같다. §12 로 고치지 않고 연 결함은 Q-71~Q-77(docs/planning/open-questions.md)."
+}

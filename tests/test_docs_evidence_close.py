@@ -31,6 +31,15 @@ SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README
 GUARD_NOTE = ("영향 범위: gone.txt 하나 / 사전 백업: 없음 — 커밋 전이라 스냅샷이 없다 / "
               "복구 방법: git checkout HEAD -- gone.txt / 확인할 내용: 삭제 대상이 그 파일 하나뿐인지")
 
+#: 2026-09-06 관통이 실제로 낸 검토 봉투의 **바이트 그대로**. 그 봉투가 재승인 뒤에도 close 를 막은 것이
+#: Q-68 이고, 이 파일이 그 사고를 합성이 아닌 실물로 재현하는 자리다. 봉투가 지목한 작업 계약(`docs/work/*/task/`)과
+#: 원시 로그(`.harness/runs/`)는 둘 다 `.gitignore` 대상이라 그 run 을 돌린 워크트리 밖에는 없다 — 그래서
+#: 주변 환경은 fixture 가 만들고 봉투 본문만 실물을 쓴다.
+#: 출처: `git show cbcbd87^:docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_3e1b612799e2-reviewer.json`
+REAL_2026_09_06_ENVELOPE = (Path(__file__).resolve().parents[1] / "docs" / "work"
+                            / "feat-20260907-close-review-reapproval-reach-bjec"
+                            / "fixtures" / "real-2026-09-06-reviewer.json")
+
 
 
 def git(*args, cwd):
@@ -1300,6 +1309,159 @@ class TestCloseReviewVerdict(unittest.TestCase):
         ids, r = self._failed()
         self.assertIn("REVIEW_TASK_ANCHORED", ids)
         self.assertEqual(r["verdict"], "FAIL")
+
+    # ── 재승인이 닿지 않던 자리 (2026-09-06 관통) ────────────────────────────────
+    def _broken_review_run(self, run, base_sha, verdict="FAIL", record=True, **over):
+        """산출물을 식별할 수 없는 검토 run — 방어 검사 두 라벨이 **다 있고** 각각 봉인·로그가 맞는데,
+        그 사이에 커밋이 들어가 값만 다르다. 빈 값이 아니라 2026-09-06 관통이 실제로 낸 모양이다."""
+        write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=base_sha, run_name=run)
+        run_command(self.unit, "git status --porcelain", run_name=run,
+                    label="review-tree-before", project_root=self.root)
+        (self.root / f"{run}-mid.txt").write_text("검토 중 변경\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", f"{run} 검토 중 커밋", cwd=self.root)
+        run_command(self.unit, "git status --porcelain", run_name=run,
+                    label="review-tree-after", project_root=self.root)
+        self._write_review(f"{run}-reviewer.json", self._envelope(verdict, run=run, **over), record=record)
+
+    def _reapprove(self):
+        """사람이 다시 승인한다 — 차단을 걷을 수 있는 유일한 행위다(D-27)."""
+        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="수용 기준 변경")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "reapprove", cwd=self.root)
+        return git("rev-parse", "HEAD", cwd=self.root)
+
+    def _current_review(self, run, base_sha, verdict="PASS", **over):
+        """지금 산출물 위의 검사 기록(`true`)과 정식 검토 run 을 함께 세운다."""
+        run_command(self.unit, "true", run_name=run, project_root=self.root)
+        self._defensive(run)
+        write_envelope(self.unit, "reviewer", project_root=self.root, base_sha=base_sha, run_name=run)
+        self._write_review(f"{run}-reviewer.json", self._envelope(verdict, run=run, **over))
+
+    def test_a_recorded_verdict_under_a_superseded_approval_is_superseded_even_when_its_product_is_unreadable(self):
+        """방어 검사가 깨져 산출물을 식별하지 못하는 **재승인 전** FAIL 봉투가 사람의 재승인 뒤에도 완료를 막았다
+        (2026-09-06 관통: 3회차가 검토 PASS·재승인까지 받고도 닫히지 않아 봉투를 손으로 빼내야 했다).
+        승인 키는 봉투가 가리킨 계약에서 읽으므로 산출물과 무관하다 — 기록된 그대로인 봉투는 경고로 인쇄하고 막지 않는다."""
+        self._broken_review_run("run-old", self.approval_sha, "FAIL",
+                                findings=[{"summary": "옛 승인의 결함"}])
+        now_sha = self._reapprove()
+        self._current_review("run-now", now_sha, "PASS")
+        ids, r = self._failed()
+        self.assertEqual(ids, set(), r["checks"])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        self.assertEqual([c["id"] for c in r["checks"] if c["level"] == "unverified"], [], r["checks"])
+        sup = self._row(r, "REVIEW_SUPERSEDED")
+        self.assertEqual(sup["level"], "warning")
+        self.assertIn("run-old-reviewer.json", sup["detail"])
+        self.assertIn("FAIL", sup["detail"])
+        self.assertIn("findings 1건", sup["detail"])
+        self.assertIn("옛 승인의 결함", sup["detail"])
+        self.assertIn("재승인 전 승인", sup["detail"])
+        self.assertTrue((self.review / "run-old-reviewer.json").is_file(), "낡은 봉투는 지우지 않는다")
+        self.assertNotIn("run-old-reviewer.json", self._row(r, "REVIEW_VERDICT")["detail"])
+
+    def test_a_reapproval_alone_does_not_close_a_unit_whose_only_verdict_is_unidentifiable(self):
+        """재승인만으로는 닫히지 않는다 — 재승인 전 PASS 가 현재 판정으로 새면 새 수용 기준이 검토되지 않은 채 닫힌다.
+        낡은 것으로 빠지는 것과 통과로 세는 것은 다르다(K-51)."""
+        self._broken_review_run("run-old", self.approval_sha, "PASS")
+        self._reapprove()
+        run_command(self.unit, "true", run_name="run-now", project_root=self.root)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("검토가 아직 없다", self._row(r, "REVIEW_VERDICT")["detail"])
+        self.assertIn("run-old-reviewer.json", self._row(r, "REVIEW_SUPERSEDED")["detail"])
+
+    def test_an_unidentifiable_verdict_of_the_current_approval_still_blocks(self):
+        """**지금 승인**의 봉투는 산출물을 확인할 수 없으면 그대로 막는다 — 차단을 걷는 것은 사람의 재승인뿐이다."""
+        self._broken_review_run("run-old", self.approval_sha, "FAIL")
+        run_command(self.unit, "true", run_name="run-now", project_root=self.root)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("판정이 본 산출물을 확인할 수 없는 봉투가 있다", self._row(r, "REVIEW_VERDICT")["detail"])
+        self.assertNotIn("REVIEW_SUPERSEDED", [c["id"] for c in r["checks"]])
+
+    def test_retargeting_the_task_ref_cannot_make_a_current_fail_look_superseded(self):
+        """가장 싼 위조: 지금 승인으로 정식 기록된 FAIL 에서 **계약 포인터 한 필드만** 옛 승인의 계약으로 돌린다.
+        승인 키가 그 계약에서 오므로 이 편집만으로 현재 FAIL 이 낡은 것으로 보인다 — 봉투 바이트가 바뀌어
+        기록 명령이 남긴 sha256 봉인이 서지 않는 것이 그것을 되막는다."""
+        old_rel, old_sha = self.task_rel, sha256_file(self.task_path)   # 재승인 전 승인으로 만든 계약
+        now_sha = self._reapprove()
+        self._broken_review_run("run-now", now_sha, "FAIL")
+        path = self.review / "run-now-reviewer.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["task_envelope_ref"] = {"path": old_rel, "sha256": old_sha}
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        run_command(self.unit, "true", run_name="run-check", project_root=self.root)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        self.assertIn("봉인 대조", self._row(r, "REVIEW_VERDICT")["detail"])
+        self.assertNotIn("REVIEW_SUPERSEDED", [c["id"] for c in r["checks"]])
+
+    def test_an_unrecorded_verdict_under_a_superseded_approval_stays_unverified(self):
+        """기록이 없는(손으로 쓴) 봉투는 재승인 전 것이어도 낡은 것으로 세지 않는다(K-51).
+        차단 사유에 봉인 대조 결과가 붙어 **재승인이 왜 듣지 않았는지**가 인쇄된다."""
+        self._broken_review_run("run-old", self.approval_sha, "FAIL", record=False)
+        self._reapprove()
+        run_command(self.unit, "true", run_name="run-now", project_root=self.root)
+        ids, r = self._failed()
+        self.assertEqual(r["verdict"], "FAIL")
+        self._assert_unverified(r, "REVIEW_VERDICT")
+        detail = self._row(r, "REVIEW_VERDICT")["detail"]
+        self.assertIn("봉인 대조", detail)
+        self.assertIn("review-record", detail)
+        self.assertNotIn("REVIEW_SUPERSEDED", [c["id"] for c in r["checks"]])
+
+    def test_the_real_2026_09_06_envelope_is_superseded_after_a_reapproval(self):
+        """합성한 이상적 봉투가 아니라 **그 사고를 실제로 낸 봉투**다. 판정 본문(`gate_verdict`·`findings`·
+        `checks`·`notes`·`blocked_reason`)은 실물 바이트를 그대로 쓰고, **포인터 세 값만** 픽스처 환경의 것으로
+        치환한다 — 그 셋이 가리키는 단위·계약·증거는 이 체크아웃에 존재할 수 없기 때문이다(작업 계약과 원시 로그는
+        `.gitignore` 대상이라 그 run 을 돌린 워크트리 밖에는 없다). 무엇을 바꿨는지는 `SUBSTITUTED` 가 이름으로 적고,
+        아래 단언이 「실물의 모든 키가 치환·이월 둘 중 하나로 처리됐다」와 「치환된 세 값만 실물과 다르다」를 고정한다.
+        봉투 원본의 출처: `git show cbcbd87^:docs/work/feat-20260906-m3-close-foreign-repo-ik3u/review/run_3e1b612799e2-reviewer.json`."""
+        real = json.loads(REAL_2026_09_06_ENVELOPE.read_text(encoding="utf-8"))
+        # 이 검사가 실물을 쓰고 있다는 것부터 고정한다 — fixture 가 바뀌면 여기서 먼저 깨진다.
+        self.assertEqual(real["unit_id"], "feat-20260906-m3-close-foreign-repo-ik3u")
+        self.assertEqual((real["gate_verdict"], real["fail_reasons"]), ("FAIL", ["AC_UNMET"]))
+        self.assertEqual(len(real["findings"]), 2)
+        # ── 치환 목록 (AC-1) ──────────────────────────────────────────────────
+        # 이 세 값만 픽스처 환경의 것으로 바꾼다. 각각 실물 봉투가 살던 **다른 단위**·그 단위의 **작업 계약**·
+        # 그 run 의 **증거**를 가리키므로 이 체크아웃에서는 성립할 수 없다(다른 단위의 봉투는 앵커 검사가 거부한다).
+        SUBSTITUTED = ("unit_id", "task_envelope_ref", "evidence_ref")
+        # 나머지는 전부 실물 바이트 그대로 옮긴다. 화이트리스트가 아니라 **여집합**으로 잡는다 —
+        # 실물에 필드가 하나 더 있어도 조용히 빠지지 않고 여기서 함께 옮겨진다.
+        carried = {k: v for k, v in real.items() if k not in SUBSTITUTED}
+        self.assertEqual(set(SUBSTITUTED) | set(carried), set(real), "실물의 모든 키가 치환·이월 중 하나로 처리된다")
+        self.assertEqual(set(SUBSTITUTED) & set(carried), set(), "치환한 값을 다시 이월하지 않는다")
+        self.assertEqual({k for k in ("gate_verdict", "findings", "checks", "notes", "blocked_reason")} - set(carried),
+                         set(), "AC-1 이 지목한 판정 본문 다섯 값은 전부 실물에서 온다")
+        run = "run_3e1b612799e2"                          # 포인터의 모양까지 실물의 run 이름을 쓴다
+        self._broken_review_run(run, self.approval_sha, **carried)
+        # 치환이 실제로 일어났다 — 세 값은 실물의 것이 아니라 픽스처가 세운 환경의 것이다.
+        written = json.loads((self.review / f"{run}-reviewer.json").read_text(encoding="utf-8"))
+        for key in SUBSTITUTED:
+            self.assertNotEqual(written[key], real[key], f"{key} 는 픽스처 환경의 값으로 치환된다")
+        self.assertEqual(written["unit_id"], self.unit)
+        self.assertEqual(written["task_envelope_ref"]["path"], f"docs/work/{self.unit}/task/{run}-reviewer.json")
+        self.assertEqual(written["evidence_ref"], f"docs/work/{self.unit}/evidence/{run}.yaml")
+        now_sha = self._reapprove()
+        self._current_review("run-now", now_sha, "PASS")
+        ids, r = self._failed()
+        self.assertEqual(ids, set(), r["checks"])
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        self.assertEqual([c["id"] for c in r["checks"] if c["level"] == "unverified"], [], r["checks"])
+        sup = self._row(r, "REVIEW_SUPERSEDED")
+        self.assertEqual(sup["level"], "warning")
+        self.assertIn(f"{run}-reviewer.json", sup["detail"])
+        self.assertIn("FAIL", sup["detail"])
+        self.assertIn("findings 2건", sup["detail"])
+        self.assertIn("재승인 전 승인", sup["detail"])
+        self.assertIn(str(real["findings"][0]["summary"])[:60], sup["detail"])
+        # 봉투는 지워지지 않고 실물 판정이 파일에 그대로 남는다(AC-2).
+        kept = json.loads((self.review / f"{run}-reviewer.json").read_text(encoding="utf-8"))
+        self.assertEqual({k: kept[k] for k in carried}, carried)
 
 
 class TestCloseRequiresFailReasonsOnFail(unittest.TestCase):
