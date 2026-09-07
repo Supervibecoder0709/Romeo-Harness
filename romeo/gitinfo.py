@@ -74,6 +74,35 @@ def artifact_hash(cwd, files):
     return h.hexdigest()
 
 
+def tree_blobs(cwd, rev, exclude_prefixes=()):
+    """<rev> 트리의 일반 파일(mode 100644·100755)을 {경로: blob sha} 로 돌려준다.
+    `exclude_prefixes` 로 시작하는 경로는 뺀다. 심볼릭 링크·서브모듈은 세지 않는다."""
+    out = _git(["ls-tree", "-r", "-z", rev], cwd).stdout
+    blobs = {}
+    for entry in out.split("\0"):
+        if not entry:
+            continue
+        meta, _, path = entry.partition("\t")
+        mode, kind, sha = meta.split()
+        if kind != "blob" or mode not in ("100644", "100755"):
+            continue
+        if any(path.startswith(prefix) for prefix in exclude_prefixes):
+            continue
+        blobs[path] = sha
+    return blobs
+
+
+def blob_sha_of(path):
+    """파일 바이트의 git blob 해시(`git hash-object` 와 같은 값). 일반 파일이 아니면 None."""
+    p = Path(path)
+    if not p.is_file():
+        return None
+    data = p.read_bytes()
+    h = hashlib.sha1(b"blob %d\0" % len(data))
+    h.update(data)
+    return h.hexdigest()
+
+
 def repo_id(cwd):
     try:
         url = _git(["remote", "get-url", "origin"], cwd).stdout.strip()

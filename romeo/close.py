@@ -12,7 +12,7 @@ from .docs import approval_chain_warnings, approval_commit, approval_key, approv
 from .evidence import (RERUN_NEAR_TIMEOUT_RATIO, RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
                        guard_decisions, parse_guard_explanation, required_explanation,
                        list_runs, replay, review_record_state, sealed_product)
-from .gitinfo import head_sha
+from .gitinfo import blob_sha_of, head_sha, tree_blobs
 from .parity import (_envelope_defects, _evidence_product, _product_of, _product_text, evidence_ref_error,
                      load_role_contracts, task_ref_error)
 from .policy import classification_from_frontmatter, load_policy, load_project_state, route
@@ -320,6 +320,8 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
         why = next((ln.strip() for ln in (e.stderr or "").splitlines() if ln.strip()), f"git exit {e.returncode}")
         check("FRESH_HEAD", UNVERIFIED, f"이 루트에는 git 이력이 없어 신선도를 판정할 수 없다 — {why}")
         return _finish(checks, fm, body, spec, runs, dry_run, project_root, None)
+    judge_ok, judge_why = _judge_revision(project_root, unit_id, harness_root)
+    check("JUDGE_REVISION", judge_ok, judge_why)
     cur_dirty = dirty_tree_hash_excluding(project_root, exclusions(unit_id))
     ev, complete, why = select_check_record(runs, plan, cur_head, cur_dirty)
     check("EVIDENCE_SELECTED", complete, why, level="error" if complete else "warning")
@@ -442,6 +444,39 @@ def _inside(project_root, raw):
     except ValueError:
         return None
     return p
+
+
+#: 승인 커밋 트리에 이 파일이 있으면 판정 대상은 하네스 저장소 자신이다 — 자기적용.
+HARNESS_MARKER = "romeo/__init__.py"
+#: 판정 하네스 대조에서 빼는 경로 — 판정이 `harness_root` 에서 읽지 않는 곳이다(증거 신선도의 `exclusions` 와 같은 이유).
+#: 문서와 런타임 기록은 관통 중에도 바뀌고(`docs/work/<id>/`·`.harness/observations.yaml`), 부착 상태는 `project_root` 에서 읽는다.
+JUDGE_EXCLUDE = ("docs/", ".harness/")
+
+
+def _judge_revision(project_root, unit_id, harness_root):
+    """판정을 낸 하네스가 **승인 커밋 시점의 하네스**인지 본다(D-81 · 2026-09-07 진단 권고 1).
+
+    하네스를 고치는 단위는 그 단위가 바꾼 규칙으로 자기를 판정해 왔다(Q-43) — 판정하는 하네스와 판정받는 하네스가
+    같은 리비전이면 실패 원인을 산출물과 하네스로 가를 수 없다. 그래서 판정은 승인 커밋을 스냅샷으로 꺼낸 하네스가 하고,
+    새 규칙은 다음 단위부터 적용된다. 이 검사는 그 절차가 지켜졌는지를 **내용**으로 본다: 승인 커밋 트리의 `docs/`·`.harness/` 밖
+    추적 파일 전부가 판정을 낸 하네스(`harness_root`)의 같은 경로에 같은 blob 으로 있어야 한다. 리비전 번호를 보지 않으므로
+    스냅샷(git 저장소 아님)·워크트리·clone 이 한 기준으로 판정된다. 내용(blob)만 본다 — 실행 비트와 더해진 파일은 보지 않는다,
+    판정이 읽는 파일은 이름이 고정돼 있다. 승인 커밋 트리에 하네스가 없는 루트(남의 저장소)는 자기적용이 아니므로 통과한다."""
+    try:
+        sha = approval_commit(project_root, unit_id)
+    except ValueError as e:
+        return UNVERIFIED, f"승인 커밋을 이력에서 찾지 못해 판정 하네스를 대조할 수 없다 — {e}"
+    blobs = tree_blobs(project_root, sha, exclude_prefixes=JUDGE_EXCLUDE)
+    if HARNESS_MARKER not in blobs:
+        return True, (f"이 루트의 승인 커밋 {sha[:12]} 트리에 하네스({HARNESS_MARKER})가 없다 — 자기적용이 아니다 · "
+                      f"판정 하네스 {harness_root}")
+    harness_root = Path(harness_root)
+    differing = [path for path, blob in blobs.items() if blob_sha_of(harness_root / path) != blob]
+    if differing:
+        shown = ", ".join(differing[:3]) + (" …" if len(differing) > 3 else "")
+        return False, (f"판정 하네스가 승인 커밋 {sha[:12]} 의 하네스가 아니다 — {len(differing)}개 파일이 다르거나 없다({shown}) · "
+                       f"판정받는 리비전이 판정하고 있다. 승인 커밋의 스냅샷에서 꺼낸 romeo close 로 --root 를 주어 다시 돌린다")
+    return True, f"판정 하네스 = 승인 커밋 {sha[:12]} 의 하네스 ({len(blobs)}개 파일 대조 · {harness_root})"
 
 
 def _task_anchor(project_root, unit_id, env, harness_root):

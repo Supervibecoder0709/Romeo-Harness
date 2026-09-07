@@ -1,0 +1,456 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_ae9a7eac2c66
+task_id: task_edc73911d3e4
+dispatch_id: ctx_222edd96a974
+unit_id: feat-20260907-judge-revision-base-sha-pwt8
+spec_ref:
+  path: docs/work/feat-20260907-judge-revision-base-sha-pwt8/spec.md
+  sha256: 0a0260776c6b9991e1986ea67699b4cc3808fb1255b71072623ce75a9d24b286
+base_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-judge-revision-base-sha-pwt8
+started_at: '2026-09-07T19:09:58+09:00'
+finished_at: '2026-09-07T19:17:55+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_tree_under_judgment_judging_itself_is_refused
+  exit_code: 0
+  started_at: '2026-09-07T19:09:58+09:00'
+  finished_at: '2026-09-07T19:10:02+09:00'
+  seconds: 3.838
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/01-check-1.log
+  log_sha256: 515acc71ecb435d80b7bed1a3c764852396479f3d89086342d76791d32d38145
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-2
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_of_the_approval_commit_passes_and_closes_the_unit
+  exit_code: 0
+  started_at: '2026-09-07T19:10:02+09:00'
+  finished_at: '2026-09-07T19:10:06+09:00'
+  seconds: 3.935
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/02-check-2.log
+  log_sha256: 9b2a09e36e71c655b2ffbd434fb8ac2d1beb0e21803740018081d69479d64540
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-3
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_with_one_file_changed_is_refused_and_names_the_path
+  exit_code: 0
+  started_at: '2026-09-07T19:10:06+09:00'
+  finished_at: '2026-09-07T19:10:11+09:00'
+  seconds: 4.357
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/03-check-3.log
+  log_sha256: ea8f2fd8e7db0a5ee9cea3b8cf8c6d7690510bb66936f9e60e88473551e5c94b
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-4
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_docs_are_not_compared
+  exit_code: 0
+  started_at: '2026-09-07T19:10:11+09:00'
+  finished_at: '2026-09-07T19:10:15+09:00'
+  seconds: 4.029
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/04-check-4.log
+  log_sha256: 968f5d40ab2ab405cddc439136a0da516b779560aef3fcf4cd5a98956e910b1b
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-5
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_root_without_the_harness_passes_as_not_self_applied
+  exit_code: 0
+  started_at: '2026-09-07T19:10:15+09:00'
+  finished_at: '2026-09-07T19:10:18+09:00'
+  seconds: 3.634
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/05-check-5.log
+  log_sha256: 7abea7c8e9b6ea8f6d7ef65d10667648498004b6f0e418d49627f2f0f55828af
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-6
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_snapshot_cli_judges_the_tree_with_root_and_prints_a_verdict
+  exit_code: 0
+  started_at: '2026-09-07T19:10:18+09:00'
+  finished_at: '2026-09-07T19:10:23+09:00'
+  seconds: 4.324
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/06-check-6.log
+  log_sha256: 7b52a38b7e9ece53772e8d34702685d752875fd3c31315399d361fcd3f6140d3
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-7
+  command: grep -q 'JUDGE_REVISION' core/workflows/plan-close/SKILL.md && grep -q '승인 커밋 시점' core/workflows/plan-close/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-07T19:10:23+09:00'
+  finished_at: '2026-09-07T19:10:23+09:00'
+  seconds: 0.006
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/07-check-7.log
+  log_sha256: 8631008cc5fc2177ad31b91e4648fa1ffb4fa4fd3eeddaa92a12cdf5f8d6c63f
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-8
+  command: grep -q 'J/bin/romeo" close --unit <작업 단위 id> --root "$W"' adapters/orca/RUNBOOK.md && ! grep
+    -q 'W/bin/romeo" close' adapters/orca/RUNBOOK.md && ! grep -q '그 변경 뒤로 잡는다' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-07T19:10:23+09:00'
+  finished_at: '2026-09-07T19:10:23+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/08-check-8.log
+  log_sha256: 553086da2c26396bb419997dbcca534aa2d4944df276215c082e5898926fe6fa
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-9
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-07T19:10:23+09:00'
+  finished_at: '2026-09-07T19:10:23+09:00'
+  seconds: 0.176
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/09-check-9.log
+  log_sha256: 9b7a29501fc88362cebef73fcf02d763442e4573f05c676b53d2e450754202fe
+  stdout_tail: compile 검사 PASS
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-10
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-07T19:10:23+09:00'
+  finished_at: '2026-09-07T19:13:03+09:00'
+  seconds: 159.898
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/10-check-10.log
+  log_sha256: f995782a78f15dcada00607418f8ff97c3f09f52fa94486c47eff2afa7424226
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-11
+  command: python3 -m unittest tests.test_doc_commands tests.test_enforce_points tests.test_attach_requirements
+  exit_code: 0
+  started_at: '2026-09-07T19:13:03+09:00'
+  finished_at: '2026-09-07T19:13:07+09:00'
+  seconds: 3.29
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/11-check-11.log
+  log_sha256: 684f6c3dff5c00b0d69c5ac3ba953823915cd73d8e5b3164dedbe2679e990062
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-12
+  command: grep -q 'JUDGE_REVISION' adapters/claude/workflows/plan-close.md && grep -q 'JUDGE_REVISION'
+    adapters/codex/workflows/plan-close.md && grep -q 'JUDGE_REVISION' .claude/skills/plan-close/SKILL.md
+    && grep -q 'JUDGE_REVISION' .agents/skills/plan-close/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-07T19:13:07+09:00'
+  finished_at: '2026-09-07T19:13:07+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/12-check-12.log
+  log_sha256: 77ba8f68214960a4645468390d2dcfefded9de7bca57ecb7727ef52dbba90383
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: check-13
+  command: python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_an_uncommitted_approval_leaves_the_judge_unverified
+  exit_code: 0
+  started_at: '2026-09-07T19:13:07+09:00'
+  finished_at: '2026-09-07T19:13:10+09:00'
+  seconds: 3.543
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/13-check-13.log
+  log_sha256: a2ac02604eb67e88fcbc1e44547d479caac407f37f2cfbf22df5631c3c25fd9a
+  stdout_tail: ''
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-judge-revision-base-sha-pwt8'
+  exit_code: 0
+  started_at: '2026-09-07T19:14:32+09:00'
+  finished_at: '2026-09-07T19:14:32+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/14-review-tree-before.log
+  log_sha256: 852399b731eb9e4546448153881bdb24033bae54aeef10c2386d3b5332f49be4
+  stdout_tail: "M .agents/skills/plan-close/SKILL.md\n M .claude/skills/plan-close/SKILL.md\n M adapters/claude/workflows/plan-close.md\n\
+    \ M adapters/codex/workflows/plan-close.md\n M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n\
+    \ M docs/planning/open-questions.md\n M docs/planning/progress.md\n M romeo/close.py\n M romeo/gitinfo.py\n\
+    ?? tests/test_judge_revision.py"
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-judge-revision-base-sha-pwt8/.harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-07T19:14:32+09:00'
+  finished_at: '2026-09-07T19:14:32+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/15-reviewer-brief.log
+  log_sha256: 4bc5cdec11d7e03e6bb077b44bf70424c9e4df19590a0f8e8be9d1a9fcaba0ed
+  stdout_tail: a61f31e5187ad2ed296c321aa3b9851ba69a160702cd9d149e68257b1074fe02  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-judge-revision-base-sha-pwt8/.harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/reviewer-brief.md
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260907-judge-revision-base-sha-pwt8/review/run_ae9a7eac2c66-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-07T19:17:55+09:00'
+  finished_at: '2026-09-07T19:17:55+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/16-review-record.log
+  log_sha256: 9ffe154a1d4b8790ffff4d78f2d3dff7a6cf10675508dc568e94743af772c7b8
+  stdout_tail: 6124d60aebba0807980544c5094927b6554490a4ea93281f7612dd7fd1c550ba  docs/work/feat-20260907-judge-revision-base-sha-pwt8/review/run_ae9a7eac2c66-reviewer.json
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-judge-revision-base-sha-pwt8'
+  exit_code: 0
+  started_at: '2026-09-07T19:17:55+09:00'
+  finished_at: '2026-09-07T19:17:55+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260907-judge-revision-base-sha-pwt8/run_ae9a7eac2c66/17-review-tree-after.log
+  log_sha256: 852399b731eb9e4546448153881bdb24033bae54aeef10c2386d3b5332f49be4
+  stdout_tail: "M .agents/skills/plan-close/SKILL.md\n M .claude/skills/plan-close/SKILL.md\n M adapters/claude/workflows/plan-close.md\n\
+    \ M adapters/codex/workflows/plan-close.md\n M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n\
+    \ M docs/planning/open-questions.md\n M docs/planning/progress.md\n M romeo/close.py\n M romeo/gitinfo.py\n\
+    ?? tests/test_judge_revision.py"
+  head_sha: 3363f8d3005eac8793d17502be2a7259846a0427
+  dirty_tree_hash: 2411ee44f6f5c877ee5344056f0eabc68429288b5124b072aee3f20e9d3bd73c
+changed_files:
+- .agents/skills/plan-close/SKILL.md
+- .claude/skills/plan-close/SKILL.md
+- adapters/claude/workflows/plan-close.md
+- adapters/codex/workflows/plan-close.md
+- adapters/orca/RUNBOOK.md
+- core/workflows/plan-close/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/close.py
+- romeo/gitinfo.py
+- tests/test_judge_revision.py
+artifact_hash: 161654bc2be0b6db6e8c4ea8bf3946460269d6b776fca01dca1a7678fa187c17
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-07T19:24:40+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 205 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-07T19:07:03+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_ae9a7eac2c66 — 검증 계획 13건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 3363f8d3005e vs 현재 3363f8d3005e
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 2411ee44f6f5 vs 현재 2411ee44f6f5 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_tree_under_judgment_judging_itself_is_refused'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_of_the_approval_commit_passes_and_closes_the_unit'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_with_one_file_changed_is_refused_and_names_the_path'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_docs_are_not_compared'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_root_without_the_harness_passes_as_not_self_applied'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_snapshot_cli_judges_the_tree_with_root_and_prints_a_verdict'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — grep -q ''JUDGE_REVISION'' core/workflows/plan-close/SKILL.md && grep -q
+      ''승인 커밋 시점'' core/workflows/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — grep -q ''J/bin/romeo" close --unit <작업 단위 id> --root "$W"'' adapters/orca/RUNBOOK.md
+      && ! grep -q ''W/bin/romeo" close'' adapters/orca/RUNBOOK.md && ! grep -q ''그 변경 뒤로 잡는다'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — python3 -m unittest tests.test_doc_commands tests.test_enforce_points
+      tests.test_attach_requirements'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-12: exit 0 — grep -q ''JUDGE_REVISION'' adapters/claude/workflows/plan-close.md &&
+      grep -q ''JUDGE_REVISION'' adapters/codex/workflows/plan-close.md && grep -q ''JUDGE_REVISION''
+      .claude/skills/plan-close/SKILL.md && grep -q ''JUDGE_REVISION'' .agents/skills/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-13: exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_an_uncommitted_approval_leaves_the_judge_unverified'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 17건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 7건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 13건이 승인 커밋 3363f8d3005e 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_tree_under_judgment_judging_itself_is_refused'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_of_the_approval_commit_passes_and_closes_the_unit'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_with_one_file_changed_is_refused_and_names_the_path'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_docs_are_not_compared'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_root_without_the_harness_passes_as_not_self_applied'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_snapshot_cli_judges_the_tree_with_root_and_prints_a_verdict'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — grep -q ''JUDGE_REVISION'' core/workflows/plan-close/SKILL.md && grep
+      -q ''승인 커밋 시점'' core/workflows/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — grep -q ''J/bin/romeo" close --unit <작업 단위 id> --root "$W"'' adapters/orca/RUNBOOK.md
+      && ! grep -q ''W/bin/romeo" close'' adapters/orca/RUNBOOK.md && ! grep -q ''그 변경 뒤로 잡는다'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — python3 -m unittest tests.test_doc_commands tests.test_enforce_points
+      tests.test_attach_requirements'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-12: 재실행도 exit 0 — grep -q ''JUDGE_REVISION'' adapters/claude/workflows/plan-close.md
+      && grep -q ''JUDGE_REVISION'' adapters/codex/workflows/plan-close.md && grep -q ''JUDGE_REVISION''
+      .claude/skills/plan-close/SKILL.md && grep -q ''JUDGE_REVISION'' .agents/skills/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-13: 재실행도 exit 0 — python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_an_uncommitted_approval_leaves_the_judge_unverified'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 3363f8d3005e 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.agents/skills/plan-close/SKILL.md', '.claude/skills/plan-close/SKILL.md',
+      'adapters/claude/workflows/plan-close.md', 'adapters/codex/workflows/plan-close.md', 'adapters/orca/RUNBOOK.md',
+      'core/workflows/plan-close/SKILL.md', 'docs/planning/open-questions.md', 'docs/planning/progress.md',
+      'romeo/close.py', 'romeo/gitinfo.py', 'tests/test_judge_revision.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_4db4be703188-reviewer.json: FAIL(findings 1건 — 첫째: AC-1·AC-3의 파일 누락 거부 조건을 충족하지 못하는 경로가
+      있습니다. 승인 스냅샷에서 core/pol) — 재승인 전 승인(approved_at 2026-09-07T18:26:46+09:00)으로 낸 판정 · 다른 산출물(5b1767a+2411ee44f6f5)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 3363f8d+2411ee44f6f5 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_ae9a7eac2c66-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

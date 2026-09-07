@@ -138,8 +138,8 @@ bin/romeo approve <작업 단위 id> --by <승인자>
 그래서 `<base-sha>` 는 **승인 커밋이거나 그 후손**이어야 하고, 그 커밋의 spec 이 담은 승인이 **지금의 승인과 같아야** 한다 —
 승인 동일성은 `envelope build` 가 검사해 재승인 전 승인을 담은 커밋(옛 `<base-sha>`)을 거부하고, 조상 관계는 §3.8 의 `BASE_SHA` 앵커
 (`envelope check`·`close`)가 검사한다. `--base-sha` 를 생략하면 승인 커밋 자체를 쓴다.
-승인 커밋과 `<base-sha>` 사이에 계약 입력(정책표·`core/roles/`·`core/schemas/`·`.harness/romeo.project.yaml`)이 바뀌었으면 §3.8 의 재계산 대조가
-**지금 하네스**로 다시 계산하므로 `<base-sha>` 를 그 변경 뒤로 잡는다.
+승인 커밋과 `<base-sha>` 사이에 계약 입력(정책표·`core/roles/`·`core/schemas/`·`.harness/romeo.project.yaml`)이 바뀌었으면 **재승인한다** —
+§3.8 의 판정·재계산은 **승인 커밋 시점의 하네스**가 하므로(D-81 · `JUDGE_REVISION`), 그 뒤의 입력으로 만든 계약은 재계산 대조에서 어긋난다.
 
 그 다음 **사람이** 승인된 `spec.md` **와 워커가 실행할 하네스 상태**를 커밋한다. 하네스는 커밋하지 않는다 —
 무엇을 언제 커밋하는지는 사람의 판단이다. 이 커밋의 SHA 가 이후 모든 명령의 `<base-sha>` 이고,
@@ -868,7 +868,7 @@ orca orchestration worker-start \
 구현자의 결과 계약: `docs/work/<id>/result/<run-id>-implementer.json`
 검토자의 결과 계약: `docs/work/<id>/review/<run-id>-reviewer.json`
 
-둘 다 **구현자 워크트리 안**의 작업 단위 폴더에 쓴다. 종료 검사(`bin/romeo close --unit <id>`)가 그 체크아웃에서 돌면서
+둘 다 **구현자 워크트리 안**의 작업 단위 폴더에 쓴다. 종료 검사(승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root "$W"`)가 그 체크아웃을 **대상으로** 돌면서
 거기 있는 evidence · `review/` · **`task/`** 를 읽고, 그 체크아웃의 **git 이력**으로 계약의 `base_sha` 를 대조하기 때문이다(K-62).
 `task/` 까지 읽는다는 것이 §3.5.1 이 필요한 이유다 — 검토자 결과 계약의 `task_envelope_ref.path` 가 가리키는 파일이
 이 체크아웃 안에 실재하고 sha256 이 맞아야 `REVIEW_TASK_ANCHORED` 가 통과하고, 그 계약의 `base_sha` 가 이 체크아웃의
@@ -974,20 +974,27 @@ PY
 값이 다르면 그 run 이 두 위임에 걸쳐 있다는 뜻이므로(`_stamp_ids` 는 다른 값을 거부한다) 새 `--run` 으로 다시 돌린다.
 
 **종료 검사를 실행한다.** 이 절이 여기서 끝나지 않는다 — 결과 계약이 검사를 통과했다는 것과 그 작업 단위가 완료라는 것은 다르다.
-종료 검사는 **구현자 워크트리에서** 돈다. 거기에 evidence·`review/`·`task/` 가 있고, 그 체크아웃의 git 이력으로 `base_sha` 를 대조하기 때문이다.
+종료 검사는 **승인 커밋 시점의 하네스**가 돌리고 대상은 구현자 워크트리다(`--root "$W"`) — 그 단위가 바꾼 하네스가 자기를
+판정하지 않게 하기 위해서다(D-81). 대상이 `$W` 인 이유는 그대로다: 거기에 evidence·`review/`·`task/` 가 있고, 그 체크아웃의
+git 이력으로 `base_sha` 를 대조한다. 스냅샷은 §3.1 확인 3 과 같은 모양으로 꺼낸다 — git 저장소가 아니어도 된다.
 
 ```bash
-"$W/bin/romeo" close --unit <작업 단위 id> --root "$W" --dry-run
-"$W/bin/romeo" close --unit <작업 단위 id> --root "$W"
+J=$(mktemp -d) && git -C "$W" archive <base-sha> | tar -x -C "$J"     # 승인 커밋의 하네스 스냅샷
+"$J/bin/romeo" close --unit <작업 단위 id> --root "$W" --dry-run
+"$J/bin/romeo" close --unit <작업 단위 id> --root "$W"
+rm -rf "$J"
 ```
 
 `close` 가 받는 플래그는 `--unit`·`--dry-run`·`--root`·`--no-rerun`·`--rerun-timeout` 이다(`--help` 실측).
 `--dry-run` 은 판정만 인쇄하고 문서를 고치지 않는다.
 `--root "$W"` 를 빼면 위임한 쪽 체크아웃을 검사한다 — 거기에는 이 실행의 evidence 도 `review/` 봉투도 없어 판정이 성립하지 않는다.
+`<base-sha>` 가 승인 커밋의 후손이어도 된다 — `JUDGE_REVISION` 은 `docs/`·`.harness/` 밖 파일을 **승인 커밋**과 대조하므로, 그 사이에 하네스 파일이
+바뀌었으면 FAIL 이고 그때는 재승인한다(§3.1).
 
 관찰 가능한 성공 신호: **종료 코드 0** 과 첫 줄 `romeo close <id> → PASS`, 그리고 각 검사가 `[PASS]` 로 인쇄되는 것.
 `[FAIL]` 은 어긴 것이고 **`[UNVERIFIED]` 는 대조가 성립하지 않은 것**이다 — 어느 쪽이든 종료 코드 1 이고 `status: done` 은 붙지 않는다.
-미검증을 통과로 접지 않는다(K-51).
+미검증을 통과로 접지 않는다(K-51). `[FAIL] JUDGE_REVISION` 은 스냅샷이 승인 커밋이 아니거나 `$W` 자신의 `bin/romeo` 로 돌린 것이다 —
+그 문장에 다른 파일이 인쇄된다.
 
 **종료 검사는 기록을 믿지 않고 주장을 다시 실행해 대조한다.** 다시 실행되는 것은 `spec.md` 검증 계획의 `required_checks` 명령이다 —
 evidence 에 적힌 종료 코드를 읽는 것으로 끝내지 않고, 같은 명령 문자열을 이 체크아웃에서 새로 실행해 그 종료 코드를 기록과 맞춰 본다

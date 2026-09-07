@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-09-07T19:07:03+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-07T19:24:40+09:00'
 parent: null
 inputs: [inputs/probe-2026-09-07.patch]
-evidence: []
+evidence: [evidence/run_4db4be703188.yaml, evidence/run_ae9a7eac2c66.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -55,31 +55,31 @@ approval_history:
   로 돌리면 같은 검사가 FAIL 로 인쇄되며 어느 파일이 다른지 보인다. 규칙이 사는 문서 셋이 같은 변경에서 그 규칙을 말한다.
   이 단위 자신은 D-81 대로 **옛 close**(승인 커밋 스냅샷)가 닫는다 — 그 출력에는 `JUDGE_REVISION` 줄이 없다.
 - **수용 기준:**
-  - [ ] AC-1 `romeo close` 가 검사 `JUDGE_REVISION` 을 인쇄한다. 판정 대상 루트의 승인 커밋(이력에서 찾은 현재 승인의 첫 커밋)
+  - [x] AC-1 `romeo close` 가 검사 `JUDGE_REVISION` 을 인쇄한다. 판정 대상 루트의 승인 커밋(이력에서 찾은 현재 승인의 첫 커밋)
         트리에 `romeo/__init__.py` 가 있으면 자기적용이고, 그 트리의 `docs/`·`.harness/` 밖 추적 파일 전부가 판정을 낸 하네스(실행된
         `bin/romeo` 의 체크아웃)의 같은 경로에 **같은 blob 해시**로 있어야 PASS 다 — 내용만 본다(실행 비트·더해진 파일은 보지 않는다). 하나라도 다르거나 없으면 FAIL 이고, 그 문장에
         승인 커밋 앞 12자·다른 파일 수·다른 경로(최대 3개)가 들어간다. 승인 커밋 뒤에 `docs/`·`.harness/` 밖 추적 파일을 바꾼 커밋이 있는
         체크아웃이 자기를 판정하면(같은 폴더를 `--root` 로) FAIL 이다.
-  - [ ] AC-2 승인 커밋을 `git archive` 로 꺼낸 스냅샷 폴더(git 저장소 아님)의 `bin/romeo close --unit <id> --root <그 트리>` 는
+  - [x] AC-2 승인 커밋을 `git archive` 로 꺼낸 스냅샷 폴더(git 저장소 아님)의 `bin/romeo close --unit <id> --root <그 트리>` 는
         `JUDGE_REVISION` PASS 이고, 나머지 검사가 전부 통과하는 단위는 그 호출 한 번으로 `status: done` 이 된다(`--dry-run` 없이 부른 실제 종료). 출력에
         `Traceback` 이 없다. `--dry-run` 도 같은 판정을 인쇄한다.
-  - [ ] AC-3 스냅샷의 `docs/`·`.harness/` 밖 파일 하나만 내용이 달라도(예: `romeo/close.py` 끝에 한 줄) FAIL 이고 그 경로가 문장에
+  - [x] AC-3 스냅샷의 `docs/`·`.harness/` 밖 파일 하나만 내용이 달라도(예: `romeo/close.py` 끝에 한 줄) FAIL 이고 그 경로가 문장에
         인쇄된다. 판정이 이 검사 **앞에서 읽지 않는** 파일 하나가 없어도 같다(예: `README.md`). 판정이 이 검사 앞에서 읽는 파일
         (정책표·스키마)이 없으면 그 읽기가 먼저 오류 문장과 종료 코드 1 로 끝나는 기존 경로이고, 그것을 바꾸지 않는다 — 어느 쪽이든
         완료가 선언되는 일은 없다. 스냅샷의 `docs/`·`.harness/` 아래 파일이 달라도 판정은 바뀌지 않는다.
-  - [ ] AC-4 승인 커밋 트리에 `romeo/__init__.py` 가 없는 루트(남의 저장소)에서는 `JUDGE_REVISION` 이 「자기적용이 아니다」 문장으로
+  - [x] AC-4 승인 커밋 트리에 `romeo/__init__.py` 가 없는 루트(남의 저장소)에서는 `JUDGE_REVISION` 이 「자기적용이 아니다」 문장으로
         PASS 이고, 승인 커밋을 이력에서 찾지 못하면(예: 커밋하지 않은 재승인) 미검증(UNVERIFIED)이다 — 통과가 아니다. 이 검사는 검사 목록에서 `FRESH_HEAD` 미검증
         조기 종료 **뒤**·검사 기록 선택 **앞**에 온다 — 이력 없는 루트의 판정(Q-67)은 바뀌지 않는다.
-  - [ ] AC-5 규칙이 사는 자리 셋이 같은 변경에서 새 규칙을 말한다 — `core/workflows/plan-close/SKILL.md` 절차 2 가 「판정하는
+  - [x] AC-5 규칙이 사는 자리 셋이 같은 변경에서 새 규칙을 말한다 — `core/workflows/plan-close/SKILL.md` 절차 2 가 「판정하는
         하네스는 승인 커밋 시점의 것」과 `JUDGE_REVISION` 의 조건(자기적용 판별·비교 대상·`docs/`·`.harness/` 제외·거부 뜻)을 적고,
         `adapters/orca/RUNBOOK.md` §3.8 이 종료 검사를 승인 커밋 스냅샷(`git archive <base-sha>`)의 `bin/romeo` 로
         `--root "$W"` 를 주어 돌리는 명령으로 바뀌며 구현자 워크트리의 `bin/romeo` 로 `close` 를 돌리는 명령(`"$W/bin/romeo" close`)은
         사라진다. §3.1 의 「계약 입력이 바뀌었으면 `<base-sha>` 를 그 변경 뒤로 잡는다」는 「재승인한다 — 판정 하네스는 승인 커밋의
         것이다」로 바뀐다. `adapters/{claude,codex}/workflows/plan-close.md` 와 컴파일 산출물(`.claude/skills/plan-close/SKILL.md` ·
         `.agents/skills/plan-close/SKILL.md`)이 같은 문장을 담고 `bin/romeo compile --check` 가 통과한다.
-  - [ ] AC-6 기존 검사(`tests/`)는 한 줄도 고치지 않고 전부 통과한다 — 늘어난 검사는 이 단위가 더한 `tests/test_judge_revision.py`
+  - [x] AC-6 기존 검사(`tests/`)는 한 줄도 고치지 않고 전부 통과한다 — 늘어난 검사는 이 단위가 더한 `tests/test_judge_revision.py`
         뿐이다. `romeo close` 첫 줄 형식(`romeo close <id> → PASS|FAIL`)과 다른 검사 id·문장은 바뀌지 않는다.
-  - [ ] AC-7 `docs/planning/open-questions.md` 의 Q-43 행이 해소 표기되고(근거 열의 파일 경로는 남긴다), 이번 작업이 발견했으나
+  - [x] AC-7 `docs/planning/open-questions.md` 의 Q-43 행이 해소 표기되고(근거 열의 파일 경로는 남긴다), 이번 작업이 발견했으나
         고치지 않은 결함이 새 행(Q-83~)으로 열린다. 진단 문서(`docs/reviews/2026-09-07-self-application-diagnosis/`)는 고치지 않는다.
 - **위험과 되돌리기:** 종료 검사가 **더 엄격해진다** — 이 저장소의 단위는 이제 자기 트리의 `bin/romeo` 로 닫히지 않는다.
   현재 작업 공간에서 직접 구현한 단위(T0)도 `docs/`·`.harness/` 밖을 바꿨으면 승인 커밋 스냅샷이 닫아야 한다(비용: `git archive` 한 줄).
@@ -199,6 +199,7 @@ CLI 검사가 실제로 밟게 했다(check-6). 프로브 산출물은 승인 �
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-07T19:24:40+09:00 · HEAD 3363f8d3005e · 검사 기록 run_ae9a7eac2c66
 
-- (없음)
+- [evidence/run_4db4be703188.yaml](evidence/run_4db4be703188.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_ae9a7eac2c66.yaml](evidence/run_ae9a7eac2c66.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

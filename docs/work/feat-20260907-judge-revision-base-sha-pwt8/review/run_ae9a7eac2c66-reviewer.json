@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-judge-revision-base-sha-pwt8",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-judge-revision-base-sha-pwt8/task/run_ae9a7eac2c66-reviewer.json",
+    "sha256": "965c1f825dcc328bfd4be53f5f02e5cb8b6b0fdbbaeb7e643b706d8b54eb660d"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "비차단 경고: 현재 상태 안내가 이전 승인 5b1767a와 구현 1회차를 가리킨다. 현재 계약의 base_sha는 3363f8d3005e이고, docs/work/feat-20260907-judge-revision-base-sha-pwt8/attempts.yaml:13에는 2회차가 기록되어 있다. 다음 세션에 이전 승인·회차를 현재 상태로 안내하는 문서 불일치이며, 승인된 수용 기준의 미달에는 해당하지 않는다.",
+      "file": "docs/planning/progress.md",
+      "line": 27
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-judge-revision-base-sha-pwt8/evidence/run_ae9a7eac2c66.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD가 일치한다. 수용 기준 근거는 AC-1: check-1·6 및 romeo/close.py:456, AC-2: check-2·6, AC-3: check-3·4와 기존 선행 파일 읽기·CLI 오류 처리, AC-4: check-5·13 및 romeo/close.py:323, AC-5: check-7·8·9·12와 해당 문서 변경, AC-6: check-10·11과 기존 tests/ 수정 없음, AC-7: docs/planning/open-questions.md:104·162·163 및 진단 문서 변경 없음이다. 필수 검사 13건의 기록과 원시 로그는 모두 exit 0이며 전체 테스트 로그는 922건 OK다. 승인 이후 spec 변경은 체크 표시뿐이고 required_checks는 바뀌지 않았다. 변경은 구현자 allowed_paths 안이며 가드 대상 행동의 위반 근거는 발견하지 않았다. 검사 재실행·파일 수정·해시 계산은 하지 않았다. 현재 변경 목록은 증거의 제외 경로를 적용하면 changed_files와 일치한다. 해시의 실제 재대조와 검토 전후 방어 검사는 위임 측 및 종료 검사의 몫이다."
+}

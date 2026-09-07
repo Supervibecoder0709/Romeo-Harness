@@ -13,6 +13,11 @@ provenance: []
 1. **증거 확인.** `docs/work/<id>/evidence/*.yaml` 이 최소 1건 있어야 한다. 없으면 close 는 `HAS_EVIDENCE` 로 실패한다.
    증거는 `romeo evidence run --unit <id> -- <명령>` 으로만 만든다. 손으로 쓰지 않는다.
 2. **검사 실행.** `romeo close --unit <id>` 는 아래를 순서대로 검사한다. 하나라도 실패하면 상태를 바꾸지 않는다.
+   **판정하는 하네스는 승인 커밋 시점의 것이다.** `romeo close` 는 그 단위의 승인 커밋을 스냅샷으로 꺼낸 그 리비전의
+   `romeo close --unit <id> --root <판정 대상 루트>` 로 돌린다. 판정 대상의 승인 커밋 트리에 `romeo/__init__.py` 가 있으면
+   (하네스 저장소 자신) 판정을 낸 하네스의 `docs/`·`.harness/` 밖 추적 파일 전부가 그 커밋의 것과 같아야 하고(`JUDGE_REVISION` — 두 곳은
+   판정이 읽지 않는다), 다르거나 없으면 거부한다 — 그 단위가 바꾼 규칙이 그 단위 자신을 판정하는 것이고, 새 규칙은 다음 단위부터 적용된다(D-81). 트리에
+   하네스가 없는 루트는 「자기적용이 아니다」로 통과한다. 내용(blob)만 본다 — 실행 비트와 더해진 파일은 보지 않는다, 판정이 읽는 파일은 이름이 고정돼 있다.
    - frontmatter 스키마 유효, `status: active`, `approved_at` 존재
    - 수용 기준 체크박스가 전부 `[x]` (미체크가 있으면 `AC_ALL_CHECKED`), 그리고 확인란의 **문장**이 승인 커밋의 것과 같음(`AC_TEXT_UNCHANGED` — 체크 표시만 다를 수 있다 —
      확인란은 사용자가 승인한 면이므로 문장을 고쳤으면 재승인 대상이다). 검증 계획(`required_checks`)도 승인 커밋의 것과 같아야 한다 —
@@ -26,6 +31,7 @@ provenance: []
      — 다르면 `FRESH_HEAD`/`FRESH_TREE`. 커밋 이동·tracked 수정·staged 변경·untracked 추가 네 경우 모두 거부한다.
      루트에 git 이력이 없으면(`git rev-parse HEAD` 실패 — 저장소가 아닌 폴더든 커밋 없는 저장소든) `FRESH_HEAD` 를
      미검증으로 인쇄하고 그 뒤 검사는 시도하지 않는다 — 대조할 현재 값이 없다. 스택 트레이스가 아니라 검사 목록과 종료 코드로 끝난다
+   - 판정을 낸 하네스가 승인 커밋의 하네스와 같음(`JUDGE_REVISION` — 위 문단). 승인 커밋을 이력에서 찾지 못하면 미검증
    - spec 의 `required_checks` 명령이 그 검사 기록의 `commands` 에 exit 0 으로 존재(`REQUIRED_CHECK`), 그 기록이 원시 로그·봉인과 맞음(`EVIDENCE_LOG`),
      그리고 **같은 명령을 그 체크아웃에서 다시 실행해** 종료 코드가 기록과 같음(`REQUIRED_CHECK_RERUN` — 기록은 믿지 않는다; `rerun: false`·`--no-rerun` 은 미검증)
    - `changed_files` 가 비어 있지 않음(`HAS_CHANGE`) — 아무것도 바뀌지 않았다면 done 이 아니다

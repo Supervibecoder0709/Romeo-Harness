@@ -1,0 +1,81 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-judge-revision-base-sha-pwt8",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-judge-revision-base-sha-pwt8/task/run_4db4be703188-implementer.json",
+    "sha256": "bc4b67201180cab9635764856cbd978fb14e928ad259407ba1d1de071fe59254"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_tree_under_judgment_judging_itself_is_refused",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_of_the_approval_commit_passes_and_closes_the_unit",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_snapshot_with_one_file_changed_is_refused_and_names_the_path",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_docs_are_not_compared",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_a_root_without_the_harness_passes_as_not_self_applied",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_the_snapshot_cli_judges_the_tree_with_root_and_prints_a_verdict",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "grep -q 'JUDGE_REVISION' core/workflows/plan-close/SKILL.md && grep -q '승인 커밋 시점' core/workflows/plan-close/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "grep -q 'J/bin/romeo\" close --unit <작업 단위 id> --root \"$W\"' adapters/orca/RUNBOOK.md && ! grep -q 'W/bin/romeo\" close' adapters/orca/RUNBOOK.md && ! grep -q '그 변경 뒤로 잡는다' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest tests.test_doc_commands tests.test_enforce_points tests.test_attach_requirements",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "grep -q 'JUDGE_REVISION' adapters/claude/workflows/plan-close.md && grep -q 'JUDGE_REVISION' adapters/codex/workflows/plan-close.md && grep -q 'JUDGE_REVISION' .claude/skills/plan-close/SKILL.md && grep -q 'JUDGE_REVISION' .agents/skills/plan-close/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-13",
+      "command": "python3 -m unittest tests.test_judge_revision.TestJudgeRevision.test_an_uncommitted_approval_leaves_the_judge_unverified",
+      "exit_code": 0
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-judge-revision-base-sha-pwt8/evidence/run_4db4be703188.yaml",
+  "findings": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "notes": "13건 전부 exit 0(run_4db4be703188 · check-1~13). 판별 검사 10건(check-1~8·12·13)과 회귀 방지 3건(check-9~11)이 모두 통과했고 check-10 은 922건 OK(170.2초 · Ran 922 tests · 로그 10-check-10.log · 재실행 상한 600초 안). 출발점은 spec frontmatter 의 inputs 에 등록된 승인 전 프로브 시제품(inputs/probe-2026-09-07.patch)이고, 적용 뒤 spec 「구현 단위」 1~3 행과 대조해 두 가지를 고쳤다 — ① 패치의 새 파일 경로가 a/b 접두 없이 'atests/…' 로 적혀 있어 git apply 가 루트에 'test_judge_revision.py' 로 풀었고, spec 이 지정한 tests/test_judge_revision.py 로 옮겼다(계약의 allowed_paths 밖에 남기지 않기 위해서다). ② 패치에 없는 구현 단위 4(open-questions 의 Q-43 해소 표기·새 행 Q-83·Q-84 · progress.md 「지금 상태」 갱신)를 새로 썼다. 그 밖의 코드·문서는 패치 내용이 spec 과 일치해 그대로 두었고, bin/romeo compile 을 다시 돌려 산출물이 패치의 값과 같음을 확인했다(compile --check PASS = check-9). 기존 검사(tests/)는 한 줄도 고치지 않았다 — git status 에서 tests/ 아래 수정 파일 0건이고 새 파일 tests/test_judge_revision.py 하나만 늘었다(AC-6). 이 봉투를 쓴 시점의 트리는 커밋하지 않은 상태이고, 증거의 head_sha 는 승인 커밋 5b1767a1ba6a 다 — 직전 단위(feat-20260907-envelope-root-close-no-history-rshi 의 run_efc3965a78d8)와 같은 모양이다. 종료 검사는 D-81 ② 대로 승인 커밋 스냅샷의 bin/romeo 가 --root 로 이 워크트리를 판정해야 한다 — 이 워크트리의 bin/romeo 로 돌리면 이 단위가 더한 JUDGE_REVISION 자신이 FAIL 을 낸다(그 동작이 check-1·check-6 이 고정한 것이다). §12 로 고치지 않고 연 것 둘: Q-83(envelope check·evidence checks 는 아직 구현자 워크트리의 하네스로 돈다 — 그 차이가 판정에 닿는지 미확인) · Q-84(판정 하네스의 리비전이 attempts.yaml 회차에 남지 않는다). 둘 다 spec 「바꾸지 않는 것」에 명시된 비범위다."
+}
