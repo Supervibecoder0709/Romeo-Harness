@@ -648,9 +648,10 @@ A-02(정책표 정확도), A-03(3-tier 충분성), A-04(경로 불변 탐색성)
 | 12 | 라이선스 필드 T1 결과물 | `archive/README.md` 라이선스 열, 18개 `_source.md` `License:` 줄, CI PASS |
 | 13 | M3: Charter·discovery·gate·capabilities·doctor | 시나리오 3·8·9 런북 PASS, hard gate 8 각 fixture ≥ 1 |
 | 13b | **G-M3 채택 게이트**(개정 3): BMAD 본체 `/repo` 아카이브(Q-06 ✅) → 추천 스킬 후보표 ✅ → 사용자 확정 ✅ (**1·2·3단계 닫힘 2026-08-31 · D-77**) → **4단계 닫힘 2026-08-31**(`feat-20260831-bmad-attach-probe-tgnb` close): `capabilities.yaml` 의 `discovery.bmad` 프로브 + `parts.bmad-cis` accepted + 추천 11종(정식 id) + 카드의 `inputs:` 요구 + 충돌 fixture c5·c6·c7. **5단계는 절반** — 설치 없이 확인 가능한 것만 했다 | discovery fixture 카드가 추천 11종·`inputs:` 요구·프로브 결과를 인쇄(실측); doctor 충돌 fixture 7종 통과. **남은 것**: BMAD 실제 설치 후 두 런타임 discovery 관측 — `.agents/skills` 를 installer 가 어떻게 다루는지가 그 단계의 위험이다 |
+| 13c | **판정 리비전 분리(D-81)** — ① 선행 Q-66·Q-67 정비 → ② 판정(`close`·`validate`·`route`)을 `base_sha` 시점 하네스로 돌린다 | ② 옛 리비전 체크아웃이 현재 트리를 `--root` 로 판정해 검사 목록과 종료 코드를 내고(스택 트레이스 아님), 새 규칙이 그 규칙을 만든 단위 자신을 판정하지 않는다. ①은 `--root` 를 준 실행에서 위치 인자가 그 루트 기준으로 해석되고(Q-66), git 이력 없는 루트에서도 판정이 인쇄된다(Q-67) |
 | 14 | M4: find·context·승격·metrics | 중복 제안 1건, `docs/current/` 1건, 지표 표 출력, 깨진 링크 0 |
 | 15 | shadow mode 20건 완료 + **v1 릴리스 게이트 판정** | 분류 수정률·gate 누락 수 집계, V-0~V-10 전부 증거로 충족 → v1 완료 선언 |
-| 16 | M5(v1.1): attach·update·rollback — preflight·파일별 승인·원자적 적용·백업 복원 | 샌드박스 + 실제 프로젝트 1건, dirty/untracked 충돌 fixture 포함 시나리오 10 PASS |
+| 16 | M5(v1.1): attach·update·rollback — preflight·파일별 승인·원자적 적용·백업 복원. **개정(D-81, 2026-09-07): #13c 를 먼저 세운다** — Q-66·Q-67 은 M5 요구사항 9건 중 2건이라 그 정비가 M5 의 입력을 줄인다. 요구사항 원본은 `docs/requirements/attach-requirements.md` 의 「올린 것」 9건 | 샌드박스 + 실제 프로젝트 1건, dirty/untracked 충돌 fixture 포함 시나리오 10 PASS |
 | 17 | 하네스 `v0.1.0` 태그(릴리스 게이트 통과 시점) | 태그 존재, provenance CI PASS |
 | 18 | M6/M7은 트리거 발생 시 — 각각 **G-M6·G-M7 채택 게이트** 선행 | UI 프로젝트 발생 / v1 통과 후; 게이트 결정이 imports.yaml에 기록됨 |
 
