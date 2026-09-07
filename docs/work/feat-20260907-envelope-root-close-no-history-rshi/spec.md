@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-09-07T14:05:05+09:00'
+approved_at: '2026-09-07T14:29:31+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,11 @@ routing:
   history: []
 created: '2026-09-07'
 updated: '2026-09-07'
+approval_history:
+- {approved_at: '2026-09-07T14:05:05+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-07T14:29:31+09:00',
+  reason: '1회차 검토자 FAIL findings 1건 — AC-2 의 「인쇄와 --json 의 path 도 그 해석된 경로다」가 없는 파일 문단 안에 있어, 없는 파일은 JSON
+    출력 전에 오류 문장으로 끝나는 기존 경로라 검토 시점에 참일 수 없었다. 그 문장을 찾은 파일로 좁히고 없는 파일은 JSON 을 내지 않는다고 명시한다. 산출물은 문제없다 —
+    AC-1·3~8 은 검토자가 확인했다'}
 ---
 
 # 위치 인자가 루트를 따르고, 이력 없는 루트에서도 종료 검사가 판정을 낸다
@@ -50,7 +55,9 @@ updated: '2026-09-07'
   - [ ] AC-1 `envelope check` 에 상대 경로를 주면 `--root` 기준으로 찾는다 — 명령을 친 자리가 **다른 저장소**여도
         `--root` 아래의 봉투를 검사해 통과한다. 절대 경로는 지금과 같다.
   - [ ] AC-2 상대 경로의 파일이 없으면 종료 코드 1 과 「결과 계약 파일이 없다」 문장에 **해석된 절대 경로**가 들어가
-        어느 루트에서 찾았는지 보인다. 인쇄와 `--json` 의 `path` 도 그 해석된 경로다. 스택 트레이스가 아니다.
+        어느 루트에서 찾았는지 보인다 — JSON 은 내지 않는다(없는 파일은 이 단위 이전부터 오류 문장과 종료 코드 1 로 끝나는
+        기존 경로이고, 그것을 바꾸지 않는다). **찾은** 파일에 대해서는 인쇄와 `--json` 의 `path` 가 그 해석된 경로다.
+        스택 트레이스가 아니다.
   - [ ] AC-3 규칙이 사는 자리 둘이 새 규칙을 말한다 — `adapters/orca/RUNBOOK.md` §3.0 에서 `envelope check` 의
         위치 인자를 「셸이 자기 cwd 로 푸는 경로」 목록에 넣은 문장이 사라지고 「상대 경로면 `--root` 기준으로 푼다」가
         적히며, `envelope check --help` 의 `paths` 설명이 같은 규칙을 말한다. 이 문서가 지시하는 명령(`$W/…` 절대 경로)은

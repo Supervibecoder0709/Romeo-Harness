@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260907-envelope-root-close-no-history-rshi
+attempts:
+- n: 1
+  run: run_efc3965a78d8
+  base_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  started_at: '2026-09-07T14:07:03+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL findings 1 — AC-2 의 「인쇄와 --json 의 path 도 그 해석된 경로다」 문장이 '없는 파일' 경우에 참일 수 없다(FileNotFoundError
+    가 JSON 출력 전에 나 main 이 오류 문장만 낸다). 산출물 결함이 아니라 AC 문장의 과잉 명세
+  settled_at: '2026-09-07T14:24:53+09:00'
+reviews: []
