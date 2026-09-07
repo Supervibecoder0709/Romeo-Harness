@@ -11,4 +11,22 @@ attempts:
     가 조용히 사라진다(AC-5 미충족 · check-5 가 이 조항을 안 본다) ② AC-8: 코디네이터가 브리프에 context 를 다시 돌린 출력을 붙여 증거의 기록(13-context-resume.log
     · 명령 12건)과 달랐다(그대로 넣지 않았다). ①은 산출물, ②는 코디네이터 절차 오류 — 2회차는 같은 워크트리에서 ① 수정 + 브리프를 기록된 stdout 으로 재구성'
   settled_at: '2026-09-08T00:20:53+09:00'
-reviews: []
+- n: 2
+  run: run_6daba018ef1d
+  base_sha: 7245eafb8650f706257df79693e0bbcb47faaa3a
+  started_at: '2026-09-08T00:22:46+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL findings 2 — ① romeo/context.py: YAML 로 유효하지만 매핑이 아닌 frontmatter(목록·문자열)를 정본으로 채택한 뒤
+    fm.get 에서 AttributeError 로 목록 전체가 죽는다(AC-5 「파일 하나가 깨져도 목록은 나온다」 반례 · check-5 는 문법 오류만 본다) ② progress
+    블록 「1회차 진행 중」 낡음(FAIL 사유 아님). 연속 2회 실패 — §10 반복 중단, 사람 재검토 대기. AC-8 은 이번 회차 충족(브리프 == 기록된 stdout)'
+  settled_at: '2026-09-08T00:39:45+09:00'
+reviews:
+- after_attempt: 2
+  conclusion: '완료 정의 달성 가능 — AC-5 의 「파일 하나가 깨져도 목록은 나온다 — 그 줄만 읽을 수 없다」는 깨짐의 종류를 열거하는 구현으로는 끝나지 않고(2회
+    연속 다른 반례), 파일 단위 예외 격리로 읽는다: 그 파일을 읽고 사실을 뽑는 어떤 예외든 그 줄에만 「읽을 수 없다」를 붙이며 목록은 나온다. frontmatter 는 매핑일
+    때만 읽힌 것으로, parent 는 스칼라만, inputs·evidence 는 목록의 스칼라 항목만 쓴다. 3회차는 이 격리·정규화와 반례 4종 검사(목록 frontmatter·문자열
+    frontmatter·문자열 inputs·목록 parent)를 넣고 progress 줄을 갱신한다. 이 관통이 남긴 구조적 원인(승인 전 반대 독자 부재)은 다음 정비 단위 feat-20260908-ac-rebuttal-before-approval-2sct
+    로 연다(사용자 확정 2026-09-08)'
+  by: Supervibecoder0709
+  at: '2026-09-08T00:52:14+09:00'
