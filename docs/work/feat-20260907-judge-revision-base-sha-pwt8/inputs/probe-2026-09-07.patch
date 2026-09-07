@@ -1,0 +1,443 @@
+diff --git a/.agents/skills/plan-close/SKILL.md b/.agents/skills/plan-close/SKILL.md
+index adb42bc..148c931 100644
+--- a/.agents/skills/plan-close/SKILL.md
++++ b/.agents/skills/plan-close/SKILL.md
+@@ -9,10 +9,10 @@ description: 작업 단위를 종료한다. 문서 스키마·링크·미체크
+ 
+ 절차의 원본은 `core/workflows/plan-close/SKILL.md` 다. 이 파일은 그 절차를 Codex CLI 에서 어떻게 수행하는지만 적는다.
+ 
+-<!-- romeo:managed start v0.1.0 source=adapters/codex/workflows/plan-close.md sha=6064a245 -->
++<!-- romeo:managed start v0.1.0 source=adapters/codex/workflows/plan-close.md sha=89c48cb2 -->
+ 1. `core/workflows/plan-close/SKILL.md` 를 읽고 절차를 그대로 따른다.
+ 2. 증거가 없으면 시작하지 않는다. `bin/romeo evidence run --unit <id> -- <명령>` 또는 `bin/romeo evidence checks --unit <id>` 로 만든다. 손으로 쓰지 않는다.
+-3. 검사는 `bin/romeo close --unit <id>` 가 한다. 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK)를 그대로 사용자에게 보고한다.
++3. 검사는 승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root <대상 루트>` 가 한다(절차 2 — 구현 워크트리 자신의 `bin/romeo` 가 아니다). 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK·JUDGE_REVISION)를 그대로 사용자에게 보고한다.
+ 4. 실패를 우회하지 않는다. 실패한 검사 이름과 출력을 그대로 보여주고 다음 행동을 제안한다.
+ 5. 통과하면 `status: done` 과 `closed_at` 이 기록된다. 결과 보고에는 실행한 명령과 종료 코드를 포함한다.
+ <!-- romeo:managed end -->
+diff --git a/.claude/skills/plan-close/SKILL.md b/.claude/skills/plan-close/SKILL.md
+index 94bf439..1d1a0f8 100644
+--- a/.claude/skills/plan-close/SKILL.md
++++ b/.claude/skills/plan-close/SKILL.md
+@@ -9,10 +9,10 @@ description: Romeo 종료 검사. docs/work/<id>/ 작업 단위의 evidence 신
+ 
+ 절차의 원본은 `core/workflows/plan-close/SKILL.md` 다. 이 파일은 그 절차를 Claude Code 에서 어떻게 수행하는지만 적는다.
+ 
+-<!-- romeo:managed start v0.1.0 source=adapters/claude/workflows/plan-close.md sha=fb2a43ad -->
++<!-- romeo:managed start v0.1.0 source=adapters/claude/workflows/plan-close.md sha=bbc494b9 -->
+ 1. `core/workflows/plan-close/SKILL.md` 를 읽고 절차를 그대로 따른다.
+ 2. 증거가 없으면 시작하지 않는다. `bin/romeo evidence run --unit <id> -- <명령>` 또는 `bin/romeo evidence checks --unit <id>` 로 만든다. 손으로 쓰지 않는다.
+-3. 검사는 `bin/romeo close --unit <id>` 가 한다. 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK)를 그대로 사용자에게 보고한다.
++3. 검사는 승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root <대상 루트>` 가 한다(절차 2 — 구현 워크트리 자신의 `bin/romeo` 가 아니다). 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK·JUDGE_REVISION)를 그대로 사용자에게 보고한다.
+ 4. 실패를 우회하지 않는다. "거의 됐다"는 완료가 아니다 — 실패한 검사 이름과 출력을 그대로 보여주고 다음 행동을 제안한다.
+ 5. 통과하면 `status: done` 과 `closed_at` 이 기록된다. 결과 보고에는 실행한 명령과 종료 코드를 포함한다.
+ <!-- romeo:managed end -->
+diff --git a/adapters/claude/workflows/plan-close.md b/adapters/claude/workflows/plan-close.md
+index 4aba0c2..0b671b6 100644
+--- a/adapters/claude/workflows/plan-close.md
++++ b/adapters/claude/workflows/plan-close.md
+@@ -1,5 +1,5 @@
+ 1. `core/workflows/plan-close/SKILL.md` 를 읽고 절차를 그대로 따른다.
+ 2. 증거가 없으면 시작하지 않는다. `bin/romeo evidence run --unit <id> -- <명령>` 또는 `bin/romeo evidence checks --unit <id>` 로 만든다. 손으로 쓰지 않는다.
+-3. 검사는 `bin/romeo close --unit <id>` 가 한다. 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK)를 그대로 사용자에게 보고한다.
++3. 검사는 승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root <대상 루트>` 가 한다(절차 2 — 구현 워크트리 자신의 `bin/romeo` 가 아니다). 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK·JUDGE_REVISION)를 그대로 사용자에게 보고한다.
+ 4. 실패를 우회하지 않는다. "거의 됐다"는 완료가 아니다 — 실패한 검사 이름과 출력을 그대로 보여주고 다음 행동을 제안한다.
+ 5. 통과하면 `status: done` 과 `closed_at` 이 기록된다. 결과 보고에는 실행한 명령과 종료 코드를 포함한다.
+diff --git a/adapters/codex/workflows/plan-close.md b/adapters/codex/workflows/plan-close.md
+index d01c7f0..5c75b6e 100644
+--- a/adapters/codex/workflows/plan-close.md
++++ b/adapters/codex/workflows/plan-close.md
+@@ -1,5 +1,5 @@
+ 1. `core/workflows/plan-close/SKILL.md` 를 읽고 절차를 그대로 따른다.
+ 2. 증거가 없으면 시작하지 않는다. `bin/romeo evidence run --unit <id> -- <명령>` 또는 `bin/romeo evidence checks --unit <id>` 로 만든다. 손으로 쓰지 않는다.
+-3. 검사는 `bin/romeo close --unit <id>` 가 한다. 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK)를 그대로 사용자에게 보고한다.
++3. 검사는 승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root <대상 루트>` 가 한다(절차 2 — 구현 워크트리 자신의 `bin/romeo` 가 아니다). 실패 코드(FRESH_*·NO_EVIDENCE·UNCHECKED_AC·MISSING_CHECK·JUDGE_REVISION)를 그대로 사용자에게 보고한다.
+ 4. 실패를 우회하지 않는다. 실패한 검사 이름과 출력을 그대로 보여주고 다음 행동을 제안한다.
+ 5. 통과하면 `status: done` 과 `closed_at` 이 기록된다. 결과 보고에는 실행한 명령과 종료 코드를 포함한다.
+diff --git a/adapters/orca/RUNBOOK.md b/adapters/orca/RUNBOOK.md
+index 7373e67..0af0704 100644
+--- a/adapters/orca/RUNBOOK.md
++++ b/adapters/orca/RUNBOOK.md
+@@ -138,8 +138,8 @@ bin/romeo approve <작업 단위 id> --by <승인자>
+ 그래서 `<base-sha>` 는 **승인 커밋이거나 그 후손**이어야 하고, 그 커밋의 spec 이 담은 승인이 **지금의 승인과 같아야** 한다 —
+ 승인 동일성은 `envelope build` 가 검사해 재승인 전 승인을 담은 커밋(옛 `<base-sha>`)을 거부하고, 조상 관계는 §3.8 의 `BASE_SHA` 앵커
+ (`envelope check`·`close`)가 검사한다. `--base-sha` 를 생략하면 승인 커밋 자체를 쓴다.
+-승인 커밋과 `<base-sha>` 사이에 계약 입력(정책표·`core/roles/`·`core/schemas/`·`.harness/romeo.project.yaml`)이 바뀌었으면 §3.8 의 재계산 대조가
+-**지금 하네스**로 다시 계산하므로 `<base-sha>` 를 그 변경 뒤로 잡는다.
++승인 커밋과 `<base-sha>` 사이에 계약 입력(정책표·`core/roles/`·`core/schemas/`·`.harness/romeo.project.yaml`)이 바뀌었으면 **재승인한다** —
++§3.8 의 판정·재계산은 **승인 커밋 시점의 하네스**가 하므로(D-81 · `JUDGE_REVISION`), 그 뒤의 입력으로 만든 계약은 재계산 대조에서 어긋난다.
+ 
+ 그 다음 **사람이** 승인된 `spec.md` **와 워커가 실행할 하네스 상태**를 커밋한다. 하네스는 커밋하지 않는다 —
+ 무엇을 언제 커밋하는지는 사람의 판단이다. 이 커밋의 SHA 가 이후 모든 명령의 `<base-sha>` 이고,
+@@ -868,7 +868,7 @@ orca orchestration worker-start \
+ 구현자의 결과 계약: `docs/work/<id>/result/<run-id>-implementer.json`
+ 검토자의 결과 계약: `docs/work/<id>/review/<run-id>-reviewer.json`
+ 
+-둘 다 **구현자 워크트리 안**의 작업 단위 폴더에 쓴다. 종료 검사(`bin/romeo close --unit <id>`)가 그 체크아웃에서 돌면서
++둘 다 **구현자 워크트리 안**의 작업 단위 폴더에 쓴다. 종료 검사(승인 커밋 스냅샷의 `bin/romeo close --unit <id> --root "$W"`)가 그 체크아웃을 **대상으로** 돌면서
+ 거기 있는 evidence · `review/` · **`task/`** 를 읽고, 그 체크아웃의 **git 이력**으로 계약의 `base_sha` 를 대조하기 때문이다(K-62).
+ `task/` 까지 읽는다는 것이 §3.5.1 이 필요한 이유다 — 검토자 결과 계약의 `task_envelope_ref.path` 가 가리키는 파일이
+ 이 체크아웃 안에 실재하고 sha256 이 맞아야 `REVIEW_TASK_ANCHORED` 가 통과하고, 그 계약의 `base_sha` 가 이 체크아웃의
+@@ -974,20 +974,27 @@ PY
+ 값이 다르면 그 run 이 두 위임에 걸쳐 있다는 뜻이므로(`_stamp_ids` 는 다른 값을 거부한다) 새 `--run` 으로 다시 돌린다.
+ 
+ **종료 검사를 실행한다.** 이 절이 여기서 끝나지 않는다 — 결과 계약이 검사를 통과했다는 것과 그 작업 단위가 완료라는 것은 다르다.
+-종료 검사는 **구현자 워크트리에서** 돈다. 거기에 evidence·`review/`·`task/` 가 있고, 그 체크아웃의 git 이력으로 `base_sha` 를 대조하기 때문이다.
++종료 검사는 **승인 커밋 시점의 하네스**가 돌리고 대상은 구현자 워크트리다(`--root "$W"`) — 그 단위가 바꾼 하네스가 자기를
++판정하지 않게 하기 위해서다(D-81). 대상이 `$W` 인 이유는 그대로다: 거기에 evidence·`review/`·`task/` 가 있고, 그 체크아웃의
++git 이력으로 `base_sha` 를 대조한다. 스냅샷은 §3.1 확인 3 과 같은 모양으로 꺼낸다 — git 저장소가 아니어도 된다.
+ 
+ ```bash
+-"$W/bin/romeo" close --unit <작업 단위 id> --root "$W" --dry-run
+-"$W/bin/romeo" close --unit <작업 단위 id> --root "$W"
++J=$(mktemp -d) && git -C "$W" archive <base-sha> | tar -x -C "$J"     # 승인 커밋의 하네스 스냅샷
++"$J/bin/romeo" close --unit <작업 단위 id> --root "$W" --dry-run
++"$J/bin/romeo" close --unit <작업 단위 id> --root "$W"
++rm -rf "$J"
+ ```
+ 
+ `close` 가 받는 플래그는 `--unit`·`--dry-run`·`--root`·`--no-rerun`·`--rerun-timeout` 이다(`--help` 실측).
+ `--dry-run` 은 판정만 인쇄하고 문서를 고치지 않는다.
+ `--root "$W"` 를 빼면 위임한 쪽 체크아웃을 검사한다 — 거기에는 이 실행의 evidence 도 `review/` 봉투도 없어 판정이 성립하지 않는다.
++`<base-sha>` 가 승인 커밋의 후손이어도 된다 — `JUDGE_REVISION` 은 `docs/`·`.harness/` 밖 파일을 **승인 커밋**과 대조하므로, 그 사이에 하네스 파일이
++바뀌었으면 FAIL 이고 그때는 재승인한다(§3.1).
+ 
+ 관찰 가능한 성공 신호: **종료 코드 0** 과 첫 줄 `romeo close <id> → PASS`, 그리고 각 검사가 `[PASS]` 로 인쇄되는 것.
+ `[FAIL]` 은 어긴 것이고 **`[UNVERIFIED]` 는 대조가 성립하지 않은 것**이다 — 어느 쪽이든 종료 코드 1 이고 `status: done` 은 붙지 않는다.
+-미검증을 통과로 접지 않는다(K-51).
++미검증을 통과로 접지 않는다(K-51). `[FAIL] JUDGE_REVISION` 은 스냅샷이 승인 커밋이 아니거나 `$W` 자신의 `bin/romeo` 로 돌린 것이다 —
++그 문장에 다른 파일이 인쇄된다.
+ 
+ **종료 검사는 기록을 믿지 않고 주장을 다시 실행해 대조한다.** 다시 실행되는 것은 `spec.md` 검증 계획의 `required_checks` 명령이다 —
+ evidence 에 적힌 종료 코드를 읽는 것으로 끝내지 않고, 같은 명령 문자열을 이 체크아웃에서 새로 실행해 그 종료 코드를 기록과 맞춰 본다
+diff --git a/core/workflows/plan-close/SKILL.md b/core/workflows/plan-close/SKILL.md
+index 4619898..aeb9097 100644
+--- a/core/workflows/plan-close/SKILL.md
++++ b/core/workflows/plan-close/SKILL.md
+@@ -13,6 +13,11 @@ provenance: []
+ 1. **증거 확인.** `docs/work/<id>/evidence/*.yaml` 이 최소 1건 있어야 한다. 없으면 close 는 `HAS_EVIDENCE` 로 실패한다.
+    증거는 `romeo evidence run --unit <id> -- <명령>` 으로만 만든다. 손으로 쓰지 않는다.
+ 2. **검사 실행.** `romeo close --unit <id>` 는 아래를 순서대로 검사한다. 하나라도 실패하면 상태를 바꾸지 않는다.
++   **판정하는 하네스는 승인 커밋 시점의 것이다.** `romeo close` 는 그 단위의 승인 커밋을 스냅샷으로 꺼낸 그 리비전의
++   `romeo close --unit <id> --root <판정 대상 루트>` 로 돌린다. 판정 대상의 승인 커밋 트리에 `romeo/__init__.py` 가 있으면
++   (하네스 저장소 자신) 판정을 낸 하네스의 `docs/`·`.harness/` 밖 추적 파일 전부가 그 커밋의 것과 같아야 하고(`JUDGE_REVISION` — 두 곳은
++   판정이 읽지 않는다), 다르거나 없으면 거부한다 — 그 단위가 바꾼 규칙이 그 단위 자신을 판정하는 것이고, 새 규칙은 다음 단위부터 적용된다(D-81). 트리에
++   하네스가 없는 루트는 「자기적용이 아니다」로 통과한다. 내용(blob)만 본다 — 실행 비트와 더해진 파일은 보지 않는다, 판정이 읽는 파일은 이름이 고정돼 있다.
+    - frontmatter 스키마 유효, `status: active`, `approved_at` 존재
+    - 수용 기준 체크박스가 전부 `[x]` (미체크가 있으면 `AC_ALL_CHECKED`), 그리고 확인란의 **문장**이 승인 커밋의 것과 같음(`AC_TEXT_UNCHANGED` — 체크 표시만 다를 수 있다 —
+      확인란은 사용자가 승인한 면이므로 문장을 고쳤으면 재승인 대상이다). 검증 계획(`required_checks`)도 승인 커밋의 것과 같아야 한다 —
+@@ -26,6 +31,7 @@ provenance: []
+      — 다르면 `FRESH_HEAD`/`FRESH_TREE`. 커밋 이동·tracked 수정·staged 변경·untracked 추가 네 경우 모두 거부한다.
+      루트에 git 이력이 없으면(`git rev-parse HEAD` 실패 — 저장소가 아닌 폴더든 커밋 없는 저장소든) `FRESH_HEAD` 를
+      미검증으로 인쇄하고 그 뒤 검사는 시도하지 않는다 — 대조할 현재 값이 없다. 스택 트레이스가 아니라 검사 목록과 종료 코드로 끝난다
++   - 판정을 낸 하네스가 승인 커밋의 하네스와 같음(`JUDGE_REVISION` — 위 문단). 승인 커밋을 이력에서 찾지 못하면 미검증
+    - spec 의 `required_checks` 명령이 그 검사 기록의 `commands` 에 exit 0 으로 존재(`REQUIRED_CHECK`), 그 기록이 원시 로그·봉인과 맞음(`EVIDENCE_LOG`),
+      그리고 **같은 명령을 그 체크아웃에서 다시 실행해** 종료 코드가 기록과 같음(`REQUIRED_CHECK_RERUN` — 기록은 믿지 않는다; `rerun: false`·`--no-rerun` 은 미검증)
+    - `changed_files` 가 비어 있지 않음(`HAS_CHANGE`) — 아무것도 바뀌지 않았다면 done 이 아니다
+diff --git a/romeo/close.py b/romeo/close.py
+index 09cce0c..344ef32 100644
+--- a/romeo/close.py
++++ b/romeo/close.py
+@@ -12,7 +12,7 @@ from .docs import approval_chain_warnings, approval_commit, approval_key, approv
+ from .evidence import (RERUN_NEAR_TIMEOUT_RATIO, RERUN_TIMEOUT, approval_log_state, command_log_state, dirty_tree_hash_excluding, exclusions,
+                        guard_decisions, parse_guard_explanation, required_explanation,
+                        list_runs, replay, review_record_state, sealed_product)
+-from .gitinfo import head_sha
++from .gitinfo import blob_sha_of, head_sha, tree_blobs
+ from .parity import (_envelope_defects, _evidence_product, _product_of, _product_text, evidence_ref_error,
+                      load_role_contracts, task_ref_error)
+ from .policy import classification_from_frontmatter, load_policy, load_project_state, route
+@@ -320,6 +320,8 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
+         why = next((ln.strip() for ln in (e.stderr or "").splitlines() if ln.strip()), f"git exit {e.returncode}")
+         check("FRESH_HEAD", UNVERIFIED, f"이 루트에는 git 이력이 없어 신선도를 판정할 수 없다 — {why}")
+         return _finish(checks, fm, body, spec, runs, dry_run, project_root, None)
++    judge_ok, judge_why = _judge_revision(project_root, unit_id, harness_root)
++    check("JUDGE_REVISION", judge_ok, judge_why)
+     cur_dirty = dirty_tree_hash_excluding(project_root, exclusions(unit_id))
+     ev, complete, why = select_check_record(runs, plan, cur_head, cur_dirty)
+     check("EVIDENCE_SELECTED", complete, why, level="error" if complete else "warning")
+@@ -444,6 +446,39 @@ def _inside(project_root, raw):
+     return p
+ 
+ 
++#: 승인 커밋 트리에 이 파일이 있으면 판정 대상은 하네스 저장소 자신이다 — 자기적용.
++HARNESS_MARKER = "romeo/__init__.py"
++#: 판정 하네스 대조에서 빼는 경로 — 판정이 `harness_root` 에서 읽지 않는 곳이다(증거 신선도의 `exclusions` 와 같은 이유).
++#: 문서와 런타임 기록은 관통 중에도 바뀌고(`docs/work/<id>/`·`.harness/observations.yaml`), 부착 상태는 `project_root` 에서 읽는다.
++JUDGE_EXCLUDE = ("docs/", ".harness/")
++
++
++def _judge_revision(project_root, unit_id, harness_root):
++    """판정을 낸 하네스가 **승인 커밋 시점의 하네스**인지 본다(D-81 · 2026-09-07 진단 권고 1).
++
++    하네스를 고치는 단위는 그 단위가 바꾼 규칙으로 자기를 판정해 왔다(Q-43) — 판정하는 하네스와 판정받는 하네스가
++    같은 리비전이면 실패 원인을 산출물과 하네스로 가를 수 없다. 그래서 판정은 승인 커밋을 스냅샷으로 꺼낸 하네스가 하고,
++    새 규칙은 다음 단위부터 적용된다. 이 검사는 그 절차가 지켜졌는지를 **내용**으로 본다: 승인 커밋 트리의 `docs/`·`.harness/` 밖
++    추적 파일 전부가 판정을 낸 하네스(`harness_root`)의 같은 경로에 같은 blob 으로 있어야 한다. 리비전 번호를 보지 않으므로
++    스냅샷(git 저장소 아님)·워크트리·clone 이 한 기준으로 판정된다. 내용(blob)만 본다 — 실행 비트와 더해진 파일은 보지 않는다,
++    판정이 읽는 파일은 이름이 고정돼 있다. 승인 커밋 트리에 하네스가 없는 루트(남의 저장소)는 자기적용이 아니므로 통과한다."""
++    try:
++        sha = approval_commit(project_root, unit_id)
++    except ValueError as e:
++        return UNVERIFIED, f"승인 커밋을 이력에서 찾지 못해 판정 하네스를 대조할 수 없다 — {e}"
++    blobs = tree_blobs(project_root, sha, exclude_prefixes=JUDGE_EXCLUDE)
++    if HARNESS_MARKER not in blobs:
++        return True, (f"이 루트의 승인 커밋 {sha[:12]} 트리에 하네스({HARNESS_MARKER})가 없다 — 자기적용이 아니다 · "
++                      f"판정 하네스 {harness_root}")
++    harness_root = Path(harness_root)
++    differing = [path for path, blob in blobs.items() if blob_sha_of(harness_root / path) != blob]
++    if differing:
++        shown = ", ".join(differing[:3]) + (" …" if len(differing) > 3 else "")
++        return False, (f"판정 하네스가 승인 커밋 {sha[:12]} 의 하네스가 아니다 — {len(differing)}개 파일이 다르거나 없다({shown}) · "
++                       f"판정받는 리비전이 판정하고 있다. 승인 커밋의 스냅샷에서 꺼낸 romeo close 로 --root 를 주어 다시 돌린다")
++    return True, f"판정 하네스 = 승인 커밋 {sha[:12]} 의 하네스 ({len(blobs)}개 파일 대조 · {harness_root})"
++
++
+ def _task_anchor(project_root, unit_id, env, harness_root):
+     """판정이 가리키는 것이 **하네스가 만든 그 작업 계약**인지 본다.
+ 
+diff --git a/romeo/gitinfo.py b/romeo/gitinfo.py
+index 13ce4de..08a6d69 100644
+--- a/romeo/gitinfo.py
++++ b/romeo/gitinfo.py
+@@ -74,6 +74,35 @@ def artifact_hash(cwd, files):
+     return h.hexdigest()
+ 
+ 
++def tree_blobs(cwd, rev, exclude_prefixes=()):
++    """<rev> 트리의 일반 파일(mode 100644·100755)을 {경로: blob sha} 로 돌려준다.
++    `exclude_prefixes` 로 시작하는 경로는 뺀다. 심볼릭 링크·서브모듈은 세지 않는다."""
++    out = _git(["ls-tree", "-r", "-z", rev], cwd).stdout
++    blobs = {}
++    for entry in out.split("\0"):
++        if not entry:
++            continue
++        meta, _, path = entry.partition("\t")
++        mode, kind, sha = meta.split()
++        if kind != "blob" or mode not in ("100644", "100755"):
++            continue
++        if any(path.startswith(prefix) for prefix in exclude_prefixes):
++            continue
++        blobs[path] = sha
++    return blobs
++
++
++def blob_sha_of(path):
++    """파일 바이트의 git blob 해시(`git hash-object` 와 같은 값). 일반 파일이 아니면 None."""
++    p = Path(path)
++    if not p.is_file():
++        return None
++    data = p.read_bytes()
++    h = hashlib.sha1(b"blob %d\0" % len(data))
++    h.update(data)
++    return h.hexdigest()
++
++
+ def repo_id(cwd):
+     try:
+         url = _git(["remote", "get-url", "origin"], cwd).stdout.strip()
+diff --git atests/test_judge_revision.py btests/test_judge_revision.py
+new file mode 100644
+index 0000000..f6e5a51
+--- /dev/null
++++ btests/test_judge_revision.py
+@@ -0,0 +1,199 @@
++"""판정하는 하네스는 승인 커밋 시점의 것이다(D-81 · 2026-09-07 진단 권고 1) — `JUDGE_REVISION`.
++
++자기적용(판정 대상이 하네스 저장소 자신)에서는 판정을 낸 하네스의 `docs/` 밖 추적 파일 전부가 승인 커밋의 것과 같아야 한다.
++워커 트리가 자기를 판정하면 거부되고, 승인 커밋을 `git archive` 로 꺼낸 스냅샷(git 저장소 아님)이 판정하면 통과한다.
++남의 저장소(트리에 하네스가 없는 루트)는 「자기적용이 아니다」로 지나간다.
++
++fixture: R = 이 체크아웃의 추적 파일을 **작업 트리 내용**으로 복사해 커밋한 저장소(하네스 저장소 자신) → T0 단위 생성·승인·커밋(승인 커밋 A)
++→ `README.md` 를 바꿔 커밋(구현 — `docs/` 밖 추적 파일을 바꾼다) → 증거 1건. 각 검사는 R 의 사본과 A 의 스냅샷 J 를 자기 임시 폴더에 둔다."""
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++from romeo import HARNESS_ROOT, frontmatter
++from romeo.close import close_unit
++from romeo.docs import approve_unit, create_unit
++from romeo.evidence import run_command
++from romeo.policy import route
++
++SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
++SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `README.md`"
++
++
++def git(*args, cwd):
++    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
++
++
++def _copy_harness(dst):
++    """이 체크아웃의 추적 파일을 작업 트리 내용으로 dst 에 복사한다 — 커밋되지 않은 변경도 함께 간다."""
++    out = subprocess.run(["git", "ls-files", "-z"], cwd=str(HARNESS_ROOT), capture_output=True, check=True).stdout
++    for rel in out.decode("utf-8").split("\0"):
++        src = HARNESS_ROOT / rel
++        if rel and src.is_file():
++            target = dst / rel
++            target.parent.mkdir(parents=True, exist_ok=True)
++            shutil.copy2(src, target)
++
++
++def _archive(repo, rev, dst):
++    """`git archive <rev> | tar -x` — RUNBOOK §3.1 확인 3·§3.8 과 같은 모양. git 저장소가 아닌 폴더가 된다."""
++    proc = subprocess.run(["git", "archive", rev], cwd=str(repo), capture_output=True, check=True)
++    dst.mkdir(parents=True, exist_ok=True)
++    subprocess.run(["tar", "-x", "-C", str(dst)], input=proc.stdout, check=True)
++    assert not (dst / ".git").exists()
++    return dst
++
++
++def _make_unit(root):
++    out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"], "gates": [],
++                 "blast_radius": "small", "uncertainty": "low"})
++    res = create_unit(out, "판정 리비전 검사", "judge-t0", "테스트용 변경", project_root=root, date="20260907")
++    spec = Path(res["files"][0])
++    fm, body = frontmatter.read(spec)
++    body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
++    body = body.replace('command: "채움"', 'command: "true"').replace("- [ ] AC-1", "- [x] AC-1")
++    frontmatter.write(spec, fm, body)
++    return res["id"], spec
++
++
++def _repo(root):
++    git("init", "-q", cwd=root)
++    git("config", "user.email", "t@example.com", cwd=root)
++    git("config", "user.name", "t", cwd=root)
++
++
++class TestJudgeRevision(unittest.TestCase):
++    @classmethod
++    def setUpClass(cls):
++        cls.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
++        cls.base = Path(cls.tmp.name) / "R"
++        cls.base.mkdir()
++        _copy_harness(cls.base)
++        _repo(cls.base)
++        git("add", ".", cwd=cls.base)
++        git("commit", "-q", "-m", "harness", cwd=cls.base)
++        cls.unit, cls.spec = _make_unit(cls.base)
++        approve_unit(cls.unit, "tester", project_root=cls.base)
++        git("add", ".", cwd=cls.base)
++        git("commit", "-q", "-m", "approve", cwd=cls.base)
++        cls.approval = git("rev-parse", "HEAD", cwd=cls.base)
++        with open(cls.base / "README.md", "a", encoding="utf-8") as fh:
++            fh.write("\n구현 커밋 — docs/ 밖 추적 파일을 바꾼다\n")
++        git("add", ".", cwd=cls.base)
++        git("commit", "-q", "-m", "impl", cwd=cls.base)
++        run_command(cls.unit, "true", run_name="run-test", label="check-1", project_root=cls.base)
++
++    @classmethod
++    def tearDownClass(cls):
++        cls.tmp.cleanup()
++
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
++        self.root = Path(self.tmp.name) / "R"
++        shutil.copytree(self.base, self.root, symlinks=True)
++        self.snap = _archive(self.root, self.approval, Path(self.tmp.name) / "J")
++
++    def tearDown(self):
++        self.tmp.cleanup()
++
++    def _judge(self, harness_root, dry_run=True):
++        r = close_unit(self.unit, project_root=self.root, harness_root=harness_root, dry_run=dry_run)
++        row = next(c for c in r["checks"] if c["id"] == "JUDGE_REVISION")
++        return r, row
++
++    def test_the_tree_under_judgment_judging_itself_is_refused(self):
++        r, row = self._judge(self.root)
++        self.assertFalse(row["ok"])
++        self.assertEqual(row["level"], "error")
++        self.assertIn(self.approval[:12], row["detail"])
++        self.assertIn("README.md", row["detail"])
++        self.assertEqual(r["verdict"], "FAIL")
++
++    def test_a_snapshot_of_the_approval_commit_passes_and_closes_the_unit(self):
++        r, row = self._judge(self.snap)
++        self.assertTrue(row["ok"], row)
++        self.assertEqual(row["level"], "error")
++        self.assertIn(self.approval[:12], row["detail"])
++        self.assertEqual(r["verdict"], "PASS", r["checks"])
++        r, _ = self._judge(self.snap, dry_run=False)
++        self.assertEqual(r["verdict"], "PASS")
++        fm, _ = frontmatter.read(self.root / "docs/work" / self.unit / "spec.md")
++        self.assertEqual(fm["status"], "done")
++
++    def test_a_snapshot_with_one_file_changed_is_refused_and_names_the_path(self):
++        with open(self.snap / "romeo/close.py", "a", encoding="utf-8") as fh:
++            fh.write("\n# 한 줄 — 거의 같은 스냅샷\n")
++        _, row = self._judge(self.snap)
++        self.assertFalse(row["ok"])
++        self.assertIn("romeo/close.py", row["detail"])
++        other = _archive(self.root, self.approval, Path(self.tmp.name) / "J2")
++        (other / "README.md").unlink()
++        _, row = self._judge(other)
++        self.assertFalse(row["ok"])
++        self.assertIn("README.md", row["detail"])
++
++    def test_docs_are_not_compared(self):
++        """`docs/`·`.harness/` 는 판정이 읽지 않는다 — 관통 중에도 바뀌는 곳이라 대조하면 늘 FAIL 이다."""
++        with open(self.snap / "docs/planning/progress.md", "a", encoding="utf-8") as fh:
++            fh.write("\n스냅샷의 문서는 대조하지 않는다\n")
++        with open(self.snap / ".harness/observations.yaml", "a", encoding="utf-8") as fh:
++            fh.write("\n# 런타임 기록도 대조하지 않는다\n")
++        _, row = self._judge(self.snap)
++        self.assertTrue(row["ok"], row)
++
++    def test_a_root_without_the_harness_passes_as_not_self_applied(self):
++        foreign = Path(self.tmp.name) / "F"
++        foreign.mkdir()
++        _repo(foreign)
++        (foreign / "README.md").write_text("hello\n", encoding="utf-8")
++        git("add", ".", cwd=foreign)
++        git("commit", "-q", "-m", "init", cwd=foreign)
++        unit, _ = _make_unit(foreign)
++        approve_unit(unit, "tester", project_root=foreign)
++        git("add", ".", cwd=foreign)
++        git("commit", "-q", "-m", "approve", cwd=foreign)
++        (foreign / "x.txt").write_text("impl\n", encoding="utf-8")
++        git("add", ".", cwd=foreign)
++        git("commit", "-q", "-m", "impl", cwd=foreign)
++        run_command(unit, "true", run_name="run-test", label="check-1", project_root=foreign)
++        r = close_unit(unit, project_root=foreign, harness_root=HARNESS_ROOT, dry_run=True)
++        row = next(c for c in r["checks"] if c["id"] == "JUDGE_REVISION")
++        self.assertTrue(row["ok"], row)
++        self.assertIn("자기적용이 아니다", row["detail"])
++        self.assertEqual(r["verdict"], "PASS", r["checks"])
++
++    def test_the_snapshot_cli_judges_the_tree_with_root_and_prints_a_verdict(self):
++        def run(binary):
++            p = subprocess.run([sys.executable, str(binary), "close", "--unit", self.unit, "--root", str(self.root), "--dry-run"],
++                               capture_output=True, text=True)
++            self.assertNotIn("Traceback", p.stdout + p.stderr)
++            return p
++        p = run(self.snap / "bin/romeo")
++        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
++        self.assertIn("[PASS] JUDGE_REVISION", p.stdout)
++        p = run(self.root / "bin/romeo")
++        self.assertEqual(p.returncode, 1, p.stdout + p.stderr)
++        self.assertIn("[FAIL] JUDGE_REVISION", p.stdout)
++        # 스냅샷의 호출 한 번으로 done 이 된다 — dry-run 이 아닌 실제 종료.
++        p = subprocess.run([sys.executable, str(self.snap / "bin/romeo"), "close", "--unit", self.unit, "--root", str(self.root)],
++                           capture_output=True, text=True)
++        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
++        self.assertNotIn("Traceback", p.stdout + p.stderr)
++        fm, _ = frontmatter.read(self.root / "docs/work" / self.unit / "spec.md")
++        self.assertEqual(fm["status"], "done")
++
++    def test_an_uncommitted_approval_leaves_the_judge_unverified(self):
++        """승인 커밋을 이력에서 찾지 못하면 대조할 리비전이 없다 — 미검증이지 통과가 아니다(K-51)."""
++        approve_unit(self.unit, "tester", project_root=self.root, reapprove=True, reason="커밋하지 않은 재승인")
++        _, row = self._judge(self.snap)
++        self.assertFalse(row["ok"])
++        self.assertEqual(row["level"], "unverified")
++        self.assertIn("승인 커밋을 이력에서 찾지 못해", row["detail"])
++
++
++if __name__ == "__main__":
++    unittest.main()
