@@ -1,0 +1,16 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260907-close-review-reapproval-reach-bjec
+attempts:
+- n: 1
+  run: run_1668ac8bf26e
+  base_sha: dc044fc42d401d0cc4a3921337a252a5bce901b1
+  started_at: '2026-09-07T09:46:32+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL findings 2건 — 둘 다 AC 문장의 결함이다. (1) AC-1 이 「실물 포인터」까지 요구했는데 실물 포인터(unit_id·task_envelope_ref·evidence_ref)는
+    그 봉투의 계약·증거를 가리키므로 픽스처 환경에서 성립할 수 없다. (2) AC-2 가 findings 건수 인쇄를 무조건 요구했는데 _findings_gist 는 findings
+    가 비면 빈 문자열을 낸다(기존 동작·이 단위가 만들지 않았다). AC-7 의 909 도 check-10 추가로 910 이 맞다.
+  settled_at: '2026-09-07T10:39:10+09:00'
+  base_sha_history:
+  - b04e5de122e51413af44c54d5c7e520888c6b669
+reviews: []
