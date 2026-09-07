@@ -540,7 +540,9 @@ def build_parser():
     v_b.set_defaults(fn=cmd_envelope)
     v_c = vs.add_parser("check", help="결과 계약 파일을 검사한다 — 스키마·작업 단위·역할·앵커·역할 계약 능력 범위. "
                                       "종료 코드 0 통과 · 1 위반 · 2 검사 불가")
-    v_c.add_argument("paths", nargs="+", help="검사할 결과 계약 파일 (예: docs/work/<id>/result/<run>-implementer.json)")
+    v_c.add_argument("paths", nargs="+",
+                     help="루트 기준으로 푸는 결과 계약 파일 — 상대 경로면 --root(없으면 발견한 루트) 아래에서 찾고, "
+                          "절대 경로면 그대로다 (예: docs/work/<id>/result/<run>-implementer.json)")
     v_c.add_argument("--unit", required=True, help="이 결과가 속해야 할 작업 단위 id — 봉투가 밝힌 값과 대조한다")
     v_c.add_argument("--role", choices=["implementer", "reviewer"],
                      help="이 결과를 낸 역할. 주면 대조하고, 생략하면 봉투의 역할로 능력 범위만 본다")

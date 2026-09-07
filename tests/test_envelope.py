@@ -247,6 +247,31 @@ class TestResultEnvelopeCheck(unittest.TestCase):
             self.assertIn(f"[PASS] {cid}", text)
         self.assertIn("→ PASS", text)
 
+    def test_a_relative_path_is_resolved_against_the_root(self):
+        """위치 인자가 `--root` 를 따른다(Q-66). 테스트 프로세스의 cwd 는 이 저장소라 `docs/work/` 를 가진
+        **다른 루트**다 — 빈 값이 아니라 그럴듯한 거짓 값이고, cwd 기준으로 풀면 못 찾아 1 을 낸다."""
+        self.assertNotEqual(Path.cwd().resolve(), self.root.resolve())
+        self._write(self._result())
+        rel = f"docs/work/{self.unit}/result/run-test-implementer.json"
+        rc, text = self._check(rel, "--role", "implementer")
+        self.assertEqual(rc, 0, text)
+        self.assertIn("→ PASS", text)
+        for cid in ("ENVELOPE_VALID", "TASK_ANCHORED", "BASE_SHA", "EVIDENCE_ANCHORED", "ROLE_CONTRACT"):
+            self.assertIn(f"[PASS] {cid}", text)
+        rc, text = self._check(rel, "--role", "implementer", "--json")
+        self.assertEqual(rc, 0, text)
+        self.assertEqual(json.loads(text)[0]["path"], str(self.root.resolve() / rel))
+
+    def test_a_missing_relative_path_names_the_root_it_looked_in(self):
+        """없는 상대 경로는 종료 코드 1 과 「결과 계약 파일이 없다」 문장에 **해석된 절대 경로**가 들어간다 —
+        어느 루트에서 찾았는지가 문장에 보여야 우회(절대 경로)를 고를 수 있다. 스택 트레이스가 아니다."""
+        rel = f"docs/work/{self.unit}/result/run-nope-implementer.json"
+        rc, text = self._check(rel)
+        self.assertEqual(rc, 1, text)
+        self.assertIn("결과 계약 파일이 없다", text)
+        self.assertIn(str(self.root.resolve() / rel), text)
+        self.assertNotIn("Traceback", text)
+
     def test_schema_violation_is_rejected_with_a_reason(self):
         rc, text = self._check(self._write(self._result(gate_verdict="아마도")))
         self.assertEqual(rc, 1)

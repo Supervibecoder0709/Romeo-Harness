@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: low
-status: active
+status: done
 approved_at: '2026-09-07T14:29:31+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-07T14:43:53+09:00'
 parent: null
 inputs: []
-evidence: []
+evidence: [evidence/run_efc3965a78d8.yaml, evidence/run_97af692139f1.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'overlay:profile.standard-or-deeper']
@@ -52,27 +52,27 @@ approval_history:
   문장에 인쇄된다. 이력 없는 루트에서 `close` 는 죽지 않고 검사 목록(앞 검사는 그대로, `FRESH_HEAD` 미검증)과
   종료 코드를 낸다 — 완료(done)가 선언되는 일은 없다. 이력이 있는 루트의 판정은 한 줄도 바뀌지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 `envelope check` 에 상대 경로를 주면 `--root` 기준으로 찾는다 — 명령을 친 자리가 **다른 저장소**여도
+  - [x] AC-1 `envelope check` 에 상대 경로를 주면 `--root` 기준으로 찾는다 — 명령을 친 자리가 **다른 저장소**여도
         `--root` 아래의 봉투를 검사해 통과한다. 절대 경로는 지금과 같다.
-  - [ ] AC-2 상대 경로의 파일이 없으면 종료 코드 1 과 「결과 계약 파일이 없다」 문장에 **해석된 절대 경로**가 들어가
+  - [x] AC-2 상대 경로의 파일이 없으면 종료 코드 1 과 「결과 계약 파일이 없다」 문장에 **해석된 절대 경로**가 들어가
         어느 루트에서 찾았는지 보인다 — JSON 은 내지 않는다(없는 파일은 이 단위 이전부터 오류 문장과 종료 코드 1 로 끝나는
         기존 경로이고, 그것을 바꾸지 않는다). **찾은** 파일에 대해서는 인쇄와 `--json` 의 `path` 가 그 해석된 경로다.
         스택 트레이스가 아니다.
-  - [ ] AC-3 규칙이 사는 자리 둘이 새 규칙을 말한다 — `adapters/orca/RUNBOOK.md` §3.0 에서 `envelope check` 의
+  - [x] AC-3 규칙이 사는 자리 둘이 새 규칙을 말한다 — `adapters/orca/RUNBOOK.md` §3.0 에서 `envelope check` 의
         위치 인자를 「셸이 자기 cwd 로 푸는 경로」 목록에 넣은 문장이 사라지고 「상대 경로면 `--root` 기준으로 푼다」가
         적히며, `envelope check --help` 의 `paths` 설명이 같은 규칙을 말한다. 이 문서가 지시하는 명령(`$W/…` 절대 경로)은
         한 글자도 바뀌지 않는다.
-  - [ ] AC-4 git 이력이 없는 루트 — 저장소가 아닌 폴더와, `git init` 만 하고 커밋이 없는 저장소 둘 다 — 에서
+  - [x] AC-4 git 이력이 없는 루트 — 저장소가 아닌 폴더와, `git init` 만 하고 커밋이 없는 저장소 둘 다 — 에서
         `romeo close --unit <id> --root <그 루트>` 는 `FRESH_HEAD` 를 **미검증**으로 인쇄하고 종료 코드 1 로 끝난다.
         그 앞 검사(`FRONTMATTER_VALID`·`APPROVED`·`HAS_EVIDENCE`)는 지금처럼 인쇄되고, 그 문장에
         「git 이력이 없어 신선도를 판정할 수 없다」가 들어가며, 출력에 스택 트레이스가 없다. `--dry-run` 도 같다.
-  - [ ] AC-5 그 미검증 뒤의 검사(검사 기록 선택·재실행·검토 판정)는 시도하지 않는다 — 이력 없이는 대조할 현재 값이
+  - [x] AC-5 그 미검증 뒤의 검사(검사 기록 선택·재실행·검토 판정)는 시도하지 않는다 — 이력 없이는 대조할 현재 값이
         없다. 그 루트에서 `status: done` 이 쓰이는 일은 없다.
-  - [ ] AC-6 규칙이 사는 자리(`core/workflows/plan-close/SKILL.md` 의 신선도 검사 문단)가 그 예외를 말한다 —
+  - [x] AC-6 규칙이 사는 자리(`core/workflows/plan-close/SKILL.md` 의 신선도 검사 문단)가 그 예외를 말한다 —
         「git 이력이 없」는 루트에서는 `FRESH_HEAD` 를 미검증으로 인쇄하고 뒤 검사를 시도하지 않는다는 것.
-  - [ ] AC-7 이력이 있는 루트의 판정은 바뀌지 않는다 — 기존 검사를 하나도 고치지 않고 전부 통과하며(삭제 0줄),
+  - [x] AC-7 이력이 있는 루트의 판정은 바뀌지 않는다 — 기존 검사를 하나도 고치지 않고 전부 통과하며(삭제 0줄),
         `envelope check` 의 기존 검사도 전부 통과한다. 늘어난 검사는 이 단위가 더한 것뿐이다.
-  - [ ] AC-8 `docs/planning/open-questions.md` 의 Q-66·Q-67 행이 해소 표기되고(두 행의 근거 열에 있는 출처 단위 id 는
+  - [x] AC-8 `docs/planning/open-questions.md` 의 Q-66·Q-67 행이 해소 표기되고(두 행의 근거 열에 있는 출처 단위 id 는
         남긴다), 이번 작업이 발견했으나 고치지 않은 결함이 새 행으로 열린다.
 - **위험과 되돌리기:** 종료 검사의 차단 범위를 **줄이지 않는다** — 예외로 죽던 자리가 미검증(완료 아님)으로 인쇄될 뿐이고,
   못 찾던 파일을 찾을 뿐이다. 바뀌는 동작은 하나다: 명령을 친 자리가 루트의 **하위 폴더**일 때 그 자리 기준으로 적은
@@ -175,6 +175,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-07T14:43:53+09:00 · HEAD 483546654b2f · 검사 기록 run_97af692139f1
 
-- (없음)
+- [evidence/run_efc3965a78d8.yaml](evidence/run_efc3965a78d8.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_97af692139f1.yaml](evidence/run_97af692139f1.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

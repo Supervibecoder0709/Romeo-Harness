@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-envelope-root-close-no-history-rshi",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/task/run_97af692139f1-reviewer.json",
+    "sha256": "ae789930a214f7d1453ebc0d61a96d3d7029b6cde554ce859ca4891e8edac00c"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "비차단 문서 경고: 활성 작업 설명이 이전 승인 b8dd830과 '1회차 구현 중'으로 남아 있다. 현재 attempts.yaml:13~15는 run_97af692139f1을 2회차, base_sha 483546654b2f3766008762890dd5c21bde53f7a1로 기록한다. 진입 문서에서 현재 회차와 승인을 잘못 파악할 수 있다. 수용 기준 미달에 해당하지 않아 게이트는 내리지 않는다.",
+      "file": "docs/planning/progress.md",
+      "line": 27
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/evidence/run_97af692139f1.yaml",
+  "notes": "현재 파일과 기록된 원시 로그를 대조했다. AC-1: check-1과 기존 절대 경로 검사. AC-2: check-1의 JSON path 단언, check-2의 오류 경로 단언, romeo/cli.py:236·638의 출력·예외 처리. AC-3: check-6·check-10 및 RUNBOOK 변경 비교에서 실행 명령 유지 확인. AC-4·AC-5: check-3·check-4가 두 종류의 이력 없는 루트에서 실제 close와 dry-run의 종료 코드 1, 후속 검사 부재, active 상태 유지를 확인하며 romeo/close.py:315·965가 이를 뒷받침한다. AC-6: check-5와 plan-close 신선도 문단. AC-7: 기존 테스트 삭제·수정 없이 추가만 있으며 check-8 원시 로그에 915개 통과, check-7·check-9도 종료 코드 0. AC-8: docs/planning/open-questions.md:129·130의 해소·출처 유지와 :161의 Q-82 등록. 승인 커밋 대비 spec 변경은 체크박스뿐이며 required_checks 변경은 없다. 현재 변경 목록은 구현자 allowed_paths 안이다. 두 계약과 현재 HEAD 및 증거의 base_sha·head_sha가 일치하고, 검사별 tree 값은 원시 로그 및 검토 전 기록과 일치한다. 재실행 불가능한 검사나 rerun:false 선언은 발견하지 못했다. 검사 실행·해시 재계산·파일 변경은 하지 않았으며, 실제 재실행 대조와 검토 후 방어 검사는 위임한 쪽에 남아 있다."
+}

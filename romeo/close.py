@@ -312,7 +312,14 @@ def close_unit(unit_id, project_root=".", harness_root=None, dry_run=False,
     if not check("HAS_EVIDENCE", bool(runs), "" if runs else "evidence/*.yaml 없음 — romeo evidence run 으로 만든다"):
         return _finish(checks, fm, body, spec, runs, dry_run, project_root, None)
     plan = required_checks(body)
-    cur_head = head_sha(project_root)
+    try:
+        cur_head = head_sha(project_root)
+    except subprocess.CalledProcessError as e:
+        # 저장소가 아닌 폴더와 커밋 없는 저장소가 여기 한 자리로 모인다(Q-67) — `is_repo` 로 미리 가르지 않는다.
+        # 대조할 현재 값이 없으므로 뒤 검사는 시도하지 않는다. 미검증은 완료가 아니다(K-51).
+        why = next((ln.strip() for ln in (e.stderr or "").splitlines() if ln.strip()), f"git exit {e.returncode}")
+        check("FRESH_HEAD", UNVERIFIED, f"이 루트에는 git 이력이 없어 신선도를 판정할 수 없다 — {why}")
+        return _finish(checks, fm, body, spec, runs, dry_run, project_root, None)
     cur_dirty = dirty_tree_hash_excluding(project_root, exclusions(unit_id))
     ev, complete, why = select_check_record(runs, plan, cur_head, cur_dirty)
     check("EVIDENCE_SELECTED", complete, why, level="error" if complete else "warning")

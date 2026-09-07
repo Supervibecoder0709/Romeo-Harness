@@ -3,6 +3,7 @@ import io
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -1940,3 +1941,107 @@ class TestRerunNearTimeout(unittest.TestCase):
         r = self._run_close("true", rerun_timeout=10)
         self.assertEqual(self._near(r), [])
         self.assertEqual(r["verdict"], "PASS", r["checks"])
+
+
+class TestCloseWithoutGitHistory(unittest.TestCase):
+    """이력 없는 루트에서 `close` 는 예외 대신 판정을 낸다(Q-67).
+
+    부착은 파일을 놓을 뿐 git 이력을 요구하지 않는다 — 저장소가 아닌 폴더와 `git init` 만 한 저장소 둘 다
+    `head_sha` 가 실패한다(뒤쪽은 `is_repo` 가 참인 채로). 두 경우가 같은 한 문장 — `FRESH_HEAD` 미검증 —
+    으로 모이고, 그 앞 검사는 그대로, 그 뒤 검사는 시도하지 않으며, 스택 트레이스가 아니라 검사 목록과 종료 코드로 끝난다.
+    단언은 판정 문자열이 아니라 검사 id·level·종료 코드·Traceback 부재로 한다."""
+
+    HEAD_CHECKS = ["FRONTMATTER_VALID", "APPROVED", "HAS_EVIDENCE"]
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.root = Path(self.tmp.name)
+        git("init", "-q", cwd=self.root)
+        git("config", "user.email", "t@example.com", cwd=self.root)
+        git("config", "user.name", "t", cwd=self.root)
+        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "init", cwd=self.root)
+        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
+                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
+        res = create_unit(out, "이력 없는 루트", "no-history-t0", "이력 없는 루트의 종료 검사",
+                          project_root=self.root, date="20260907")
+        self.unit = res["id"]
+        self.spec = Path(res["files"][0])
+        fm, body = frontmatter.read(self.spec)
+        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS).replace('command: "채움"', 'command: "true"')
+        frontmatter.write(self.spec, fm, body.replace("- [ ] AC-1", "- [x] AC-1"))
+        approve_unit(self.unit, "tester", project_root=self.root)
+        (self.root / "x.txt").write_text("impl\n", encoding="utf-8")
+        git("add", ".", cwd=self.root)
+        git("commit", "-q", "-m", "impl", cwd=self.root)
+        run_command(self.unit, "true", run_name="run-test", project_root=self.root)
+        # 단위 폴더만 든 루트 — git 이 없다. 어느 저장소 안도 아님을 먼저 확인하고, 안이면 상위 탐색을 막는다.
+        self.nogit_tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
+        self.nogit = Path(self.nogit_tmp.name)
+        shutil.copytree(self.root / "docs", self.nogit / "docs")
+        self._ceiling = os.environ.get("GIT_CEILING_DIRECTORIES")
+        if self._inside_a_repo(self.nogit):
+            os.environ["GIT_CEILING_DIRECTORIES"] = str(self.nogit.resolve().parent)
+        self.assertFalse(self._inside_a_repo(self.nogit), "이력 없는 루트를 만들지 못했다")
+
+    def tearDown(self):
+        if self._ceiling is None:
+            os.environ.pop("GIT_CEILING_DIRECTORIES", None)
+        else:
+            os.environ["GIT_CEILING_DIRECTORIES"] = self._ceiling
+        self.nogit_tmp.cleanup()
+        self.tmp.cleanup()
+
+    @staticmethod
+    def _inside_a_repo(path):
+        return subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], cwd=str(path),
+                              capture_output=True, text=True).returncode == 0
+
+    def _close_cli(self, root, *extra):
+        out, err = io.StringIO(), io.StringIO()
+        with redirect_stdout(out), redirect_stderr(err):
+            rc = main(["close", "--unit", self.unit, "--root", str(root), *extra])
+        return rc, out.getvalue() + err.getvalue()
+
+    def _assert_no_history_verdict(self, root):
+        for extra in (("--dry-run",), ()):
+            rc, text = self._close_cli(root, *extra)
+            self.assertEqual(rc, 1, text)
+            self.assertNotIn("Traceback", text)
+            self.assertIn("git 이력이 없어 신선도를 판정할 수 없다", text)
+        r = close_unit(self.unit, project_root=root, dry_run=True)
+        ids = [c["id"] for c in r["checks"] if c["id"] != "DOC_WARNING"]
+        self.assertEqual(ids, self.HEAD_CHECKS + ["FRESH_HEAD"], r["checks"])
+        for c in r["checks"]:
+            if c["id"] in self.HEAD_CHECKS:
+                self.assertTrue(c["ok"], c)
+        last = r["checks"][-1]
+        self.assertEqual(last["level"], "unverified", last)
+        self.assertFalse(last["ok"], last)
+        self.assertIn("git 이력이 없어 신선도를 판정할 수 없다", last["detail"])
+        self.assertEqual(r["verdict"], "FAIL")
+        fm, _ = frontmatter.read(root / "docs" / "work" / self.unit / "spec.md")
+        self.assertEqual(fm["status"], "active", "이력 없는 루트에서 done 이 쓰였다")
+
+    def test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback(self):
+        self._assert_no_history_verdict(self.nogit)
+
+    def test_a_repository_without_commits_is_reported_the_same_way(self):
+        """`git init` 만 한 루트 — `is_repo` 는 참인데 `head_sha` 는 실패한다. `is_repo` 로만 가른 구현은 여기서 다시 죽는다."""
+        git("init", "-q", cwd=self.nogit)
+        self.assertTrue(self._inside_a_repo(self.nogit))
+        self._assert_no_history_verdict(self.nogit)
+
+    def test_a_root_with_history_is_judged_as_before(self):
+        """회귀 방지 — 이력이 있는 루트의 판정은 한 줄도 바뀌지 않는다."""
+        rc, text = self._close_cli(self.root, "--dry-run")
+        self.assertEqual(rc, 0, text)
+        self.assertNotIn("git 이력이 없어", text)
+        r = close_unit(self.unit, project_root=self.root, dry_run=True)
+        self.assertEqual(r["verdict"], "PASS", r["checks"])
+        fresh = next(c for c in r["checks"] if c["id"] == "FRESH_HEAD")
+        self.assertTrue(fresh["ok"])
+        self.assertEqual(fresh["level"], "error")
+        self.assertIn("REQUIRED_CHECK", [c["id"] for c in r["checks"]])
+

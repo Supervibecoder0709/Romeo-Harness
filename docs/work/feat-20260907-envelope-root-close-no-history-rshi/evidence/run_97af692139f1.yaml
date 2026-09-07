@@ -1,0 +1,384 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_97af692139f1
+task_id: task_a0e47f453259
+dispatch_id: ctx_558b93b5c40d
+unit_id: feat-20260907-envelope-root-close-no-history-rshi
+spec_ref:
+  path: docs/work/feat-20260907-envelope-root-close-no-history-rshi/spec.md
+  sha256: 663fd7acf788551250e1ba301fc7f907283feee1b1d4449ba436427a29c227df
+base_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi
+started_at: '2026-09-07T14:31:59+09:00'
+finished_at: '2026-09-07T14:39:02+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_relative_path_is_resolved_against_the_root
+  exit_code: 0
+  started_at: '2026-09-07T14:31:59+09:00'
+  finished_at: '2026-09-07T14:32:00+09:00'
+  seconds: 0.477
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/01-check-1.log
+  log_sha256: c91a0cd1d82e7093bc4435debc8a5f762e409091a314a368046ab304667b61b5
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-2
+  command: python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_missing_relative_path_names_the_root_it_looked_in
+  exit_code: 0
+  started_at: '2026-09-07T14:32:00+09:00'
+  finished_at: '2026-09-07T14:32:00+09:00'
+  seconds: 0.317
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/02-check-2.log
+  log_sha256: 555392b3f40d326d0346aef3ac6ad45da9615783344148fe39ceb884e31be240
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-3
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback
+  exit_code: 0
+  started_at: '2026-09-07T14:32:00+09:00'
+  finished_at: '2026-09-07T14:32:01+09:00'
+  seconds: 0.301
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/03-check-3.log
+  log_sha256: f482b91b38236659228337c3008dac36d0617fc6e2916af33a7fff715ba15e92
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-4
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_repository_without_commits_is_reported_the_same_way
+  exit_code: 0
+  started_at: '2026-09-07T14:32:01+09:00'
+  finished_at: '2026-09-07T14:32:01+09:00'
+  seconds: 0.309
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/04-check-4.log
+  log_sha256: 3efd1668522ca5f56b4df9b5aa77fadc9648106fac1ca38d9f0b329bcde5430d
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-5
+  command: grep -q 'git 이력이 없' core/workflows/plan-close/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-07T14:32:01+09:00'
+  finished_at: '2026-09-07T14:32:01+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/05-check-5.log
+  log_sha256: c332266f5fc93309a33e1b0775449ecb449f09174f6de8dca796957c0be1224e
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-6
+  command: grep -q '상대 경로면' adapters/orca/RUNBOOK.md && ! grep -q 'envelope check` 의 위치 인자, `orca terminal
+    create' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-07T14:32:01+09:00'
+  finished_at: '2026-09-07T14:32:01+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/06-check-6.log
+  log_sha256: f660ab8e4a7cb2a8a4397e00b4131b96cbf0faeef16437d541d327209e608b33
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-07T14:32:01+09:00'
+  finished_at: '2026-09-07T14:32:01+09:00'
+  seconds: 0.178
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/07-check-7.log
+  log_sha256: c6f724cdc7c6171fb8306885f521809c8934ac1f3fee213510032e55c1201110
+  stdout_tail: compile 검사 PASS
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-8
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-07T14:32:01+09:00'
+  finished_at: '2026-09-07T14:34:27+09:00'
+  seconds: 145.033
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/08-check-8.log
+  log_sha256: 123f1b55249521cd183fbdfe543da05fde4dec32d079949a66382423d9482932
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-9
+  command: python3 -m unittest tests.test_attach_requirements tests.test_enforce_points
+  exit_code: 0
+  started_at: '2026-09-07T14:34:27+09:00'
+  finished_at: '2026-09-07T14:34:30+09:00'
+  seconds: 3.745
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/09-check-9.log
+  log_sha256: a88e260dad57684abaff447e873cdd05e8e7064cf00083ac00569ce281c2b088
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-10
+  command: bin/romeo envelope check --help | grep -q '루트 기준'
+  exit_code: 0
+  started_at: '2026-09-07T14:34:30+09:00'
+  finished_at: '2026-09-07T14:34:31+09:00'
+  seconds: 0.053
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/10-check-10.log
+  log_sha256: 8262997e6c1e32b722af23b37b920e81f8ff1f1a80f1010122c3ce57b2c2e43d
+  stdout_tail: ''
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-envelope-root-close-no-history-rshi'
+  exit_code: 0
+  started_at: '2026-09-07T14:35:13+09:00'
+  finished_at: '2026-09-07T14:35:13+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/11-review-tree-before.log
+  log_sha256: 4b0494c47cc16cb7e6ff8de2cf7c2d32fd8b2b130d836923ead8b4e9f3bf56fb
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n\
+    \ M docs/planning/progress.md\n M romeo/cli.py\n M romeo/close.py\n M romeo/envelope.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py"
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi/.harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-07T14:35:13+09:00'
+  finished_at: '2026-09-07T14:35:13+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/12-reviewer-brief.log
+  log_sha256: e5f7c1c523444200df0b415b3c1a1636c584cdef09f1c1c523f4588f91b4eb10
+  stdout_tail: d9cf44732dcbf1d0d7bdede429dc8d68b42671fa213f7cda878176ad4e8c4de1  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi/.harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/reviewer-brief.md
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-envelope-root-close-no-history-rshi'
+  exit_code: 0
+  started_at: '2026-09-07T14:39:01+09:00'
+  finished_at: '2026-09-07T14:39:01+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/13-review-tree-after.log
+  log_sha256: 4b0494c47cc16cb7e6ff8de2cf7c2d32fd8b2b130d836923ead8b4e9f3bf56fb
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n\
+    \ M docs/planning/progress.md\n M romeo/cli.py\n M romeo/close.py\n M romeo/envelope.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py"
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260907-envelope-root-close-no-history-rshi/review/run_97af692139f1-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-07T14:39:02+09:00'
+  finished_at: '2026-09-07T14:39:02+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_97af692139f1/14-review-record.log
+  log_sha256: add6f895cdadb9078584391fcdd3942a859cc77f90a9ed78403d8badba4b4926
+  stdout_tail: 08c43ed2e09d70d82e29ec67764544c43ee4d683fd9e5e56e6b4a17d971ec377  docs/work/feat-20260907-envelope-root-close-no-history-rshi/review/run_97af692139f1-reviewer.json
+  head_sha: 483546654b2f3766008762890dd5c21bde53f7a1
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/workflows/plan-close/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/envelope.py
+- tests/test_docs_evidence_close.py
+- tests/test_envelope.py
+artifact_hash: f5cabcbac45c8c1981311eda5d70146cc8b5fe577b49ef7bea5ddbb0b4a9efda
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-07T14:43:53+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 181 > 150
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-07T14:29:31+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_97af692139f1 — 검증 계획 10건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/2건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 483546654b2f vs 현재 483546654b2f
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence f965ffbf9394 vs 현재 f965ffbf9394 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_relative_path_is_resolved_against_the_root'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_missing_relative_path_names_the_root_it_looked_in'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_repository_without_commits_is_reported_the_same_way'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — grep -q ''git 이력이 없'' core/workflows/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — grep -q ''상대 경로면'' adapters/orca/RUNBOOK.md && ! grep -q ''envelope check`
+      의 위치 인자, `orca terminal create'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — python3 -m unittest tests.test_attach_requirements tests.test_enforce_points'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — bin/romeo envelope check --help | grep -q ''루트 기준'''
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 14건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 8건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 10건이 승인 커밋 483546654b2f 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_relative_path_is_resolved_against_the_root'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_missing_relative_path_names_the_root_it_looked_in'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_repository_without_commits_is_reported_the_same_way'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — grep -q ''git 이력이 없'' core/workflows/plan-close/SKILL.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — grep -q ''상대 경로면'' adapters/orca/RUNBOOK.md && ! grep -q ''envelope
+      check` 의 위치 인자, `orca terminal create'' adapters/orca/RUNBOOK.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — python3 -m unittest tests.test_attach_requirements tests.test_enforce_points'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — bin/romeo envelope check --help | grep -q ''루트 기준'''
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 483546654b2f 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'core/workflows/plan-close/SKILL.md', 'docs/planning/open-questions.md',
+      'docs/planning/progress.md', 'romeo/cli.py', 'romeo/close.py', 'romeo/envelope.py', 'tests/test_docs_evidence_close.py',
+      'tests/test_envelope.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_efc3965a78d8-reviewer.json: FAIL(findings 1건 — 첫째: AC-2 미충족: 없는 상대 경로를 --json으로 검사하면
+      여기서 FileNotFoundError가 발생하) — 재승인 전 승인(approved_at 2026-09-07T14:05:05+09:00)으로 낸 판정 · 다른 산출물(b8dd830+f965ffbf9394)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 4835466+f965ffbf9394 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_97af692139f1-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

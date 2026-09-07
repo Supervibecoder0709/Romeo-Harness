@@ -23,7 +23,9 @@ provenance: []
      마지막 파일이 아니다: 검토자를 띄우며 남긴 방어 검사 전용 run 은 검사 기록이 아니고, run 들을 합치지도 않는다(검사는 한 산출물 위에서
      전부 돌아야 한다). 어느 run 을 골랐고 어느 run 을 제외했는지 인쇄한다
    - 그 검사 기록의 `head_sha` 가 현재 `git rev-parse HEAD` 와 같고 `dirty_tree_hash` 가 현재 작업 트리와 같음
-     — 다르면 `FRESH_HEAD`/`FRESH_TREE`. 커밋 이동·tracked 수정·staged 변경·untracked 추가 네 경우 모두 거부한다
+     — 다르면 `FRESH_HEAD`/`FRESH_TREE`. 커밋 이동·tracked 수정·staged 변경·untracked 추가 네 경우 모두 거부한다.
+     루트에 git 이력이 없으면(`git rev-parse HEAD` 실패 — 저장소가 아닌 폴더든 커밋 없는 저장소든) `FRESH_HEAD` 를
+     미검증으로 인쇄하고 그 뒤 검사는 시도하지 않는다 — 대조할 현재 값이 없다. 스택 트레이스가 아니라 검사 목록과 종료 코드로 끝난다
    - spec 의 `required_checks` 명령이 그 검사 기록의 `commands` 에 exit 0 으로 존재(`REQUIRED_CHECK`), 그 기록이 원시 로그·봉인과 맞음(`EVIDENCE_LOG`),
      그리고 **같은 명령을 그 체크아웃에서 다시 실행해** 종료 코드가 기록과 같음(`REQUIRED_CHECK_RERUN` — 기록은 믿지 않는다; `rerun: false`·`--no-rerun` 은 미검증)
    - `changed_files` 가 비어 있지 않음(`HAS_CHANGE`) — 아무것도 바뀌지 않았다면 done 이 아니다

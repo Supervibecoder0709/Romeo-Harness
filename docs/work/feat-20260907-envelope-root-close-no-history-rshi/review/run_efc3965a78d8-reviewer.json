@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-envelope-root-close-no-history-rshi",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/task/run_efc3965a78d8-reviewer.json",
+    "sha256": "57125372e70b0a8544c2aa6af50325a76a2c1d928f195752491a0b6dc9c2de51"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-2 미충족: 없는 상대 경로를 --json으로 검사하면 여기서 FileNotFoundError가 발생하여 JSON 출력(romeo/cli.py:241)에 도달하지 않는다. main의 예외 처리(romeo/cli.py:644)는 오류 문장만 stderr에 출력하고 종료 코드 1을 반환하므로, spec.md:52-53이 요구하는 해석된 절대 경로의 JSON path가 제공되지 않는다. check-2는 --json 없이 호출하고(tests/test_envelope.py:269), check-1의 JSON 검사는 존재하는 파일만 대상으로 하므로(:261), 기록된 통과 결과는 이 조건을 뒷받침하지 못한다.",
+      "file": "romeo/envelope.py",
+      "line": 323
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/evidence/run_efc3965a78d8.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD는 b8dd830693fd226bc3eff3a8264ee57646232225로 일치한다. 승인 이후 spec 변경은 AC 체크 표시뿐이며 required_checks는 유지됐다. 확인한 변경은 구현자 allowed_paths 안이다. 필수 검사 10건의 증거와 원시 로그는 모두 exit 0이며, 전체 검사 로그는 915건 OK다. AC-1은 check-1·8, AC-3은 check-6·10과 문서 차이, AC-4·5는 check-3·4와 조기 반환 코드, AC-6은 check-5와 절차 문서, AC-7은 check-7·8과 기존 테스트 삭제·수정 없는 차이, AC-8은 check-9와 Q-66·Q-67·Q-82 행으로 확인했다. 검사 재실행·해시 계산·파일 변경은 하지 않았다. 현재 트리 해시 및 로그 해시의 재계산 대조와 검토 후 방어 검사는 수행하지 않았다."
+}

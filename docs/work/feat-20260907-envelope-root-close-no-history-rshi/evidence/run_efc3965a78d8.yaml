@@ -1,0 +1,193 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_efc3965a78d8
+task_id: task_aaaa467eb132
+dispatch_id: ctx_a7fc5a6c5754
+unit_id: feat-20260907-envelope-root-close-no-history-rshi
+spec_ref:
+  path: docs/work/feat-20260907-envelope-root-close-no-history-rshi/spec.md
+  sha256: 20b584845b08885e449c7b353097e2b63434cf7c012e4e490ac3eb8d774b919d
+base_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi
+started_at: '2026-09-07T14:13:44+09:00'
+finished_at: '2026-09-07T14:20:48+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_relative_path_is_resolved_against_the_root
+  exit_code: 0
+  started_at: '2026-09-07T14:13:44+09:00'
+  finished_at: '2026-09-07T14:13:45+09:00'
+  seconds: 0.409
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/01-check-1.log
+  log_sha256: bf75b7aa111990c56db738b672e5ebb6988f56acd40fb08f81590a2bfedb1a3b
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-2
+  command: python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_missing_relative_path_names_the_root_it_looked_in
+  exit_code: 0
+  started_at: '2026-09-07T14:13:45+09:00'
+  finished_at: '2026-09-07T14:13:45+09:00'
+  seconds: 0.309
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/02-check-2.log
+  log_sha256: 3087d772736d23035037e3c1ab793f4c59a7949dbd97ff04ddcd7c4f73f51c1d
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-3
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback
+  exit_code: 0
+  started_at: '2026-09-07T14:13:45+09:00'
+  finished_at: '2026-09-07T14:13:45+09:00'
+  seconds: 0.292
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/03-check-3.log
+  log_sha256: 9818b34b23f42c3d103fe989b572fe8950968c214aa625bc12e4dfd99dc7666f
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-4
+  command: python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_repository_without_commits_is_reported_the_same_way
+  exit_code: 0
+  started_at: '2026-09-07T14:13:45+09:00'
+  finished_at: '2026-09-07T14:13:46+09:00'
+  seconds: 0.307
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/04-check-4.log
+  log_sha256: 6fb32eb34657aa272091927fb6e8e1295a513587af1f983fda7d6583040ac6f2
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-5
+  command: grep -q 'git 이력이 없' core/workflows/plan-close/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-07T14:13:46+09:00'
+  finished_at: '2026-09-07T14:13:46+09:00'
+  seconds: 0.004
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/05-check-5.log
+  log_sha256: 6fffa8394a84afb8e36b4334723f90e8300cb31124d161871a11330f9dd8c316
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-6
+  command: grep -q '상대 경로면' adapters/orca/RUNBOOK.md && ! grep -q 'envelope check` 의 위치 인자, `orca terminal
+    create' adapters/orca/RUNBOOK.md
+  exit_code: 0
+  started_at: '2026-09-07T14:13:46+09:00'
+  finished_at: '2026-09-07T14:13:46+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/06-check-6.log
+  log_sha256: fa057eec02b2fb17fa8b159a43bf1a3eea26ae691a1f22cff4c6c27efc33974f
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-7
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-07T14:13:46+09:00'
+  finished_at: '2026-09-07T14:13:46+09:00'
+  seconds: 0.162
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/07-check-7.log
+  log_sha256: 2dfae1686a57487d8705520c6f923e5bd3b0840fa58cf99a802c5d67915e36b4
+  stdout_tail: compile 검사 PASS
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-8
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-07T14:13:46+09:00'
+  finished_at: '2026-09-07T14:16:04+09:00'
+  seconds: 137.937
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/08-check-8.log
+  log_sha256: f0622dd70b35d6a5d0d42f43ce89d9c7807cbd1f427e28c549412ae58697556d
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-9
+  command: python3 -m unittest tests.test_attach_requirements tests.test_enforce_points
+  exit_code: 0
+  started_at: '2026-09-07T14:16:04+09:00'
+  finished_at: '2026-09-07T14:16:08+09:00'
+  seconds: 3.543
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/09-check-9.log
+  log_sha256: 13123dcaa7b1f3699e68de45d01d93da2b5a50fdb49b1d6c9711f367ef3617fe
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: check-10
+  command: bin/romeo envelope check --help | grep -q '루트 기준'
+  exit_code: 0
+  started_at: '2026-09-07T14:16:08+09:00'
+  finished_at: '2026-09-07T14:16:08+09:00'
+  seconds: 0.049
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/10-check-10.log
+  log_sha256: 64249f85b6c782b4838f145e2fa4f0c822ac4e946ee1fd2e1ad93b73af6e703d
+  stdout_tail: ''
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-envelope-root-close-no-history-rshi'
+  exit_code: 0
+  started_at: '2026-09-07T14:17:16+09:00'
+  finished_at: '2026-09-07T14:17:16+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/11-review-tree-before.log
+  log_sha256: e1ebab6e8b27197448785a1934d514c4473822336ee1505d38dcb64e4f97d672
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n\
+    \ M docs/planning/progress.md\n M romeo/cli.py\n M romeo/close.py\n M romeo/envelope.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py"
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi/.harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-07T14:17:16+09:00'
+  finished_at: '2026-09-07T14:17:16+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/12-reviewer-brief.log
+  log_sha256: f973f3896f5fc9c2e4e5e4f2dc6413a5f492697c9bed12125b01b82299916b29
+  stdout_tail: 6251170d51c0536ba25d2ef3b63728768d66a1d6bd0c2dbc06c82307facb6e15  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-envelope-root-close-no-history-rshi/.harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/reviewer-brief.md
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-envelope-root-close-no-history-rshi'
+  exit_code: 0
+  started_at: '2026-09-07T14:20:48+09:00'
+  finished_at: '2026-09-07T14:20:48+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/13-review-tree-after.log
+  log_sha256: e1ebab6e8b27197448785a1934d514c4473822336ee1505d38dcb64e4f97d672
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/plan-close/SKILL.md\n M docs/planning/open-questions.md\n\
+    \ M docs/planning/progress.md\n M romeo/cli.py\n M romeo/close.py\n M romeo/envelope.py\n M tests/test_docs_evidence_close.py\n\
+    \ M tests/test_envelope.py"
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260907-envelope-root-close-no-history-rshi/review/run_efc3965a78d8-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-07T14:20:48+09:00'
+  finished_at: '2026-09-07T14:20:48+09:00'
+  seconds: 0.012
+  log: .harness/runs/feat-20260907-envelope-root-close-no-history-rshi/run_efc3965a78d8/14-review-record.log
+  log_sha256: 6f80aec4ea934aac9a370ddf8e06a6194a72edf259a3c79ec47b1eb19b45a2d6
+  stdout_tail: 69b6f7c84680b7b09e538bb79e07e1fd32044bf8e95331aa9912320d55ff7845  docs/work/feat-20260907-envelope-root-close-no-history-rshi/review/run_efc3965a78d8-reviewer.json
+  head_sha: b8dd830693fd226bc3eff3a8264ee57646232225
+  dirty_tree_hash: f965ffbf93947ffaf68f77bacc364b61cafb9423affc6bd70124f467e48f7bc9
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/workflows/plan-close/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/envelope.py
+- tests/test_docs_evidence_close.py
+- tests/test_envelope.py
+artifact_hash: f5cabcbac45c8c1981311eda5d70146cc8b5fe577b49ef7bea5ddbb0b4a9efda
+reviewer: null
+verdict: null
+approvals: []

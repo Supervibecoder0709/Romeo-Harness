@@ -1,0 +1,66 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-envelope-root-close-no-history-rshi",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/task/run_97af692139f1-implementer.json",
+    "sha256": "167bbd352ab4e800c151237d5c7c64de6a235db6b7ebb2f3da2967c9ca6824c4"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_relative_path_is_resolved_against_the_root",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_envelope.TestResultEnvelopeCheck.test_a_missing_relative_path_names_the_root_it_looked_in",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_root_without_a_repository_prints_fresh_head_unverified_instead_of_a_traceback",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_docs_evidence_close.TestCloseWithoutGitHistory.test_a_repository_without_commits_is_reported_the_same_way",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "grep -q 'git 이력이 없' core/workflows/plan-close/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -q '상대 경로면' adapters/orca/RUNBOOK.md && ! grep -q 'envelope check` 의 위치 인자, `orca terminal create' adapters/orca/RUNBOOK.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_attach_requirements tests.test_enforce_points",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo envelope check --help | grep -q '루트 기준'",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-envelope-root-close-no-history-rshi/evidence/run_97af692139f1.yaml",
+  "notes": "2회차(재승인 D-80 뒤, 승인 커밋 483546654b2f). 산출물은 1회차(run_efc3965a78d8)와 동일 — 코드·문서를 바꾸지 않았고 spec 확인란의 체크박스만 채웠다. run_97af692139f1 의 check-1~check-10 전부 exit 0(evidence checks 한 번에 기록, check-8 145초). AC 근거: AC-1 → check-1 · AC-2(재승인본: 없는 파일은 종료 코드 1+해석된 절대 경로·JSON 없음, 찾은 파일은 인쇄·--json 의 path 가 해석된 경로) → check-2(없는 파일)·check-1(찾은 파일의 path 단언) · AC-3 → check-6(RUNBOOK)·check-10(--help) · AC-4·AC-5 → check-3·check-4(dry-run 과 실제 close 둘 다 종료 코드 1·status active 유지·트레이스 없음 단언) · AC-6 → check-5 · AC-7 → check-8(기존 검사 삭제 0줄, git diff 추가만)·check-7·check-9 · AC-8 → docs/planning/open-questions.md 의 Q-66·Q-67 해소 행과 Q-82 신설(check-8 에 포함된 문서 검사 통과). 1회차 검토(review/run_efc3965a78d8-reviewer.json)는 AC-1·3~8 을 확인했고 유일한 finding 은 옛 AC-2 문장이었다 — 재승인본은 현재 산출물이 만족한다. §12 로 남긴 것(1회차와 동일): Q-82 — evidence run 이 git init 만 한 루트에서 같은 CalledProcessError 로 죽는다(romeo/evidence.py 비범위)."
+}

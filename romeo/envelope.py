@@ -314,7 +314,11 @@ def check_result_envelope(path, unit_id, role=None, project_root=".", harness_ro
     UNVERIFIED(어긋난 것은 없으나 대조가 성립하지 않은 검사가 있다). 마지막은 통과가 아니다(K-51)."""
     project_root = Path(project_root).resolve()
     harness_root = Path(harness_root or HARNESS_ROOT)
+    # 위치 인자는 `--root` 를 따른다(Q-66) — 절대 경로는 그대로, 상대 경로는 명령을 친 자리(cwd)가 아니라 루트 기준이다.
+    # 못 찾으면 해석된 절대 경로를 문장에 넣어 어느 루트에서 찾았는지 보인다.
     path = Path(path)
+    if not path.is_absolute():
+        path = project_root / path
     if not path.is_file():
         raise FileNotFoundError(f"결과 계약 파일이 없다: {path}")
     udir = find_unit_dir(project_root, unit_id)
