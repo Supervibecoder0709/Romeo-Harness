@@ -21,6 +21,16 @@ attempts:
     fm.get 에서 AttributeError 로 목록 전체가 죽는다(AC-5 「파일 하나가 깨져도 목록은 나온다」 반례 · check-5 는 문법 오류만 본다) ② progress
     블록 「1회차 진행 중」 낡음(FAIL 사유 아님). 연속 2회 실패 — §10 반복 중단, 사람 재검토 대기. AC-8 은 이번 회차 충족(브리프 == 기록된 stdout)'
   settled_at: '2026-09-08T00:39:45+09:00'
+- n: 3
+  run: run_94f401ad8cff
+  base_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  started_at: '2026-09-08T00:53:37+09:00'
+  result: fail
+  failure_class: outputs
+  note: 검토자 FAIL findings 2 — ① 공유 파서 romeo/frontmatter.py 의 'yaml.safe_load(raw) or {}' 가 falsey 비매핑([]·0·false)을
+    빈 매핑으로 바꿔 context 가 「읽힌 정본」으로 분류한다(AC-5 반례 3번째 · check-5 는 truthy 반례만) ② progress 「열린 park」 목록에 Q-85~87
+    누락(FAIL 사유 아님). 연속 3회 실패 — §10 반복 중단, 사람 재검토 대기. 파일 단위 예외 격리·타입 정규화·반례 4종은 이 회차에 들어갔고 AC-8 은 충족
+  settled_at: '2026-09-08T01:12:44+09:00'
 reviews:
 - after_attempt: 2
   conclusion: '완료 정의 달성 가능 — AC-5 의 「파일 하나가 깨져도 목록은 나온다 — 그 줄만 읽을 수 없다」는 깨짐의 종류를 열거하는 구현으로는 끝나지 않고(2회
@@ -30,3 +40,12 @@ reviews:
     로 연다(사용자 확정 2026-09-08)'
   by: Supervibecoder0709
   at: '2026-09-08T00:52:14+09:00'
+- after_attempt: 3
+  conclusion: 완료 정의 달성 가능 — 3회차가 넣은 파일 단위 예외 격리는 맞는 방향이었고 남은 반례는 이 단위의 구현이 아니라 **공유 파서**에 있다. `romeo/frontmatter.py`
+    의 `yaml.safe_load(raw) or {}` 가 falsey 비매핑 6종(`[]`·`{}`·`0`·`false`·`''`·빈 frontmatter)을 전부 빈 매핑으로
+    바꿔 버려, context.py 는 `isinstance(parsed, dict)` 로 아무리 걸러도 그 여섯을 「읽힌 정본」과 구별할 수 없다 — 지금 구조에서는 AC-5 를
+    충족시킬 방법이 호출자에게 없다. 그래서 4회차는 context.py 가 frontmatter 를 **직접 판독**하고 「비어 있지 않은 매핑」일 때만 읽힌 정본으로 본다(공유
+    파서는 고치지 않는다 — 이 단위의 비범위이고 다른 호출자 전부의 동작이 바뀐다, §12). check-5 에 그 6종을 반례로 넣고, 공유 파서의 강제 변환 결함은 Q-88
+    로 열고, progress 「열린 park」에 Q-85~87 을 넣는다. 이것으로 깨짐의 종류를 열거하는 반복이 끝난다 — 판독의 조건이 「매핑이 아니면 전부」로 닫히기 때문이다
+  by: Supervibecoder0709
+  at: '2026-09-08T01:55:05+09:00'
