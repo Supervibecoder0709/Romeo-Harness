@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260907-judge-revision-base-sha-pwt8
+attempts:
+- n: 1
+  run: run_4db4be703188
+  base_sha: 5b1767a1ba6aec49b782e127c2baec1ec90ae206
+  started_at: '2026-09-07T18:28:46+09:00'
+  result: fail
+  failure_class: goal
+  note: 검토자 FAIL findings 1 — AC-3 의 「파일 하나가 없어도 같다」가 판정이 JUDGE_REVISION 앞에서 읽는 파일(정책표·스키마)에는 참일 수 없다(그
+    파일이 없으면 load_policy 가 먼저 ERROR 로 끝난다 — 2026-09-07 실행 재현). 산출물 결함이 아니라 AC 문장의 과잉 명세
+  settled_at: '2026-09-07T18:49:45+09:00'
+reviews: []

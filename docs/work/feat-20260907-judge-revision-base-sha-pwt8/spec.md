@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: low
 status: active
-approved_at: '2026-09-07T18:26:46+09:00'
+approved_at: '2026-09-07T19:07:03+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,11 @@ routing:
   history: []
 created: '2026-09-07'
 updated: '2026-09-07'
+approval_history:
+- {approved_at: '2026-09-07T18:26:46+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-07T19:07:03+09:00',
+  reason: 1회차 검토자 FAIL findings 1건 — AC-3 의 「파일 하나가 없어도 같다」가 판정이 JUDGE_REVISION 앞에서 읽는 파일(정책표·스키마)에는 참일
+    수 없었다(그 파일이 없으면 load_policy 가 먼저 ERROR 로 끝난다 — 실행 재현). 첫 문장의 「docs/ 밖」도 대조에서 뺀 .harness/ 를 포함했다. AC-3
+    을 두 자리에서 좁혔다. 산출물은 문제없다 — 검토자가 13/13·원시 로그·allowed_paths 를 확인했다}
 ---
 
 # 종료 검사는 base_sha 시점의 하네스가 낸다 — 규칙을 만든 단위가 자기 규칙으로 닫히지 않는다
@@ -58,8 +63,10 @@ updated: '2026-09-07'
   - [ ] AC-2 승인 커밋을 `git archive` 로 꺼낸 스냅샷 폴더(git 저장소 아님)의 `bin/romeo close --unit <id> --root <그 트리>` 는
         `JUDGE_REVISION` PASS 이고, 나머지 검사가 전부 통과하는 단위는 그 호출 한 번으로 `status: done` 이 된다(`--dry-run` 없이 부른 실제 종료). 출력에
         `Traceback` 이 없다. `--dry-run` 도 같은 판정을 인쇄한다.
-  - [ ] AC-3 스냅샷의 `docs/` 밖 파일 하나만 내용이 달라도(예: `romeo/close.py` 끝에 한 줄) FAIL 이고 그 경로가 문장에 인쇄된다.
-        파일 하나가 없어도 같다. 스냅샷의 `docs/`·`.harness/` 아래 파일이 달라도 판정은 바뀌지 않는다.
+  - [ ] AC-3 스냅샷의 `docs/`·`.harness/` 밖 파일 하나만 내용이 달라도(예: `romeo/close.py` 끝에 한 줄) FAIL 이고 그 경로가 문장에
+        인쇄된다. 판정이 이 검사 **앞에서 읽지 않는** 파일 하나가 없어도 같다(예: `README.md`). 판정이 이 검사 앞에서 읽는 파일
+        (정책표·스키마)이 없으면 그 읽기가 먼저 오류 문장과 종료 코드 1 로 끝나는 기존 경로이고, 그것을 바꾸지 않는다 — 어느 쪽이든
+        완료가 선언되는 일은 없다. 스냅샷의 `docs/`·`.harness/` 아래 파일이 달라도 판정은 바뀌지 않는다.
   - [ ] AC-4 승인 커밋 트리에 `romeo/__init__.py` 가 없는 루트(남의 저장소)에서는 `JUDGE_REVISION` 이 「자기적용이 아니다」 문장으로
         PASS 이고, 승인 커밋을 이력에서 찾지 못하면(예: 커밋하지 않은 재승인) 미검증(UNVERIFIED)이다 — 통과가 아니다. 이 검사는 검사 목록에서 `FRESH_HEAD` 미검증
         조기 종료 **뒤**·검사 기록 선택 **앞**에 온다 — 이력 없는 루트의 판정(Q-67)은 바뀌지 않는다.
