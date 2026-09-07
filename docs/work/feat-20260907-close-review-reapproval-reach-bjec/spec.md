@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-07T09:45:47+09:00'
+approved_at: '2026-09-07T10:08:21+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,10 @@ routing:
   history: []
 created: '2026-09-07'
 updated: '2026-09-07'
+approval_history:
+- {approved_at: '2026-09-07T09:45:47+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-07T10:08:21+09:00',
+  reason: AC-1 이 실물 봉투의 계약·원시 로그를 요구했는데 둘 다 .gitignore 대상이라 그 run 을 돌린 워크트리 밖에서는 존재하지 않는다 — 어느 구현으로도 만족시킬
+    수 없는 환경 의존 기준이었다. 봉투 바이트를 픽스처에 넣는 형태로 바꾸고 check-10 을 더한다}
 ---
 
 # 재승인이 닿지 않던 자리를 연다 — 산출물을 식별하지 못한 봉투도 승인 키는 읽는다
@@ -45,8 +49,10 @@ updated: '2026-09-07'
   경고로 인쇄된다. **지금 승인의 검토는 그대로 막는다** — 차단을 걷는 것은 사람의 재승인뿐이다.
 - **수용 기준:**
   - [ ] AC-1 재승인 전 승인으로 **정식 기록된** 검토 봉투는, 방어 검사가 깨져 어느 산출물을 봤는지 확인할 수
-        없더라도 `REVIEW_SUPERSEDED`(경고)로 인쇄되고 완료를 막지 않는다. 합성 픽스처와 **실물 봉투**
-        (2026-09-06 관통의 그 봉투) 양쪽으로 보인다.
+        없더라도 `REVIEW_SUPERSEDED`(경고)로 인쇄되고 완료를 막지 않는다. 합성 픽스처와, 2026-09-06 관통이
+        실제로 낸 봉투의 **바이트 그대로**를 픽스처에 넣은 검사 양쪽으로 보인다 — 그 봉투의 작업 계약과
+        원시 로그는 그 run 을 돌린 워크트리에만 있고 둘 다 커밋되지 않으므로(`.gitignore`), 주변 환경은
+        픽스처가 만든다. 실물 판정 문자열·`findings`·포인터가 이 분류를 지나는 것이 이 기준이 보는 것이다.
   - [ ] AC-2 그 봉투 파일은 지워지지 않고 `review/` 에 그대로 남으며, 인쇄에 판정·findings 건수·「재승인 전 승인」
         문구가 들어간다.
   - [ ] AC-3 **지금 승인**의 봉투는 산출물을 확인할 수 없으면 그대로 완료를 막는다.
@@ -110,7 +116,7 @@ required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대�
 부정 조건은 `!` 로 쓴다: `! grep -q '<있으면 안 되는 것>' <파일>`.
 
 **판별 검사와 회귀 방지 검사의 구분** — §11 은 「어느 쪽인지는 검증 계획에 적는다, 적지 않으면 전부 판별 검사로 본다」고 한다.
-**판별 검사는 check-1·check-2 둘뿐**이고 승인 전에 기존 상태·가상 완료 상태 양쪽에서 실행해 각각 실패·통과를 보였다.
+**판별 검사는 check-1·check-2·check-10 셋뿐**이고 승인 전에 기존 상태·가상 완료 상태 양쪽에서 실행해 각각 실패·통과를 보였다.
 check-3~check-9 는 **회귀 방지 검사**이므로 양쪽 실측 대상이 아니다 — 양쪽에서 통과하는 것이 그 검사의 정의다.
 다만 check-4·check-5 가 빈 검사가 아니라는 증거는 따로 있다: 봉인 조건을 뺀 중간 상태에서 **실패한다**(실측).
 
@@ -134,6 +140,8 @@ required_checks:
     command: "python3 -m unittest discover -s tests -q"
   - id: check-9
     command: "python3 -m unittest tests.test_attach_requirements tests.test_enforce_points"
+  - id: check-10
+    command: "python3 -m unittest tests.test_docs_evidence_close.TestCloseReviewVerdict.test_the_real_2026_09_06_envelope_is_superseded_after_a_reapproval"
 ```
 
 **각 검사가 무엇을 보는가**
@@ -149,6 +157,7 @@ required_checks:
 | check-7 | 회귀 방지 | 코어 본문 변경이 컴파일 산출물과 어긋나지 않는다 | — |
 | check-8 | 회귀 방지 | 기존 검사가 하나도 깨지지 않는다(904 → 909) | — |
 | check-9 | 회귀 방지 | 문서 편집이 출처 집합 대조·해소 표기 대조를 깨지 않는다 | — |
+| check-10 | **판별** | 2026-09-06 관통이 낸 봉투의 **바이트 그대로**(판정·`findings`·포인터)가 픽스처가 세운 환경에서 `REVIEW_SUPERSEDED` 로 분류된다 | 합성한 이상적 봉투가 아니라 실제로 그 사고를 낸 봉투다 — 그 봉투의 계약·증거·원시 로그는 커밋되지 않으므로 픽스처가 만들고, 봉투 본문만 실물을 쓴다 |
 
 **재실행 시간** — check-8 이 약 130초, 나머지는 각 1~4초다. `romeo close` 의 재실행 상한 600초 안이다.
 
