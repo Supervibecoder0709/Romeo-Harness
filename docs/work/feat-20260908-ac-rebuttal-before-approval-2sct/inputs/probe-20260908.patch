@@ -1,0 +1,529 @@
+diff --git a/.agents/skills/plan/SKILL.md b/.agents/skills/plan/SKILL.md
+index e10222d..7e59ede 100644
+--- a/.agents/skills/plan/SKILL.md
++++ b/.agents/skills/plan/SKILL.md
+@@ -9,12 +9,15 @@ description: 요청을 이해해 사실·가정·미확인·분류 후보를 제
+ 
+ 절차의 원본은 `core/workflows/plan/SKILL.md` 다. 이 파일은 그 절차를 Codex CLI 에서 어떻게 수행하는지만 적는다.
+ 
+-<!-- romeo:managed start v0.1.0 source=adapters/codex/workflows/plan.md sha=c992f442 -->
++<!-- romeo:managed start v0.1.0 source=adapters/codex/workflows/plan.md sha=d950f823 -->
+ 1. `core/workflows/plan/SKILL.md` 를 읽고 절차를 그대로 따른다. 이 파일은 그 절차의 Codex 매핑일 뿐이다.
+ 2. 제안은 `core/schemas/proposal.json` 형식의 YAML 로 `.harness/runs/plan/<slug>.proposal.yaml` 에 쓴다(git 제외).
+ 3. 카드는 `bin/romeo card --proposal <파일>` 로 만든다.
+ 4. **사람 확정**은 카드를 그대로 출력하고 한 번의 질문으로 받는다 — "제안대로 확정 / 단위 변경 / 깊이 변경 / 게이트 수정" 중 무엇인지 묻고, 답이 올 때까지 문서를 만들지 않는다. 사용자가 고치면 fixture 의 `human_correction` 에 기록한다.
+ 5. `bin/romeo new --proposal <파일> --title ... --slug ...` 로 문서를 만들고 `NEEDS_INPUT` 을 채운다. `bin/romeo validate` 가 PASS 여야 한다.
+-6. 승인 요청은 **확인란만** 출력하고 사용자의 명시적 승인을 기다린다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
+-7. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
++6. **반박 읽기(절차 8)** 는 검토자 런타임의 읽기 전용 비대화형 실행으로 한다 — 역할 교체 실행에서 이 런타임은 구현자이므로 검토자는 상대 런타임이다. 명령의 읽기 전용 강제는 `.harness/bindings.yaml` 의 검토자 `enforcement` 를 그대로 쓰고, 출력은 파일로 받아 `inputs/` 에 둔다:
++   `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config "$(cat adapters/orca/prompts/ac-rebuttal-brief.md; sed -n '/^## 확인란/,/^## 변경 범위/p' docs/work/<id>/spec.md)" > docs/work/<id>/inputs/ac-rebuttal-<YYYYMMDD>.md`
++   브리프의 `<id>` 를 실제 단위 id 로 바꾼다. 실행 전후 `git status --porcelain` 이 같은지 방어 검사한다.
++7. 승인 요청은 **확인란만** 출력하고 사용자의 명시적 승인을 기다린다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
++8. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
+ <!-- romeo:managed end -->
+diff --git a/.claude/skills/plan/SKILL.md b/.claude/skills/plan/SKILL.md
+index 6b33f47..73a97e1 100644
+--- a/.claude/skills/plan/SKILL.md
++++ b/.claude/skills/plan/SKILL.md
+@@ -9,12 +9,15 @@ description: Romeo 라우터. 새 요청을 받으면 사실·가정·미확인
+ 
+ 절차의 원본은 `core/workflows/plan/SKILL.md` 다. 이 파일은 그 절차를 Claude Code 에서 어떻게 수행하는지만 적는다.
+ 
+-<!-- romeo:managed start v0.1.0 source=adapters/claude/workflows/plan.md sha=8757ab95 -->
++<!-- romeo:managed start v0.1.0 source=adapters/claude/workflows/plan.md sha=621bba49 -->
+ 1. `core/workflows/plan/SKILL.md` 를 읽고 절차를 그대로 따른다. 이 파일은 그 절차의 Claude 매핑일 뿐이다.
+ 2. 제안은 `core/schemas/proposal.json` 형식의 YAML 로 `.harness/runs/plan/<slug>.proposal.yaml` 에 쓴다(git 제외).
+ 3. 카드는 `bin/romeo card --proposal <파일>` 로 만든다.
+ 4. **사람 확정**은 AskUserQuestion 한 번으로 받는다 — 첫 옵션 "제안대로 확정(추천)", 나머지는 "단위 변경", "깊이 변경", "게이트 수정". 사용자가 고치면 fixture 의 `human_correction` 에 기록한다.
+ 5. `bin/romeo new --proposal <파일> --title ... --slug ...` 로 문서를 만들고 `NEEDS_INPUT` 을 채운다. `bin/romeo validate` 가 PASS 여야 한다.
+-6. 승인 요청은 **확인란만** 보여주고 AskUserQuestion 으로 받는다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
+-7. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
++6. **반박 읽기(절차 8)** 는 검토자 런타임의 읽기 전용 비대화형 실행으로 한다 — 기본 실행에서 이 런타임은 구현자이므로 검토자는 상대 런타임이다. 명령의 읽기 전용 강제는 `.harness/bindings.yaml` 의 검토자 `enforcement` 를 그대로 쓰고, 출력은 파일로 받아 `inputs/` 에 둔다:
++   `codex exec -s read-only -C <저장소 루트> -o docs/work/<id>/inputs/ac-rebuttal-<YYYYMMDD>.md - < <(cat adapters/orca/prompts/ac-rebuttal-brief.md; sed -n '/^## 확인란/,/^## 변경 범위/p' docs/work/<id>/spec.md)`
++   브리프의 `<id>` 를 실제 단위 id 로 바꾼다. 실행 전후 `git status --porcelain` 이 같은지 방어 검사한다.
++7. 승인 요청은 **확인란만** 보여주고 AskUserQuestion 으로 받는다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
++8. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
+ <!-- romeo:managed end -->
+diff --git a/adapters/claude/workflows/plan.md b/adapters/claude/workflows/plan.md
+index 7345a72..5af037f 100644
+--- a/adapters/claude/workflows/plan.md
++++ b/adapters/claude/workflows/plan.md
+@@ -3,5 +3,8 @@
+ 3. 카드는 `bin/romeo card --proposal <파일>` 로 만든다.
+ 4. **사람 확정**은 AskUserQuestion 한 번으로 받는다 — 첫 옵션 "제안대로 확정(추천)", 나머지는 "단위 변경", "깊이 변경", "게이트 수정". 사용자가 고치면 fixture 의 `human_correction` 에 기록한다.
+ 5. `bin/romeo new --proposal <파일> --title ... --slug ...` 로 문서를 만들고 `NEEDS_INPUT` 을 채운다. `bin/romeo validate` 가 PASS 여야 한다.
+-6. 승인 요청은 **확인란만** 보여주고 AskUserQuestion 으로 받는다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
+-7. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
++6. **반박 읽기(절차 8)** 는 검토자 런타임의 읽기 전용 비대화형 실행으로 한다 — 기본 실행에서 이 런타임은 구현자이므로 검토자는 상대 런타임이다. 명령의 읽기 전용 강제는 `.harness/bindings.yaml` 의 검토자 `enforcement` 를 그대로 쓰고, 출력은 파일로 받아 `inputs/` 에 둔다:
++   `codex exec -s read-only -C <저장소 루트> -o docs/work/<id>/inputs/ac-rebuttal-<YYYYMMDD>.md - < <(cat adapters/orca/prompts/ac-rebuttal-brief.md; sed -n '/^## 확인란/,/^## 변경 범위/p' docs/work/<id>/spec.md)`
++   브리프의 `<id>` 를 실제 단위 id 로 바꾼다. 실행 전후 `git status --porcelain` 이 같은지 방어 검사한다.
++7. 승인 요청은 **확인란만** 보여주고 AskUserQuestion 으로 받는다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
++8. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
+diff --git a/adapters/codex/workflows/plan.md b/adapters/codex/workflows/plan.md
+index e8f2fcf..7826a56 100644
+--- a/adapters/codex/workflows/plan.md
++++ b/adapters/codex/workflows/plan.md
+@@ -3,5 +3,8 @@
+ 3. 카드는 `bin/romeo card --proposal <파일>` 로 만든다.
+ 4. **사람 확정**은 카드를 그대로 출력하고 한 번의 질문으로 받는다 — "제안대로 확정 / 단위 변경 / 깊이 변경 / 게이트 수정" 중 무엇인지 묻고, 답이 올 때까지 문서를 만들지 않는다. 사용자가 고치면 fixture 의 `human_correction` 에 기록한다.
+ 5. `bin/romeo new --proposal <파일> --title ... --slug ...` 로 문서를 만들고 `NEEDS_INPUT` 을 채운다. `bin/romeo validate` 가 PASS 여야 한다.
+-6. 승인 요청은 **확인란만** 출력하고 사용자의 명시적 승인을 기다린다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
+-7. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
++6. **반박 읽기(절차 8)** 는 검토자 런타임의 읽기 전용 비대화형 실행으로 한다 — 역할 교체 실행에서 이 런타임은 구현자이므로 검토자는 상대 런타임이다. 명령의 읽기 전용 강제는 `.harness/bindings.yaml` 의 검토자 `enforcement` 를 그대로 쓰고, 출력은 파일로 받아 `inputs/` 에 둔다:
++   `claude -p --tools "Read" "Grep" "Glob" --allowedTools "Read" "Grep" "Glob" --strict-mcp-config "$(cat adapters/orca/prompts/ac-rebuttal-brief.md; sed -n '/^## 확인란/,/^## 변경 범위/p' docs/work/<id>/spec.md)" > docs/work/<id>/inputs/ac-rebuttal-<YYYYMMDD>.md`
++   브리프의 `<id>` 를 실제 단위 id 로 바꾼다. 실행 전후 `git status --porcelain` 이 같은지 방어 검사한다.
++7. 승인 요청은 **확인란만** 출력하고 사용자의 명시적 승인을 기다린다. 승인되면 `bin/romeo approve <id> --by <사용자>`.
++8. `unit: none` 이면 문서를 만들지 않고 답변으로 끝낸다. 비코드 프로젝트면 `OUT_OF_SCOPE_NON_CODE` 를 그대로 보고한다.
+diff --git a/adapters/orca/prompts/ac-rebuttal-brief.md b/adapters/orca/prompts/ac-rebuttal-brief.md
+new file mode 100644
+index 0000000..e17cefb
+--- /dev/null
++++ b/adapters/orca/prompts/ac-rebuttal-brief.md
+@@ -0,0 +1,23 @@
++너는 작업 단위 `<id>` 의 **반대 독자**다.
++
++아래 구분선 뒤에 이어지는 **확인란만** 읽는다 — 저장소를 읽거나 검색해도 되지만
++**아무것도 쓰지 않고 검사·빌드를 실행하지 않는다**. **판정을 내지 않는다** — 너의 출력은
++승인 여부가 아니라 사람이 문장을 고칠 때 쓰는 입력이다.
++
++수용 기준(AC) 하나마다 다음 형식으로 답한다. 빠뜨리지 않는다.
++
++### AC-n
++- 반례: 이 AC 를 **글자 그대로 충족하면서도 의도를 배신하는** 그럴듯한 산출물 하나.
++  빈 값·명백한 미구현이 아니라, 형태가 그럴듯하고 내용이 거짓인 것이어야 한다. 없으면 「없음」과 그 이유.
++- 검토 시점: 구현이 끝난 **검토 시점에 참일 수 있는 명제**인가. 사후 관측이 불가능한 것
++  (누가 언제 무엇을 먼저 했는지 같은 시간 순서)·다른 경우를 말하는 부수 문장·검토자가
++  확인할 수단이 없는 요구가 있으면 지적한다.
++- 표현: 전칭 표현·열거되지 않은 집합·한 문장에 두 경우가 섞인 것이 있으면 지적한다.
++  전칭 문장은 **여집합으로 다시 쓸 수 있는지**도 본다.
++
++마지막에 `## 요약` 으로 고쳐야 할 AC 를 번호와 한 줄 이유로 나열한다.
++**문장을 대신 써 주지 않는다** — 무엇이 문제인지만 말한다.
++
++---
++
++아래가 그 확인란이다.
+diff --git a/core/policy/packages.yaml b/core/policy/packages.yaml
+index 7cb8c6c..1473870 100644
+--- a/core/policy/packages.yaml
++++ b/core/policy/packages.yaml
+@@ -296,8 +296,28 @@ budgets:
+   brief_max_lines: 120
+   charter_max_lines: 250
+ 
++# ── 확인란 수용 기준 검사 ─────────────────────────────────────────────────────
++# 요구하는 자리(확인란)와 그것을 반박하는 자리를 승인 앞으로 옮긴다. 둘 다 경고까지만이다(K-31).
++ac_lint:
++  # 전칭 표현 — 반례가 무한해 구현이 「종류를 세는」 반복에 들어간다.
++  universal_patterns:
++    - "어떤 .{1,12}이든"
++    - "어느 .{1,12}든"
++    - "전부"
++    - "모든"
++    - "하나라도"
++    - "하나(가|만) .{1,20}도"
++    - "항상"
++    - "언제나"
++    - "어떤 경우에도"
++  # 반박 기록의 자리와 형식. approve 가 찾는 접두이자 절차가 지시하는 접두다(§11).
++  rebuttal_prefix: "inputs/ac-rebuttal-"
++  rebuttal_heading: "### AC-"
++
+ # ── 경고 메시지 카탈로그 ──────────────────────────────────────────────────────
+ warnings:
++  AC_UNIVERSAL: 확인란의 수용 기준에 전칭 표현이 있다 — 반례가 무한하다. 닫힌 집합을 열거하거나 파일 단위 격리처럼 달성 가능한 형태로 고친다.
++  AC_UNREBUTTED: 승인 전 반박 기록이 없거나 이 AC 를 덮지 못한다 — 반박 읽기 단계를 밟는다.
+   WORKTREE_ISOLATES_CODE_ONLY: worktree는 코드 변경만 분리한다. DB·배포 환경·브라우저 세션·외부 서비스 변경은 분리되지 않으므로 환경 계획을 적는다.
+   CAPABILITY_CHECK_REQUIRED: 필요한 도구·능력을 실행 전에 프로브한다. 없으면 가능한 척 우회하지 않고 BLOCKED_CAPABILITY로 보고한다.
+   DOCS_ONLY_CHANGE: 문서·규칙만 바뀐다. required_checks는 스키마·링크·길이 검사다.
+diff --git a/core/workflows/plan/SKILL.md b/core/workflows/plan/SKILL.md
+index d8e1ca0..f4f7320 100644
+--- a/core/workflows/plan/SKILL.md
++++ b/core/workflows/plan/SKILL.md
+@@ -47,7 +47,15 @@ provenance: [anthropics-skills-skill-format]
+    - 아직 템플릿이 없는 문서(brief 는 M2, charter 는 M3)는 `NOT_AVAILABLE_YET` 으로 정직하게 보고한다.
+ 7. **내용 채우기.** `NEEDS_INPUT` 자리를 요청·조사 결과로 채운다. 모르는 것은 `UNKNOWN` 또는 `NEEDS_VALIDATION`
+    으로 남긴다(K-33). 길이 예산을 넘으면 게이트 섹션이 아니라 다른 절을 줄인다.
+-8. **승인 요청.** 사용자에게는 **확인란만** 읽고 승인하도록 안내한다. 승인되면 `romeo approve <id> --by <이름>` 이
++8. **반박 읽기.** 승인을 요청하기 전에 확인란의 수용 기준을 **구현하지 않는 다른 런타임의 읽기 전용 실행**에 넘겨
++   AC 마다 세 줄을 받는다 — 「반례:」(그 AC 를 글자 그대로 충족하면서 의도를 배신하는 그럴듯한 산출물 하나 · 없으면
++   「없음」과 이유) · 「검토 시점:」(구현이 끝난 검토 시점에 참일 수 있는 명제인가 — 사후 관측 불가·시간 순서·다른
++   경우의 부수 문장이면 지적) · 「표현:」(전칭 표현·열거되지 않은 집합·한 문장에 두 경우가 있으면 지적).
++   결과는 `docs/work/<id>/inputs/ac-rebuttal-<YYYYMMDD>.md` 에 두고 frontmatter `inputs:` 로 등록한다(K-62).
++   **반박은 판정이 아니라 입력이다** — 읽고 문장을 고친 뒤 승인을 요청하고, 고친 AC 는 그 파일 끝 「반영」 절에 적는다.
++   `romeo approve` 는 이 파일이 없거나 절이 없는 AC 가 있으면 `AC_UNREBUTTED` 로 경고한다(막지 않는다 — K-31).
++   `romeo validate` 의 `AC_UNIVERSAL` 은 같은 것을 문장을 쓰는 시점에 먼저 보여 준다.
++9. **승인 요청.** 사용자에게는 **확인란만** 읽고 승인하도록 안내한다. 승인되면 `romeo approve <id> --by <이름>` 이
+    `approved_at` 을 기록하고 `status: active` 로 바꾼다. 구현 착수는 이 승인이 유일한 선행 조건이다(D-27).
+ 
+ ## 하지 않는 것
+diff --git a/romeo/cli.py b/romeo/cli.py
+index 9c5d3e4..b2b479d 100644
+--- a/romeo/cli.py
++++ b/romeo/cli.py
+@@ -189,10 +189,22 @@ def cmd_fixtures(args):
+     return 0 if rep["total"] and rep["matched"] == rep["total"] and rep["gate_misses"] == 0 else 1
+ 
+ 
++def _print_rebuttal_warnings(fm, args):
++    """승인 전 반박이 확인란의 AC 를 덮었는지 인쇄한다. 경고까지만 — 종료 코드를 바꾸지 않는다(K-31)."""
++    from . import frontmatter
++    from .docs import find_unit_dir, rebuttal_warnings
++    from .policy import load_policy
++    udir = find_unit_dir(_root(args), fm["id"])
++    _fm, body = frontmatter.read(udir / "spec.md")
++    for w in rebuttal_warnings(udir, _fm, body, load_policy()):
++        print(f"WARN {w}")
++
++
+ def cmd_approve(args):
+     from .docs import approve_unit
+     fm = approve_unit(args.unit, args.by, project_root=_root(args), reapprove=args.reapprove, reason=args.reason)
+     what = "reapproved" if args.reapprove else "approved"
++    _print_rebuttal_warnings(fm, args)
+     print(f"{what} {fm['id']} at {fm['approved_at']} by {fm['approved_by']}"
+           + (f" (이전 승인 {len(fm['approval_history'])}건은 approval_history 에 남았다)" if args.reapprove else ""))
+     print("  다음: 승인된 spec.md 를 커밋한다. 위임된 실행 공간은 커밋된 것만 본다(D-a). "
+diff --git a/romeo/docs.py b/romeo/docs.py
+index 7db42aa..3b31f0c 100644
+--- a/romeo/docs.py
++++ b/romeo/docs.py
+@@ -95,6 +95,39 @@ def _is_approved(fm):
+     return fm.get("status") == "active" and bool(fm.get("approved_at"))
+ 
+ 
++def rebuttal_warnings(udir, fm, body, policy):
++    """승인 전 반박 기록이 확인란의 AC 를 덮는지. 경고 문자열 목록 — 비었으면 덮었다는 뜻이다.
++
++    반박은 판정이 아니라 입력이므로 이 함수는 승인을 막지 않는다(K-31). 절의 **존재**만 본다 —
++    내용이 값어치 있는지는 사람이 읽는다."""
++    from .validate import ac_items
++    cfg = policy["packages"].get("ac_lint", {})
++    prefix = cfg.get("rebuttal_prefix", "inputs/ac-rebuttal-")
++    heading = cfg.get("rebuttal_heading", "### AC-")
++    ids = [ac for ac, _ in ac_items(body)]
++    if not ids:
++        return []
++    path = None
++    for item in fm.get("inputs") or []:
++        if str(item).startswith(prefix):
++            cand = Path(udir) / str(item)
++            if cand.exists():
++                path = cand
++                break
++    if path is None:
++        return ["AC_UNREBUTTED " + ", ".join(ids)]
++    text = path.read_text(encoding="utf-8")
++    import re as _re
++    covered = set()
++    for ln in text.split("\n"):
++        if ln.startswith(heading):
++            m = _re.match(r"AC-\d+", ln[len(heading) - len("AC-"):])
++            if m:
++                covered.add(m.group(0))
++    missing = [i for i in ids if i not in covered]
++    return ["AC_UNREBUTTED " + ", ".join(missing)] if missing else []
++
++
+ def approve_unit(unit_id, by, project_root=".", reapprove=False, reason=None):
+     """사람의 승인 사건을 기록한다: approved_at·approved_by, status active. 확인란이 비어 있으면 거부.
+ 
+diff --git a/romeo/validate.py b/romeo/validate.py
+index d64adbd..65b0675 100644
+--- a/romeo/validate.py
++++ b/romeo/validate.py
+@@ -52,6 +52,34 @@ def section_lines(body, title):
+     return None
+ 
+ 
++AC_ITEM_RE = re.compile(r"^\s*- \[[ xX]\] (AC-\d+)\b")
++
++
++def ac_items(body):
++    """확인란 절의 수용 기준 항목. [(id, 그 항목의 전체 문장)] — 이어지는 줄까지 한 문장으로 합친다.
++
++    다음 `- [` 항목이나 절 끝에서 끊는다. 확인란 절이 없으면 빈 목록이다."""
++    lines = section_lines(body, "확인란")
++    if lines is None:
++        return []
++    items, cur_id, buf = [], None, []
++    for ln in lines:
++        m = AC_ITEM_RE.match(ln)
++        if m:
++            if cur_id:
++                items.append((cur_id, "\n".join(buf)))
++            cur_id, buf = m.group(1), [ln]
++        elif cur_id is not None:
++            if re.match(r"^\s*- \[", ln):      # 다른 체크 항목에서 끊는다
++                items.append((cur_id, "\n".join(buf)))
++                cur_id, buf = None, []
++            else:
++                buf.append(ln)
++    if cur_id:
++        items.append((cur_id, "\n".join(buf)))
++    return items
++
++
+ def validate_doc(path, harness_root=None):
+     harness_root = Path(harness_root or HARNESS_ROOT)
+     pol = load_policy(harness_root)
+@@ -101,6 +129,12 @@ def validate_doc(path, harness_root=None):
+         warnings.append(f"OPEN_LOOP NEEDS_INPUT {info['needs_input']}곳")
+     if info["unchecked_ac"]:
+         warnings.append(f"UNCHECKED_AC {info['unchecked_ac']}개")
++    # 확인란의 전칭 표현 — 패턴은 정책표가 소유한다(§11). 경고까지만이고 종료 코드를 바꾸지 않는다(K-31).
++    for ac, sentence in ac_items(body):
++        for pat in pk.get("ac_lint", {}).get("universal_patterns", []):
++            m = re.search(pat, sentence)
++            if m:
++                warnings.append(f"AC_UNIVERSAL {ac} \u00ab{m.group(0)}\u00bb")
+     # base_sha 는 더 이상 승인이 기록하지 않는다(체크리스트 38) — 남아 있는 값은 승인 커밋의 부모를 가리키는 낡은 사실이다.
+     if fm.get("base_sha") and fm.get("status") not in ("done", "dropped", "superseded"):
+         warnings.append(f"STALE_BASE_SHA frontmatter 의 base_sha {str(fm['base_sha'])[:12]} 는 승인 커밋이 아니다 — "
+diff --git a/tests/test_ac_rebuttal.py b/tests/test_ac_rebuttal.py
+new file mode 100644
+index 0000000..9ca685a
+--- /dev/null
++++ b/tests/test_ac_rebuttal.py
+@@ -0,0 +1,241 @@
++"""승인 전 반대 독자: 확인란 AC 의 전칭 표현 경고(AC_UNIVERSAL)와 반박 누락 경고(AC_UNREBUTTED).
++
++둘 다 **경고까지만**이다 — 종료 코드를 바꾸지 않고 승인을 막지 않는다(K-31). 이 파일이 보는 것은
++「경고가 나는가」가 아니라 「요구하는 자리(정책표·절차)와 보는 자리(검사)가 한 문자열인가」다(§11)."""
++import io
++import os
++import re
++import shutil
++import subprocess
++import tempfile
++import unittest
++from contextlib import redirect_stdout
++from pathlib import Path
++
++import yaml
++
++from romeo import HARNESS_ROOT, frontmatter
++from romeo.cli import main
++from romeo.docs import approve_unit, create_unit, rebuttal_warnings
++from romeo.policy import load_policy, route
++from romeo.validate import ac_items, validate_doc
++
++SCOPE_PATHS = "- 바뀌는 파일·모듈: `docs/work/` · `scripts/` · `README.md`"
++SCOPE_TODO = "- 바뀌는 파일·모듈: 채움"
++
++
++def git(*args, cwd):
++    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
++
++
++class TestUniversalLint(unittest.TestCase):
++    """전칭 표현 경고. 패턴은 정책표가 소유한다 — 검사가 그것을 실측한다."""
++
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
++        self.root = Path(self.tmp.name)
++
++    def tearDown(self):
++        self.tmp.cleanup()
++
++    def _spec(self, ac_lines, harness=None):
++        """확인란만 있는 최소 문서. validate_doc 는 frontmatter 스키마를 보므로 실물 spec 을 베껴 쓴다."""
++        src = HARNESS_ROOT / "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/spec.md"
++        fm, body = frontmatter.read(src)
++        head = body.split("## 확인란")[0]
++        rest = "## 변경 범위" + body.split("## 변경 범위", 1)[1]
++        body = head + "## 확인란\n\n- **수용 기준:**\n" + "\n".join(ac_lines) + "\n\n" + rest
++        p = self.root / "spec.md"
++        frontmatter.write(p, fm, body)
++        return p
++
++    def test_universal_sentences_warn_each_matched_pattern(self):
++        p = self._spec([
++            "  - [ ] AC-1 어떤 입력이든 목록은 나온다.",
++            "  - [ ] AC-2 파일 하나라도 깨지면 그 줄만 표시한다.",
++            "  - [ ] AC-3 모든 호출자가 항상 같은 값을 본다.",
++        ])
++        r = validate_doc(p)
++        warns = [w for w in r["warnings"] if w.startswith("AC_UNIVERSAL")]
++        self.assertTrue(any(w.startswith("AC_UNIVERSAL AC-1") for w in warns), warns)
++        self.assertTrue(any(w.startswith("AC_UNIVERSAL AC-2") for w in warns), warns)
++        # AC-3 은 「모든」·「항상」 두 패턴에 맞는다 — 맞은 패턴마다 한 줄이다.
++        ac3 = [w for w in warns if w.startswith("AC_UNIVERSAL AC-3")]
++        self.assertEqual(len(ac3), 2, ac3)
++        self.assertEqual(r["errors"], [], r)
++
++    def test_closed_set_sentences_do_not_warn(self):
++        p = self._spec([
++            "  - [ ] AC-1 `a.py`·`b.py`·`c.py` 세 파일이 같은 접두를 담는다.",
++            "  - [ ] AC-2 AC-1~7 의 id 가 출력에 그대로 인쇄된다.",
++        ])
++        r = validate_doc(p)
++        self.assertEqual([w for w in r["warnings"] if w.startswith("AC_UNIVERSAL")], [])
++
++    def test_pattern_comes_from_policy_not_code(self):
++        """정책표에서 패턴 하나를 지우면 **그 경고만** 사라지고 나머지는 남는다.
++
++        패턴을 코드에 하드코딩한 구현은 정책표를 고쳐도 경고가 그대로다 — 그 반례를 이 검사가 가른다."""
++        p = self._spec(["  - [ ] AC-1 모든 호출자가 항상 같은 값을 본다."])
++        before = {w for w in validate_doc(p)["warnings"] if w.startswith("AC_UNIVERSAL")}
++        self.assertEqual(len(before), 2, before)
++
++        copy = self.root / "harness"
++        shutil.copytree(HARNESS_ROOT / "core", copy / "core")
++        pol = copy / "core/policy/packages.yaml"
++        d = yaml.safe_load(pol.read_text(encoding="utf-8"))
++        d["ac_lint"]["universal_patterns"] = [x for x in d["ac_lint"]["universal_patterns"] if x != "항상"]
++        pol.write_text(yaml.safe_dump(d, allow_unicode=True, sort_keys=False), encoding="utf-8")
++
++        after = {w for w in validate_doc(p, harness_root=copy)["warnings"] if w.startswith("AC_UNIVERSAL")}
++        self.assertEqual(before - after, {"AC_UNIVERSAL AC-1 «항상»"}, (before, after))
++        self.assertIn("AC_UNIVERSAL AC-1 «모든»", after)
++
++    def test_exit_code_is_zero_with_warnings(self):
++        buf = io.StringIO()
++        with redirect_stdout(buf):
++            rc = main(["validate", str(HARNESS_ROOT / "docs/work/feat-20260907-context-one-hop-resume-w5jq")])
++        self.assertEqual(rc, 0)
++        self.assertIn("AC_UNIVERSAL AC-5", buf.getvalue())
++
++
++class TestApproveWarnsUnrebutted(unittest.TestCase):
++    """반박 누락 경고. 세 경우(없음·일부·전부) 모두 **승인은 기록된다**."""
++
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
++        self.root = Path(self.tmp.name)
++        git("init", "-q", cwd=self.root)
++        git("config", "user.email", "t@example.com", cwd=self.root)
++        git("config", "user.name", "t", cwd=self.root)
++        (self.root / "README.md").write_text("hello\n", encoding="utf-8")
++        git("add", ".", cwd=self.root)
++        git("commit", "-q", "-m", "init", cwd=self.root)
++        out = route({"unit": "T0", "mode": "delivery", "intent": "write", "facets": ["tooling"],
++                     "gates": [], "blast_radius": "small", "uncertainty": "low"})
++        res = create_unit(out, "테스트 T0", "test-t0", "테스트용 변경", project_root=self.root, date="20260827")
++        self.unit = res["id"]
++        self.spec = Path(res["files"][0])
++        fm, body = frontmatter.read(self.spec)
++        body = body.replace("NEEDS_INPUT", "채움").replace(SCOPE_TODO, SCOPE_PATHS)
++        head, rest = body.split("## 확인란")[0], "## 변경 범위" + body.split("## 변경 범위", 1)[1]
++        body = head + "## 확인란\n\n- **수용 기준:**\n" + "\n".join(
++            f"  - [x] AC-{i} 무언가가 참이다." for i in (1, 2, 3)) + "\n\n" + rest
++        frontmatter.write(self.spec, fm, body)
++
++    def tearDown(self):
++        self.tmp.cleanup()
++
++    def _warns(self):
++        fm, body = frontmatter.read(self.spec)
++        return rebuttal_warnings(self.spec.parent, fm, body, load_policy())
++
++    def _write_rebuttal(self, ids, name="inputs/ac-rebuttal-20260908.md"):
++        p = self.spec.parent / name
++        p.parent.mkdir(parents=True, exist_ok=True)
++        p.write_text("\n".join(f"### AC-{i}\n- 반례: 없음\n" for i in ids), encoding="utf-8")
++        fm, body = frontmatter.read(self.spec)
++        fm["inputs"] = [name]
++        frontmatter.write(self.spec, fm, body)
++
++    def test_no_file_lists_every_ac_and_approval_is_recorded(self):
++        self.assertEqual(self._warns(), ["AC_UNREBUTTED AC-1, AC-2, AC-3"])
++        fm = approve_unit(self.unit, "tester", project_root=self.root)
++        self.assertEqual(fm["status"], "active")
++        self.assertIsNotNone(fm["approved_at"])
++
++    def test_partial_file_lists_only_missing(self):
++        self._write_rebuttal([1, 2])
++        self.assertEqual(self._warns(), ["AC_UNREBUTTED AC-3"])
++        fm = approve_unit(self.unit, "tester", project_root=self.root)
++        self.assertEqual(fm["status"], "active")
++
++    def test_full_file_warns_nothing(self):
++        self._write_rebuttal([1, 2, 3])
++        self.assertEqual(self._warns(), [])
++        fm = approve_unit(self.unit, "tester", project_root=self.root)
++        self.assertEqual(fm["status"], "active")
++
++    def test_cli_prints_warning_and_exits_zero(self):
++        buf = io.StringIO()
++        with redirect_stdout(buf):
++            rc = main(["approve", self.unit, "--by", "tester", "--root", str(self.root)])
++        self.assertEqual(rc, 0)
++        self.assertIn("WARN AC_UNREBUTTED AC-1, AC-2, AC-3", buf.getvalue())
++
++
++class TestProcedureAndAdapters(unittest.TestCase):
++    """요구하는 자리와 보는 자리가 한 문자열인가(§11)."""
++
++    def setUp(self):
++        self.pol = load_policy()["packages"]
++        self.skill = (HARNESS_ROOT / "core/workflows/plan/SKILL.md").read_text(encoding="utf-8")
++
++    def _step_body(self, title):
++        """절차 목록에서 그 단계 하나의 본문만. 다음 번호 항목이나 절 끝에서 끊는다."""
++        lines = self.skill.split("\n")
++        out, on = [], False
++        for ln in lines:
++            m = re.match(r"^(\d+)\. \*\*(.+?)\.\*\*", ln)
++            if m:
++                if on:
++                    break
++                on = m.group(2) == title
++            elif ln.startswith("## ") and on:
++                break
++            if on:
++                out.append(ln)
++        return "\n".join(out)
++
++    def test_rebuttal_step_prefix_equals_policy_prefix(self):
++        body = self._step_body("반박 읽기")
++        self.assertTrue(body, "절차에 「반박 읽기」 단계가 없다")
++        found = re.findall(r"`docs/work/<id>/(inputs/ac-rebuttal-)", body)
++        self.assertTrue(found, body)
++        self.assertEqual(found[0], self.pol["ac_lint"]["rebuttal_prefix"])
++
++    def test_rebuttal_step_comes_before_approval_request(self):
++        i = self.skill.index("**반박 읽기.**")
++        j = self.skill.index("**승인 요청.**")
++        self.assertLess(i, j)
++
++    def test_brief_has_one_placeholder_and_says_its_four_things(self):
++        t = (HARNESS_ROOT / "adapters/orca/prompts/ac-rebuttal-brief.md").read_text(encoding="utf-8")
++        self.assertEqual(sorted(set(re.findall(r"<[a-z_]+>", t))), ["<id>"])
++        for phrase in ("반례", "검토 시점", "표현", "아무것도 쓰지 않고", "판정을 내지 않는다", "대신 써 주지 않는다"):
++            self.assertIn(phrase, t)
++
++    def test_adapters_and_compiled_carry_the_line(self):
++        b = yaml.safe_load((HARNESS_ROOT / ".harness/bindings.yaml").read_text(encoding="utf-8"))
++        enforce = b["roles"]["default"]["reviewer"]["enforcement"] if "default" in b.get("roles", {}) else None
++        for rel in ("adapters/claude/workflows/plan.md", "adapters/codex/workflows/plan.md",
++                    ".claude/skills/plan/SKILL.md", ".agents/skills/plan/SKILL.md"):
++            t = (HARNESS_ROOT / rel).read_text(encoding="utf-8")
++            self.assertIn("ac-rebuttal", t, rel)
++        claude_map = (HARNESS_ROOT / "adapters/claude/workflows/plan.md").read_text(encoding="utf-8")
++        if enforce:
++            self.assertIn(enforce, claude_map)
++
++    def test_warning_codes_come_from_catalog_each_matching_its_command(self):
++        cat = self.pol["warnings"]
++        self.assertIn("AC_UNIVERSAL", cat)
++        self.assertIn("AC_UNREBUTTED", cat)
++        buf = io.StringIO()
++        with redirect_stdout(buf):
++            main(["validate", str(HARNESS_ROOT / "docs/work/feat-20260907-context-one-hop-resume-w5jq")])
++        self.assertIn("AC_UNIVERSAL", buf.getvalue())      # validate 쪽 코드
++        self.assertNotIn("AC_UNREBUTTED", buf.getvalue())  # approve 쪽 코드가 여기 섞이지 않는다
++
++    def test_new_step_body_has_no_vendor_name(self):
++        """이 단위가 코어에 **새로 넣은 문장**에만 도구명이 없어야 한다(C-C6).
++
++        기존 C-C6 검사(`tests/test_roles_envelopes.py` 의 `TestVendorNeutral`)는 `core/roles/*.yaml` 과
++        결과 계약 스키마만 보고 절차 파일은 대상이 아니다. 그리고 이 절차 파일에는 원래부터 「실행기(…)에
++        중립이다」라는 문장이 있어 파일 전체를 보면 기존 상태에서도 실패한다 — 그래서 **새 단계 본문만** 본다."""
++        body = self._step_body("반박 읽기")
++        for name in ("codex", "claude", "orca", "anthropic", "openai"):
++            self.assertNotIn(name, body.lower(), f"「반박 읽기」 단계 본문에 도구명 {name}")
++
++
++if __name__ == "__main__":
++    unittest.main()

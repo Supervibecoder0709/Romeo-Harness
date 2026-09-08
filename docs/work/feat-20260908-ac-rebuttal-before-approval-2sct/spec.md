@@ -10,13 +10,13 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: draft
-approved_at: null
-approved_by: null
+status: active
+approved_at: '2026-09-08T16:43:21+09:00'
+approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
 parent: null
-inputs: []
+inputs: [inputs/ac-rebuttal-20260908.md, inputs/probe-20260908.patch]
 evidence: []
 routing:
   policy_version: 0.1.0
@@ -48,29 +48,46 @@ updated: '2026-09-08'
   전칭 표현을 경고로 보여 주고, `romeo approve` 는 반박이 빠진 AC 를 이름으로 보여 준다. 1회차 통과율이 오르는지는 이 단위가 아니라 그 뒤 10개 단위의 관측이 말한다.
 - **수용 기준:**
   - [ ] AC-1 `romeo validate` 가 확인란의 AC 항목(`- [ ] AC-n`/`- [x] AC-n` 으로 시작하는 항목의 이어지는 줄까지)에서 정책표 `core/policy/packages.yaml` 의
-        `ac_lint.universal_patterns` 에 적힌 패턴을 찾으면 경고 `AC_UNIVERSAL AC-n «맞은 패턴»` 을 인쇄하고 종료 코드는 그대로다(경고는 오류가 아니다).
-        패턴은 정책표에서 **읽는다** — 검사가 패턴 하나를 정책표에서 지우면 그 경고가 사라지는 것을 확인한다. 검사에 쓴 닫힌 집합 문장 2개(「A·B·C 세 파일」「AC-1~7」)에는 경고가 없다.
-  - [ ] AC-2 `romeo approve` 가 spec frontmatter `inputs:` 에서 단위 폴더 기준 `inputs/ac-rebuttal-*.md` 를 찾아, 파일이 없으면 경고 `AC_UNREBUTTED` 뒤에 확인란의 AC id 목록을
-        그대로, 있으면 그 파일에 `### AC-n` 절이 없는 AC id 만 인쇄한다. 승인은 기록된다(`status: active`·`approved_at`) — 경고까지만이다. 파일이 있고 확인란의 AC 마다 절이 있으면
-        그 경고는 인쇄되지 않는다.
+        `ac_lint.universal_patterns` 에 적힌 패턴을 찾으면 **맞은 패턴마다 한 줄** `AC_UNIVERSAL AC-n «맞은 패턴»` 을 인쇄하고, 그 실행의 **종료 코드는 0** 이다(경고는 오류가 아니다).
+        패턴은 정책표에서 **읽는다** — 검사가 임시 하네스 사본의 정책표에서 패턴 하나를 지우고 같은 문서를 다시 검사해 **그 패턴의 경고만 사라지고 나머지 경고는 남는 것**을 한 실행 안에서 보인다.
+        검사에 쓴 닫힌 집합 문장 2개(「A·B·C 세 파일」「AC-1~7」)에는 경고가 없다.
+  - [ ] AC-2 `romeo approve` 가 spec frontmatter `inputs:` 에서 단위 폴더 기준 `inputs/ac-rebuttal-` 로 시작하는 **첫 항목 하나**를 읽어(둘 이상이면 `inputs:` 목록 순서상 처음),
+        파일이 없으면 경고 `AC_UNREBUTTED` 뒤에 확인란의 AC id 를 **확인란에 나온 순서대로 쉼표로** 인쇄하고, 있으면 그 파일에 `### AC-n` 절이 없는 AC id 만 같은 형식으로 인쇄한다.
+        세 경우(파일 없음·일부 누락·전부 있음) 모두 승인은 기록된다(`status: active`·`approved_at`) — 경고까지만이다. 전부 있으면 그 경고는 인쇄되지 않는다.
+        **절의 내용이 비었는지는 보지 않는다** — 이 경고는 「반박이 이 AC 를 덮었나」의 근사치이고 내용은 사람이 읽는다(아래 한계 ④).
   - [ ] AC-3 `core/workflows/plan/SKILL.md` 절차에 「반박 읽기」 단계가 「내용 채우기」 뒤·「승인 요청」 앞에 있고, 그 본문이 기록 경로 규약(`inputs/ac-rebuttal-<YYYYMMDD>.md`)과
-        세 항목(반례·검토 시점·표현)과 「판정이 아니라 입력」을 말한다. 검사가 **그 단계 본문만** 읽어 경로 접두 `inputs/ac-rebuttal-` 을 뽑고 `romeo approve` 가 찾는 접두와
-        같은 문자열인지 본다 — 요구하는 자리와 보는 자리가 한 문자열이다(§11).
-  - [ ] AC-4 반박 브리프 정본 `adapters/orca/prompts/ac-rebuttal-brief.md` 가 있고 자리표시자는 `<id>` 하나다. 두 런타임 매핑 `adapters/claude/workflows/plan.md`·`adapters/codex/workflows/plan.md` 에
-        반박 실행 한 줄이 있다 — 읽기 전용 강제 수단은 `.harness/bindings.yaml` 의 검토자 enforcement 값을 옮겨 적고 출력은 `-o`/파일로 받아 `inputs/` 에 둔다.
-        compile 산출물(`.claude/skills/plan/SKILL.md`·`.agents/skills/plan/SKILL.md`)이 같은 줄을 담고 `bin/romeo compile --check` 가 통과한다. `core/` 파일에는 도구명·모델명이 없다(C-C6).
+        세 항목(반례·검토 시점·표현)과 「판정이 아니라 입력」을 말한다. **검사가 보는 것은 하나다** — 그 단계 본문**에서만** 뽑은 경로 접두가 정책표 `rebuttal_prefix` 및 `romeo approve` 가
+        찾는 접두와 **문자 단위로 같은가**(요구하는 자리와 보는 자리가 한 문자열이다, §11). 나머지 세 항목이 그 본문에 있는지는 검토자가 읽는다.
+  - [ ] AC-4 반박 브리프 정본 `adapters/orca/prompts/ac-rebuttal-brief.md` 가 있고 ① 본문이 세 항목(반례·검토 시점·표현)의 형식과 「아무것도 쓰지 않고 검사·빌드를 실행하지 않는다」·
+        「판정을 내지 않는다」·「문장을 대신 써 주지 않는다」를 말하며 ② 자리표시자는 `<id>` 하나뿐이다(다른 `<…>` 토큰이 없다). ③ 두 런타임 매핑 `adapters/claude/workflows/plan.md`·
+        `adapters/codex/workflows/plan.md` 에 반박 실행 한 줄이 있고, 그 줄이 `.harness/bindings.yaml` 의 검토자 `enforcement` 문자열을 **그대로 담고** 출력을 파일로 받는다.
+        ④ compile 산출물(`.claude/skills/plan/SKILL.md`·`.agents/skills/plan/SKILL.md`)이 같은 줄을 담고 `bin/romeo compile --check` 가 통과한다.
+        ⑤ 「반박 읽기」 **단계 본문에** 도구명·모델명이 없다(C-C6) — 검사가 그 단계 본문만 읽어 본다.
+        `core/workflows/plan/SKILL.md` 파일 **전체**를 보지 않는다: 그 파일에는 원래부터 「실행기(…)에 중립이다」라는 문장이 있어 파일 전체를 보면 기존 상태에서도 실패한다
+        (승인 전 프로브가 잡았다). 기존 C-C6 검사(`tests/test_roles_envelopes.py` 의 `TestVendorNeutral`)는 `core/roles/*.yaml` 과 결과 계약 스키마만 보므로 이 파일을 덮지 않는다.
   - [ ] AC-5 두 경고 코드 `AC_UNIVERSAL`·`AC_UNREBUTTED` 가 `core/policy/packages.yaml` `warnings:` 카탈로그에 한 줄 설명과 함께 있고, 검사가 카탈로그에서 코드를 **읽어**
-        validate·approve 출력의 코드 문자열과 대조한다.
-  - [ ] AC-6 기존 검사 파일은 바뀌지 않고 `python3 -m unittest discover -s tests` 가 종료 코드 0 이다. 기존 spec 2건 — `feat-20260907-context-one-hop-resume-w5jq`(AC-5)·
-        `feat-20260907-judge-revision-base-sha-pwt8`(AC-3) — 에서 `AC_UNIVERSAL` 이 실제로 인쇄되고 그 `validate` 의 종료 코드는 0 이다.
-  - [ ] AC-7 이 단위 자신이 절차의 첫 실사용이다 — 승인 전에 코디네이터가 구현 단위 4 의 브리프 문안으로 반박을 한 번 돌려 `inputs/ac-rebuttal-<날짜>.md` 를 등록했고,
-        그 반박으로 고친 AC 가 있으면 그 파일 끝 「반영」 절에 AC 번호와 무엇을 고쳤는지가 있다(없으면 「반영: 없음」).
-  - [ ] AC-8 `docs/planning/open-questions.md` 의 Q-87(1회차 통과율·반대 독자 부재)이 해소 표기되고, 이번 작업이 발견했으나 고치지 않은 것이 새 행으로 열린다.
-        `docs/planning/progress.md` 「지금 상태」가 이 단위를 활성 단위로 가리킨다.
+        `AC_UNIVERSAL` 은 `validate` 출력의 코드와, `AC_UNREBUTTED` 는 `approve` 출력의 코드와 **각각** 대조한다(두 출력의 합집합이 아니다 — 한쪽만 맞아도 통과해서는 안 된다).
+        설명 문구가 그 코드의 뜻과 맞는지는 검토자가 읽는다.
+  - [ ] AC-6 `python3 -m unittest discover -s tests -q` 가 종료 코드 0 이고, 그 출력의 `Ran <N> tests` 에서 **N ≥ 929 + 새로 더한 검사 수**다
+        (929 는 승인 시점 실측값 — 아래 「승인 전 실측」). 기존 검사가 skip 이나 discovery 변경으로 비워지지 않았다는 것을 그 수가 말한다.
+        `git diff --stat <승인 커밋> -- tests/` 에 `tests/test_ac_rebuttal.py` 말고 다른 파일이 없다(검토자가 확인한다 — 승인 커밋은 `romeo/docs.py` 의 `approval_commit` 이 이력에서 찾는 그 자리다. frontmatter 의 `base_sha` 가 아니다). 기존 spec 2건 —
+        `feat-20260907-context-one-hop-resume-w5jq`(AC-5)·`feat-20260907-judge-revision-base-sha-pwt8`(AC-3) — 에서 `AC_UNIVERSAL` 이 실제로 인쇄되고 그 `validate` 의 종료 코드는 0 이다.
+  - [ ] AC-7 이 단위 폴더에 `inputs/ac-rebuttal-<YYYYMMDD>.md` 가 있고 spec frontmatter `inputs:` 에 등록돼 있으며, 확인란의 AC 마다 `### AC-n` 절이 있고 각 절에 세 항목이 있다.
+        그 파일 끝에 「반영」 절이 있고, 고친 AC 가 있으면 AC 번호와 무엇을 고쳤는지가, 없으면 「반영: 없음」과 그 이유가 있다.
+        **승인 전에 만들어졌다는 것은 이력이 말한다** — 그 파일을 추가한 커밋(`git log --diff-filter=A --format=%H -- <그 경로>`)이 **승인 커밋**이거나 그 조상이다(승인 커밋은 이력에서 찾는다 — frontmatter 의 `base_sha` 가 아니다).
+        「누가·언제·몇 번 돌렸나」는 검토 시점에 관측할 수 없으므로 요구하지 않는다 — 관측 가능한 것은 파일과 그 파일이 든 커밋뿐이다.
+  - [ ] AC-8 `docs/planning/open-questions.md` 의 Q-87 에서 **「반대 독자 부재」 부분만** 해소 표기되고, 아직 관측되지 않은 「1회차 통과율」은 **새 행으로 열려**
+        그 행이 「이 단위 뒤 10개 단위의 관측으로 판단한다」를 말한다. 이번 작업이 발견했으나 고치지 않은 것이 있으면 새 행으로 열고, 없으면 결과 보고에 「없음」이라고 적는다
+        (발견이 없는 것과 적지 않은 것을 가른다). `docs/planning/progress.md` 「지금 상태」가 이 단위 id 를 담는다 — 활성이든 마지막 완료든, 종료 뒤에도 참인 형태로.
+
 - **위험과 되돌리기:** 경고 두 개와 절차 단계 하나, 브리프 파일 하나가 늘어난다 — 차단·판정 자리(close·envelope·evidence)는 바뀌지 않는다. 기존 단위의 `validate` 출력에
   경고가 더 붙을 수 있다(오류 아님). 거짓 양성이 나면 정책표 패턴 목록만 고친다 — 경고라 정상 경로를 막지 않는다(charter M4 위험 「드러내기가 차단으로 자라는 것」).
   되돌리기는 `git revert <통합 커밋>`. 알려진 한계: ① 반박은 문장을 읽을 뿐 구현을 보지 않는다 — 산출물 결함(3mcv·w5jq 2회차)은 그대로 검토자의 몫이다 ·
-  ② 경고를 차단으로 올리는 것은 10건 관측 뒤의 별도 결정이다 · ③ 반박 실행의 비용(약 5분 가정)은 착수 시 실측한다.
+  ② 경고를 차단으로 올리는 것은 10건 관측 뒤의 별도 결정이다 · ③ 반박 실행의 비용은 **약 6분**이다(2026-09-08 실측 · `inputs/ac-rebuttal-20260908.md`) · ④ `AC_UNREBUTTED` 는 `### AC-n` 절의 **존재**만 본다 — 제목만 있고 내용이 빈 반박 파일은 경고 없이 통과한다(승인 전 반박이 낸 반례). 내용의 값어치는 사람이 읽는다 · ⑤ 전칭 패턴은 문자열로 맞으므로 인용문·예시 안의 낱말도 경고될 수 있다 — 경고라 정상 경로를 막지 않고, 오탐이 잦으면 정책표 목록만 고친다.
+- **승인 전 반박:** 이 확인란은 승인 전에 **다른 런타임의 읽기 전용 실행**이 한 번 반박했다 — `inputs/ac-rebuttal-20260908.md`.
+  그 반박이 AC-1~8 전부에 지적을 냈고, **AC 8개를 전부 고쳤다**. 가장 큰 셋: AC-7 이 「누가·언제·몇 번」이라는 사후 관측 불가능한 명제였고(파일과 그 파일이 든 커밋으로 바꿨다),
+  AC-6 의 「기존 검사 파일은 바뀌지 않고」에 비교 기준이 없었으며(승인 커밋 대비 diff 와 검사 개수 하한으로 바꿨다), AC-8 의 Q-87 해소가 아직 관측되지 않은 통과율까지 닫고 있었다(둘로 갈랐다).
+  무엇을 어떻게 고쳤는지는 그 파일 끝 「반영」 절에 있다.
 - **결정 필요:** 없음 — 착수 순서(정비 후보 맨 앞)와 「경고까지만」은 사용자가 2026-09-08 에 정했다.
 
 
@@ -154,8 +171,18 @@ required_checks:
 
 **재실행 시간** — check-10 약 170초(929건 + 새 검사), 나머지 각 1~5초. `romeo close` 의 재실행 상한 600초 안이다.
 
-**승인 전 실측** — 착수 시 한다. 기존 상태에서 판별 검사 7건(check-1~4·6~8)이 exit 1 이어야 하고(검사 모듈 없음·경고 없음·규약 문구 없음·반박 파일 없음),
-가상 완료 상태에서 7건 전부 exit 0 이어야 한다. 그 실측 결과와 프로브 워크트리 이름·base 를 이 문단에 적은 뒤 승인을 요청한다. 시제품은 `inputs/probe-<날짜>.patch` 로 넘긴다.
+**승인 전 실측 (2026-09-08 · 완료)** — 프로브 워크트리 `probe-2sct-20260908`(base `84f5344`)에서 양쪽 상태를 실행했다. 시제품은 `inputs/probe-20260908.patch`(11개 파일).
+
+- **기존 상태(`84f5344` 그대로):** 판별 검사 7건 `check-1·2·3·4·6·7·8` 이 **전부 exit 1** — 검사 모듈 없음 · 경고 없음 · 규약 문구 없음 · 반박 파일 없음.
+- **가상 완료 상태(시제품 적용):** 같은 7건이 **전부 exit 0**. 회귀 방지 `check-5`(경고가 붙어도 `validate` 는 exit 0)·`check-9`(`compile --check`)도 exit 0. 새 검사 `tests/test_ac_rebuttal.py` 는 14건 OK.
+- **실물 문서에서 실측:** `w5jq` 에서 `AC_UNIVERSAL AC-5 «전부»`·`«하나가 깨져도»`, `pwt8` 에서 `AC-3 «어느 쪽이든»`·`«하나만 내용이 달라도»` 가 인쇄됐고 둘 다 종료 코드 0 이다.
+  그 두 문장이 각각 4회차 반복과 D-80 재승인을 부른 문장이다 — 검사가 겨눈 것을 실물에서 맞혔다.
+- **그 실측이 잡은 것:** 확인란 AC 2건이 저장소 사실과 어긋나 고쳤다(`base_sha` → 승인 커밋 · C-C6 검사의 대상 범위). 반박은 확인란만 읽으므로 이 자리는 프로브만 볼 수 있다 —
+  자세한 것은 `inputs/ac-rebuttal-20260908.md` 의 「승인 전 프로브가 그 뒤에 잡은 것」.
+- **회귀 방지 검사도 프로브에서 돌렸다:** `check-10` 은 가상 완료 상태에서 `Ran 943 tests … OK`(165초) — 승인 시점 929 + 새 검사 14 다. 기존 검사는 하나도 깨지지 않았고, skip 으로 비워지지도 않았다.
+  회귀 방지 검사는 양쪽 실측 대상이 아니지만(§11 — 양쪽에서 통과하는 것이 정의다), 한쪽 실측만으로도 「기존을 깨뜨리지 않는다」는 확인이 된다.
+
+
 
 
 ## 증거
