@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-context-one-hop-resume-w5jq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-context-one-hop-resume-w5jq/task/run_02812052acd8-reviewer.json",
+    "sha256": "ea4d76dba571dc451dc699f377ae1cc86cea8d92def7e1bda3a6057558f7dd1f"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5의 깨진 파일 처리가 충족되지 않는다. 정본 frontmatter 읽기가 실패하면 빈 메타데이터로 처리하면서도 정본 줄에는 고정 설명을 붙이므로 `읽을 수 없다`가 표시되지 않고 parent·inputs도 목록에서 사라진다. check-5는 정상 파일만 사용해 이 조항을 검사하지 않는다.",
+      "file": "romeo/context.py",
+      "line": 114
+    },
+    {
+      "summary": "AC-8에서 reviewer brief에 기록 명령의 출력을 그대로 넣었다고 볼 수 없다. 이 줄은 증거 명령 수를 13건으로 적지만, 증거가 가리키는 `13-context-resume.log:12`의 실제 출력은 12건이다.",
+      "file": ".harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_02812052acd8/reviewer-brief.md",
+      "line": 92
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_02812052acd8.yaml",
+  "notes": "목록 밖 파일: core/workflows/review/SKILL.md, core/roles/reviewer.yaml, core/schemas/result-envelope.json(역할 절차); core/workflows/plan/SKILL.md, docs/planning/open-questions.md, docs/planning/progress.md, romeo/cli.py, romeo/context.py, tests/test_context_resume.py(allowed_paths·changed_files 검토); romeo/docs.py, romeo/frontmatter.py, romeo/util.py(context.py 직접 참조 확인); .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_02812052acd8/13-context-resume.log, .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_02812052acd8/reviewer-brief.md(AC-8 동일 출력 대조)."
+}

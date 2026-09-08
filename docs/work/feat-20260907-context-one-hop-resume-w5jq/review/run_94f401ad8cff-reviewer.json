@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-context-one-hop-resume-w5jq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-context-one-hop-resume-w5jq/task/run_94f401ad8cff-reviewer.json",
+    "sha256": "d2205c778718d4356a2637075b64f22e6b2ee078dc92d31cfe87f3c98060b9a7"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5의 깨진 frontmatter 격리가 falsey 비매핑 YAML에서 충족되지 않는다. `yaml.safe_load(raw) or {}`가 `[]`, `0`, `false`를 빈 매핑으로 바꾸므로 `unit_context`는 이를 읽힌 정본으로 분류해 「읽을 수 없다」 대신 고정 설명을 붙인다. check-5의 반례는 truthy 목록·문자열만 다뤄 이 경로를 검사하지 않는다.",
+      "file": "romeo/frontmatter.py",
+      "line": 16
+    },
+    {
+      "summary": "비게이트 문서 불일치: 「지금 상태」의 열린 park 목록은 Q-83~84까지만 적지만 이번 변경으로 Q-85~87이 열렸다. AC-9의 활성 단위 포인터 자체는 충족하므로 별도 FAIL 사유로 추가하지 않았다.",
+      "file": "docs/planning/progress.md",
+      "line": 38
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_94f401ad8cff.yaml",
+  "notes": "목록 밖 파일: core/workflows/review/SKILL.md, core/roles/reviewer.yaml, core/schemas/result-envelope.json(역할 절차와 출력 스키마); core/workflows/plan/SKILL.md, docs/planning/open-questions.md, docs/planning/progress.md, romeo/cli.py, romeo/context.py, tests/test_context_resume.py(allowed_paths·changed_files와 AC 구현 검토); romeo/docs.py, romeo/frontmatter.py, romeo/util.py(context.py 직접 참조 확인); .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/13-context-resume.log, .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/reviewer-brief.md(AC-8 동일 출력 대조)."
+}

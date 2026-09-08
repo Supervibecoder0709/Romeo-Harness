@@ -1,0 +1,234 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_94f401ad8cff
+task_id: task_a2005419d9c5
+dispatch_id: ctx_ecc3e42c8279
+unit_id: feat-20260907-context-one-hop-resume-w5jq
+spec_ref:
+  path: docs/work/feat-20260907-context-one-hop-resume-w5jq/spec.md
+  sha256: 9c13e8739961e3a7b2b86f99ff16b22120b6b8d16c81e341bec5397a804ef965
+base_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq
+started_at: '2026-09-08T00:57:36+09:00'
+finished_at: '2026-09-08T01:12:43+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_lists_every_file_in_the_unit_folder_with_a_role
+  exit_code: 0
+  started_at: '2026-09-08T00:57:36+09:00'
+  finished_at: '2026-09-08T00:57:36+09:00'
+  seconds: 0.145
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/01-check-1.log
+  log_sha256: 2d662d26415f2493406c3bce81f2bf2015c5c71db5234a16a65b00cef26f3bcc
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-2
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_follows_parent_and_inputs_exactly_one_hop
+  exit_code: 0
+  started_at: '2026-09-08T00:57:36+09:00'
+  finished_at: '2026-09-08T00:57:36+09:00'
+  seconds: 0.086
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/02-check-2.log
+  log_sha256: 8938f7157e6e3ef074dad91687a1894194b2932d1fbda0d2da9f9672f170ead2
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-3
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_unknown_unit_is_refused_with_exit_1_and_no_traceback
+  exit_code: 0
+  started_at: '2026-09-08T00:57:36+09:00'
+  finished_at: '2026-09-08T00:57:36+09:00'
+  seconds: 0.084
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/03-check-3.log
+  log_sha256: a622af337ff4392d4206a83f104a53d0ca5bef2e6135793e2a4b2b16e9635681
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-4
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_missing_reference_is_printed_not_hidden
+  exit_code: 0
+  started_at: '2026-09-08T00:57:36+09:00'
+  finished_at: '2026-09-08T00:57:37+09:00'
+  seconds: 0.119
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/04-check-4.log
+  log_sha256: 9a67171709eeddacd5be8f7e5fd06b3b48b002abe4702f83632d3c6e45a5ad11
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-5
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_facts_come_from_the_files_not_from_judgment
+  exit_code: 0
+  started_at: '2026-09-08T00:57:37+09:00'
+  finished_at: '2026-09-08T00:57:37+09:00'
+  seconds: 0.546
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/05-check-5.log
+  log_sha256: 8a759fe75af7b55e1c4ea0db0e44d19ab112014fc714d69b74476de37c55b1d1
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-6
+  command: python3 -m unittest tests.test_context_resume.TestContextCommand.test_every_unit_in_this_repo_resolves_without_a_missing_reference
+  exit_code: 0
+  started_at: '2026-09-08T00:57:37+09:00'
+  finished_at: '2026-09-08T00:57:38+09:00'
+  seconds: 0.879
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/06-check-6.log
+  log_sha256: 5179e9ba811cd12062f14308560ea013ac2976b35cb44b68ce4d56d52bd89c5f
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-7
+  command: python3 -m unittest tests.test_context_resume.TestProcedureNamesTheCommandThatListsTheUnit
+  exit_code: 0
+  started_at: '2026-09-08T00:57:38+09:00'
+  finished_at: '2026-09-08T00:57:39+09:00'
+  seconds: 0.202
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/07-check-7.log
+  log_sha256: 4d9bb2343534f074d533d94cd4d7c85ccaf41a64739e21de1a31e266cebd1f70
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-8
+  command: bin/romeo context feat-20260907-context-one-hop-resume-w5jq --json | grep -q 'docs/work/feat-20260907-context-one-hop-resume-w5jq/spec.md'
+  exit_code: 0
+  started_at: '2026-09-08T00:57:39+09:00'
+  finished_at: '2026-09-08T00:57:39+09:00'
+  seconds: 0.077
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/08-check-8.log
+  log_sha256: 1fa4ed16d2ff4abc744bb73fbc692730c87223c085595ccb3b10568ae2f623ce
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-9
+  command: python3 -m unittest tests.test_find_reuse tests.test_doc_commands
+  exit_code: 0
+  started_at: '2026-09-08T00:57:39+09:00'
+  finished_at: '2026-09-08T00:57:40+09:00'
+  seconds: 0.835
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/09-check-9.log
+  log_sha256: 10b473d6e8f0ea32d52d71229a0483f1a90619aae53c70ee0e944544a99abdbd
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-10
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-08T00:57:40+09:00'
+  finished_at: '2026-09-08T01:00:24+09:00'
+  seconds: 164.104
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/10-check-10.log
+  log_sha256: 37e6225f9763fbe368b4c5a95bb6ced6e646516402ad8441ce542f5a010d0faf
+  stdout_tail: ''
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-11
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-08T01:00:24+09:00'
+  finished_at: '2026-09-08T01:00:24+09:00'
+  seconds: 0.182
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/11-check-11.log
+  log_sha256: 7e740bc80a8e07c5429770fc55f27073156967108e76c7c62d43414a52f8a8b7
+  stdout_tail: compile 검사 PASS
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: check-12
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-08T01:00:24+09:00'
+  finished_at: '2026-09-08T01:00:24+09:00'
+  seconds: 0.182
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/12-check-12.log
+  log_sha256: 2d3b27bf65bfc55529c773df554d85bf6888415c70d67daa0cbdf0ded959bca1
+  stdout_tail: 'S] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: context-resume
+  command: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq/bin/romeo
+    context feat-20260907-context-one-hop-resume-w5jq --root /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq
+  exit_code: 0
+  started_at: '2026-09-08T01:01:45+09:00'
+  finished_at: '2026-09-08T01:01:45+09:00'
+  seconds: 0.073
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/13-context-resume.log
+  log_sha256: 0b81ec3df306f69dc19c2134349883f4ab360097dad3926a0dd38c9e82b8a474
+  stdout_tail: '6daba018ef1d-implementer.json — implementer · PASS
+
+    [결과] docs/work/feat-20260907-context-one-hop-resume-w5jq/result/run_94f401ad8cff-implementer.json
+    — implementer · PASS
+
+    [검토] docs/work/feat-20260907-context-one-hop-resume-w5jq/review/run_02812052acd8-reviewer.json — FAIL
+    · findings 2
+
+    [검토] docs/work/feat-20260907-context-one-hop-resume-w5jq/review/run_6daba018ef1d-reviewer.json — FAIL
+    · findings 2'
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq/.harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-08T01:01:45+09:00'
+  finished_at: '2026-09-08T01:01:45+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/14-reviewer-brief.log
+  log_sha256: 84704b99b669ce25feee9a41c0c865e1c2715dbc0d3a43abcf8dab5cf6b28341
+  stdout_tail: 710d95b2f11ed0ae3f289b3d0141e9f2c540a0326effecbba33b4853dc406851  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260907-context-one-hop-resume-w5jq/.harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/reviewer-brief.md
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-context-one-hop-resume-w5jq'
+  exit_code: 0
+  started_at: '2026-09-08T01:01:45+09:00'
+  finished_at: '2026-09-08T01:01:46+09:00'
+  seconds: 0.015
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/15-review-tree-before.log
+  log_sha256: a98128e994822f065f0a28d32eb511e0909c50a386f7759b80951d28bbbdd23f
+  stdout_tail: "M core/workflows/plan/SKILL.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    \ M romeo/cli.py\n?? romeo/context.py\n?? tests/test_context_resume.py"
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260907-context-one-hop-resume-w5jq'
+  exit_code: 0
+  started_at: '2026-09-08T01:12:43+09:00'
+  finished_at: '2026-09-08T01:12:43+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/16-review-tree-after.log
+  log_sha256: a98128e994822f065f0a28d32eb511e0909c50a386f7759b80951d28bbbdd23f
+  stdout_tail: "M core/workflows/plan/SKILL.md\n M docs/planning/open-questions.md\n M docs/planning/progress.md\n\
+    \ M romeo/cli.py\n?? romeo/context.py\n?? tests/test_context_resume.py"
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260907-context-one-hop-resume-w5jq/review/run_94f401ad8cff-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-08T01:12:43+09:00'
+  finished_at: '2026-09-08T01:12:43+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_94f401ad8cff/17-review-record.log
+  log_sha256: c5681c5d0458cac975f02fd78b3817810379627991f64ef2c95fc0bfd480a3b5
+  stdout_tail: 711354e609aac2f16183f08087c3bea4b207de1b640defe7de709bad54d2ad64  docs/work/feat-20260907-context-one-hop-resume-w5jq/review/run_94f401ad8cff-reviewer.json
+  head_sha: c0df8d3c8ad7992a52c5552fce686f3078b14706
+  dirty_tree_hash: ec09b8dbd97fc838b3293960e1133cb790c3a5b45440f5d2ad0e9362837245dd
+changed_files:
+- core/workflows/plan/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/cli.py
+- romeo/context.py
+- tests/test_context_resume.py
+artifact_hash: ffc81101bb7e02b9caaf612e38a9983e6d025446f088a6967867a77667b632b3
+reviewer: null
+verdict: null
+approvals: []

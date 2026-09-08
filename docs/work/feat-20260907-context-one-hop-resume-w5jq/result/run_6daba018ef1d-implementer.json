@@ -1,0 +1,77 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-context-one-hop-resume-w5jq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-context-one-hop-resume-w5jq/task/run_6daba018ef1d-implementer.json",
+    "sha256": "5963f6f453df8d2585efb1bc2ec1303d265611d9e0723dc764e9eb25e4b7af5b"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_lists_every_file_in_the_unit_folder_with_a_role",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_follows_parent_and_inputs_exactly_one_hop",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_unknown_unit_is_refused_with_exit_1_and_no_traceback",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_missing_reference_is_printed_not_hidden",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_facts_come_from_the_files_not_from_judgment",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_every_unit_in_this_repo_resolves_without_a_missing_reference",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest tests.test_context_resume.TestProcedureNamesTheCommandThatListsTheUnit",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo context feat-20260907-context-one-hop-resume-w5jq --json | grep -q 'docs/work/feat-20260907-context-one-hop-resume-w5jq/spec.md'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_find_reuse tests.test_doc_commands",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_6daba018ef1d.yaml",
+  "notes": "2회차. 1회차 검토자 findings 2건 중 ① 만 고쳤다(② AC-8 은 코디네이터의 몫 — 브리프 재생성이라 이 역할의 allowed_paths 밖이고, 이번 회차에 손대지 않았다). ① 은 romeo/context.py 의 unit_context 가 정본 frontmatter 파싱 실패를 fm={} 로 삼키면서 그 줄에는 고정 설명(「Tech Spec(…)」)을 붙이고 parent·inputs 를 조용히 버린 것이다(AC-5 「파일 하나가 깨져도 목록은 나온다 — 그 줄만 「읽을 수 없다」가 붙는다」 미충족). 고친 내용: UNIT_DOCS 를 전부 훑어 읽힌 것과 읽히지 않은 것을 구분하고, 읽히지 않은 정본 줄의 note 를 「읽을 수 없다 — frontmatter 를 파싱하지 못했다」로 두며, fm 은 처음으로 읽힌 정본에서 가져온다(spec 이 깨지고 brief 가 읽히면 brief 의 parent·inputs 를 쓴다). 정본이 전부 읽히지 않으면 parent·inputs 줄을 낼 수 없으므로 format_context 헤더 둘째 줄 끝에 「 · 정본 읽을 수 없음」을 붙여 그 사실을 드러낸다. 역할·순서·exit 0·JSON 키는 그대로다. 판별 근거: 검사(check-5, tests.test_context_resume.TestContextCommand.test_facts_come_from_the_files_not_from_judgment) 안에 합성 케이스 둘을 더했고 — spec.md 의 frontmatter 만 깨진 루트에서 spec 줄 note 에 「읽을 수 없다」가 있고 brief 에서 읽은 parent 의 「상위」 줄이 목록에 있는 것, 그리고 정본 둘 다 깨진 루트에서 텍스트 둘째 줄에 「정본 읽을 수 없음」이 있고 exit 0 인 것 — 구현 전 상태에서 이 검사가 실패(AssertionError: '읽을 수 없다' not found in 'Tech Spec(승인·수용 기준·검증 계획)')하고 구현 뒤 통과하는 것을 양쪽으로 봤다. 검사 이름·required_checks·확인란 문장·AC 체크 표시는 바꾸지 않았다. 이 run 의 12건 전부 exit 0 이다(증거 docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_6daba018ef1d.yaml, head 7245eafb8650 = HEAD = base_sha). 1회차 증거(evidence/run_02812052acd8.yaml)는 그대로 남겼다. 커밋·push 는 하지 않았다."
+}

@@ -23,24 +23,21 @@ authority: derived
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
 - **마일스톤:** M2·M3 완료. 부착 이니셔티브 `init-20260904-attach-payload-manual-rreq` 는 M1~M4 가 닫혀 **종료됐다**.
-- **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260907-judge-revision-base-sha-pwt8`(정비 · D-81 ② · 계획 §10 #13c ·
-  **2회차 close PASS** · 13/13 · 재실행 13/13 · 검토자 PASS(비차단 경고 1) · 통합 `bbb371b`) — `romeo close` 에 `JUDGE_REVISION`
-  (판정 하네스의 `docs/`·`.harness/` 밖 파일이 승인 커밋과 전부 같아야 PASS · 남의 저장소는 「자기적용 아님」)을 더했고,
-  절차는 승인 커밋 스냅샷(`git archive <base-sha>`)의 `bin/romeo close --root "$W"` 로 바뀌었다(RUNBOOK §3.8 · plan-close · 매핑 2곳).
-  **이 단위 자신은 승인 커밋 `3363f8d` 스냅샷의 옛 close 가 닫았다 — 자기적용의 마지막 라운드(D-81).** 1회차 검토자 FAIL 1건은
-  AC-3 문장의 과잉 명세(판정이 먼저 읽는 파일이 없으면 그 읽기가 먼저 죽는다)라 좁혀 재승인했고(D-80), 옛 FAIL 은 `REVIEW_SUPERSEDED`.
-  승인 전 프로브(판별 검사 10건 양쪽 실측)가 시제품을 냈고 그 패치를 `inputs/` 로 넘겨 구현자가 출발점으로 썼다.
-  그 앞의 완료는 `feat-20260907-envelope-root-close-no-history-rshi`(Q-66·Q-67 · D-81 ① · 통합 `8f14b09`),
-  `feat-20260907-close-review-reapproval-reach-bjec`(Q-68 · 통합 `3c11750`), `feat-20260906-m4-attach-requirements-3mcv`(M4 · 통합 `affb8ad`).
+- **활성 작업 단위:** `feat-20260907-context-one-hop-resume-w5jq`(D-81 ③ 첫 조각 · M4 charter M2 · **4회차 진행 중**(1~3회차 검토자 FAIL — AC-5 · §10 반복 중단 뒤 사람 재검토 2회 · 3회차 남은 반례는 공유 파서)) —
+  `romeo context <id>` 가 재개하는 세션이 읽을 파일 목록을 1-hop 으로 낸다. **D-81 ② 뒤 첫 단위라 종료 검사는 승인 커밋 스냅샷이 낸다.**
+  마지막 완료는 `feat-20260907-judge-revision-base-sha-pwt8`(정비 · D-81 ② · 계획 §10 #13c · 2회차 close PASS · 13/13 · 재실행 13/13 ·
+  검토자 PASS(비차단 경고 1) · 통합 `bbb371b`) — `romeo close` 에 `JUDGE_REVISION` 을 더했고 절차가 승인 커밋 스냅샷의 close 로 바뀌었다(RUNBOOK §3.8).
+  그 앞은 `feat-20260907-envelope-root-close-no-history-rshi`(D-81 ① · `8f14b09`) · `feat-20260907-close-review-reapproval-reach-bjec`(Q-68 · `3c11750`) ·
+  `feat-20260906-m4-attach-requirements-3mcv`(M4 · `affb8ad`).
 - **이 정비가 남긴 것.** 판정은 이제 리비전으로 분리됐지만 **계약·증거를 만드는 명령은 아직 워커 트리의 하네스가 돈다**(Q-83) ·
   판정 하네스의 리비전이 회차 기록에 없다(Q-84 · Q-02 계측 재료). 다음 하네스 정비 단위부터는 새 규칙이 판정한다.
-- **다음 행동(D-81 순서):** ① Q-66·Q-67 정비(완료) → ② 판정 리비전 분리(**완료** — 위 단위) → **③ M4 나머지 3마일스톤 ← 다음** →
+- **다음 행동(D-81 순서):** ① Q-66·Q-67 정비(완료) → ② 판정 리비전 분리(**완료** — 위 단위) → **③ M4 나머지 3마일스톤 — 진행 중(M2) → M3 승격·무결성 → M4 지표** →
   ④ shadow 20건·v1 릴리스 게이트 → ⑤ M5 `attach`(「올린 것」 9건이 입력 · 계획 §10 #16 그대로 v1.1).
 - **blocker:** 없음. 워커·프로브 워크트리와 브랜치는 전부 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
 - **최신 CI:** `bbb371b` run `34113582978` **success**. 미푸시 없음 — 여기까지 전부 푸시됐다.
-- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·**83~84**(`open-questions.md`).
+- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·**83~88**(`open-questions.md`).
   Q-43 은 위 단위가 닫았다. Q-53~Q-68 은 `attach-requirements.md` 가 갈랐다 — 「올린 것」은 M5 가, 「뺀 것」은 정비가 가져간다.
-- **다음 정비 후보(③ 사이):** Q-64 → Q-69·Q-70 → Q-82 → Q-83.
+- **다음 정비 후보(③ 사이):** **`feat-20260908-ac-rebuttal-before-approval-2sct`(승인 대기 · 승인 전 반대 독자)** → Q-64 → Q-69·Q-70 → Q-82 → Q-83.
 - **진단 (2026-09-07):** 자가봉착의 뿌리는 **판정하는 하네스와 판정받는 하네스가 같은 리비전**이라는 것 —
   자기참조 9건·드리프트 11건·단위당 Q 2.4건(`docs/reviews/2026-09-07-self-application-diagnosis/`). 권고 1 은 위 단위가 집행했고,
   권고 2 는 D-81·계획 §10 #13c, 권고 3 은 Q-02, 발견 ①·②는 Q-78·Q-79.

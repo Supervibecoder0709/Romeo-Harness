@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · find · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · find · context · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -84,6 +84,17 @@ def cmd_find(args):
     else:
         for h in hits:
             print(f"{h['id']}  score {h['score']} ({', '.join(h['matched'])})  {h['title']}")
+    return 0
+
+
+def cmd_context(args):
+    """1-hop 재개 — 한 단위 id 로 다음 세션이 읽을 파일 목록을 인쇄한다. 없는 참조는 [없음] 으로 남기고 exit 0 이다."""
+    from .context import format_context, unit_context
+    res = unit_context(_root(args), args.unit)
+    if args.json:
+        print(json.dumps(res, ensure_ascii=False, indent=1))
+    else:
+        print(format_context(res))
     return 0
 
 
@@ -449,6 +460,12 @@ def build_parser():
     s.add_argument("--limit", type=int, default=DEFAULT_LIMIT, help=f"인쇄할 후보 수 (기본 {DEFAULT_LIMIT})")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_find)
+
+    s = sub.add_parser("context", help="1-hop 재개 — 한 단위 id 로 다음 세션이 읽을 파일 목록 (/plan 1단계의 재개)")
+    s.add_argument("unit", help="작업 단위 id (docs/work/<id>)")
+    s.add_argument("--root", help="프로젝트 루트")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(fn=cmd_context)
 
     s = sub.add_parser("new", help="docs/work/<id>/ 문서 패키지 생성")
     g = s.add_mutually_exclusive_group(required=True)

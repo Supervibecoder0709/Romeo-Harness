@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-context-one-hop-resume-w5jq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-context-one-hop-resume-w5jq/task/run_04c7a85c7351-reviewer.json",
+    "sha256": "e62344eb41390a075078ea570dcc8d6f88f6860bea3f3ae91378ce4750228745"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_04c7a85c7351.yaml",
+  "notes": "수용 기준별 근거를 현재 증거에서 지목할 수 있다. required_checks 12건과 context-resume은 exit 0이며 같은 head_sha·dirty_tree_hash에 묶였다. 승인된 검증 계획은 AC 체크 표시 외에 바뀌지 않았고, 현재 변경은 allowed_paths 안이다. 공유 파서 romeo/frontmatter.py를 고치지 않은 판단은 타당하다 — 계약의 허용 범위 밖이고 다른 호출자 동작까지 바꾸는 별도 문제를 Q-88로 기록했다. 목록 밖 파일: core/workflows/review/SKILL.md, core/roles/reviewer.yaml, core/schemas/result-envelope.json(역할 절차·출력 스키마); core/workflows/plan/SKILL.md, docs/planning/open-questions.md, docs/planning/progress.md, romeo/cli.py, romeo/context.py, tests/test_context_resume.py(allowed_paths·changed_files와 AC 구현); romeo/docs.py, romeo/frontmatter.py, romeo/util.py(직접 참조와 Q-88 범위 판단); .harness/runs/feat-20260907-context-one-hop-resume-w5jq/run_04c7a85c7351/01-probe-shared-parser-reverted.log, 02-probe-direct-read-restored.log, 03-check-1.log, 04-check-2.log, 05-check-3.log, 06-check-4.log, 07-check-5.log, 08-check-6.log, 09-check-7.log, 10-check-8.log, 11-check-9.log, 12-check-10.log, 13-check-11.log, 14-check-12.log, 15-context-resume.log, 16-reviewer-brief.log, 17-review-tree-before.log, reviewer-brief.md(원시 증거·AC-8 동일 출력·현재 변경 목록 대조)."
+}

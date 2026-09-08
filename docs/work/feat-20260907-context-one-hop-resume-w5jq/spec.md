@@ -10,20 +10,21 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-07T23:59:31+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-08T09:58:23+09:00'
 parent: init-20260904-m4-doc-reuse-metrics-wr9m
 inputs: [../init-20260904-m4-doc-reuse-metrics-wr9m/charter.md, inputs/probe-2026-09-07.patch]
-evidence: []
+evidence: [evidence/run_02812052acd8.yaml, evidence/run_6daba018ef1d.yaml, evidence/run_94f401ad8cff.yaml,
+  evidence/run_04c7a85c7351.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
   history: []
 created: '2026-09-07'
-updated: '2026-09-07'
+updated: '2026-09-08'
 ---
 
 # 1-hop 재개 — `romeo context <id>` 가 다음 세션이 읽을 파일 목록을 낸다
@@ -47,27 +48,27 @@ updated: '2026-09-07'
   「파일 10 · 없음 0 · 정본 2 · 입력 1 · 회차(1 fail(goal) · 2 pass) · 증거 2(등록됨) · 결과 2 · 검토 2(FAIL findings 1 · PASS findings 1)」로 나온다(프로브 실측).
   깨진 참조는 `[없음]` 으로 보이고 종료 코드는 0 이다. 없는 id 는 한 줄 오류와 exit 1 이다. **재개하는 다음 세션 — 이 단위의 검토자 세션 — 이 그 목록만 받고 판정을 낸다(1회 실측).**
 - **수용 기준:**
-  - [ ] AC-1 `romeo context <id>` 가 단위 폴더 안의 파일을 **하나도 빠뜨리지 않고** 인쇄한다(폴더 안 파일 누락 0). 각 줄은 역할 한 낱말(`정본`·`상위`·`입력`·`회차`·`계약`·`증거`·`결과`·`검토`·`기타`)로 시작하고
+  - [x] AC-1 `romeo context <id>` 가 단위 폴더 안의 파일을 **하나도 빠뜨리지 않고** 인쇄한다(폴더 안 파일 누락 0). 각 줄은 역할 한 낱말(`정본`·`상위`·`입력`·`회차`·`계약`·`증거`·`결과`·`검토`·`기타`)로 시작하고
         정본이 먼저다 — `spec.md` 가 있으면 그것이 첫 파일 줄이다. `--json` 은 `unit`(id·title·status·approved_at·closed_at·parent·dir)·`files`(path·role·exists·note)·`missing` 을 담는다. 경로는 프로젝트 루트 기준 상대 경로다.
-  - [ ] AC-2 **1-hop.** frontmatter 의 `parent` 는 `docs/work/<parent>/charter.md`(없으면 `spec.md`) 한 파일로, `inputs` 의 각 항목은 단위 폴더 기준 상대 경로를 푼 한 파일로 목록에 든다.
+  - [x] AC-2 **1-hop.** frontmatter 의 `parent` 는 `docs/work/<parent>/charter.md`(없으면 `spec.md`) 한 파일로, `inputs` 의 각 항목은 단위 폴더 기준 상대 경로를 푼 한 파일로 목록에 든다.
         그 너머 — 입력 단위의 다른 파일, 부모의 증거·회차, 부모의 부모 — 는 들지 않는다. 같은 파일이 두 경로로 가리켜지면 한 번만, 먼저 온 역할(상위 → 입력)로 든다.
-  - [ ] AC-3 없는 id 는 종료 코드 1 과 `ERROR` 로 시작하는 stderr 한 줄(id 포함)로 끝나고 `Traceback` 이 없다.
-  - [ ] AC-4 git 이력이 없는 루트(`--root`)에서도 돈다. 없는 참조(`parent`·`inputs` 가 가리키지만 파일이 없는 것)는 `[없음]` 줄로 역할과 함께 인쇄하고 `missing` 에 그 경로를 넣되
+  - [x] AC-3 없는 id 는 종료 코드 1 과 `ERROR` 로 시작하는 stderr 한 줄(id 포함)로 끝나고 `Traceback` 이 없다.
+  - [x] AC-4 git 이력이 없는 루트(`--root`)에서도 돈다. 없는 참조(`parent`·`inputs` 가 가리키지만 파일이 없는 것)는 `[없음]` 줄로 역할과 함께 인쇄하고 `missing` 에 그 경로를 넣되
         **종료 코드는 0** 이다 — 드러내되 막지 않는다. 워커 트리에만 있는 것들 — 계약(`task/` 는 git 에 없다)·등록되지 않은 증거·결과 계약 — 도 있으면 목록에 든다.
         증거는 spec frontmatter `evidence:` 에 있으면 「등록됨(검사 기록)」, 없으면 「미등록」이다.
-  - [ ] AC-5 **사실만 붙인다.** 회차 파일은 `회차 N · <n> <result>(<failure_class>)…`, 검토 봉투는 `<gate_verdict> · findings <N>`, 결과 봉투는 `<role> · <gate_verdict>`,
+  - [x] AC-5 **사실만 붙인다.** 회차 파일은 `회차 N · <n> <result>(<failure_class>)…`, 검토 봉투는 `<gate_verdict> · findings <N>`, 결과 봉투는 `<role> · <gate_verdict>`,
         계약은 `<role> · base <SHA 앞 12자>`, 증거는 등록 여부와 `명령 <N>건 · head <SHA 앞 12자>`, 헤더는 status·승인일·종료일·parent 다 — 전부 그 파일에 적힌 값이다.
         명령이 **덧붙이는** 문장(역할·note·헤더 라벨)에는 「추천」·「다음 행동」 이 없다 — 파일에서 읽어 옮긴 제목·값은 그 파일의 것이다(제목에 「추천」이 든 단위가 실재한다).
         파일 하나가 깨져도 목록은 나온다 — 그 줄만 「읽을 수 없다」가 붙는다.
-  - [ ] AC-6 이 저장소의 모든 단위(`docs/work/*`, 31개 이상)에서 종료 코드 0 이고 깨진 참조가 0 이다(전수).
-  - [ ] AC-7 `core/workflows/plan/SKILL.md` 절차 1단계가 재개할 때 읽는 범위로 이 명령을 지정하고, 검사가 **`## 절차` 아래 1단계 본문만** 읽어 거기 적힌 `romeo <하위명령>` 이름을 뽑은 뒤
+  - [x] AC-6 이 저장소의 모든 단위(`docs/work/*`, 31개 이상)에서 종료 코드 0 이고 깨진 참조가 0 이다(전수).
+  - [x] AC-7 `core/workflows/plan/SKILL.md` 절차 1단계가 재개할 때 읽는 범위로 이 명령을 지정하고, 검사가 **`## 절차` 아래 1단계 본문만** 읽어 거기 적힌 `romeo <하위명령>` 이름을 뽑은 뒤
         **기존 단위 id 로 실제 실행해** 그 단위의 `spec.md` 경로가 출력에 나오는 것까지 확인한다 — `romeo find` 는 폴더까지만 내므로 이름 대조로는 부족하다.
         어댑터 산출물은 바뀌지 않고 `bin/romeo compile --check` 가 통과한다.
-  - [ ] AC-8 **1회 실측의 자리.** 검토자를 띄우기 전에 코디네이터가 워커 트리에서 `bin/romeo context <이 단위 id> --root "$W"` 를 검토 run 의 증거로(`evidence run`, 라벨 `context-resume`) 기록하고,
+  - [x] AC-8 **1회 실측의 자리.** 검토자를 띄우기 전에 코디네이터가 워커 트리에서 `bin/romeo context <이 단위 id> --root "$W"` 를 검토 run 의 증거로(`evidence run`, 라벨 `context-resume`) 기록하고,
         검토자 브리프에 그 출력을 「읽을 파일」로 그대로 넣는다 — 검토 run 의 `evidence/<run>.yaml` 의 `commands` 에 `context-resume` 가 exit 0 으로 있다.
         검토자는 판정의 `notes` 에 목록 밖에서 열어야 했던 파일이 있으면 그 경로를, 없으면 「목록 밖 파일 없음」을 적는다 — 그 관찰이 이 마일스톤의 실측이고 판정 조건이 아니다.
         이 항목의 체크는 구현자가 아니라 코디네이터가 `context-resume` 를 기록한 뒤 검토자 기동 전에 한다.
-  - [ ] AC-9 이번 작업이 발견했으나 고치지 않은 것이 `docs/planning/open-questions.md` 새 행(Q-85~)으로 열린다 — 최소 둘: 재개 절차(구현자·검토자 브리프 정본)가 이 목록을 생성해 쓰게 하는 자리가
+  - [x] AC-9 이번 작업이 발견했으나 고치지 않은 것이 `docs/planning/open-questions.md` 새 행(Q-85~)으로 열린다 — 최소 둘: 재개 절차(구현자·검토자 브리프 정본)가 이 목록을 생성해 쓰게 하는 자리가
         아직 없다 · 계약(`task/`)은 git 에 없어 새 체크아웃의 목록에는 없다. `docs/planning/progress.md` 「지금 상태」가 이 단위를 활성 단위로 가리킨다.
 - **위험과 되돌리기:** 읽기 전용 명령 하나와 절차 1단계의 문단 하나를 더한다 — 기존 동작 변경 0, 운영·외부 상태 없음. 되돌리기는 `git revert <통합 커밋>` —
   하위 명령·검사·문단이 사라진다(charter 의 「하위 명령 제거」). 알려진 한계 셋 — ① 계약(`task/`)은 git 에 없어 **새 체크아웃**의 목록에는 없다(목록은 있는 것만 말한다) ·
@@ -181,6 +182,9 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-08T09:58:23+09:00 · HEAD 8cb0c096fc98 · 검사 기록 run_04c7a85c7351
 
-- (없음)
+- [evidence/run_02812052acd8.yaml](evidence/run_02812052acd8.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_6daba018ef1d.yaml](evidence/run_6daba018ef1d.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_94f401ad8cff.yaml](evidence/run_94f401ad8cff.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_04c7a85c7351.yaml](evidence/run_04c7a85c7351.yaml) — exit codes [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

@@ -1,0 +1,77 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260907-context-one-hop-resume-w5jq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260907-context-one-hop-resume-w5jq/task/run_94f401ad8cff-implementer.json",
+    "sha256": "334eb01095307e51efd31c57d3c3f2e619fd79727825e80bb9f143113e302a26"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_lists_every_file_in_the_unit_folder_with_a_role",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_follows_parent_and_inputs_exactly_one_hop",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_unknown_unit_is_refused_with_exit_1_and_no_traceback",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_missing_reference_is_printed_not_hidden",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_facts_come_from_the_files_not_from_judgment",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_context_resume.TestContextCommand.test_every_unit_in_this_repo_resolves_without_a_missing_reference",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest tests.test_context_resume.TestProcedureNamesTheCommandThatListsTheUnit",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo context feat-20260907-context-one-hop-resume-w5jq --json | grep -q 'docs/work/feat-20260907-context-one-hop-resume-w5jq/spec.md'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "python3 -m unittest tests.test_find_reuse tests.test_doc_commands",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-12",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "fail_reasons": [],
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260907-context-one-hop-resume-w5jq/evidence/run_94f401ad8cff.yaml",
+  "notes": "3회차 — §10 반복 중단 뒤 사람의 재검토 결론(attempts.yaml reviews[0], 2026-09-08)에 따라 AC-5 를 「깨짐의 종류 열거」가 아니라 「파일 단위 예외 격리 + 필드 정규화」로 세웠다. ① romeo/context.py: frontmatter 는 isinstance(parsed, dict) 일 때만 읽힌 것으로 채택하고(목록·문자열·숫자는 그 정본 줄에 「읽을 수 없다 — frontmatter 를 파싱하지 못했다(매핑이 아니다)」, 파싱 실패는 종전 문장 그대로 — 둘은 다른 사실이다), parent 는 스칼라일 때만, inputs·evidence 는 목록의 스칼라 항목만 쓰며 어긋난 필드는 첫 정본 줄 note 끝에 「 · parent 값이 문자열이 아니다」·「 · inputs 값이 목록이 아니다」로 붙인다. 폴더 파일 순회는 파일 단위 try/except Exception 으로 감싸 어떤 예외도 그 줄만 「읽을 수 없다」로 남긴다. 헤더·JSON 키·역할·순서·exit 0 은 그대로이고 「추천」·「다음 행동」 낱말은 만들지 않는다. ② tests/test_context_resume.py: check-5 검사 이름을 바꾸지 않고 그 안에 반례 4종(목록 frontmatter · 문자열 frontmatter · 문자열 inputs · 목록 parent)을 더했다. 2회차가 넣은 두 케이스는 그대로 뒀다. **판별 양쪽 실측**: 이 변경 전 상태(매핑 검사·필드 정규화 없음)로 되돌려 같은 검사를 돌리면 `AttributeError: 'list' object has no attribute 'get'`(romeo/context.py 의 parent = fm.get(\"parent\")) 로 FAILED(failures=1) 이고, 복구 뒤 OK 다 — 2회차 검토자가 재현한 반례와 같은 자리다. 이 확인은 임시 사본으로만 했고 작업 트리에는 최종 상태만 남아 있다. ③ docs/planning/progress.md 「활성 작업 단위」를 3회차로, 「다음 정비 후보」에 feat-20260908-ac-rebuttal-before-approval-2sct 를 앞세웠다. ④ docs/planning/open-questions.md 에 Q-87(승인 전 반대 독자 부재 — 1회차 통과율 3/15 · FAIL 의 과반이 AC 문장 결함)을 열었다. 검사 12건은 이 run(run_94f401ad8cff)의 evidence 에 전부 exit 0 으로 기록됐다 — check-1~12, 근거는 evidence_ref 의 commands. 1·2회차 증거(run_02812052acd8 · run_6daba018ef1d)는 지우지 않았다. spec.md 의 확인란 문장·검증 계획·AC 체크 표시(AC-1~9 전부 [x])는 손대지 않았다. 커밋·push 는 하지 않았다."
+}
