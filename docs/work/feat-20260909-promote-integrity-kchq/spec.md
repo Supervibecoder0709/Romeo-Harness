@@ -11,7 +11,7 @@ profile: standard
 blast_radius: small
 uncertainty: high
 status: active
-approved_at: '2026-09-09T00:41:29+09:00'
+approved_at: '2026-09-09T01:44:00+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -29,6 +29,9 @@ approval_history:
 - {approved_at: '2026-09-09T00:24:38+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-09T00:41:29+09:00',
   reason: '2차 반박(ac-rebuttal-20260909-2.md)이 AC-3·AC-5·AC-9 에 실질 결함을 냈다 — 위조 판별을 같은 사본의 0→1 짝으로, 거짓 양성
     배제를 종료 코드 0 으로, continue-on-error 금지를 상위 job 까지 넓혔다. AC-2·AC-4·AC-7 의 표현도 함께 조였다'}
+- {approved_at: '2026-09-09T00:41:29+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-09T01:44:00+09:00',
+  reason: '§10 연속 2회 실패 재검토 결론에 따라 AC-4 의 열린 포함 집합을 판별 규칙으로 닫았다 — 괄호 안 내용의 첫 공백 앞까지가 경로 후보이고 # 뒤를 잘라낸
+    것이 대상 경로다. fixture 가 담을 세 표기도 명시했다. 다른 AC 와 검증 계획은 그대로다'}
 ---
 
 # 승격과 무결성 — 끝난 사실을 current/ 로 올리고, 링크·ID 중복을 검사한다
@@ -47,7 +50,7 @@ approval_history:
   - [ ] AC-1 `docs/current/enforcement.md` 가 있고, 표의 각 행이 **리터럴로 등록되는** 판정 id 하나와 그 판정의 수준(`error` 또는 `warning`)과 출처 파일 경로를 담는다. 표의 행 수는 0 이 아니다. 리터럴 연결로 만들어지는 판정(`romeo/close.py` 의 `check("REVIEW_" + cid, …)`)은 표가 아니라 「파생 판정」 절에 규칙 한 줄로 적고, 대조 대상이 아님을 그 자리에 밝힌다.
   - [ ] AC-2 `bin/romeo integrity` 는 두 집합의 `(id, 수준)` 쌍을 대조한다 — **(가)** `docs/current/enforcement.md` 표에서 읽은 것, **(나)** `romeo/close.py` 의 `check("<id>"` 리터럴 호출과 `ENVELOPE_CHECKS` 튜플·`romeo/validate.py` 가 `errors`/`warnings` 에 넣는 리터럴 접두·`core/policy/packages.yaml` 의 `blocks:` 키에서 뽑은 것. 뽑는 규칙은 하나다 — 그 호출이나 `append` 의 문자열 인자가 **고정 텍스트로 시작**하면 그 선두의 첫 공백 앞까지를 id 로 본다(f-string 의 고정 선두를 포함한다). 문자열이 변수나 연결 표현으로 **시작**하면 (나)에 넣지 않는다. 주석 줄도 넣지 않는다. 두 집합이 다르면 종료 코드가 1 이고, 한쪽에만 있는 쌍을 어느 쪽인지와 함께 표준 출력에 인쇄한다.
   - [ ] AC-3 AC-2 의 판별을 세 위조 상태에서 실측한다. 각 위조는 **다른 위반이 없어 `bin/romeo integrity` 가 종료 코드 0 을 내는 사본**에서 만들고, 같은 사본에서 위조 전 0 과 위조 후 1 을 이어 관측한다 — 종료 코드의 차이가 그 위조에서 나온 것임을 이 짝이 보인다. 세 상태는 ① `romeo/close.py` 에 기존 호출과 같은 형태의 유효한 `check("<코드에 없던 id>", True)` 한 줄을 더한 것 ② `enforcement.md` 표에서 한 행을 지운 것 ③ `enforcement.md` 의 한 id 를 코드에 없는 이름으로 바꾼 것이다. 세 상태에서 위조한 id 가 출력에 인쇄된다.
-  - [ ] AC-4 `bin/romeo integrity` 는 `docs/current/` 아래 `.md` 문서의 인라인 링크(대괄호로 텍스트, 이어지는 괄호로 경로를 적는 표기) 중 `http://`·`https://`·`mailto:`·`#` 으로 시작하지 않는 것을 상대 링크로 보고, 그 문서의 위치를 기준으로 경로의 `#` 뒤를 잘라낸 부분이 가리키는 대상 파일이 없으면 종료 코드가 1 이고 그 링크를 인쇄한다. 깨진 링크를 담은 fixture 에서 실측한다. 참조형 링크(괄호 대신 두 번째 대괄호로 라벨을 적고 경로를 다른 줄에 정의하는 표기)는 이 검사의 대상이 아니다 — `docs/current/` 에서 쓰지 않는 표기다.
+  - [ ] AC-4 `bin/romeo integrity` 는 `docs/current/` 아래 `.md` 문서의 인라인 링크(대괄호로 텍스트, 이어지는 괄호로 대상을 적는 표기)에서 **괄호 안 내용의 첫 공백 앞까지**를 경로 후보로 잡고, 그 후보에서 `#` 뒤를 잘라낸 것을 대상 경로로 본다. 대상 경로가 `http://`·`https://`·`mailto:` 로 시작하거나 빈 문자열이면 검사하지 않고, 그 밖의 대상 경로가 그 문서의 위치를 기준으로 존재하지 않으면 종료 코드가 1 이고 그 링크를 인쇄한다. fixture 는 괄호 안이 경로뿐인 표기·경로 뒤에 공백과 따옴표 제목이 붙은 표기·경로 뒤에 공백만 붙은 표기를 함께 담는다. 참조형 링크(괄호 대신 두 번째 대괄호로 라벨을 적고 경로를 다른 줄에 정의하는 표기)는 이 검사의 대상이 아니다 — `docs/current/` 에서 쓰지 않는 표기다.
   - [ ] AC-5 `bin/romeo integrity` 는 `docs/work/` 아래 각 폴더의 `spec.md` frontmatter `id` 를 모아(`spec.md` 가 없는 폴더는 건너뛴다) 같은 값이 둘 이상이면 종료 코드가 1 이고 그 값과 폴더 이름들을 인쇄한다. 탐색 범위는 `docs/work/` **바로 아래** 폴더다. 두 fixture 로 양방향을 실측한다 — 폴더 이름이 서로 다르고 frontmatter `id` 만 같은 fixture 에서 종료 코드가 1 이고 그 id 가 인쇄되며, `id` 는 서로 다르고 `title` 만 같은 fixture 에서 종료 코드가 0 이다.
   - [ ] AC-6 `bin/romeo integrity` 를 인자 없이 이 저장소 루트에서 실행하면 종료 코드가 0 이고, 검사한 루트의 경로와 대조한 id 개수를 인쇄한다. 인쇄된 루트가 그 실행의 작업 디렉터리다.
   - [ ] AC-7 `romeo/close.py` 에서 `check("` 로 등록되는 id 집합이 승인 커밋 시점의 같은 파일과 현재 파일에서 같다 — 승인 커밋은 `bin/romeo envelope build` 가 이력에서 찾는 것과 같은 커밋이다 — 이 단위는 종료 판정을 더하지도 빼지도 않는다.

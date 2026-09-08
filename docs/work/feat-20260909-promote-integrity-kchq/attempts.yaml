@@ -10,4 +10,19 @@ attempts:
   note: 검토자 FAIL findings 2건 — compare() 가 한쪽 집합이 비면 대조를 건너뛰고(AC-2·AC-8), 문서 행을 (id,수준) 쌍이 아니라 id 키로만
     저장해 같은 id 의 다른 수준 행이 사라진다(AC-2)
   settled_at: '2026-09-09T01:10:08+09:00'
-reviews: []
+- n: 2
+  run: run_98070e608181
+  base_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  started_at: '2026-09-09T01:11:04+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL — AC-4 미달: LINK_RE 가 [텍스트](경로 "제목") 과 경로 뒤 공백 표기를 놓친다. 2차 반박이 낸 「제목이 붙었을 때」 지적을 내가 #
+    만 반영하고 제목은 빠뜨린 결과다. 신선도 경고 1건은 검토자가 FAIL 사유로 세지 않았다'
+  settled_at: '2026-09-09T01:40:35+09:00'
+reviews:
+- after_attempt: 2
+  conclusion: 완료 정의는 달성 가능하다 — 세 finding 이 전부 산출물을 가리켰고 목표나 하네스를 가리키지 않았다. 다만 AC-4 가 「인라인 링크」의 포함 집합을
+    판별 규칙 없이 산문으로만 정의해, 검토자가 회차마다 새 표기를 찾을 수 있는 열린 집합이었다. AC-2 가 이미 쓴 「첫 공백 앞까지」 규칙을 AC-4 에도 넣어 여집합을 닫고
+    재승인한 뒤 3회차를 돌린다
+  by: Supervibecoder0709
+  at: '2026-09-09T01:43:46+09:00'
