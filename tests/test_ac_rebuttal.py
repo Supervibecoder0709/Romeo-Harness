@@ -61,12 +61,16 @@ class TestUniversalLint(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
+    #: 임시 spec 이 원본 폴더 밖에 서므로, 원본의 **상대 링크**는 거기서 전부 깨진다.
+    #: `## 증거` 절은 close 가 evidence 링크를 채우는 자리라 이 검사가 볼 것이 없다 — 통째로 비운다.
+    #: (비우지 않으면 이 단위가 close 된 **뒤에** 그 링크가 생겨 검사가 깨진다 — 실제로 그렇게 깨졌다.)
     def _spec(self, ac_lines, harness=None):
         """확인란만 있는 최소 문서. validate_doc 는 frontmatter 스키마를 보므로 실물 spec 을 베껴 쓴다."""
         src = HARNESS_ROOT / "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/spec.md"
         fm, body = frontmatter.read(src)
         head = body.split("## 확인란")[0]
         rest = "## 변경 범위" + body.split("## 변경 범위", 1)[1]
+        rest = rest.split("## 증거")[0] + "## 증거\n\n- (없음)\n"
         body = head + "## 확인란\n\n- **수용 기준:**\n" + "\n".join(ac_lines) + "\n\n" + rest
         p = self.root / "spec.md"
         frontmatter.write(p, fm, body)

@@ -23,15 +23,16 @@ authority: derived
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
 - **마일스톤:** M2·M3 완료. 부착 이니셔티브 `init-20260904-attach-payload-manual-rreq` 는 M1~M4 가 닫혀 **종료됐다**.
-- **활성 작업 단위:** `feat-20260908-ac-rebuttal-before-approval-2sct`(정비 · 승인 전 반대 독자 · 승인 `cd65272`) —
-  **반박 읽기 절차의 첫 실사용이 이 단위 자신이고**, 그 반박 `inputs/ac-rebuttal-20260908.md` 는 승인 커밋에 들어 있다(AC-7).
-  마지막 완료는 `feat-20260907-context-one-hop-resume-w5jq`(D-81 ③ 첫 조각 · **M4 charter M2 닫힘** · 4회차 close PASS · 12/12 · 재실행 12/12 ·
-  검토자 PASS findings 0(WARN 2 비차단) · 통합 `7f77699`) — `romeo context <id>` 가 재개 세션이 읽을 파일 목록을 1-hop 으로 낸다.
-  **§10 반복 중단이 2회 걸렸다** — 1~3회차 검토자 FAIL 은 전부 AC-5 의 전칭 문장이었고, 사람 재검토 결론 2건은 그 단위 `attempts.yaml` 의 `reviews` 에 있다.
-  그 앞은 `feat-20260907-judge-revision-base-sha-pwt8`(D-81 ② · `bbb371b`) · `feat-20260907-envelope-root-close-no-history-rshi`(D-81 ① · `8f14b09`) ·
-  `feat-20260907-close-review-reapproval-reach-bjec`(Q-68 · `3c11750`).
-- **그 관통이 남긴 것.** 공유 파서 `romeo/frontmatter.py` 의 `yaml.safe_load(raw) or {}` 가 빈 값 6종을 `{}` 로 접어 호출자가 구별하지 못한다(Q-88 · §12 로 비범위) ·
-  계약·증거를 만드는 명령은 아직 워커 트리의 하네스가 돈다(Q-83) · 판정 하네스의 리비전이 회차 기록에 없다(Q-84 · Q-02 계측 재료).
+- **활성 작업 단위:** 없음 — 정비 1회를 마쳤다. 다음은 M4 charter **M3(승격·무결성)**.
+  마지막 완료는 `feat-20260908-ac-rebuttal-before-approval-2sct`(정비 · 승인 전 반대 독자 · Q-87 · **2회차 close PASS** · 11/11 · 재실행 11/11 ·
+  검토자 PASS findings 0 · 통합 `2666093`) — `/plan` 절차 8 「반박 읽기」와 경고 `AC_UNIVERSAL`(전칭 표현)·`AC_UNREBUTTED`(반박 누락)를 세웠다. 둘 다 경고까지만이다(K-31).
+  **그 절차의 첫 실사용이 이 단위 자신이었고** 반박이 AC-1~8 전부에 지적을 내 여덟을 전부 고쳤다(`inputs/ac-rebuttal-20260908.md`) —
+  1회차 검토자 FAIL 2건은 둘 다 산출물 결함이었다(AC-5 를 검사가 절반만 봄 · AC-6 증거가 pipefail 없는 파이프라인).
+  그 앞은 `feat-20260907-context-one-hop-resume-w5jq`(M4 charter M2 닫힘 · `7f77699`) · `feat-20260907-judge-revision-base-sha-pwt8`(D-81 ② · `bbb371b`) ·
+  `feat-20260907-envelope-root-close-no-history-rshi`(D-81 ① · `8f14b09`).
+- **이 정비가 남긴 것.** 반박과 승인 전 프로브는 **서로 다른 것을 잡는다** — 반박은 확인란만 읽어 문장의 논리 결함을,
+  프로브는 저장소 사실과 어긋나는 AC 를 잡았다(승인이 `base_sha` 를 더는 적지 않는다는 것 · 기존 C-C6 검사의 대상 범위). 둘 중 하나만 했으면 각각 놓쳤다.
+  1회차 검토 뒤 `review-tree-after` 를 제때 남기지 않아 그 FAIL 봉투를 `inputs/` 로 옮겨야 했다 · 공유 파서는 그대로다(Q-88).
 - **다음 행동(D-81 순서):** ① Q-66·Q-67 정비(완료) → ② 판정 리비전 분리(완료) → **③ M4 나머지 — M2 닫힘 → 정비 1회(2sct) → M3 승격·무결성 → M4 지표** →
   ④ shadow 20건·v1 릴리스 게이트 → ⑤ M5 `attach`(「올린 것」 9건이 입력 · 계획 §10 #16 그대로 v1.1).
 - **blocker:** 없음. 워커·프로브 워크트리와 브랜치는 전부 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
