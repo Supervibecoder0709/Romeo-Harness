@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260908-ac-rebuttal-before-approval-2sct",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/task/run_a133a0d90790-reviewer.json",
+    "sha256": "6b30cc51327fc7807d5f634350f62400be708ebefaf339a95eda2ae3d595d116"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5의 검사는 카탈로그에서 읽은 두 코드를 validate와 approve 출력에 각각 대조하지 않는다. 이 테스트는 approve를 실행하지 않으며, 별도 approve 테스트도 AC_UNREBUTTED 포함만 확인하므로 approve가 두 코드를 모두 출력하는 합집합 반례가 통과할 수 있다.",
+      "file": "tests/test_ac_rebuttal.py",
+      "line": 227
+    },
+    {
+      "summary": "AC-6이 요구한 pwt8 validate 자체의 종료 코드 0을 지목할 수 없다. 기록된 명령은 pipefail 없는 validate와 grep 파이프라인이라 exit_code 0은 마지막 grep의 성공만 증명하며, 원시 로그에도 validate의 개별 종료 코드가 없다.",
+      "file": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/run_a133a0d90790.yaml",
+      "line": 150
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/run_a133a0d90790.yaml",
+  "notes": "두 계약의 base_sha는 일치했고, 현재 변경 경로는 allowed_paths 안이며, 검증 계획의 사후 변경·가드 위반·실패 검사 통과 주장은 확인되지 않았다."
+}

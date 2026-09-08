@@ -1,0 +1,229 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_a133a0d90790
+task_id: task_0f5bcc4f5c1b
+dispatch_id: ctx_f841275249e9
+unit_id: feat-20260908-ac-rebuttal-before-approval-2sct
+spec_ref:
+  path: docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/spec.md
+  sha256: 8bb5a72aa5cbf3c03fd70359aed2f8091e42b7752255a7cdd7300b6ab0892680
+base_sha: cd652726c0286847de6fd902d08de3cffd12833e
+head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+dirty_tree_hash: 3d60c9a94b5b92eedf896632ffd38190066992cc928c18a2bf6a74488290b818
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-2sct-r1
+started_at: '2026-09-08T16:58:33+09:00'
+finished_at: '2026-09-08T18:46:09+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_ac_rebuttal.TestUniversalLint
+  exit_code: 0
+  started_at: '2026-09-08T16:58:33+09:00'
+  finished_at: '2026-09-08T16:58:33+09:00'
+  seconds: 0.299
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/01-check-1.log
+  log_sha256: c2aaa3987d65cddb0e5ee3a86735eef5214834bd9c06360a14147aca9ec9c971
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-2
+  command: python3 -m unittest tests.test_ac_rebuttal.TestApproveWarnsUnrebutted
+  exit_code: 0
+  started_at: '2026-09-08T16:58:33+09:00'
+  finished_at: '2026-09-08T16:58:34+09:00'
+  seconds: 0.712
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/02-check-2.log
+  log_sha256: 09085ba68daf38ab27a6a66086d804f1b512a45e488a460bd7a8ae8110c52b50
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-3
+  command: python3 -m unittest tests.test_ac_rebuttal.TestProcedureAndAdapters
+  exit_code: 0
+  started_at: '2026-09-08T16:58:34+09:00'
+  finished_at: '2026-09-08T16:58:35+09:00'
+  seconds: 0.214
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/03-check-3.log
+  log_sha256: 2f32b98304a1ce95b74b36609611ff47a9a532c056f59e2d3d8b6a8caae5c265
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-4
+  command: bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq | grep -q 'AC_UNIVERSAL
+    AC-5'
+  exit_code: 0
+  started_at: '2026-09-08T16:58:35+09:00'
+  finished_at: '2026-09-08T16:58:35+09:00'
+  seconds: 0.151
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/04-check-4.log
+  log_sha256: ca284cbb7df38049e967841ed755dab930da3817c77f2c35aef6d0580a426255
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-5
+  command: bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq
+  exit_code: 0
+  started_at: '2026-09-08T16:58:35+09:00'
+  finished_at: '2026-09-08T16:58:35+09:00'
+  seconds: 0.153
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/05-check-5.log
+  log_sha256: c56308f47dfa011e60360fbd64c191bd1d4a8a44cbaa07d928f71523159f5a5f
+  stdout_tail: "[PASS] docs/work/feat-20260907-context-one-hop-resume-w5jq/brief.md lines=72 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/feat-20260907-context-one-hop-resume-w5jq/spec.md lines=191 needs_input=0\
+    \ unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 191 > 150\n    WARN  AC_UNIVERSAL AC-5 «전부»\n    WARN\
+    \  AC_UNIVERSAL AC-5 «하나가 깨져도»\n    WARN  AC_UNIVERSAL AC-6 «모든»"
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-6
+  command: grep -q 'inputs/ac-rebuttal-' core/workflows/plan/SKILL.md && grep -q 'ac-rebuttal' adapters/claude/workflows/plan.md
+    && grep -q 'ac-rebuttal' adapters/codex/workflows/plan.md && grep -q 'ac-rebuttal' .claude/skills/plan/SKILL.md
+    && grep -q 'ac-rebuttal' .agents/skills/plan/SKILL.md
+  exit_code: 0
+  started_at: '2026-09-08T16:58:35+09:00'
+  finished_at: '2026-09-08T16:58:35+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/06-check-6.log
+  log_sha256: 3910971a8a3cd1cca7e8b555b21683fb0fed4edba57e8c3e79732bfe9a62109a
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-7
+  command: grep -q 'AC_UNIVERSAL' core/policy/packages.yaml && grep -q 'AC_UNREBUTTED' core/policy/packages.yaml
+    && grep -q 'universal_patterns' core/policy/packages.yaml
+  exit_code: 0
+  started_at: '2026-09-08T16:58:35+09:00'
+  finished_at: '2026-09-08T16:58:36+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/07-check-7.log
+  log_sha256: b982cfb5662c1ea10d97a470bb5dd42ca6a0787334e1727ab7684083f303906b
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-8
+  command: ls docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md && grep
+    -q '^### AC-1' docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md
+  exit_code: 0
+  started_at: '2026-09-08T16:58:36+09:00'
+  finished_at: '2026-09-08T16:58:36+09:00'
+  seconds: 0.014
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/08-check-8.log
+  log_sha256: df8934dbc43f92cd9b75b6db75675f5268e458d43cd2ca8f68e77128227d5ef6
+  stdout_tail: docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-20260908.md
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-9
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-08T16:58:36+09:00'
+  finished_at: '2026-09-08T16:58:36+09:00'
+  seconds: 0.37
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/09-check-9.log
+  log_sha256: 6c4832600d729b52c7aa7e06db6e53620ca1850ee5d26afe90ed134055704348
+  stdout_tail: compile 검사 PASS
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-10
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-08T16:58:36+09:00'
+  finished_at: '2026-09-08T17:04:51+09:00'
+  seconds: 374.111
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/10-check-10.log
+  log_sha256: d4e1230e0cb36d316d6bf7b273cf3700b9cc6f50f4ec2a456e5c799c836b109c
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: check-11
+  command: python3 -m unittest tests.test_doc_commands tests.test_find_reuse tests.test_context_resume
+  exit_code: 0
+  started_at: '2026-09-08T17:04:51+09:00'
+  finished_at: '2026-09-08T17:04:57+09:00'
+  seconds: 6.545
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/11-check-11.log
+  log_sha256: 0f2cefe1a4ea3ec5f54d3b764504219e3ffae108fd86c58db3c3052a17f7740e
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: cmd-12
+  command: bin/romeo validate docs/work/feat-20260907-judge-revision-base-sha-pwt8 | grep -q 'AC_UNIVERSAL
+    AC-3'
+  exit_code: 0
+  started_at: '2026-09-08T17:05:43+09:00'
+  finished_at: '2026-09-08T17:05:43+09:00'
+  seconds: 0.154
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/12-cmd-12.log
+  log_sha256: cfb7c261abba634dbf5381bf06e9f8d5844e1e43eb009e43d4281de0465e5c05
+  stdout_tail: ''
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: cmd-13
+  command: git diff --stat cd652726c0286847de6fd902d08de3cffd12833e -- tests/
+  exit_code: 0
+  started_at: '2026-09-08T17:05:43+09:00'
+  finished_at: '2026-09-08T17:05:43+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/13-cmd-13.log
+  log_sha256: fd96c79bb0d3fbab99e78c0f53afb31a6ce91f7ce22061a968a475c2d0f96bf8
+  stdout_tail: "tests/test_ac_rebuttal.py | 249 ++++++++++++++++++++++++++++++++++++++++++++++\n 1 file\
+    \ changed, 249 insertions(+)"
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: review-tree-before
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-2sct-r1 status --porcelain
+  exit_code: 0
+  started_at: '2026-09-08T17:07:15+09:00'
+  finished_at: '2026-09-08T17:07:15+09:00'
+  seconds: 0.045
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/14-review-tree-before.log
+  log_sha256: 97cd382d4432a421d1fe2c07e41b89ce3c530266d439a90f24caeae8653db501
+  stdout_tail: "ions.md\n M docs/planning/progress.md\n M docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/spec.md\n\
+    \ M romeo/cli.py\n M romeo/docs.py\n M romeo/validate.py\n A tests/test_ac_rebuttal.py\n?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/attempts.yaml\n\
+    ?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/\n?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/result/"
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-2sct-r1/.harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-08T17:07:23+09:00'
+  finished_at: '2026-09-08T17:07:24+09:00'
+  seconds: 0.027
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/15-reviewer-brief.log
+  log_sha256: 36c79e6390358f4172d2224aa367cc5567dd176e3e0bf641cfc0ee6cc08039fb
+  stdout_tail: bd27cb4da83308681d4f075810d97c9a1662cff531fe21273858f29d39e191cb  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-2sct-r1/.harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/reviewer-brief.md
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 55141ee08033dc27ad9a300ee8ee0fceb542dbffe7aab064aaa5935c9e0e6c2f
+- id: review-tree-after
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-2sct-r1 status --porcelain
+  exit_code: 0
+  started_at: '2026-09-08T18:46:09+09:00'
+  finished_at: '2026-09-08T18:46:09+09:00'
+  seconds: 0.033
+  log: .harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_a133a0d90790/16-review-tree-after.log
+  log_sha256: a494048dda0d7e934ac41a4b30db2502d30542b93291136d174167e4b64c1659
+  stdout_tail: "ebuttal-before-approval-2sct/spec.md\n M romeo/cli.py\n M romeo/docs.py\n M romeo/validate.py\n\
+    \ A tests/test_ac_rebuttal.py\n?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/attempts.yaml\n\
+    ?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/\n?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/result/\n\
+    ?? docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/review/"
+  head_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  dirty_tree_hash: 3d60c9a94b5b92eedf896632ffd38190066992cc928c18a2bf6a74488290b818
+changed_files:
+- .agents/skills/plan/SKILL.md
+- .claude/skills/plan/SKILL.md
+- adapters/claude/workflows/plan.md
+- adapters/codex/workflows/plan.md
+- adapters/orca/prompts/ac-rebuttal-brief.md
+- core/policy/packages.yaml
+- core/workflows/plan/SKILL.md
+- docs/planning/open-questions.md
+- docs/planning/progress.md
+- romeo/cli.py
+- romeo/docs.py
+- romeo/validate.py
+- tests/test_ac_rebuttal.py
+artifact_hash: aa839db8edb040d324e1c38e66ce3a00f835128ada09c1733f1cb208ab56a0b6
+reviewer: null
+verdict: null
+approvals: []

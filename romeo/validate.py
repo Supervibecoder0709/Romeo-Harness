@@ -52,6 +52,34 @@ def section_lines(body, title):
     return None
 
 
+AC_ITEM_RE = re.compile(r"^\s*- \[[ xX]\] (AC-\d+)\b")
+
+
+def ac_items(body):
+    """확인란 절의 수용 기준 항목. [(id, 그 항목의 전체 문장)] — 이어지는 줄까지 한 문장으로 합친다.
+
+    다음 `- [` 항목이나 절 끝에서 끊는다. 확인란 절이 없으면 빈 목록이다."""
+    lines = section_lines(body, "확인란")
+    if lines is None:
+        return []
+    items, cur_id, buf = [], None, []
+    for ln in lines:
+        m = AC_ITEM_RE.match(ln)
+        if m:
+            if cur_id:
+                items.append((cur_id, "\n".join(buf)))
+            cur_id, buf = m.group(1), [ln]
+        elif cur_id is not None:
+            if re.match(r"^\s*- \[", ln):      # 다른 체크 항목에서 끊는다
+                items.append((cur_id, "\n".join(buf)))
+                cur_id, buf = None, []
+            else:
+                buf.append(ln)
+    if cur_id:
+        items.append((cur_id, "\n".join(buf)))
+    return items
+
+
 def validate_doc(path, harness_root=None):
     harness_root = Path(harness_root or HARNESS_ROOT)
     pol = load_policy(harness_root)
@@ -101,6 +129,12 @@ def validate_doc(path, harness_root=None):
         warnings.append(f"OPEN_LOOP NEEDS_INPUT {info['needs_input']}곳")
     if info["unchecked_ac"]:
         warnings.append(f"UNCHECKED_AC {info['unchecked_ac']}개")
+    # 확인란의 전칭 표현 — 패턴은 정책표가 소유한다(§11). 경고까지만이고 종료 코드를 바꾸지 않는다(K-31).
+    for ac, sentence in ac_items(body):
+        for pat in pk.get("ac_lint", {}).get("universal_patterns", []):
+            m = re.search(pat, sentence)
+            if m:
+                warnings.append(f"AC_UNIVERSAL {ac} \u00ab{m.group(0)}\u00bb")
     # base_sha 는 더 이상 승인이 기록하지 않는다(체크리스트 38) — 남아 있는 값은 승인 커밋의 부모를 가리키는 낡은 사실이다.
     if fm.get("base_sha") and fm.get("status") not in ("done", "dropped", "superseded"):
         warnings.append(f"STALE_BASE_SHA frontmatter 의 base_sha {str(fm['base_sha'])[:12]} 는 승인 커밋이 아니다 — "

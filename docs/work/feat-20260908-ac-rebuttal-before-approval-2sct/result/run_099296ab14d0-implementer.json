@@ -1,0 +1,71 @@
+{
+ "schema": "romeo/result-envelope@0.1.0",
+ "unit_id": "feat-20260908-ac-rebuttal-before-approval-2sct",
+ "role": "implementer",
+ "task_envelope_ref": {
+  "path": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/task/run_099296ab14d0-implementer.json",
+  "sha256": "1369440d147ca0f2ed6a153c190823559d60f41601ce0deb2d287a9eb9573344"
+ },
+ "checks": [
+  {
+   "id": "check-1",
+   "command": "python3 -m unittest tests.test_ac_rebuttal.TestUniversalLint",
+   "exit_code": 0
+  },
+  {
+   "id": "check-2",
+   "command": "python3 -m unittest tests.test_ac_rebuttal.TestApproveWarnsUnrebutted",
+   "exit_code": 0
+  },
+  {
+   "id": "check-3",
+   "command": "python3 -m unittest tests.test_ac_rebuttal.TestProcedureAndAdapters",
+   "exit_code": 0
+  },
+  {
+   "id": "check-4",
+   "command": "bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq | grep -q 'AC_UNIVERSAL AC-5'",
+   "exit_code": 0
+  },
+  {
+   "id": "check-5",
+   "command": "bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq",
+   "exit_code": 0
+  },
+  {
+   "id": "check-6",
+   "command": "grep -q 'inputs/ac-rebuttal-' core/workflows/plan/SKILL.md && grep -q 'ac-rebuttal' adapters/claude/workflows/plan.md && grep -q 'ac-rebuttal' adapters/codex/workflows/plan.md && grep -q 'ac-rebuttal' .claude/skills/plan/SKILL.md && grep -q 'ac-rebuttal' .agents/skills/plan/SKILL.md",
+   "exit_code": 0
+  },
+  {
+   "id": "check-7",
+   "command": "grep -q 'AC_UNIVERSAL' core/policy/packages.yaml && grep -q 'AC_UNREBUTTED' core/policy/packages.yaml && grep -q 'universal_patterns' core/policy/packages.yaml",
+   "exit_code": 0
+  },
+  {
+   "id": "check-8",
+   "command": "ls docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md && grep -q '^### AC-1' docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md",
+   "exit_code": 0
+  },
+  {
+   "id": "check-9",
+   "command": "bin/romeo compile --check",
+   "exit_code": 0
+  },
+  {
+   "id": "check-10",
+   "command": "python3 -m unittest discover -s tests -q",
+   "exit_code": 0
+  },
+  {
+   "id": "check-11",
+   "command": "python3 -m unittest tests.test_doc_commands tests.test_find_reuse tests.test_context_resume",
+   "exit_code": 0
+  }
+ ],
+ "gate_verdict": "PASS",
+ "blocked_reason": null,
+ "findings": [],
+ "evidence_ref": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/run_099296ab14d0.yaml",
+ "notes": "2회차(재작업). 1회차 검토 판정(docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/review/run_a133a0d90790-reviewer.json)의 산출물 결함 2건만 고쳤다.\n① AC-5 — tests/test_ac_rebuttal.py 의 test_warning_codes_come_from_catalog_each_matching_its_command 가 validate 만 돌려 두 코드를 한 출력에서 봤다. 이제 두 코드가 **둘 다 날 만한** 임시 T0 단위 하나(확인란에 전칭 표현이 있고 반박 파일은 없다)에서 validate 와 approve 를 각각 돌려, validate 출력에는 AC_UNIVERSAL 이 있고 AC_UNREBUTTED 가 없으며 approve 출력에는 그 반대임을 본다. 두 코드 문자열은 정책표 warnings 카탈로그에서 읽는다(카탈로그의 AC_ 코드가 2건이 아니면 실패한다). approve 를 돌릴 단위는 TestApproveWarnsUnrebutted.setUp 이 쓰던 형태를 모듈 수준 make_t0_unit 으로 뽑아 재사용했다. 판별력은 승인 전 프로브와 같은 방식으로 양쪽 실측했다 — (a) cmd_approve 가 rebuttal 경고에 더해 validate 의 AC_UNIVERSAL 도 인쇄하는 합집합 구현에서 FAILED(failures=1), (b) 정책표 warnings 에서 AC_UNIVERSAL 줄을 지운 상태에서 FAILED(failures=1, '1 != 2'). 두 반례 모두 원상복구 뒤 재실행해 OK 를 확인했고, 이 run 의 check-3(cmd-3)·check-10(cmd-10)이 복구된 상태의 판정이다.\n② AC-6 — 1회차 cmd-12 는 validate | grep 파이프라인이라 exit_code 0 이 마지막 grep 의 성공만 증명했다. 이 run 의 cmd-12 는 파이프 없는 단독 명령 'bin/romeo validate docs/work/feat-20260907-judge-revision-base-sha-pwt8' 이고 exit_code 0 이며, 같은 로그 본문(.harness/runs/feat-20260908-ac-rebuttal-before-approval-2sct/run_099296ab14d0/12-cmd-12.log)에 'AC_UNIVERSAL AC-3 «어느 쪽이든»'·'«하나만 내용이 달라도»' 가 인쇄돼 있다. w5jq 쪽은 check-5(cmd-5)가 이미 단독 validate 로 exit 0 을 증명하므로 그대로 뒀다. AC-6 의 나머지 두 조건도 이 run 에서 다시 실측했다 — cmd-10 의 'Ran 944 tests ... OK'(929 승인 시점 + 새 검사 15건), cmd-13 'git diff --stat cd652726c028 -- tests/' 가 tests/test_ac_rebuttal.py 한 파일만 낸다.\n검증 계획(required_checks)과 확인란 문장은 고치지 않았다(§10 동결). 확인란의 AC 체크박스는 1회차 상태 그대로 전부 [x] 다. required_checks 11건은 이 run 으로 다시 돌려 전부 exit 0 이다(cmd-1~cmd-11).\n발견했으나 고치지 않은 것: 없음(산출물 결함 기준). 다만 관측 하나 — check-10 재실행이 이 실행에서 365초 걸렸다(spec 의 추정 약 170초, 프로브 실측 165초). romeo close 의 재실행 상한 600초 안이지만 여유가 줄었다. 이 단위의 변경이 아니라 실행 기계의 부하 차이로 보이며, 산출물 결함이 아니라 close 시 관측 대상이다."
+}

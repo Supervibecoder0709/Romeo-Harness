@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-08T16:43:21+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-08T22:06:04+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260908.md, inputs/probe-20260908.patch]
-evidence: []
+evidence: [evidence/run_a133a0d90790.yaml, evidence/run_099296ab14d0.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -47,36 +47,36 @@ updated: '2026-09-08'
 - **기대 결과:** 승인 요청 직전에 반박 파일 하나가 단위 폴더에 서고, 거기 적힌 반례로 고친 AC 가 「반영」 절에 남는다. 문장을 쓰는 순간 `romeo validate` 가
   전칭 표현을 경고로 보여 주고, `romeo approve` 는 반박이 빠진 AC 를 이름으로 보여 준다. 1회차 통과율이 오르는지는 이 단위가 아니라 그 뒤 10개 단위의 관측이 말한다.
 - **수용 기준:**
-  - [ ] AC-1 `romeo validate` 가 확인란의 AC 항목(`- [ ] AC-n`/`- [x] AC-n` 으로 시작하는 항목의 이어지는 줄까지)에서 정책표 `core/policy/packages.yaml` 의
+  - [x] AC-1 `romeo validate` 가 확인란의 AC 항목(`- [ ] AC-n`/`- [x] AC-n` 으로 시작하는 항목의 이어지는 줄까지)에서 정책표 `core/policy/packages.yaml` 의
         `ac_lint.universal_patterns` 에 적힌 패턴을 찾으면 **맞은 패턴마다 한 줄** `AC_UNIVERSAL AC-n «맞은 패턴»` 을 인쇄하고, 그 실행의 **종료 코드는 0** 이다(경고는 오류가 아니다).
         패턴은 정책표에서 **읽는다** — 검사가 임시 하네스 사본의 정책표에서 패턴 하나를 지우고 같은 문서를 다시 검사해 **그 패턴의 경고만 사라지고 나머지 경고는 남는 것**을 한 실행 안에서 보인다.
         검사에 쓴 닫힌 집합 문장 2개(「A·B·C 세 파일」「AC-1~7」)에는 경고가 없다.
-  - [ ] AC-2 `romeo approve` 가 spec frontmatter `inputs:` 에서 단위 폴더 기준 `inputs/ac-rebuttal-` 로 시작하는 **첫 항목 하나**를 읽어(둘 이상이면 `inputs:` 목록 순서상 처음),
+  - [x] AC-2 `romeo approve` 가 spec frontmatter `inputs:` 에서 단위 폴더 기준 `inputs/ac-rebuttal-` 로 시작하는 **첫 항목 하나**를 읽어(둘 이상이면 `inputs:` 목록 순서상 처음),
         파일이 없으면 경고 `AC_UNREBUTTED` 뒤에 확인란의 AC id 를 **확인란에 나온 순서대로 쉼표로** 인쇄하고, 있으면 그 파일에 `### AC-n` 절이 없는 AC id 만 같은 형식으로 인쇄한다.
         세 경우(파일 없음·일부 누락·전부 있음) 모두 승인은 기록된다(`status: active`·`approved_at`) — 경고까지만이다. 전부 있으면 그 경고는 인쇄되지 않는다.
         **절의 내용이 비었는지는 보지 않는다** — 이 경고는 「반박이 이 AC 를 덮었나」의 근사치이고 내용은 사람이 읽는다(아래 한계 ④).
-  - [ ] AC-3 `core/workflows/plan/SKILL.md` 절차에 「반박 읽기」 단계가 「내용 채우기」 뒤·「승인 요청」 앞에 있고, 그 본문이 기록 경로 규약(`inputs/ac-rebuttal-<YYYYMMDD>.md`)과
+  - [x] AC-3 `core/workflows/plan/SKILL.md` 절차에 「반박 읽기」 단계가 「내용 채우기」 뒤·「승인 요청」 앞에 있고, 그 본문이 기록 경로 규약(`inputs/ac-rebuttal-<YYYYMMDD>.md`)과
         세 항목(반례·검토 시점·표현)과 「판정이 아니라 입력」을 말한다. **검사가 보는 것은 하나다** — 그 단계 본문**에서만** 뽑은 경로 접두가 정책표 `rebuttal_prefix` 및 `romeo approve` 가
         찾는 접두와 **문자 단위로 같은가**(요구하는 자리와 보는 자리가 한 문자열이다, §11). 나머지 세 항목이 그 본문에 있는지는 검토자가 읽는다.
-  - [ ] AC-4 반박 브리프 정본 `adapters/orca/prompts/ac-rebuttal-brief.md` 가 있고 ① 본문이 세 항목(반례·검토 시점·표현)의 형식과 「아무것도 쓰지 않고 검사·빌드를 실행하지 않는다」·
+  - [x] AC-4 반박 브리프 정본 `adapters/orca/prompts/ac-rebuttal-brief.md` 가 있고 ① 본문이 세 항목(반례·검토 시점·표현)의 형식과 「아무것도 쓰지 않고 검사·빌드를 실행하지 않는다」·
         「판정을 내지 않는다」·「문장을 대신 써 주지 않는다」를 말하며 ② 자리표시자는 `<id>` 하나뿐이다(다른 `<…>` 토큰이 없다). ③ 두 런타임 매핑 `adapters/claude/workflows/plan.md`·
         `adapters/codex/workflows/plan.md` 에 반박 실행 한 줄이 있고, 그 줄이 `.harness/bindings.yaml` 의 검토자 `enforcement` 문자열을 **그대로 담고** 출력을 파일로 받는다.
         ④ compile 산출물(`.claude/skills/plan/SKILL.md`·`.agents/skills/plan/SKILL.md`)이 같은 줄을 담고 `bin/romeo compile --check` 가 통과한다.
         ⑤ 「반박 읽기」 **단계 본문에** 도구명·모델명이 없다(C-C6) — 검사가 그 단계 본문만 읽어 본다.
         `core/workflows/plan/SKILL.md` 파일 **전체**를 보지 않는다: 그 파일에는 원래부터 「실행기(…)에 중립이다」라는 문장이 있어 파일 전체를 보면 기존 상태에서도 실패한다
         (승인 전 프로브가 잡았다). 기존 C-C6 검사(`tests/test_roles_envelopes.py` 의 `TestVendorNeutral`)는 `core/roles/*.yaml` 과 결과 계약 스키마만 보므로 이 파일을 덮지 않는다.
-  - [ ] AC-5 두 경고 코드 `AC_UNIVERSAL`·`AC_UNREBUTTED` 가 `core/policy/packages.yaml` `warnings:` 카탈로그에 한 줄 설명과 함께 있고, 검사가 카탈로그에서 코드를 **읽어**
+  - [x] AC-5 두 경고 코드 `AC_UNIVERSAL`·`AC_UNREBUTTED` 가 `core/policy/packages.yaml` `warnings:` 카탈로그에 한 줄 설명과 함께 있고, 검사가 카탈로그에서 코드를 **읽어**
         `AC_UNIVERSAL` 은 `validate` 출력의 코드와, `AC_UNREBUTTED` 는 `approve` 출력의 코드와 **각각** 대조한다(두 출력의 합집합이 아니다 — 한쪽만 맞아도 통과해서는 안 된다).
         설명 문구가 그 코드의 뜻과 맞는지는 검토자가 읽는다.
-  - [ ] AC-6 `python3 -m unittest discover -s tests -q` 가 종료 코드 0 이고, 그 출력의 `Ran <N> tests` 에서 **N ≥ 929 + 새로 더한 검사 수**다
+  - [x] AC-6 `python3 -m unittest discover -s tests -q` 가 종료 코드 0 이고, 그 출력의 `Ran <N> tests` 에서 **N ≥ 929 + 새로 더한 검사 수**다
         (929 는 승인 시점 실측값 — 아래 「승인 전 실측」). 기존 검사가 skip 이나 discovery 변경으로 비워지지 않았다는 것을 그 수가 말한다.
         `git diff --stat <승인 커밋> -- tests/` 에 `tests/test_ac_rebuttal.py` 말고 다른 파일이 없다(검토자가 확인한다 — 승인 커밋은 `romeo/docs.py` 의 `approval_commit` 이 이력에서 찾는 그 자리다. frontmatter 의 `base_sha` 가 아니다). 기존 spec 2건 —
         `feat-20260907-context-one-hop-resume-w5jq`(AC-5)·`feat-20260907-judge-revision-base-sha-pwt8`(AC-3) — 에서 `AC_UNIVERSAL` 이 실제로 인쇄되고 그 `validate` 의 종료 코드는 0 이다.
-  - [ ] AC-7 이 단위 폴더에 `inputs/ac-rebuttal-<YYYYMMDD>.md` 가 있고 spec frontmatter `inputs:` 에 등록돼 있으며, 확인란의 AC 마다 `### AC-n` 절이 있고 각 절에 세 항목이 있다.
+  - [x] AC-7 이 단위 폴더에 `inputs/ac-rebuttal-<YYYYMMDD>.md` 가 있고 spec frontmatter `inputs:` 에 등록돼 있으며, 확인란의 AC 마다 `### AC-n` 절이 있고 각 절에 세 항목이 있다.
         그 파일 끝에 「반영」 절이 있고, 고친 AC 가 있으면 AC 번호와 무엇을 고쳤는지가, 없으면 「반영: 없음」과 그 이유가 있다.
         **승인 전에 만들어졌다는 것은 이력이 말한다** — 그 파일을 추가한 커밋(`git log --diff-filter=A --format=%H -- <그 경로>`)이 **승인 커밋**이거나 그 조상이다(승인 커밋은 이력에서 찾는다 — frontmatter 의 `base_sha` 가 아니다).
         「누가·언제·몇 번 돌렸나」는 검토 시점에 관측할 수 없으므로 요구하지 않는다 — 관측 가능한 것은 파일과 그 파일이 든 커밋뿐이다.
-  - [ ] AC-8 `docs/planning/open-questions.md` 의 Q-87 에서 **「반대 독자 부재」 부분만** 해소 표기되고, 아직 관측되지 않은 「1회차 통과율」은 **새 행으로 열려**
+  - [x] AC-8 `docs/planning/open-questions.md` 의 Q-87 에서 **「반대 독자 부재」 부분만** 해소 표기되고, 아직 관측되지 않은 「1회차 통과율」은 **새 행으로 열려**
         그 행이 「이 단위 뒤 10개 단위의 관측으로 판단한다」를 말한다. 이번 작업이 발견했으나 고치지 않은 것이 있으면 새 행으로 열고, 없으면 결과 보고에 「없음」이라고 적는다
         (발견이 없는 것과 적지 않은 것을 가른다). `docs/planning/progress.md` 「지금 상태」가 이 단위 id 를 담는다 — 활성이든 마지막 완료든, 종료 뒤에도 참인 형태로.
 
@@ -187,6 +187,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-08T22:06:04+09:00 · HEAD cd652726c028 · 검사 기록 run_099296ab14d0
 
-- (없음)
+- [evidence/run_a133a0d90790.yaml](evidence/run_a133a0d90790.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_099296ab14d0.yaml](evidence/run_099296ab14d0.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

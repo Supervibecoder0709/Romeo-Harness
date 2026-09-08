@@ -1,0 +1,22 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260908-ac-rebuttal-before-approval-2sct
+attempts:
+- n: 1
+  run: run_a133a0d90790
+  base_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  started_at: '2026-09-08T16:44:11+09:00'
+  result: fail
+  failure_class: outputs
+  note: 검토자 FAIL findings 2 — AC-5 를 검사가 절반만 본다(approve 출력을 대조하지 않아 합집합 반례가 통과) · AC-6 의 pwt8 validate
+    종료 코드를 증거가 지목 못 한다(pipefail 없는 validate|grep 이라 exit 0 이 grep 성공만 증명)
+  settled_at: '2026-09-08T18:19:45+09:00'
+- n: 2
+  run: run_099296ab14d0
+  base_sha: cd652726c0286847de6fd902d08de3cffd12833e
+  started_at: '2026-09-08T18:20:04+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS findings 0 — 1회차 findings 2건(AC-5 검사가 approve 출력을 대조하지 않음 · AC-6 증거가 pipefail 없는 파이프라인)
+    둘 다 닫혔다
+  settled_at: '2026-09-08T18:39:05+09:00'
+reviews: []

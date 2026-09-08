@@ -95,6 +95,37 @@ def _is_approved(fm):
     return fm.get("status") == "active" and bool(fm.get("approved_at"))
 
 
+def rebuttal_warnings(udir, fm, body, policy):
+    """승인 전 반박 기록이 확인란의 AC 를 덮는지. 경고 문자열 목록 — 비었으면 덮었다는 뜻이다.
+
+    반박은 판정이 아니라 입력이므로 이 함수는 승인을 막지 않는다(K-31). 절의 **존재**만 본다 —
+    내용이 값어치 있는지는 사람이 읽는다."""
+    from .validate import ac_items
+    cfg = policy["packages"].get("ac_lint", {})
+    prefix = cfg.get("rebuttal_prefix", "inputs/ac-rebuttal-")
+    heading = cfg.get("rebuttal_heading", "### AC-")
+    ids = [ac for ac, _ in ac_items(body)]
+    if not ids:
+        return []
+    # 접두에 맞는 **첫 항목 하나**만 읽는다 — 둘 이상이면 `inputs:` 목록 순서상 처음이다.
+    # 뒤 항목으로 넘어가지 않는다: 첫 항목이 없는데 뒤가 있어 통과하면, 「어느 파일이 반박인가」가 목록이 아니라
+    # 파일 존재 여부로 정해져 지시대로 등록한 사람과 다른 답이 나온다.
+    first = next((str(i) for i in (fm.get("inputs") or []) if str(i).startswith(prefix)), None)
+    path = Path(udir) / first if first else None
+    if path is None or not path.exists():
+        return ["AC_UNREBUTTED " + ", ".join(ids)]
+    text = path.read_text(encoding="utf-8")
+    import re as _re
+    covered = set()
+    for ln in text.split("\n"):
+        if ln.startswith(heading):
+            m = _re.match(r"AC-\d+", ln[len(heading) - len("AC-"):])
+            if m:
+                covered.add(m.group(0))
+    missing = [i for i in ids if i not in covered]
+    return ["AC_UNREBUTTED " + ", ".join(missing)] if missing else []
+
+
 def approve_unit(unit_id, by, project_root=".", reapprove=False, reason=None):
     """사람의 승인 사건을 기록한다: approved_at·approved_by, status active. 확인란이 비어 있으면 거부.
 

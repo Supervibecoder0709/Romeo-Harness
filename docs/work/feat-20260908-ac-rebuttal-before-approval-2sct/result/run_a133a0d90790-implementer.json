@@ -1,0 +1,71 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260908-ac-rebuttal-before-approval-2sct",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/task/run_a133a0d90790-implementer.json",
+    "sha256": "1369440d147ca0f2ed6a153c190823559d60f41601ce0deb2d287a9eb9573344"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_ac_rebuttal.TestUniversalLint",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_ac_rebuttal.TestApproveWarnsUnrebutted",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_ac_rebuttal.TestProcedureAndAdapters",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq | grep -q 'AC_UNIVERSAL AC-5'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate docs/work/feat-20260907-context-one-hop-resume-w5jq",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "grep -q 'inputs/ac-rebuttal-' core/workflows/plan/SKILL.md && grep -q 'ac-rebuttal' adapters/claude/workflows/plan.md && grep -q 'ac-rebuttal' adapters/codex/workflows/plan.md && grep -q 'ac-rebuttal' .claude/skills/plan/SKILL.md && grep -q 'ac-rebuttal' .agents/skills/plan/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "grep -q 'AC_UNIVERSAL' core/policy/packages.yaml && grep -q 'AC_UNREBUTTED' core/policy/packages.yaml && grep -q 'universal_patterns' core/policy/packages.yaml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "ls docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md && grep -q '^### AC-1' docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/inputs/ac-rebuttal-*.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest tests.test_doc_commands tests.test_find_reuse tests.test_context_resume",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/run_a133a0d90790.yaml",
+  "notes": "required_checks 11건 전부 exit 0 (run_a133a0d90790 의 check-1~check-11). 출발점은 승인 커밋에 등록된 승인 전 프로브 패치 inputs/probe-20260908.patch(11개 파일)를 git apply 로 적용한 것이고, 거기서 두 곳을 고쳤다. (1) core/policy/packages.yaml 의 전칭 패턴 하나를 승인된 spec 의 구현 단위 1 이 적은 초기값 그대로 「어느 .{1,12}(이)?든」 으로 맞췄다(패치는 「어느 .{1,12}든」 이었다) — 실물 실측에서 두 표기 모두 pwt8 AC-3 의 «어느 쪽이든» 을 잡지만, 정본은 승인된 spec 이다. (2) romeo/docs.py 의 rebuttal_warnings 가 inputs: 목록에서 접두에 맞는 **첫 항목**이 아니라 **첫 존재 항목**을 골랐다 — AC-2 는 「첫 항목 하나를 읽어(둘 이상이면 inputs: 목록 순서상 처음), 파일이 없으면 …」 을 요구하므로, 첫 항목이 없고 뒤 항목이 있는 경우 AC-2 와 반대 판정이 났다. 첫 항목만 보도록 고치고 그 반례를 tests/test_ac_rebuttal.TestApproveWarnsUnrebutted.test_only_the_first_matching_input_is_read 로 고정했다(검사 14 → 15건). AC-6 의 두 실측은 required_checks 밖이라 같은 run 의 cmd-12·cmd-13 으로 기록했다 — cmd-12 는 pwt8 AC-3 의 AC_UNIVERSAL 인쇄(exit 0), cmd-13 은 `git diff --stat cd652726c0286847de6fd902d08de3cffd12833e -- tests/` 로 tests/test_ac_rebuttal.py 한 파일뿐임을 보인다. check-10 의 로그(.harness/runs/.../10-check-10.log:6)가 `Ran 944 tests` 이고 944 = 929(승인 시점) + 15(새 검사) 이므로 AC-6 의 하한을 충족한다. 관측된 위험 하나: check-10 재실행이 이 기계에서 374초 걸렸다(승인 전 프로브 실측은 165초 — 같은 명령이 부하에 따라 두 배 이상 벌어진다). romeo close 의 재실행 상한은 600초이고 RERUN_NEAR_TIMEOUT_RATIO 0.8 이므로 480초를 넘으면 RERUN_NEAR_TIMEOUT 경고가 뜨고 600초를 넘으면 그 검사가 미검증이 되어 완료가 서지 않는다. 지금은 62% 로 임계 아래이지만, close 를 도는 시점의 기계 부하에 따라 달라질 수 있다는 것을 기록해 둔다 — 검증 계획은 실행 중에 바꾸지 않는다. §12 로 고치지 않고 연 것: 없음(발견 자체가 없었다 — 위 (1)(2)는 이 단위의 요청 범위 안, 즉 AC-1·AC-2 가 요구하는 동작이다). docs/planning/open-questions.md 에는 AC-8 이 요구한 Q-89(1회차 통과율 관측 10건)만 새로 열었다."
+}

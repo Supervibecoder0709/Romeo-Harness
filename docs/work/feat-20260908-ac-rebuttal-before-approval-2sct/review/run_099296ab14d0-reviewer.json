@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260908-ac-rebuttal-before-approval-2sct",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/task/run_099296ab14d0-reviewer.json",
+    "sha256": "6b30cc51327fc7807d5f634350f62400be708ebefaf339a95eda2ae3d595d116"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260908-ac-rebuttal-before-approval-2sct/evidence/run_099296ab14d0.yaml",
+  "notes": "두 작업 계약의 base_sha가 일치한다. 수용 기준 AC-1~8의 충족 근거를 구현·원시 로그·승인 커밋에서 확인했다. required_checks 11건은 재실행 가능하며 모두 같은 head_sha와 dirty_tree_hash에서 exit 0으로 기록됐다. 검증 계획의 사후 변경, 계약 밖 쓰기, 가드 위반, 실패 검사의 통과 주장은 확인되지 않았다."
+}

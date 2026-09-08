@@ -189,10 +189,22 @@ def cmd_fixtures(args):
     return 0 if rep["total"] and rep["matched"] == rep["total"] and rep["gate_misses"] == 0 else 1
 
 
+def _print_rebuttal_warnings(fm, args):
+    """승인 전 반박이 확인란의 AC 를 덮었는지 인쇄한다. 경고까지만 — 종료 코드를 바꾸지 않는다(K-31)."""
+    from . import frontmatter
+    from .docs import find_unit_dir, rebuttal_warnings
+    from .policy import load_policy
+    udir = find_unit_dir(_root(args), fm["id"])
+    _fm, body = frontmatter.read(udir / "spec.md")
+    for w in rebuttal_warnings(udir, _fm, body, load_policy()):
+        print(f"WARN {w}")
+
+
 def cmd_approve(args):
     from .docs import approve_unit
     fm = approve_unit(args.unit, args.by, project_root=_root(args), reapprove=args.reapprove, reason=args.reason)
     what = "reapproved" if args.reapprove else "approved"
+    _print_rebuttal_warnings(fm, args)
     print(f"{what} {fm['id']} at {fm['approved_at']} by {fm['approved_by']}"
           + (f" (이전 승인 {len(fm['approval_history'])}건은 approval_history 에 남았다)" if args.reapprove else ""))
     print("  다음: 승인된 spec.md 를 커밋한다. 위임된 실행 공간은 커밋된 것만 본다(D-a). "
