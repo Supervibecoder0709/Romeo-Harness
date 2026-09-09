@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promote-integrity-kchq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_98070e608181-implementer.json",
+    "sha256": "b729840c9c989463cf7940f34388f86e130b588ec22f8753a1169f6a8b57320e"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_integrity -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q 'romeo integrity' .github/workflows/harness.yml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_98070e608181.yaml",
+  "notes": "2회차다. 1회차(run_4bcfc5770ac3)는 검사 6건이 전부 exit 0 이었으나 검토자가 FAIL 을 냈다 — finding 2건을 고쳤고 검증 계획·확인란 문장은 고치지 않았다(승인 그대로). [finding 1 — romeo/integrity.py:223, AC-2·AC-8 미달] compare() 의 건너뜀 조건이 `not code or not doc_path.is_file()` 이라 한쪽만 없어도 대조를 건너뛰었다. `not code and not doc` 으로 좁혔다 — 건너뛰는 것은 양쪽이 다 없을 때뿐이다. 그 결과 문서가 통째로 없는 루트에서 코드에만 남은 판정이 인쇄되고 exit 1 이며, romeo/close.py 의 promotion_candidate 도 「승격 후보」 줄을 낸다(close.py 는 이번에 고치지 않았다 — compare() 가 None 을 돌려주지 않게 된 것으로 충분하다). [finding 2 — romeo/integrity.py:205, AC-2 미달] document() 가 id 만 키로 삼아 같은 id 의 다른 수준을 덮어썼다. 문서 쪽을 `{(id, 수준): 출처}` 로 바꿔 행을 쌍으로 보존하고, **코드 쪽도 같게** 바꿨다 (_check_call_pairs·_envelope_tuple_pairs·_validate_pairs·_block_pairs·derive). 한쪽만 쌍으로 두면 「쌍의 집합을 대조한다」가 여전히 절반이기 때문이다. compare() 는 이제 쌍 집합의 대칭차를 인쇄한다 — 수준만 다른 id 는 「코드에만 있다」·「문서에만 있다」 두 줄로 나온다. check_call_ids(source) 는 AC-7 이 쓰는 id 집합 계약을 그대로 두되 _check_call_pairs 위의 축약으로 두고, 한 id 가 여러 수준이면 더 강한 쪽(error)을 남긴다 — 모듈이 이미 선언한 규칙과 같게 맞췄다. 이 저장소의 현재 상태에서 코드 쪽에 같은 id 의 서로 다른 수준은 0건이라 대조 결과(49건·위반 0)는 그대로다. [검사] 두 결함을 재현하는 판별 검사 3건을 tests/test_integrity.py 에 더했다 — ④ test_document_disappears(목록 통째 삭제) · ⑤ test_document_repeats_an_id_at_another_level(같은 id 를 반대 수준으로 한 행 더, 진짜 행 앞에) · PromotionCandidate.test_line_when_the_document_is_missing(finding 1 이 지목한 AC-8 쪽). AC-3 의 세 위조는 그대로 두었다. 양쪽 실측(§11): cmd-14 가 1회차 모듈에서 이 3건이 **실패**함을 보이고(`!` 로 반전해 exit 0), cmd-13 이 지금 코드에서 **통과**함을 보인다(exit 0). 1회차 모듈은 커밋되지 않았어서 `git show <승인 커밋>:romeo/integrity.py` 로 꺼낼 수 없다 — 이번 수정의 역연산으로 복원해 docs/work/feat-20260909-promote-integrity-kchq/inputs/integrity-before-fix.py.txt 에 두고 그것으로 실측했다. 복원본이 1회차 모듈과 같다는 이력 앵커는 없다 — 재현한 증상이 검토자 finding 의 문장(「대조를 건너뛴다」·「일치로 처리한다」)과 같다는 것이 근거다. 이 한계는 Q-92 로 열어 두었다. [검증 계획] 6건 전부 exit 0 이다(run_98070e608181 의 check-1~check-6, 2회 기록 — 마지막 기록이 결과다). 이 run 은 검사 뒤에 위 양쪽 실측 2건(cmd-13·cmd-14)을 더 담는다. [범위 밖 발견 2건, 고치지 않았다(§12)] Q-92 — 새 파일을 만드는 단위는 §11 의 「고치기 전 상태」를 이력에서 재구성할 수 없다(회차 판정 커밋이 미추적 산출물을 담지 않는다). Q-93 — finding 1 을 고친 결과, `core/` 만 부착되고 승격 문서가 없는 루트에서 정책표 차단 5건이 「코드에만 있다」로 인쇄되고 `bin/romeo integrity` 가 exit 1 을 낸다(임시 루트 실측). 그 저장소가 실제로 5건을 집행하고 목록이 없는 것은 사실이지만, 승격 규약에 가입하지 않은 저장소를 어긋났다고 볼 것인지는 승인된 기획이 정하지 않았다. AC-2 의 문장(「두 집합이 다르면 종료 코드가 1」)을 그대로 집행했고, 예외를 두는 것은 새 요구라 판단해 열어 두었다(§11) — 되돌리기는 compare() 의 조건 한 줄이다. [수용 기준] AC-1~AC-9 는 1회차에 채워졌고 이번 변경으로 무효가 된 항목이 없어 그대로 둔다 — AC-2 는 이번에 쌍 대조로 실제 집행이 되었고(check-1·check-2, 검사 ⑤), AC-8 은 문서가 없는 상태까지 덮게 되었다(check-1 의 test_line_when_the_document_is_missing)."
+}

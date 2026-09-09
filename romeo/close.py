@@ -997,6 +997,23 @@ def _findings_gist(env):
     return f"(findings {len(findings)}건 — 첫째: {first})"
 
 
+def promotion_candidate(project_root):
+    """승격 문서(`docs/current/`)가 코드·정책표와 어긋나면 인쇄할 한 줄. 없으면 None.
+
+    **판정하지 않는다** — `check()` 를 부르지 않으므로 종료 코드도 done 판정도 바꾸지 않는다.
+    끝난 사실을 올리는 것은 사람이 하는 일이고, 종료 검사가 그것을 막으면 이 단위와 무관한 이유로
+    다른 단위가 닫히지 못한다. 막는 자리는 `bin/romeo integrity` 와 CI 다 — 여기는 **보이는** 자리다."""
+    try:
+        from .integrity import DOC_PATH, compare
+        compared, drift = compare(project_root)
+    except Exception:
+        return None
+    if compared is None or not drift:
+        return None
+    return (f"승격 후보 — {DOC_PATH} 가 코드·정책표와 {len(drift)}건 어긋난다. "
+            f"`bin/romeo integrity` 가 어느 쪽에만 있는지 인쇄한다")
+
+
 def _finish(checks, fm, body, spec, runs, dry_run, project_root, ev):
     """PASS 는 '어긴 것이 없다' 가 아니라 '전부 대조했고 어긴 것이 없다' 다.
     성립하지 않은 검사(UNVERIFIED)가 하나라도 있으면 done 을 선언하지 않는다 — 미검증은 완료가 아니다(K-51).
@@ -1006,6 +1023,7 @@ def _finish(checks, fm, body, spec, runs, dry_run, project_root, ev):
     unverified = [c for c in checks if c["level"] == UNVERIFIED]
     verdict = "PASS" if not failed and not unverified else "FAIL"
     result = {"unit_id": fm.get("id"), "verdict": verdict, "checks": checks, "dry_run": dry_run, "updated": []}
+    result["promotion"] = promotion_candidate(project_root)
     if verdict == "PASS" and not dry_run and ev is not None:
         ev_links = [rel(r["_path"], spec.parent) for r in runs]
         fm["status"] = "done"
@@ -1052,4 +1070,6 @@ def format_close(result):
                      "위 UNVERIFIED 줄을 해소한 뒤 다시 실행한다.")
     for u in result["updated"]:
         lines.append(f"  updated: {u}")
+    if result.get("promotion"):
+        lines.append(result["promotion"])
     return "\n".join(lines)

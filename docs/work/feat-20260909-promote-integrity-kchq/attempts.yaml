@@ -19,6 +19,15 @@ attempts:
   note: '검토자 FAIL — AC-4 미달: LINK_RE 가 [텍스트](경로 "제목") 과 경로 뒤 공백 표기를 놓친다. 2차 반박이 낸 「제목이 붙었을 때」 지적을 내가 #
     만 반영하고 제목은 빠뜨린 결과다. 신선도 경고 1건은 검토자가 FAIL 사유로 세지 않았다'
   settled_at: '2026-09-09T01:40:35+09:00'
+- n: 3
+  run: run_748ddeba9896
+  base_sha: 178e03970e3228cff67a9d019c391b292071456d
+  started_at: '2026-09-09T09:12:03+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS — finding 1건은 이미 Q-90 으로 열린 범위 밖 경고라 FAIL 사유가 아니다. required_checks 6건 exit 0 · 판별 검사
+    4건 양쪽 실측 · 신선도 8건 일치
+  settled_at: '2026-09-09T09:32:34+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다 — 세 finding 이 전부 산출물을 가리켰고 목표나 하네스를 가리키지 않았다. 다만 AC-4 가 「인라인 링크」의 포함 집합을

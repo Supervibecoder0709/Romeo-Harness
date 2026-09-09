@@ -1,0 +1,289 @@
+"""무결성 검사 — 승격 문서가 코드를 따라잡고 있는가 · `docs/current/` 의 링크 · 작업 단위 id 중복.
+
+승격 문서(`docs/current/enforcement.md`)는 **끝난 사실**이 모이는 자리다. 그 자리의 위험은 하나다 —
+코드가 앞질러 가거나 문서가 코드에 없는 것을 적어도 아무도 모른다는 것. 그래서 이 모듈은 문서를 읽어서
+**코드·정책표에서 다시 뽑은 것**과 대조한다. 문서를 코드에서 생성하지 않는 이유는 그 반대다:
+생성하면 문서는 코드의 사본이 되어 어긋날 수 없고, 어긋날 수 없는 것은 아무것도 알리지 않는다.
+
+**뽑는 규칙은 하나다.** 호출이나 `append` 의 문자열 인자가 **고정 텍스트로 시작**하면 그 선두의
+첫 공백 앞까지를 id 로 본다(f-string 의 고정 선두를 포함한다). 문자열이 변수나 연결 표현이면 넣지 않는다 —
+`check("REVIEW_" + cid, …)` 처럼 리터럴 연결로 만들어지는 판정은 **파생 판정**이고 대조 대상이 아니다.
+그 규칙은 승격 문서의 「파생 판정」 절이 한 줄로 적는다.
+
+수준이 조건에 따라 갈리는 호출(`level="error" if … else "warning"`)은 **더 강한 쪽**(error)으로 본다 —
+경고로 적어 두면 실제로 막는 날 문서가 거짓이 된다.
+"""
+import ast
+import re
+from pathlib import Path
+
+from . import frontmatter
+from .util import load_yaml
+
+#: 승격 문서의 자리. 이 자리는 규약이다 — 검사가 읽는 문서와 요구가 사는 문서가 같아야 한다(§11).
+DOC_PATH = "docs/current/enforcement.md"
+#: 판정 id 를 뽑는 코드·정책표. 여기 없는 자리의 판정은 대조하지 않는다(승격 문서의 「범위」 절이 밝힌다).
+CLOSE_SRC = "romeo/close.py"
+VALIDATE_SRC = "romeo/validate.py"
+POLICY_SRC = "core/policy/packages.yaml"
+
+#: 인라인 링크. 대괄호로 텍스트, 이어지는 괄호로 경로. 참조형 링크는 대상이 아니다.
+LINK_RE = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+#: 표의 한 셀에서 백틱으로 감싼 첫 토큰.
+BACKTICK_RE = re.compile(r"`([^`]+)`")
+
+LEVELS = ("error", "warning")
+
+
+def _lead(node):
+    """문자열 노드의 **고정 선두**. 순수 리터럴과 f-string 의 고정 선두만 돌려준다.
+
+    변수·연결 표현으로 시작하면 None 이다 — 그런 자리에서 만들어지는 id 는 파생 판정이고,
+    한 자리의 문자열만 봐서는 실제 id 를 알 수 없다."""
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.JoinedStr) and node.values:
+        first = node.values[0]
+        if isinstance(first, ast.Constant) and isinstance(first.value, str):
+            return first.value
+    return None
+
+
+def _id_of(text):
+    """고정 선두에서 id 를 자른다 — 첫 공백 앞까지."""
+    head = text.split()
+    return head[0] if head else None
+
+
+def _level_of(call):
+    """`check(...)` 호출의 수준. `level=` 이 없으면 기본값 error 다.
+
+    조건식이면 그 안의 문자열 상수를 전부 보고 error 가 하나라도 있으면 error 로 본다 —
+    막을 수 있는 판정을 경고로 적어 두지 않는다."""
+    for kw in call.keywords:
+        if kw.arg != "level":
+            continue
+        consts = [n.value for n in ast.walk(kw.value)
+                  if isinstance(n, ast.Constant) and n.value in LEVELS]
+        if "error" in consts:
+            return "error"
+        return consts[0] if consts else "error"
+    return "error"
+
+
+def check_call_ids(source):
+    """`check("<id>"` 리터럴 호출로 등록되는 판정. `{id: (수준, 출처)}`.
+
+    소스 **문자열**을 받는다 — 두 리비전의 같은 파일을 대조하는 자리가 파일 경로를 가질 수 없기 때문이다
+    (`git show <sha>:romeo/close.py`)."""
+    out = {}
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) \
+                and node.func.id == "check" and node.args:
+            text = _lead(node.args[0])
+            cid = _id_of(text) if text is not None else None
+            if cid:
+                out[cid] = (_level_of(node), CLOSE_SRC)
+    return out
+
+
+def _envelope_tuple_ids(source):
+    """`ENVELOPE_CHECKS` 튜플에 실린 결과 계약 검사 id. 차단이므로 전부 error 다."""
+    out = {}
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Assign) and any(
+                isinstance(t, ast.Name) and t.id == "ENVELOPE_CHECKS" for t in node.targets):
+            for elt in getattr(node.value, "elts", []):
+                cid = _id_of(elt.value) if isinstance(elt, ast.Constant) and isinstance(elt.value, str) else None
+                if cid:
+                    out[cid] = ("error", CLOSE_SRC)
+    return out
+
+
+def _close_ids(path):
+    """`romeo/close.py` 의 `check("<id>"` 리터럴 호출과 `ENVELOPE_CHECKS` 튜플."""
+    source = Path(path).read_text(encoding="utf-8")
+    out = check_call_ids(source)
+    for cid, value in _envelope_tuple_ids(source).items():
+        out.setdefault(cid, value)
+    return out
+
+
+def _appends_to(node, names):
+    """이 노드가 `names` 의 리스트에 넣는 문자열 노드들. `.append(...)` 과 `+= [...]` 둘 다 본다.
+
+    이른 반환의 딕셔너리 리터럴(`{"errors": [...]}`)은 대상이 아니다 — 그 자리는 `errors` 변수에
+    넣는 것이 아니라 새 리스트를 만드는 것이고, 담긴 것도 id 접두가 아니라 문장이다."""
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) \
+            and node.func.attr == "append" and isinstance(node.func.value, ast.Name) \
+            and node.func.value.id in names and node.args:
+        return node.func.value.id, [node.args[0]]
+    if isinstance(node, ast.AugAssign) and isinstance(node.target, ast.Name) \
+            and node.target.id in names and isinstance(node.op, ast.Add):
+        val = node.value
+        if isinstance(val, ast.ListComp):
+            return node.target.id, [val.elt]
+        if isinstance(val, (ast.List, ast.Tuple)):
+            return node.target.id, list(val.elts)
+    return None, []
+
+
+def _validate_ids(path):
+    """`romeo/validate.py` 가 `errors`/`warnings` 에 넣는 리터럴 접두. 넣는 리스트가 수준을 정한다."""
+    out = {}
+    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        name, nodes = _appends_to(node, ("errors", "warnings"))
+        if not name:
+            continue
+        level = "error" if name == "errors" else "warning"
+        for n in nodes:
+            text = _lead(n)
+            cid = _id_of(text) if text is not None else None
+            if cid:
+                out[cid] = (level, VALIDATE_SRC)
+    return out
+
+
+def _block_ids(path):
+    """`core/policy/packages.yaml` 의 `blocks:` 키. 차단이므로 전부 error 다."""
+    data = load_yaml(path) or {}
+    return {str(k): ("error", POLICY_SRC) for k in (data.get("blocks") or {})}
+
+
+def derive(project_root="."):
+    """코드·정책표에서 다시 뽑은 판정. `{id: (수준, 출처)}`.
+
+    출처 파일이 없는 루트(하네스를 부착한 프로젝트)에서는 그 자리만 비운다."""
+    root = Path(project_root)
+    out = {}
+    if (root / CLOSE_SRC).is_file():
+        out.update(_close_ids(root / CLOSE_SRC))
+    if (root / VALIDATE_SRC).is_file():
+        out.update(_validate_ids(root / VALIDATE_SRC))
+    if (root / POLICY_SRC).is_file():
+        out.update(_block_ids(root / POLICY_SRC))
+    return out
+
+
+def derive_ids(project_root="."):
+    """코드·정책표에서 뽑은 `{id: 출처}`."""
+    return {cid: src for cid, (_lv, src) in derive(project_root).items()}
+
+
+def _rows(text):
+    """문서의 표 중 **`수준` 열을 가진 표**의 데이터 행. `[(첫 열, {열이름: 값})]`.
+
+    수준 열이 없는 표(안내표·범위표)는 판정 목록이 아니므로 지나간다."""
+    rows, header = [], None
+    for line in text.split("\n"):
+        s = line.strip()
+        if not (s.startswith("|") and s.endswith("|")):
+            header = None
+            continue
+        cells = [c.strip() for c in s[1:-1].split("|")]
+        if header is None:
+            header = cells if "수준" in cells else []
+            continue
+        if not header or set("".join(cells)) <= set("- :"):     # 구분선
+            continue
+        rows.append((cells[0], dict(zip(header, cells))))
+    return rows
+
+
+def document(path):
+    """승격 문서에서 읽은 판정. `{id: (수준, 출처)}`. 문서가 없으면 빈 사전이다."""
+    path = Path(path)
+    if not path.is_file():
+        return {}
+    out = {}
+    for first, row in _rows(path.read_text(encoding="utf-8")):
+        m = BACKTICK_RE.search(first)
+        if not m:
+            continue
+        src = BACKTICK_RE.search(row.get("출처", "") or "")
+        out[m.group(1)] = (row.get("수준", ""), src.group(1) if src else "")
+    return out
+
+
+def document_ids(path):
+    """승격 문서에서 읽은 `{id: 출처}`."""
+    return {cid: src for cid, (_lv, src) in document(path).items()}
+
+
+def compare(project_root="."):
+    """(가) 문서와 (나) 코드·정책표의 `(id, 수준)` 쌍을 대조한다. `(대조한 개수, 어긋난 줄들)`.
+
+    코드도 문서도 없으면 대조가 성립하지 않는다 — 그 사실을 말하고 위반으로 세지 않는다.
+    없는 것을 어긋남으로 인쇄하면 하네스를 부착한 프로젝트에서 늘 빨간불이 되고,
+    늘 뜨는 경고는 아무것도 알리지 않는다."""
+    root = Path(project_root)
+    doc_path = root / DOC_PATH
+    code = derive(root)
+    if not code or not doc_path.is_file():
+        return None, []
+    doc = document(doc_path)
+    lines = []
+    for cid in sorted(set(code) | set(doc)):
+        want, got = code.get(cid), doc.get(cid)
+        if want is None:
+            lines.append(f"PROMOTION_DRIFT 문서에만 있다: `{cid}` ({got[0]}) — {DOC_PATH}")
+        elif got is None:
+            lines.append(f"PROMOTION_DRIFT 코드에만 있다: `{cid}` ({want[0]}) — {want[1]}")
+        elif want[0] != got[0]:
+            lines.append(f"PROMOTION_DRIFT 수준이 다르다: `{cid}` — 코드 {want[0]} vs 문서 {got[0]}")
+    return len(code), lines
+
+
+def broken_links(project_root="."):
+    """`docs/current/` 아래 `.md` 의 상대 인라인 링크 중 대상 파일이 없는 것."""
+    base = Path(project_root) / "docs" / "current"
+    out = []
+    for md in sorted(base.rglob("*.md")) if base.is_dir() else []:
+        for target in LINK_RE.findall(md.read_text(encoding="utf-8")):
+            if target.startswith(("http://", "https://", "mailto:", "#")):
+                continue
+            t = target.split("#")[0]
+            if t and not (md.parent / t).exists():
+                out.append(f"BROKEN_LINK {md.relative_to(project_root)} → {target}")
+    return out
+
+
+def duplicate_unit_ids(project_root="."):
+    """`docs/work/` **바로 아래** 폴더의 `spec.md` frontmatter `id` 중복. `spec.md` 가 없는 폴더는 건너뛴다."""
+    base = Path(project_root) / "docs" / "work"
+    seen = {}
+    for d in sorted(p for p in base.iterdir() if p.is_dir()) if base.is_dir() else []:
+        spec = d / "spec.md"
+        if not spec.is_file():
+            continue
+        try:
+            fm, _body = frontmatter.read(spec)
+        except Exception:
+            continue
+        uid = (fm or {}).get("id")
+        if uid:
+            seen.setdefault(str(uid), []).append(d.name)
+    return [f"DUPLICATE_UNIT_ID {uid} — docs/work/{{{', '.join(dirs)}}}"
+            for uid, dirs in sorted(seen.items()) if len(dirs) > 1]
+
+
+def run(project_root="."):
+    """세 검사를 한 번에. `(종료 코드, 인쇄할 줄들)`."""
+    root = Path(project_root).resolve()
+    compared, drift = compare(root)
+    lines = [f"romeo integrity {root}"]
+    if compared is None:
+        lines.append(f"  대조 건너뜀 — {DOC_PATH} 또는 판정을 뽑을 코드가 이 루트에 없다")
+    else:
+        lines.append(f"  대조 {compared}건 — {DOC_PATH} ↔ 코드·정책표")
+    violations = drift + broken_links(root) + duplicate_unit_ids(root)
+    lines += [f"  {v}" for v in violations]
+    lines.append(f"  위반 {len(violations)}건")
+    return (1 if violations else 0), lines
+
+
+def main(project_root="."):
+    code, lines = run(project_root)
+    print("\n".join(lines))
+    return code

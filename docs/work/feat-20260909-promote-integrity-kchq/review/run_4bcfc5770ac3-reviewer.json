@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promote-integrity-kchq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_4bcfc5770ac3-reviewer.json",
+    "sha256": "de095de382e80ff7b6021778110dee3a35144c775697694e001fdc5bdfe29a16"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-2·AC-8 미달: 코드나 문서 중 한쪽만 없어도 compare()가 불일치 없이 반환한다. 현재 저장소에서 enforcement.md만 없어진 경우, 코드에는 판정 49건이 남지만 대조를 건너뛴다. 다른 위반이 없으면 run()은 종료 코드 0을 반환하고, romeo/close.py:1011도 승격 후보를 생략한다. 한쪽 집합이 빈 경우에도 두 집합의 차이를 보고해야 하는 요구와 다르다.",
+      "file": "romeo/integrity.py",
+      "line": 223
+    },
+    {
+      "summary": "AC-2 미달: 문서의 행을 (id, 수준) 쌍으로 보존하지 않고 id만 키로 삼아 덮어쓴다. 현재 AC_ALL_CHECKED/error 행 앞에 같은 id의 warning 행을 추가하면, 문서에만 존재하는 (AC_ALL_CHECKED, warning) 쌍이 읽는 단계에서 사라진다. 따라서 실제 두 집합이 다른데도 compare()는 일치로 처리한다. 기록된 세 위조 검사는 같은 id의 서로 다른 수준을 다루지 않아 이 누락을 검출하지 못한다.",
+      "file": "romeo/integrity.py",
+      "line": 205
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_4bcfc5770ac3.yaml",
+  "notes": "파일 변경·검사 재실행·해시 계산 없이 검토했다. 두 작업 계약의 base_sha와 현재 HEAD는 제공된 기준 커밋과 같다. 승인 이후 spec 변경은 수용 기준 체크 표시뿐이며 required_checks는 유지됐다. 확인한 변경 경로는 구현자의 allowed_paths 안이다. 필수 검사 6건과 AC-9 보강 검사 2건의 종료 코드 0 및 동일한 head_sha·dirty_tree_hash 기록을 원시 로그와 대조했다. 현재 작업 트리 해시는 재계산하지 않았다. 두 finding은 현재 코드의 분기와 자료 저장 방식을 읽어 도출한 반례이며 재실행 결과가 아니다."
+}

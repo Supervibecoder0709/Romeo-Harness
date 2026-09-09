@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promote-integrity-kchq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_748ddeba9896-reviewer.json",
+    "sha256": "b0eda086470a528fc2b0dfa287aa392e77fa41e6d53199bfd6c6c70429d14721"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "범위 밖 경고(Q-90): push·pull_request의 paths 필터에 docs/current/**가 없어 승격 문서만 변경하면 이 워크플로가 자동 실행되지 않는다. docs/planning/open-questions.md에 이미 기록돼 있다. AC-9가 요구한 실행 단계와 실패 무시 금지 조건은 충족하므로 FAIL 사유로 사용하지 않았다.",
+      "file": ".github/workflows/harness.yml",
+      "line": 8
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_748ddeba9896.yaml",
+  "notes": "AC-1·2는 docs/current/enforcement.md의 49행·파생 판정 설명, romeo/integrity.py의 추출·집합 대조 코드와 check-2 로그로 확인했다. AC-3·4·5·7·8은 tests/test_integrity.py의 대응 검사와 check-1 원시 로그로 확인했다. AC-6은 check-2의 실행 루트·49건·위반 0건 출력, AC-9는 현재 워크플로의 job·실행 단계와 check-3 기록으로 확인했다. 필수 검사 6건은 모두 exit 0이며 기능 검사 14건·전체 검사 958건의 통과 로그가 있다. 두 계약의 base_sha와 현재 HEAD가 일치하고, 승인 이후 spec 변경은 체크 표시뿐이며 required_checks는 유지됐다. 확인한 변경은 allowed_paths 안이고 가드 대상 행동은 발견하지 않았다. 필수 검사별 head_sha·dirty_tree_hash 기록은 원시 로그 및 run의 최종 기록과 일치한다. 현재 트리·로그 해시 재계산, 검사 재실행, 파일 변경, 승인은 하지 않았다."
+}

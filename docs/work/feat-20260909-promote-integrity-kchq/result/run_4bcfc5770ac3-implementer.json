@@ -1,0 +1,46 @@
+{
+ "schema": "romeo/result-envelope@0.1.0",
+ "unit_id": "feat-20260909-promote-integrity-kchq",
+ "role": "implementer",
+ "task_envelope_ref": {
+  "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_4bcfc5770ac3-implementer.json",
+  "sha256": "a2d377ade624c1616463ea7362e13d190323b284bec635865ba60298e5b174a7"
+ },
+ "checks": [
+  {
+   "id": "check-1",
+   "command": "python3 -m unittest tests.test_integrity -v",
+   "exit_code": 0
+  },
+  {
+   "id": "check-2",
+   "command": "bin/romeo integrity",
+   "exit_code": 0
+  },
+  {
+   "id": "check-3",
+   "command": "grep -q 'romeo integrity' .github/workflows/harness.yml",
+   "exit_code": 0
+  },
+  {
+   "id": "check-4",
+   "command": "python3 -m unittest discover -s tests",
+   "exit_code": 0
+  },
+  {
+   "id": "check-5",
+   "command": "bin/romeo validate",
+   "exit_code": 0
+  },
+  {
+   "id": "check-6",
+   "command": "bin/romeo compile --check",
+   "exit_code": 0
+  }
+ ],
+ "gate_verdict": "PASS",
+ "blocked_reason": null,
+ "findings": [],
+ "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_4bcfc5770ac3.yaml",
+ "notes": "검증 계획 6건이 전부 exit 0 이다(run_4bcfc5770ac3 의 check-1~check-6). 이 run 은 검사 6건 뒤에 AC-9 를 뒷받침하는 명령 2건을 더 담는다 — ac9-no-continue-on-error(`! grep -q 'continue-on-error' .github/workflows/harness.yml`, exit 0: 이 파일 어디에도 continue-on-error 가 없으므로 새 단계와 그것을 담은 job 에도 없다)와 ac9-run-line-exact(`grep -qx '        run: bin/romeo integrity' ...`, exit 0: 그 단계의 run 이 정확히 그 한 줄이므로 `|| true` 가 붙어 있지 않다). AC 대응: AC-1·AC-2 는 docs/current/enforcement.md(표 49행 + 「파생 판정」 절)와 romeo/integrity.py, 그리고 check-2; AC-3 는 check-1 의 Forgery 세 검사(각 위조를 같은 사본에서 만들고 위조 전 exit 0 을 assert 한 뒤 위조 후 exit 1 과 위조한 id 인쇄를 본다); AC-4 는 check-1 의 test_broken_link + fixtures/integrity/broken-link/; AC-5 는 test_duplicate_unit_id(exit 1)와 test_same_title_is_not_duplicate(exit 0) 두 방향; AC-6 는 check-2 와 test_repo_root_is_clean; AC-7 은 test_close_registers_the_same_ids_as_at_approval(승인 커밋을 docs.approval_commit 으로 찾아 `git show <sha>:romeo/close.py` 의 check(\" id 집합과 현재 파일을 대조); AC-8 은 PromotionCandidate 두 검사; AC-9 는 check-3 과 위 두 명령이다. 범위 밖 발견 2건은 고치지 않고 docs/planning/open-questions.md 에 Q-90(CI 의 paths: 필터에 docs/current/** 가 없어 승격 문서만 바뀐 커밋에서는 이 검사가 돌지 않는다)·Q-91(docs/current/ 문서는 romeo validate 의 대상이 아니다)로 열어 두었다(§12). 계획과 다른 점 둘 — ① 구현 단위 5 는 「검사 5건」을 적었으나 실제 검사는 10건이다(AC-3 세 위조를 각각 한 검사로 두고, AC-5 를 양방향 두 검사로 나누고, AC-6·AC-7·AC-8 을 각각 두었다). ② 구현 단위 1·2 의 `derive_ids()`·`document_ids()` 는 `{id: 출처}` 를 그대로 내되, AC-2 가 요구하는 `(id, 수준)` 대조는 같은 모듈의 `derive()`·`document()`(`{id: (수준, 출처)}`)가 낸다 — 한 사전에 둘을 담을 수 없어 얇은 래퍼로 나눴다."
+}

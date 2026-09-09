@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · find · context · new · validate · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · find · context · new · validate · integrity · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -152,6 +152,11 @@ def cmd_validate(args):
         for w in r["warnings"]:
             print(f"    WARN  {w}")
     return rc
+
+
+def cmd_integrity(args):
+    from .integrity import main as integrity_main
+    return integrity_main(_root(args))
 
 
 def cmd_fixtures(args):
@@ -494,6 +499,10 @@ def build_parser():
     s.add_argument("paths", nargs="*")
     s.add_argument("--root")
     s.set_defaults(fn=cmd_validate)
+
+    s = sub.add_parser("integrity", help="승격 문서 ↔ 코드·정책표 대조 · docs/current 링크 · 작업 단위 id 중복")
+    s.add_argument("--root")
+    s.set_defaults(fn=cmd_integrity)
 
     s = sub.add_parser("fixtures", help="fixture 검사·리포트·동등성 판정")
     s.add_argument("action", choices=["check", "report", "parity"])

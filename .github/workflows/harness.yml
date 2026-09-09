@@ -150,6 +150,11 @@ jobs:
           fi
           exit $rc
 
+      # 승격 문서가 코드를 따라잡고 있는가 · docs/current 의 링크 · 작업 단위 id 중복.
+      # `|| true` 를 붙이지 않는다 — 종료 코드 자체가 판정이다(어긋난 id 를 인쇄하고 exit 1).
+      - name: 무결성 — 승격 대조 · 링크 · id 중복
+        run: bin/romeo integrity
+
       - name: 작업 문서 검증
         run: bin/romeo validate
 

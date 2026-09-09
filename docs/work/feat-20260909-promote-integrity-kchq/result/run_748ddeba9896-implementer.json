@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promote-integrity-kchq",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_748ddeba9896-implementer.json",
+    "sha256": "bdecfb0beeca78103ff1db48b5f37b37e35a39e030ad447da58ae9af91a0f433"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_integrity -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q 'romeo integrity' .github/workflows/harness.yml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_748ddeba9896.yaml",
+  "notes": "3회차다 — 연속 2회 실패로 §10 브레이크가 걸렸다가 사람이 풀었고, AC-4 가 재승인(178e039)으로 판별 규칙을 갖게 됐다. 2회차 산출물을 출발점으로 두고 검토자 finding 1건과 증거 신선도 1건만 고쳤다(§12). 검증 계획과 확인란 문장은 고치지 않았다. [finding — romeo/integrity.py:39, AC-4 미달] 2회차의 LINK_RE 는 `\\[[^\\]]*\\]\\(([^)\\s]+)\\)` 라 괄호 안에서 공백을 배제했다. 그래서 `[없는 문서](missing.md \"설명\")` 과 `[없는 문서](missing.md )` 은 링크로 보이지도 않았고, missing.md 가 없어도 broken_links() 가 아무것도 보고하지 않았다. 고침은 **표기를 세어 더하지 않는 쪽**이다 — LINK_RE 가 괄호 안 내용을 통째로 잡고(`\\(([^)]*)\\)`), 새 자리 _link_target(inner) 이 재승인된 AC-4 의 규칙 하나로 자른다: 첫 공백 앞까지가 경로 후보(FIRST_SPACE_RE 로 split), 그 후보에서 `#` 뒤를 잘라낸 것이 대상 경로. 대상 경로가 http://·https://·mailto: 로 시작하거나 빈 문자열이면 검사하지 않는다. 기존의 `#` 선두 배제는 지웠다 — 문서 안 앵커는 후보를 자른 결과가 빈 문자열이 되어 같은 자리로 떨어진다. 표기 목록이 아니라 규칙이 판정하므로 세지 않은 표기도 같은 자리로 떨어진다. 인쇄는 괄호 안 내용을 그대로 낸다(앵커·제목이 보인다). [fixture] fixtures/integrity/broken-link/docs/current/notes.md 가 AC-4 가 요구한 세 표기를 함께 담는다 — 괄호 안이 경로뿐인 것 (../없는-파일.md) · 경로 뒤에 공백과 따옴표 제목이 붙은 것 (없는-제목붙은.md \"설명\") · 경로 뒤에 공백만 붙은 것 (없는-공백붙은.md ). 같은 세 표기로 **실재하는** 대상(sibling.md)도 함께 담아 거짓 양성을 막는다. [판별 검사] tests/test_integrity.py 에 Fixtures.test_broken_link_notations 1건을 더했다 — 두 깨진 표기가 인쇄되는지와 sibling.md 가 인쇄되지 **않는지**를 함께 본다. 2회차가 더한 판별 검사 3건(④⑤·PromotionCandidate.test_line_when_the_document_is_missing)은 그대로 두었다. 양쪽 실측(§11): ac4-before-fix 가 2회차 모듈로 되돌린 사본에서 이 검사가 **실패**함을 보이고(스크립트가 실패를 exit 0 으로 반전한다), ac4-after-fix 가 지금 코드에서 **통과**함을 보인다 — 둘 다 run_748ddeba9896 에 exit 0 으로 기록돼 있다. 2회차 모듈은 커밋되지 않아 이력에서 꺼낼 수 없어(같은 한계가 Q-92 다) 이번 수정의 역연산으로 복원해 docs/work/feat-20260909-promote-integrity-kchq/inputs/integrity-before-fix-3.py.txt 에 두었고, 사본을 만들어 돌리는 것이 같은 폴더의 ac4-before-fix.sh 다. 복원본이 2회차 모듈과 같다는 이력 앵커는 없다 — 재현한 증상이 검토자 finding 의 문장(「경로 바로 뒤에 닫는 괄호가 오는 표기만 수집한다」)과 같다는 것이 근거다. 서술 기록은 inputs/ac4-discriminating-20260909-3.md 다(증거가 아니라 메모다). [증거 신선도 — 2회차 지적] 이 run 은 산출물을 **다 고친 뒤에** 기록을 시작했다. run_748ddeba9896 의 8건(check-1~check-6 · ac4-before-fix · ac4-after-fix)이 전부 dirty_tree_hash a8238a3a24d4 로, 이 run 의 최종 값과 같다 — romeo/close.py:340 의 UNVERIFIED 조건에 걸리는 기록이 0건이다. 기록 뒤에 바뀐 것은 docs/work/feat-20260909-promote-integrity-kchq/ 안뿐이고 그 경로는 evidence.exclusions() 가 해시에서 제외한다. [검증 계획] 6건 전부 exit 0 이다(run_748ddeba9896 의 check-1~check-6, head 178e03970e32). [범위 밖] 이번 회차에서 새로 연 질문은 없다. 2회차가 연 Q-92(새 파일을 만드는 단위는 「고치기 전 상태」를 이력에서 재구성할 수 없다)와 Q-93(승격 규약이 부착 저장소에도 적용되는지)은 그대로 열려 있고 고치지 않았다(§12). [수용 기준] AC-1~AC-9 를 전부 채웠다. 재승인으로 바뀐 AC-4 는 이번 회차가 그 규칙대로 구현했고 check-1(test_broken_link·test_broken_link_notations)·check-2 가 뒷받침한다. 나머지는 1·2회차가 세운 것이 이번 변경으로 무효가 되지 않았고 같은 검사가 다시 exit 0 을 냈다."
+}

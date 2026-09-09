@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promote-integrity-kchq",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promote-integrity-kchq/task/run_98070e608181-reviewer.json",
+    "sha256": "968f41fd2130a3e51d0984c7ab2ea0c5f219314c5699c14af7c9ebd5718d4c62"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-4 미달: LINK_RE는 경로 바로 뒤에 닫는 괄호가 오는 표기만 수집한다. 따라서 유효한 인라인 상대 링크인 [없는 문서](missing.md ) 또는 [없는 문서](missing.md \"설명\")는 검사에서 빠진다. missing.md가 없어도 broken_links()는 이 링크를 보고하지 않으며, 다른 위반이 없으면 run()은 종료 코드 0을 반환한다. tests/test_integrity.py:221의 fixture 검사는 공백이나 제목이 없는 표기만 다뤄 이 누락을 검출하지 못한다.",
+      "file": "romeo/integrity.py",
+      "line": 39
+    },
+    {
+      "summary": "증거 신선도 경고: check-1·check-2·check-3의 마지막 dirty_tree_hash는 80d0109dc2e8…인데, 이 run의 최종 값은 98a457fd4e20…이다. 원시 로그에도 같은 차이가 기록돼 있다. romeo/close.py:340은 이런 필수 검사를 REQUIRED_CHECK의 UNVERIFIED로 처리하므로, 현재 산출물에서 세 명령을 다시 실행해 기록해야 종료 검사의 미검증이 해소된다.",
+      "file": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_98070e608181.yaml",
+      "line": 104
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-promote-integrity-kchq/evidence/run_98070e608181.yaml",
+  "notes": "FAIL 근거는 AC-4의 링크 누락이며, 신선도 경고를 별도 FAIL 사유로 추가하지 않았다. 첫 finding은 코드를 읽어 도출한 반례로 직접 실행하지 않았다. 두 작업 계약의 base_sha와 현재 HEAD는 제공된 기준 커밋과 일치한다. 승인 이후 spec 변경은 체크 표시뿐이고 required_checks는 유지됐다. 확인한 변경은 allowed_paths 안이다. 기록된 검사 13건·전체 검사 957건의 통과 로그와 이전 두 결함의 수정 근거를 확인했다. 파일 변경·검사 재실행·해시 계산은 하지 않았다."
+}

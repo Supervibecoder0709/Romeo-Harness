@@ -1,0 +1,257 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_98070e608181
+task_id: task_6f6fa9631677
+dispatch_id: ctx_444ae7ba68b8
+unit_id: feat-20260909-promote-integrity-kchq
+spec_ref:
+  path: docs/work/feat-20260909-promote-integrity-kchq/spec.md
+  sha256: df0af909e50d9136cc2df80ab149319484f973a5d41afa28839ca612f88c8d69
+base_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq
+started_at: '2026-09-09T01:26:04+09:00'
+finished_at: '2026-09-09T01:40:35+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_integrity -v
+  exit_code: 0
+  started_at: '2026-09-09T01:26:04+09:00'
+  finished_at: '2026-09-09T01:26:06+09:00'
+  seconds: 1.404
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/01-check-1.log
+  log_sha256: 1b61e2aaa42341dd0e7fde6053b73f9b9fb94fe4dc106c572faf306777d99fae
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-2
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-09T01:26:06+09:00'
+  finished_at: '2026-09-09T01:26:06+09:00'
+  seconds: 0.135
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/02-check-2.log
+  log_sha256: 5256d5b96ec89e30f3d3734dc76df29b2a1558c7fc09a8aaf5ede98fb2e90b4d
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  위반 0건"
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-3
+  command: grep -q 'romeo integrity' .github/workflows/harness.yml
+  exit_code: 0
+  started_at: '2026-09-09T01:26:06+09:00'
+  finished_at: '2026-09-09T01:26:06+09:00'
+  seconds: 0.005
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/03-check-3.log
+  log_sha256: e1962d5e83e97faec1b1e2cd6f402cfd55031f98a61db037ad16a4ad4bc1faf4
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-09T01:26:06+09:00'
+  finished_at: '2026-09-09T01:29:21+09:00'
+  seconds: 194.94
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/04-check-4.log
+  log_sha256: 044a75654b1759d89928fe98d45e51d2122fd23895a14e65cb41aeda8283b3c6
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-09T01:29:21+09:00'
+  finished_at: '2026-09-09T01:29:21+09:00'
+  seconds: 0.186
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/05-check-5.log
+  log_sha256: 714a01fdca72888adc5c83d0d1c64ee155010f4d35b2a41ae95353d2c8087c6a
+  stdout_tail: 's=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-09T01:29:21+09:00'
+  finished_at: '2026-09-09T01:29:21+09:00'
+  seconds: 0.182
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/06-check-6.log
+  log_sha256: 52b12e4135fdf91969d69b2a8df080180a1aab587b55879a53def5bc34f7d0f4
+  stdout_tail: compile 검사 PASS
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 1afe6934c3e62b92be9b23e938140138143b2c0f508947a65050e1db427630d3
+- id: check-1
+  command: python3 -m unittest tests.test_integrity -v
+  exit_code: 0
+  started_at: '2026-09-09T01:30:14+09:00'
+  finished_at: '2026-09-09T01:30:15+09:00'
+  seconds: 1.473
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/07-check-1.log
+  log_sha256: 75071560cdf37b9a99c6e9731fb21c3495f512b5b1a56aa68b965dd83adca16d
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 80d0109dc2e8a38e723564c79ebe5c3dfb6d7fc999d55311fc41725ef078992c
+- id: check-2
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-09T01:30:15+09:00'
+  finished_at: '2026-09-09T01:30:15+09:00'
+  seconds: 0.137
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/08-check-2.log
+  log_sha256: 83555b8b2c4ca3479ea9939ff432a93be8c1fea39185b63fa6136a8b733f47dc
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  위반 0건"
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 80d0109dc2e8a38e723564c79ebe5c3dfb6d7fc999d55311fc41725ef078992c
+- id: check-3
+  command: grep -q 'romeo integrity' .github/workflows/harness.yml
+  exit_code: 0
+  started_at: '2026-09-09T01:30:15+09:00'
+  finished_at: '2026-09-09T01:30:15+09:00'
+  seconds: 0.007
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/09-check-3.log
+  log_sha256: b27b2137e32dae6379d44bb9400cf862afe1b26cc2d3802b77751dda4d9aced2
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 80d0109dc2e8a38e723564c79ebe5c3dfb6d7fc999d55311fc41725ef078992c
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-09T01:30:15+09:00'
+  finished_at: '2026-09-09T01:33:37+09:00'
+  seconds: 201.693
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/10-check-4.log
+  log_sha256: cc70deb6c21ac3a577c87499c3f97bf4a10232e5deead5d2ba586a76abf45d57
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-09T01:33:37+09:00'
+  finished_at: '2026-09-09T01:33:38+09:00'
+  seconds: 0.21
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/11-check-5.log
+  log_sha256: eaf6ede7f6bfb56e84723ebc738d906662fdb2d92b17e5e0f9a358adb73d5d81
+  stdout_tail: 's=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-09T01:33:38+09:00'
+  finished_at: '2026-09-09T01:33:38+09:00'
+  seconds: 0.192
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/12-check-6.log
+  log_sha256: aae0ab432fc12855e86c7b595128e983190be20a8231e2e2e4725c6b165feb6b
+  stdout_tail: compile 검사 PASS
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: cmd-13
+  command: python3 -m unittest tests.test_integrity.Forgery.test_document_disappears tests.test_integrity.Forgery.test_document_repeats_an_id_at_another_level
+    tests.test_integrity.PromotionCandidate.test_line_when_the_document_is_missing
+  exit_code: 0
+  started_at: '2026-09-09T01:33:49+09:00'
+  finished_at: '2026-09-09T01:33:49+09:00'
+  seconds: 0.561
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/13-cmd-13.log
+  log_sha256: 0b9abc1fb0490fe90d3366526a6f0a592c47b381607764ce665a34270d502003
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: cmd-14
+  command: sh -c 'set -e; d=$(mktemp -d); tar -c bin romeo tests core fixtures docs/current docs/work/feat-20260909-promote-integrity-kchq/spec.md
+    | tar -x -C "$d"; cp docs/work/feat-20260909-promote-integrity-kchq/inputs/integrity-before-fix.py.txt
+    "$d/romeo/integrity.py"; cd "$d"; ! python3 -m unittest tests.test_integrity.Forgery.test_document_disappears
+    tests.test_integrity.Forgery.test_document_repeats_an_id_at_another_level tests.test_integrity.PromotionCandidate.test_line_when_the_document_is_missing'
+  exit_code: 0
+  started_at: '2026-09-09T01:33:56+09:00'
+  finished_at: '2026-09-09T01:33:57+09:00'
+  seconds: 1.134
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/14-cmd-14.log
+  log_sha256: 26a1c0e7a35e94cf567060ba08064dd94b3a9626d8d0fac8c1c50c775dd1bf06
+  stdout_tail: ''
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260909-promote-integrity-kchq'
+  exit_code: 0
+  started_at: '2026-09-09T01:35:25+09:00'
+  finished_at: '2026-09-09T01:35:25+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/15-review-tree-before.log
+  log_sha256: d167dc91f17c693ac806d21650fc4ac899828cedd63bfbefc83d7d87cf3cfabb
+  stdout_tail: "M .github/workflows/harness.yml\n M docs/planning/open-questions.md\n M romeo/cli.py\n\
+    \ M romeo/close.py\n?? docs/current/\n?? fixtures/integrity/\n?? romeo/integrity.py\n?? tests/test_integrity.py"
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/.harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-09T01:35:25+09:00'
+  finished_at: '2026-09-09T01:35:26+09:00'
+  seconds: 0.013
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/16-reviewer-brief.log
+  log_sha256: d9406d663479b219d39ce73c157721a2d1c6afcb57950cd8e89b55cea45beef3
+  stdout_tail: 5fd39392077fe68dd55cc9820178c2c34c1b3582c9d8d88fa230deb10eaa675c  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-promote-integrity-kchq/.harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/reviewer-brief.md
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260909-promote-integrity-kchq'
+  exit_code: 0
+  started_at: '2026-09-09T01:39:59+09:00'
+  finished_at: '2026-09-09T01:40:00+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/17-review-tree-after.log
+  log_sha256: d167dc91f17c693ac806d21650fc4ac899828cedd63bfbefc83d7d87cf3cfabb
+  stdout_tail: "M .github/workflows/harness.yml\n M docs/planning/open-questions.md\n M romeo/cli.py\n\
+    \ M romeo/close.py\n?? docs/current/\n?? fixtures/integrity/\n?? romeo/integrity.py\n?? tests/test_integrity.py"
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-promote-integrity-kchq/review/run_98070e608181-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T01:40:35+09:00'
+  finished_at: '2026-09-09T01:40:35+09:00'
+  seconds: 0.016
+  log: .harness/runs/feat-20260909-promote-integrity-kchq/run_98070e608181/18-review-record.log
+  log_sha256: db89c33f6c6b4a7743064257a059e6bd29b0ad22c387eca8f7217a6ac530f110
+  stdout_tail: a9dc3ffc33b92304744e8bfcbb63abd695d4079a82227e5b29fbdb64cae5beb0  docs/work/feat-20260909-promote-integrity-kchq/review/run_98070e608181-reviewer.json
+  head_sha: 933e4d639ddad9be25ac42399b8e98e3b7531b94
+  dirty_tree_hash: 98a457fd4e2047c4398630f6a3859b9f3448c7d3cf7f1eb66f5499baefcda082
+changed_files:
+- .github/workflows/harness.yml
+- docs/current/enforcement.md
+- docs/planning/open-questions.md
+- fixtures/integrity/README.md
+- fixtures/integrity/broken-link/docs/current/notes.md
+- fixtures/integrity/broken-link/docs/current/sibling.md
+- fixtures/integrity/duplicate-id/docs/work/first/spec.md
+- fixtures/integrity/duplicate-id/docs/work/second/spec.md
+- fixtures/integrity/same-title/docs/work/alpha/spec.md
+- fixtures/integrity/same-title/docs/work/beta/spec.md
+- romeo/cli.py
+- romeo/close.py
+- romeo/integrity.py
+- tests/test_integrity.py
+artifact_hash: 0a1c599064b05824dc6a5fe9b0ae229ce4b7f61ad71d34acb75db077cf94d83f
+reviewer: null
+verdict: null
+approvals: []
