@@ -24,7 +24,7 @@ authority: derived
 
 - **마일스톤:** M2·M3 완료. M4 charter 는 **M3(승격·무결성)까지 닫혔다** — 남은 것은 M4(지표 `romeo metrics`) 하나다.
 - **활성 작업 단위:** 없음. 마지막 완료는 `feat-20260909-promote-integrity-kchq`(M4 charter M3 · **3회차 close PASS** · 6/6 · 재실행 6/6 ·
-  검토자 PASS · 통합 아래 커밋) — `docs/current/` 를 열고 첫 승격 문서 `enforcement.md`(집행 판정 49행)를 세웠으며,
+  검토자 PASS · 통합 `c7a5cd2`) — `docs/current/` 를 열고 첫 승격 문서 `enforcement.md`(집행 판정 49행)를 세웠으며,
   그 목록과 코드·정책표를 `(id, 수준)` 쌍으로 대조하는 `bin/romeo integrity` 가 링크·id 중복까지 함께 본다.
   **승격 대상 판정 규칙**(charter 가 미정으로 넘긴 관문)은 사용자가 확정했다 — 코드가 집행하는 판정 목록을 올리고 검사가 대조한다.
   사본이 되지 않는 유일한 방법은 그 사본을 검사가 계속 대조하는 것이다. `decisions.md` append 는 M3 의 다음 단위로 뺐다.
@@ -37,8 +37,8 @@ authority: derived
   승인 전 반박 2회(1차가 AC 8개 전부에 지적)와 프로브 1회(리터럴 연결로 등록되는 판정 5개 · 죽은 폴백 1건)를 마쳤다.
   통합 뒤 회귀 1건 — close 가 `status` 를 done 으로 바꾸자 AC-7 검사의 `approval_commit` 이 `active` 를 요구해 깨졌다(`473191d` 와 같은 계열).
 - **다음 행동(D-81 순서):** ③ M4 나머지 — **M4 지표 `romeo metrics`** → ④ shadow 20건·v1 릴리스 게이트 → ⑤ M5 `attach`.
-- **blocker:** 없음. 워커 워크트리 `impl-promote-integrity-kchq` 는 통합 뒤 정리한다.
-- **최신 CI:** `473191d` run `34235868900` **success**. 이 커밋들은 아직 미푸시다.
+- **blocker:** 없음. 워커 워크트리와 브랜치는 정리했다 — 남은 것은 `main` 과 이 체크아웃뿐이다.
+- **최신 CI:** `c7a5cd2` run `34297594080` **success**. 미푸시 없음 — 여기까지 전부 푸시됐다.
 - **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·83~89·**90~93**(`open-questions.md`).
   Q-90(CI `paths:` 에 `docs/current/**` 없음)·Q-91(승격 문서가 문서 검사 대상 밖)·Q-92(새 파일 단위는 §11 「기존 상태」를 이력에서 재구성 못 함)·
   Q-93(승격 규약이 부착 저장소에도 적용되는가)은 이 관통이 §12 로 남긴 것이다.
