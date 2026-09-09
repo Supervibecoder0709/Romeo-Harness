@@ -51,12 +51,14 @@ def attempts_path(project_root, unit_id):
 def load_attempts(project_root, unit_id):
     path = attempts_path(project_root, unit_id)
     if not path.is_file():
-        return {"schema": ATTEMPTS_SCHEMA, "unit_id": unit_id, "attempts": [], "reviews": []}
+        return {"schema": ATTEMPTS_SCHEMA, "unit_id": unit_id, "attempts": [], "reviews": [],
+                "reviewer_runs": []}
     data = load_yaml(path) or {}
     data.setdefault("schema", ATTEMPTS_SCHEMA)
     data.setdefault("unit_id", unit_id)
     data.setdefault("attempts", [])
     data.setdefault("reviews", [])
+    data.setdefault("reviewer_runs", [])
     return data
 
 
@@ -119,6 +121,22 @@ def gate(data):
         f"기록하고 끝난다(시도를 시작하지 않는다). 기록과 기동을 한 번에 하려면 "
         f"bin/romeo run-unit --unit {unit} --run <run> --base-sha <승인 커밋> "
         f"--after-review \"<결론>\" --by <사람>. 실패 원인 분류는 기록만 하고 이 판정에 쓰지 않는다.")
+
+
+def add_reviewer_run(data, run):
+    """검토자만 다시 띄운 실행을 **이력으로** 남긴다 — 관통 회차를 늘리지 않는다(Q-95).
+
+    `reviews:` 와 **다른 목록**이다. 그 자리는 §10 의 사람 재검토 기록이고 `gate()` 가 그것으로
+    연속 실패 차단을 푼다 — 검토자 재실행을 섞으면 사람이 완료 정의를 다시 보지 않은 채 다음 회차가 돈다.
+    구현은 한 번뿐인데 검토만 여러 번 도는 것은 정상이므로(RUNBOOK §6.6), 그 사실은 남기되 회차로 세지 않는다.
+
+    **덮어쓰지 않는다.** 같은 run 이 이미 있으면 아무것도 하지 않는다 — 계약 생성은 멱등이고,
+    시각을 새로 쓰면 그 run 이 처음 돈 때가 사라진다."""
+    runs = data.setdefault("reviewer_runs", [])
+    if any((r or {}).get("run") == run for r in runs):
+        return data
+    runs.append({"run": run, "at": now_iso()})
+    return data
 
 
 def add_review(data, conclusion, by=None):

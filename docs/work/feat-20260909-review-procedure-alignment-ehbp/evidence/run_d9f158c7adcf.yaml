@@ -1,0 +1,371 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_d9f158c7adcf
+task_id: null
+dispatch_id: null
+unit_id: feat-20260909-review-procedure-alignment-ehbp
+spec_ref:
+  path: docs/work/feat-20260909-review-procedure-alignment-ehbp/spec.md
+  sha256: 520d47d476ddb7606347fbb68945d68f80cd97e902028940a837ed81f560d149
+base_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1
+started_at: '2026-09-09T19:57:27+09:00'
+finished_at: '2026-09-09T20:02:35+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_review_guidance_alignment -v
+  exit_code: 0
+  started_at: '2026-09-09T19:57:27+09:00'
+  finished_at: '2026-09-09T19:57:27+09:00'
+  seconds: 0.072
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/01-check-1.log
+  log_sha256: 5c88d2a05763aeb4b227c163fb18b82883c64698514ba295e8def75ffd71c196
+  stdout_tail: ''
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-2
+  command: python3 -m unittest tests.test_reviewer_attempt_isolation -v
+  exit_code: 0
+  started_at: '2026-09-09T19:57:27+09:00'
+  finished_at: '2026-09-09T19:57:28+09:00'
+  seconds: 0.425
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/02-check-2.log
+  log_sha256: 3e5e563c2aeb563b0f1949e0d69adb581f5c3becc3720dd7eb2bfda418086f35
+  stdout_tail: ''
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-3
+  command: python3 -m unittest tests.test_ac_rebuttal_multi -v
+  exit_code: 0
+  started_at: '2026-09-09T19:57:28+09:00'
+  finished_at: '2026-09-09T19:57:28+09:00'
+  seconds: 0.074
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/03-check-3.log
+  log_sha256: bc717448cbe016065fbae590315c87c0f8d1bc6c6c475d2a9b80bf9af739fa31
+  stdout_tail: ''
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-4
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-09T19:57:28+09:00'
+  finished_at: '2026-09-09T19:57:28+09:00'
+  seconds: 0.172
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/04-check-4.log
+  log_sha256: 1ba66a847e478e4f8f2f47aceaf442e3a332593bb88dabbad5d5ecce1ed0e1d7
+  stdout_tail: compile 검사 PASS
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-09T19:57:28+09:00'
+  finished_at: '2026-09-09T19:57:28+09:00'
+  seconds: 0.182
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/05-check-5.log
+  log_sha256: 0b5236e05d5e41a8ea21484356916b2cb193d231b6175b59974839e00e090654
+  stdout_tail: '_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-6
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-09T19:57:28+09:00'
+  finished_at: '2026-09-09T19:57:28+09:00'
+  seconds: 0.126
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/06-check-6.log
+  log_sha256: 2a560817e2d67c7fba8ce8cce82ee03631704310ba5fcf7de31efc92ca805b15
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  등록 1건 · 미등록 0건 — docs/current/\n  위반 0건"
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: check-7
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-09T19:57:28+09:00'
+  finished_at: '2026-09-09T20:00:12+09:00'
+  seconds: 163.181
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/07-check-7.log
+  log_sha256: a4c2272b64ec586c8a94f94c58bb8f9edac5c3b98e80f2b245781d6486171a6f
+  stdout_tail: ''
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: review-tree-before
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T20:00:34+09:00'
+  finished_at: '2026-09-09T20:00:34+09:00'
+  seconds: 0.019
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/08-review-tree-before.log
+  log_sha256: 41904beeaf753e2c0b48806f393c3b62e6bc76a7afd4b8c30466b564e429cd39
+  stdout_tail: 'y
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/attempts.yaml
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/result/
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/review/
+
+    ?? tests/test_ac_rebuttal_multi.py
+
+    ?? tests/test_review_guidance_alignment.py
+
+    ?? tests/test_reviewer_attempt_isolation.py'
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: review-tree-after
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T20:02:27+09:00'
+  finished_at: '2026-09-09T20:02:27+09:00'
+  seconds: 0.017
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/09-review-tree-after.log
+  log_sha256: 41904beeaf753e2c0b48806f393c3b62e6bc76a7afd4b8c30466b564e429cd39
+  stdout_tail: 'y
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/attempts.yaml
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/result/
+
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/review/
+
+    ?? tests/test_ac_rebuttal_multi.py
+
+    ?? tests/test_review_guidance_alignment.py
+
+    ?? tests/test_reviewer_attempt_isolation.py'
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-review-procedure-alignment-ehbp/review/run_d9f158c7adcf-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T20:02:35+09:00'
+  finished_at: '2026-09-09T20:02:35+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_d9f158c7adcf/10-review-record.log
+  log_sha256: e97c446f44d6070c1ad370839920d58766411a31c0419f4ba47f261ea68a8f08
+  stdout_tail: ec1dee5c7a328847eba500f9f78de178c2e8e8e7aee95913d578eff261bb9f5d  docs/work/feat-20260909-review-procedure-alignment-ehbp/review/run_d9f158c7adcf-reviewer.json
+  head_sha: abcf09c757345d90e8b09e83ecd220e6529331fe
+  dirty_tree_hash: 857b1bd2320d3b36368f5d32f34c9d12e6cf89b7e2d07086b3e04e5aeb55363a
+changed_files:
+- .agents/skills/review/SKILL.md
+- .claude/skills/review/SKILL.md
+- adapters/claude/workflows/review.md
+- adapters/codex/workflows/review.md
+- core/workflows/review/SKILL.md
+- romeo/close.py
+- romeo/docs.py
+- romeo/envelope.py
+- romeo/run_unit.py
+- tests/test_ac_rebuttal.py
+- tests/test_ac_rebuttal_multi.py
+- tests/test_review_guidance_alignment.py
+- tests/test_reviewer_attempt_isolation.py
+artifact_hash: 01d081c1faf22ff07231090c0e8342f169a87c47ca20de7f0be29f5cee090338
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-09T20:05:29+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-2 «하나라도»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-3 «전부»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-5 «전부»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-7 «전부»
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-09T19:56:24+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 abcf09c75734 의 하네스 (470개 파일 대조 · /Users/julliettelee/.claude/jobs/7e45da56/tmp/judge-abcf09c)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_d9f158c7adcf — 검증 계획 7건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/4건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence abcf09c75734 vs 현재 abcf09c75734
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 857b1bd2320d vs 현재 857b1bd2320d (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_review_guidance_alignment -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_reviewer_attempt_isolation -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_ac_rebuttal_multi -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest discover -s tests'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 10건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 9건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 7건이 승인 커밋 abcf09c75734 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_review_guidance_alignment -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_reviewer_attempt_isolation -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_ac_rebuttal_multi -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 abcf09c75734 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.agents/skills/review/SKILL.md', '.claude/skills/review/SKILL.md', 'adapters/claude/workflows/review.md',
+      'adapters/codex/workflows/review.md', 'core/workflows/review/SKILL.md', 'romeo/close.py', 'romeo/docs.py',
+      'romeo/envelope.py', 'romeo/run_unit.py', 'tests/test_ac_rebuttal.py', 'tests/test_ac_rebuttal_multi.py',
+      'tests/test_review_guidance_alignment.py', 'tests/test_reviewer_attempt_isolation.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_6db75c4080d1-reviewer.json: FAIL(findings 1건 — 첫째: AC-5의 기존 회차 바이트 보존이 여전히 충족되지 않는다.
+      새 검토자 run을 기록하는 이 분기는 save) — 재승인 전 승인(approved_at 2026-09-09T18:16:32+09:00)으로 낸 판정 · 다른 산출물(cc28fdd+73691ca5f1fe)을
+      본 판정이라 이 close 의 대상이 아니다; run_708ab665b453-reviewer.json: FAIL(findings 1건 — 첫째: AC-5의 저장 전후 파일
+      바이트 보존이 입증되지 않았다. 다른 run의 회차가 있는 상태에서 59·63행은) — 재승인 전 승인(approved_at 2026-09-09T18:16:32+09:00)으로
+      낸 판정 · 다른 산출물(cc28fdd+439886cdb340)을 본 판정이라 이 close 의 대상이 아니다; run_f3865efd8b63-reviewer.json: FAIL(findings
+      4건 — 첫째: AC-6의 차단 상태에서 검토자 계약을 두 번 생성하는 판별이 충족되지 않는다. 실제 계약 생성 함수 wri) — 재승인 전 승인(approved_at 2026-09-09T18:16:32+09:00)으로
+      낸 판정 · 다른 산출물(cc28fdd+a164dd7fc84e)을 본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 abcf09c+857b1bd2320d 이다(검사
+      기록 run 의 head_sha+dirty_tree_hash, D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_d9f158c7adcf-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

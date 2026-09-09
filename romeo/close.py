@@ -844,6 +844,11 @@ def _check_review(check, udir, unit_id, harness_root, project_root, product=None
 REVIEW_PASS_SAMPLES = 2
 # 검토자를 띄운 쪽이 검토 전후에 남기는 방어 검사의 라벨(RUNBOOK §4). 이 두 기록이 검토 시점의 산출물이다.
 DEFENSIVE_LABELS = ("review-tree-before", "review-tree-after")
+#: 검토자 봉투를 **봉인하는** 명령. 이 명령만이 봉투의 sha256 을 같은 run 의 증거에 남기고,
+#: 아래 검사는 그 봉인과 같은 봉투만 판정으로 센다 — 손으로 복사한 봉투는 세지 않는다.
+#: 요구가 여기 살므로 안내(절차 문서)가 이 값을 따라가야 한다(AGENTS.core §11 ②) —
+#: `tests/test_review_guidance_alignment.py` 가 이 값과 DEFENSIVE_LABELS 를 읽어 안내 셋과 대조한다.
+SEAL_COMMAND = ("review", "record")
 
 
 def _run_of_envelope(env):

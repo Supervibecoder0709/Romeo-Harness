@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_f3865efd8b63-implementer.json",
+    "sha256": "296a425e165acb47f0a36ab6233a680afd69a5e38f667bdd354e6b61b9b4338d"
+  },
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_f3865efd8b63.yaml",
+  "gate_verdict": "PASS",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_reviewer_attempt_isolation -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_ac_rebuttal_multi -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "blocked_reason": null,
+  "notes": "회귀 1건을 고쳤다 — tests/test_ac_rebuttal.py 의 test_only_the_first_matching_input_is_read 가 옛 규약(첫 항목만 읽는다)을 고정하고 있었다. 이 단위가 바꾸는 동작이므로 그 케이스를 새 규약으로 옮기고, 규약의 나머지 절반(목록 밖 파일은 읽지 않는다)을 test_unlisted_file_is_not_read 로 따로 세웠다. 근거: run_f3865efd8b63 의 check-7 — 옮기기 전 discover 는 failures=1, 옮긴 뒤 991건 전부 통과. 검사 설계에서 두 번 되돌아왔다 — (1) test_review_guidance_alignment 의 금지 리터럴 목록을 그 파일에 리터럴로 적어 자기 검사에 걸렸고 정본에서 파생하도록 고쳤다(commonprefix · join). (2) registered() 가 서브파서가 아닌 액션의 choices 를 잡아 TypeError 를 냈고 _SubParsersAction 으로 좁혔다. 둘 다 검사 자신의 결함이고 산출물의 결함이 아니다."
+}

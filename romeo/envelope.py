@@ -17,7 +17,7 @@ from .gitinfo import head_sha, is_repo
 from .parity import load_role_contracts
 from .policy import classification_from_frontmatter, load_policy, load_project_state, route
 from .schema import validate as validate_schema
-from .util import load_json, load_yaml, rel, sha256_bytes
+from .util import dump_yaml, load_json, load_yaml, rel, sha256_bytes
 
 SCHEMA_ID = "romeo/task-envelope@0.1.0"
 TASK_SCHEMA = "core/schemas/task-envelope.json"
@@ -406,7 +406,12 @@ def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     두는 이유는, 종료 검사가 봉투를 대조할 때 그 계산을 다시 부르기 때문이다(`close._check_review`) —
     거기서 막으면 차단된 단위는 지난 관통의 판정조차 대조하지 못한다. 막아야 할 것은 **새 관통의 시작**이다."""
     project_root = Path(project_root).resolve()
-    repeat_gate(project_root, unit_id)
+    # 반복 중단 게이트는 **관통 회차**를 막는다. 검토자 계약은 회차를 열지 않으므로(NON_ATTEMPT_ROLES)
+    # 여기서도 막지 않는다 — 막으면 차단된 단위에서 같은 산출물을 다시 검토할 길이 사라지는데,
+    # §10 이 요구하는 것은 「사람이 완료 정의를 재검토하기 전에 다음 회차가 돌지 않는 것」이지
+    # 「이미 만든 산출물을 다시 읽지 못하는 것」이 아니다.
+    if role not in NON_ATTEMPT_ROLES:
+        repeat_gate(project_root, unit_id)
     dispatch_gate(project_root, unit_id, harness_root=harness_root)
     if role == "reviewer" and not run_name:
         # 검토 봉투는 계약 경로의 <run> 으로 자기 run 의 증거(방어 검사)에 묶인다 — run 없는 자리(task/reviewer.json)의 계약으로 낸
@@ -418,14 +423,24 @@ def write_envelope(unit_id, role, project_root=".", harness_root=None, base_sha=
     path = tdir / (f"{run_name}-{role}.json" if run_name else f"{role}.json")
     text = envelope_text(env)
     path.write_text(text, encoding="utf-8")
-    started = record_start(project_root, unit_id, run_name, env["base_sha"]) if (run_name and record_attempt) else None
+    started = record_start(project_root, unit_id, run_name, env["base_sha"], role) if (run_name and record_attempt) else None
     # `scope_ignored` 는 인쇄용이다 — 「변경 범위」의 백틱 중 경로로 읽지 않은 것(Q-36). 계약 JSON 에는 없다.
     return {"path": str(path), "envelope": env, "sha256": sha256_bytes(text.encode("utf-8")),
             "attempt": started, "scope_ignored": scope["ignored"]}
 
 
-def record_start(project_root, unit_id, run, base_sha):
+#: 이 역할의 계약만으로는 회차를 열지 않는다. 구현이 도는 자리에서만 회차가 열린다(Q-95).
+#: RUNBOOK §6.6 의 검토자-only 재실행은 **새 run** 을 쓰는데, 그때 회차가 하나 더 생기면
+#: 구현은 한 번뿐인데 회차가 둘이 되고 §10 의 연속 실패 카운터가 검토 실행을 구현 회차로 센다.
+NON_ATTEMPT_ROLES = ("reviewer",)
+
+
+def record_start(project_root, unit_id, run, base_sha, role=None):
     """이 run 의 기동을 `attempts.yaml` 에 남긴다 — 이미 있으면 회차를 늘리지 않는다(두 역할분 계약이 한 회차다).
+
+    `role` 이 `NON_ATTEMPT_ROLES` 에 들고 그 run 에 회차가 아직 없으면 **회차를 열지 않고**
+    `reviewer_runs:` 에 그 사실만 남긴다. 그 run 에 이미 회차가 있으면(구현자가 먼저 만들었다) 그것을 그대로 돌려준다 —
+    한 run 은 한 회차이고, 검토자 계약이 그 회차를 바꾸지 않는다.
 
     **같은 run 인데 `base_sha` 가 다르면 새 값으로 옮기고 이전 값을 `base_sha_history` 에 남긴다**(Q-42).
     관통 도중 재승인하면 계약·증거는 새 승인 커밋으로 옮겨가는데 회차는 기동 시점 값에 고정돼, 이력을 읽는 사람이
@@ -436,10 +451,15 @@ def record_start(project_root, unit_id, run, base_sha):
     성공하든 실패하든 **회차가 하나도 남지 않았다**(Q-27). 그래서 §10 의 연속 2회 실패 차단이
     그 경로에서 한 번도 세지 않았다 — 규칙은 문서에 있고 집행은 다른 경로에만 있었다.
     반복 중단 게이트가 이 자리에 있는 것과 같은 이유로 회차 기록도 여기 둔다: **어느 경로로 돌리든 지난다.**"""
-    from .run_unit import load_attempts, save_attempts, start_attempt  # 순환 import 를 피해 여기서 부른다
+    from .run_unit import (add_reviewer_run, load_attempts, save_attempts,  # 순환 import 를 피해 여기서 부른다
+                           start_attempt)
     data = load_attempts(project_root, unit_id)
     for att in data.get("attempts") or []:
         if att.get("run") == run:
+            # 검토자 계약은 이미 열린 회차를 **읽기만** 한다 — base_sha 갱신은 관통이 겨눈 승인이 바뀐 사건이고,
+            # 검토자를 다시 띄우는 것은 그 사건이 아니다. 여기서 갱신하면 검토자 계약 하나로 기존 회차가 바뀐다.
+            if role in NON_ATTEMPT_ROLES:
+                return att
             if base_sha and att.get("base_sha") != base_sha:
                 history = list(att.get("base_sha_history") or [])
                 history.append(att.get("base_sha"))
@@ -447,6 +467,12 @@ def record_start(project_root, unit_id, run, base_sha):
                 att["base_sha"] = base_sha
                 save_attempts(project_root, unit_id, data)
             return att
+    if role in NON_ATTEMPT_ROLES:
+        before = dump_yaml(data)
+        add_reviewer_run(data, run)
+        if dump_yaml(data) != before:      # 같은 run 이면 아무것도 쓰지 않는다 — 파일도 그대로다
+            save_attempts(project_root, unit_id, data)
+        return None
     entry = start_attempt(data, run, base_sha)
     save_attempts(project_root, unit_id, data)
     return entry

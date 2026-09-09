@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_6db75c4080d1-reviewer.json",
+    "sha256": "b0bee6adde8f6a4327978463142f088e2c3391fd0749304f53cef70ee8fec243"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5의 기존 회차 바이트 보존이 여전히 충족되지 않는다. 새 검토자 run을 기록하는 이 분기는 save_attempts를 호출하며, 그 함수는 파일 전체를 YAML로 다시 작성한다(romeo/run_unit.py:67, romeo/util.py:14~20). 따라서 기존 attempts 영역의 주석·인용 방식·CRLF 줄바꿈은 보존되지 않는다. 새 검사도 tests/test_reviewer_attempt_isolation.py:29에서 read_text로 줄바꿈을 정규화한 뒤 문자열을 비교하므로 CRLF가 LF로 바뀐 경우를 검출하지 못한다. 원본 read_bytes 값은 82행의 파일 불일치 확인에만 사용된다. check-2의 성공을 승인된 원본 바이트 보존의 근거로 지목할 수 없다.",
+      "file": "romeo/envelope.py",
+      "line": 474
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_6db75c4080d1.yaml",
+  "notes": "두 역할 계약의 base_sha와 현재 HEAD가 일치한다. 승인본 대비 spec 변경은 체크 표시뿐이며 required_checks는 유지됐다. 확인한 변경은 allowed_paths 안이다. 필수 검사 7개의 원시 로그는 모두 exit 0이며 전체 테스트는 999건이다. 각 로그와 검토 전 기록의 head_sha·dirty_tree_hash가 일치한다. 파일 수정, 검사 재실행, 해시 재계산은 하지 않았다. 판정 근거는 현재 파일과 기록이며 과거 메모의 구현 상태를 근거로 사용하지 않았다."
+}

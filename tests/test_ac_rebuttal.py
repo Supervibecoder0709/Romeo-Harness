@@ -168,11 +168,24 @@ class TestApproveWarnsUnrebutted(unittest.TestCase):
         fm = approve_unit(self.unit, "tester", project_root=self.root)
         self.assertEqual(fm["status"], "active")
 
-    def test_only_the_first_matching_input_is_read(self):
-        """접두에 맞는 **첫 항목**만 본다 — 그 파일이 없으면 뒤 항목이 있어도 전체가 경고된다(AC-2)."""
+    def test_listed_files_are_read_even_if_an_earlier_one_is_missing(self):
+        """접두에 맞는 **등록된 항목 전부**를 본다 — 앞 항목이 없어도 뒤 항목이 실재하면 그것을 읽는다(Q-94).
+
+        종전에는 첫 항목 하나만 읽었다. 그래서 반박을 두 번 돌려 AC 를 쪼개면 새 AC 가 1차 파일에 있을 수 없어
+        영영 미반박으로 남았고, 사후에 1차 파일에 절을 더하는 것은 그 반박이 본 적 없는 AC 를 적는 **거짓 기록**이었다.
+        「어느 파일이 반박인가」가 `inputs:` 목록으로 정해진다는 규약은 그대로다 —
+        아래 `test_unlisted_file_is_not_read` 가 그것을 지킨다."""
         self._write_rebuttal([1, 2, 3], name="inputs/ac-rebuttal-later.md")
         fm, body = frontmatter.read(self.spec)
         fm["inputs"] = ["inputs/ac-rebuttal-first.md", "inputs/ac-rebuttal-later.md"]
+        frontmatter.write(self.spec, fm, body)
+        self.assertEqual(self._warns(), [])
+
+    def test_unlisted_file_is_not_read(self):
+        """`inputs:` 에 없는 파일은 같은 접두로 디렉터리에 있어도 읽지 않는다 — 규약은 그대로다."""
+        self._write_rebuttal([1, 2, 3], name="inputs/ac-rebuttal-later.md")
+        fm, body = frontmatter.read(self.spec)
+        fm["inputs"] = ["inputs/ac-rebuttal-first.md"]
         frontmatter.write(self.spec, fm, body)
         self.assertEqual(self._warns(), ["AC_UNREBUTTED AC-1, AC-2, AC-3"])
 

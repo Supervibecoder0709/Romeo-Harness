@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_d9f158c7adcf-implementer.json",
+    "sha256": "ea614b092e0bde168fdfb6c8b64ef7f465460d2b9bc976bd1132d03895954929"
+  },
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_d9f158c7adcf.yaml",
+  "gate_verdict": "PASS",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_reviewer_attempt_isolation -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_ac_rebuttal_multi -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "blocked_reason": null,
+  "notes": "4회차 — 재승인(D-80) 뒤 첫 회차다. AC-5 의 「바이트로 그대로」가 save_attempts 의 전체 재직렬화 때문에 어떤 구현으로도 참일 수 없어 「항목을 딕셔너리로 통째 비교한다 · 파일 표현은 대상이 아니다」로 고쳐졌고, 검사를 그 문장에 맞췄다 — 블록 추출 헬퍼를 걷어내고 항목 딕셔너리를 deepcopy 로 비교한다. 그 비교가 어느 필드가 바뀌어도 잡는지도 같은 자리에서 보인다(각 키를 하나씩 흔들어 갈리는 것을 확인). 1~3회차의 수정은 그대로다 — write_envelope 의 역할 조건, 같은 run 분기의 base_sha 미갱신, 등록 확인의 선행·중단, 목록 밖 파일을 읽지 않음. 근거: run_d9f158c7adcf 의 check-1·check-2·check-3 과 check-7(전체 테스트 통과)."
+}

@@ -10,14 +10,15 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-09T19:56:24+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-09T20:05:29+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260909.md, inputs/ac-rebuttal-20260909-2.md]
-evidence: []
+evidence: [evidence/run_f3865efd8b63.yaml, evidence/run_708ab665b453.yaml, evidence/run_6db75c4080d1.yaml,
+  evidence/run_d9f158c7adcf.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -43,15 +44,15 @@ approval_history:
 - **왜 지금:** 바로 앞 관통이 §12 로 남긴 셋이고, **Q-96 은 그 관통에서 실제로 두 번 close 를 막았다.** 절차 문서(`core/workflows/review/SKILL.md` 7번과 두 어댑터의 5·6번)는 「봉투를 파일로 남기는 것은 부른 쪽의 일」·「방어 검사는 부른 쪽이 증거 기록 명령으로 돌린다」 까지만 적는다 — 봉인을 만드는 것이 `romeo review record` 라는 것도, 라벨이 정확히 `review-tree-before`/`review-tree-after` 여야 한다는 것도 `adapters/orca/RUNBOOK.md` 에만 있다. **지시대로 따른 실행이 미검증으로 막히고, RUNBOOK 을 따로 읽은 실행만 통과한다.** 다음 마일스톤(M4 지표)의 단위도 검토자를 붙이므로 고치지 않으면 같은 두 자리에서 또 막힌다.
 - **기대 결과:** 절차 문서만 읽고 검토자를 띄운 실행이 close 를 통과한다. 라벨이나 명령 이름을 코드에서 바꾸면 안내가 따라오지 않은 것을 검사가 지목한다. 검토자만 다시 띄운 실행이 관통 회차를 늘리지 않고, 그 사실은 이력에 남는다. 반박을 두 번 돌려 AC 를 쪼개도 새 AC 가 미반박으로 남지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 요구의 정본은 코드에 하나씩 있다 — 방어 검사 라벨은 `romeo.close.DEFENSIVE_LABELS`(이미 있다), 봉인 명령은 `romeo/close.py` 에 새로 두는 `SEAL_COMMAND` 튜플이다. 종료 검사가 요구하는 것이므로 요구가 사는 자리에 함께 둔다. `tests/test_review_guidance_alignment.py` 는 그 둘을 **import 로만** 가져오고(두 정본을 참조하는 자리가 그 import 뿐이다), **자기 안에 그 값을 조각으로도 적지 않는다** — 판별 규칙: 그 검사 파일의 소스에서 `review-tree` · `review record` · `record` · `"review"` 중 어느 것도 문자열 리터럴로 나타나지 않는다(이름을 두 조각으로 나눠 고정하는 것도 중복이다).
-  - [ ] AC-2 그 검사가 `SEAL_COMMAND` 가 **CLI 파서에 실제로 등록돼 있는지** 먼저 확인하고(등록이 없으면 그 자체로 실패 — 정본이 실재하지 않는 이름을 가리키는 것이다), 그다음 안내 문서 셋(`core/workflows/review/SKILL.md` · `adapters/claude/workflows/review.md` · `adapters/codex/workflows/review.md`) 각각이 ① 방어 검사 라벨 둘과 ② 봉인 명령을 **백틱으로 감싼 채** 담는지 본다. 백틱 안만 세는 것은 산문 언급과 실행 지시를 가르기 위해서다. 한 문서에서 하나라도 빠지면 그 `(문서, 빠진 것)` 쌍을 튜플 목록으로 보고하며 실패한다. 등록 확인이 실패할 때는 그 사실과 `SEAL_COMMAND` 값을 보고하며 실패한다 — 안내 대조로 넘어가지 않는다.
-  - [ ] AC-3 AC-2 의 판정을 **구현이 끝난 뒤의 안내 문서**를 기준으로 네 짝으로 보인다. ① 그 문서 하나에서 라벨 한 줄을 지운 사본을 판정에 넣으면 그 문서의 쌍이 나오고, 지금 문서를 넣으면 0쌍이다. ② `DEFENSIVE_LABELS` 를 **안내 문서 셋 어디에도 나타나지 않는 값**으로 바꿔치면 문서 셋 전부가 쌍을 낸다 — 검사가 코드를 읽는다는 것이 여기서 드러난다(안내에 복사한 사본이면 바꿔쳐도 통과한다). ③ `SEAL_COMMAND` 를 CLI 파서에 없는 이름으로 바꿔치면 AC-2 의 등록 확인에서 실패한다. ④ `SEAL_COMMAND` 를 **파서에 등록은 돼 있지만 안내 문서 셋 어디에도 없는** 다른 명령으로 바꿔치면 등록 확인은 지나고 문서 셋 전부가 쌍을 낸다 — 명령 이름의 문서 대조가 실제로 도는 것이 여기서 드러난다.
-  - [ ] AC-4 안내 문서 셋이 실제로 담는 것 넷 — ① 봉투는 `bin/romeo review record` 로 기록해야 종료 검사가 판정으로 센다는 것 ② 방어 검사를 `review-tree-before`/`review-tree-after` 라는 이름으로 검토 **전**과 **후**에 남긴다는 것 ③ 그 셋(방어 검사 둘과 봉투 기록)이 **같은 run** 에 들어가야 한다는 것 ④ 봉투를 손으로 복사하면 봉인이 서지 않는다는 것. 코어 절차에도 적는다 — `bin/romeo` 는 이 하네스 자신의 명령이고 C-C6 이 금지하는 것은 벤더 도구명·모델명이다(코어의 implement 절차가 이미 `romeo evidence run` 을 적는다).
-  - [ ] AC-5 `romeo/envelope.py` 의 회차 기록이 **역할을 본다** — `role` 이 `reviewer` 이고 그 run 에 회차가 아직 없으면 회차를 열지 않는다. 그리고 그때 `attempts` 목록의 기존 항목이 **키와 값 전부 그대로다** — 항목을 딕셔너리로 **통째로** 비교한다(필드를 골라 비교하면 비교하지 않은 필드가 바뀌어도 통과한다). **파일의 표현(주석·인용 방식·줄바꿈)은 대상이 아니다** — `save_attempts` 가 파일 전체를 다시 직렬화하므로 어떤 구현도 그것을 보존하지 않는다. 보존을 요구하면 참일 수 없는 명제가 된다(3회차 검토자 finding). 판별 상태 넷에서 확인한다 — ① `attempts.yaml` 파일이 아직 없는 상태 ② 다른 run 의 회차가 이미 하나 있는 상태 ③ 같은 run 의 회차가 이미 있는 상태(그때는 기존 회차를 그대로 돌려준다) ④ **여집합** — 같은 상태에서 `role` 이 `implementer` 이면 회차가 **열린다**. 「그대로다」는 저장 전후 그 항목의 딕셔너리를 통째로 비교해 확인한다.
-  - [ ] AC-6 회차를 열지 않은 검토자 계약은 `attempts.yaml` 의 **`reviewer_runs:`** 목록에 그 run 과 시각을 남긴다. 그 목록은 **덮어쓰지 않는 이력**이다 — 서로 다른 두 run 으로 검토자 계약을 만들면 항목이 둘이 되고, 같은 run 으로 다시 만들면 항목이 늘지 않으면서 기존 항목의 시각도 바뀌지 않는다. 그리고 그 자리는 `reviews:` 와 **다른 목록**이다 — `reviews:` 는 §10 의 사람 재검토 기록이고 `romeo/run_unit.py` 의 `gate()` 가 그것으로 연속 실패 차단을 푼다. 판별 규칙 둘 — ① 연속 2회 실패로 `gate()` 가 **거부하는** 상태에서 검토자 계약을 두 번 만들어도 `gate()` 의 반환값 세 요소가 그대로다. ② 연속 2회 실패에 **사람 재검토가 있어 `gate()` 가 허용하는** 상태에서도 검토자 계약을 만든 뒤 반환값 세 요소가 그대로다 — `reviews:` 목록이 보존된다는 것이 이 두 번째에서만 드러난다(첫 번째는 그 목록이 비어 있어 지워져도 결과가 같다).
-  - [ ] AC-7 `romeo/docs.py` 의 반박 검사가 `inputs:` 목록의 각 항목 **문자열이 정책표의 `rebuttal_prefix` 로 시작하는** 파일 전부를 읽고, 각 파일에서 `rebuttal_heading` 으로 시작하는 줄의 **AC 번호**를 모아 합집합으로 본다. `inputs:` 에 없는 파일은 같은 접두로 디렉터리에 있어도 읽지 않는다.
-  - [ ] AC-8 AC-7 의 판별을 짝으로 보인다. AC 두 개짜리 확인란에서 — ① 1차 파일이 AC-1 만, 2차 파일이 AC-2 만 반박하고 둘 다 `inputs:` 에 있으면 그 함수가 내는 `AC_UNREBUTTED` 경고가 0건이다. ② 2차 파일을 `inputs:` 에서 빼면 `AC_UNREBUTTED AC-2` 가 나온다. ③ 2차 파일을 `inputs:` 에서 뺀 채 **그 경로를 디렉터리로 두면** 여전히 `AC_UNREBUTTED AC-2` 가 나오고 예외가 오르지 않는다 — 그 경로를 읽으려는 구현은 거기서 실패하므로, 통과 자체가 「읽지 않았다」의 관측이다(반환값만으로는 「읽고 결과를 버리는」 구현과 구별되지 않는다). ②는 그 경로를 디렉터리로 두지 않은 상태이고 ③과 다른 상태다. 세 경우 모두 그 함수의 반환값이 **정확히 기대한 줄만** 담는다 — ①은 0건, ②·③은 `AC_UNREBUTTED AC-2` 한 건이고 `AC_UNREBUTTED AC-1` 은 어느 경우에도 없다.
-  - [ ] AC-9 `bin/romeo compile --check` 가 통과한다 — 어댑터 원본을 고쳤으므로 `.claude/skills/` 와 `.agents/skills/` 의 managed block 이 함께 갱신돼 있다.
+  - [x] AC-1 요구의 정본은 코드에 하나씩 있다 — 방어 검사 라벨은 `romeo.close.DEFENSIVE_LABELS`(이미 있다), 봉인 명령은 `romeo/close.py` 에 새로 두는 `SEAL_COMMAND` 튜플이다. 종료 검사가 요구하는 것이므로 요구가 사는 자리에 함께 둔다. `tests/test_review_guidance_alignment.py` 는 그 둘을 **import 로만** 가져오고(두 정본을 참조하는 자리가 그 import 뿐이다), **자기 안에 그 값을 조각으로도 적지 않는다** — 판별 규칙: 그 검사 파일의 소스에서 `review-tree` · `review record` · `record` · `"review"` 중 어느 것도 문자열 리터럴로 나타나지 않는다(이름을 두 조각으로 나눠 고정하는 것도 중복이다).
+  - [x] AC-2 그 검사가 `SEAL_COMMAND` 가 **CLI 파서에 실제로 등록돼 있는지** 먼저 확인하고(등록이 없으면 그 자체로 실패 — 정본이 실재하지 않는 이름을 가리키는 것이다), 그다음 안내 문서 셋(`core/workflows/review/SKILL.md` · `adapters/claude/workflows/review.md` · `adapters/codex/workflows/review.md`) 각각이 ① 방어 검사 라벨 둘과 ② 봉인 명령을 **백틱으로 감싼 채** 담는지 본다. 백틱 안만 세는 것은 산문 언급과 실행 지시를 가르기 위해서다. 한 문서에서 하나라도 빠지면 그 `(문서, 빠진 것)` 쌍을 튜플 목록으로 보고하며 실패한다. 등록 확인이 실패할 때는 그 사실과 `SEAL_COMMAND` 값을 보고하며 실패한다 — 안내 대조로 넘어가지 않는다.
+  - [x] AC-3 AC-2 의 판정을 **구현이 끝난 뒤의 안내 문서**를 기준으로 네 짝으로 보인다. ① 그 문서 하나에서 라벨 한 줄을 지운 사본을 판정에 넣으면 그 문서의 쌍이 나오고, 지금 문서를 넣으면 0쌍이다. ② `DEFENSIVE_LABELS` 를 **안내 문서 셋 어디에도 나타나지 않는 값**으로 바꿔치면 문서 셋 전부가 쌍을 낸다 — 검사가 코드를 읽는다는 것이 여기서 드러난다(안내에 복사한 사본이면 바꿔쳐도 통과한다). ③ `SEAL_COMMAND` 를 CLI 파서에 없는 이름으로 바꿔치면 AC-2 의 등록 확인에서 실패한다. ④ `SEAL_COMMAND` 를 **파서에 등록은 돼 있지만 안내 문서 셋 어디에도 없는** 다른 명령으로 바꿔치면 등록 확인은 지나고 문서 셋 전부가 쌍을 낸다 — 명령 이름의 문서 대조가 실제로 도는 것이 여기서 드러난다.
+  - [x] AC-4 안내 문서 셋이 실제로 담는 것 넷 — ① 봉투는 `bin/romeo review record` 로 기록해야 종료 검사가 판정으로 센다는 것 ② 방어 검사를 `review-tree-before`/`review-tree-after` 라는 이름으로 검토 **전**과 **후**에 남긴다는 것 ③ 그 셋(방어 검사 둘과 봉투 기록)이 **같은 run** 에 들어가야 한다는 것 ④ 봉투를 손으로 복사하면 봉인이 서지 않는다는 것. 코어 절차에도 적는다 — `bin/romeo` 는 이 하네스 자신의 명령이고 C-C6 이 금지하는 것은 벤더 도구명·모델명이다(코어의 implement 절차가 이미 `romeo evidence run` 을 적는다).
+  - [x] AC-5 `romeo/envelope.py` 의 회차 기록이 **역할을 본다** — `role` 이 `reviewer` 이고 그 run 에 회차가 아직 없으면 회차를 열지 않는다. 그리고 그때 `attempts` 목록의 기존 항목이 **키와 값 전부 그대로다** — 항목을 딕셔너리로 **통째로** 비교한다(필드를 골라 비교하면 비교하지 않은 필드가 바뀌어도 통과한다). **파일의 표현(주석·인용 방식·줄바꿈)은 대상이 아니다** — `save_attempts` 가 파일 전체를 다시 직렬화하므로 어떤 구현도 그것을 보존하지 않는다. 보존을 요구하면 참일 수 없는 명제가 된다(3회차 검토자 finding). 판별 상태 넷에서 확인한다 — ① `attempts.yaml` 파일이 아직 없는 상태 ② 다른 run 의 회차가 이미 하나 있는 상태 ③ 같은 run 의 회차가 이미 있는 상태(그때는 기존 회차를 그대로 돌려준다) ④ **여집합** — 같은 상태에서 `role` 이 `implementer` 이면 회차가 **열린다**. 「그대로다」는 저장 전후 그 항목의 딕셔너리를 통째로 비교해 확인한다.
+  - [x] AC-6 회차를 열지 않은 검토자 계약은 `attempts.yaml` 의 **`reviewer_runs:`** 목록에 그 run 과 시각을 남긴다. 그 목록은 **덮어쓰지 않는 이력**이다 — 서로 다른 두 run 으로 검토자 계약을 만들면 항목이 둘이 되고, 같은 run 으로 다시 만들면 항목이 늘지 않으면서 기존 항목의 시각도 바뀌지 않는다. 그리고 그 자리는 `reviews:` 와 **다른 목록**이다 — `reviews:` 는 §10 의 사람 재검토 기록이고 `romeo/run_unit.py` 의 `gate()` 가 그것으로 연속 실패 차단을 푼다. 판별 규칙 둘 — ① 연속 2회 실패로 `gate()` 가 **거부하는** 상태에서 검토자 계약을 두 번 만들어도 `gate()` 의 반환값 세 요소가 그대로다. ② 연속 2회 실패에 **사람 재검토가 있어 `gate()` 가 허용하는** 상태에서도 검토자 계약을 만든 뒤 반환값 세 요소가 그대로다 — `reviews:` 목록이 보존된다는 것이 이 두 번째에서만 드러난다(첫 번째는 그 목록이 비어 있어 지워져도 결과가 같다).
+  - [x] AC-7 `romeo/docs.py` 의 반박 검사가 `inputs:` 목록의 각 항목 **문자열이 정책표의 `rebuttal_prefix` 로 시작하는** 파일 전부를 읽고, 각 파일에서 `rebuttal_heading` 으로 시작하는 줄의 **AC 번호**를 모아 합집합으로 본다. `inputs:` 에 없는 파일은 같은 접두로 디렉터리에 있어도 읽지 않는다.
+  - [x] AC-8 AC-7 의 판별을 짝으로 보인다. AC 두 개짜리 확인란에서 — ① 1차 파일이 AC-1 만, 2차 파일이 AC-2 만 반박하고 둘 다 `inputs:` 에 있으면 그 함수가 내는 `AC_UNREBUTTED` 경고가 0건이다. ② 2차 파일을 `inputs:` 에서 빼면 `AC_UNREBUTTED AC-2` 가 나온다. ③ 2차 파일을 `inputs:` 에서 뺀 채 **그 경로를 디렉터리로 두면** 여전히 `AC_UNREBUTTED AC-2` 가 나오고 예외가 오르지 않는다 — 그 경로를 읽으려는 구현은 거기서 실패하므로, 통과 자체가 「읽지 않았다」의 관측이다(반환값만으로는 「읽고 결과를 버리는」 구현과 구별되지 않는다). ②는 그 경로를 디렉터리로 두지 않은 상태이고 ③과 다른 상태다. 세 경우 모두 그 함수의 반환값이 **정확히 기대한 줄만** 담는다 — ①은 0건, ②·③은 `AC_UNREBUTTED AC-2` 한 건이고 `AC_UNREBUTTED AC-1` 은 어느 경우에도 없다.
+  - [x] AC-9 `bin/romeo compile --check` 가 통과한다 — 어댑터 원본을 고쳤으므로 `.claude/skills/` 와 `.agents/skills/` 의 managed block 이 함께 갱신돼 있다.
 - **위험과 되돌리기:** 이 변경은 이 저장소 안에서 끝난다 — 외부 반영·비용·권한 변화가 없다. 되돌리기는 `git revert <커밋>` 한 번이다. 실질 위험은 하나 — **회차 기록 규칙은 §10 브레이크의 입력이다.** 잘못 고치면 연속 실패 차단이 풀리거나 엉뚱하게 걸린다. AC-6 이 그것을 직접 겨눈다(검토자 계약을 만들어도 `gate()` 판정이 바뀌지 않는다). 개별 되돌리기는 `envelope.py` 의 조건 한 줄이다.
 - **결정 필요:** 없음 — 확정 단계에서 둘 다 골랐다. 다만 **확정하신 「`reviews:` 목록에 남긴다」를 글자 그대로 하지 않는다.** 그 목록은 `gate()` 가 읽어 §10 연속 실패 차단을 푸는 자리라, 검토자 재실행을 섞으면 **사람 재검토 없이 3회차가 돈다** — 안전 장치가 낮아진다. 의도(검토만 다시 돌린 사실을 이력에 남긴다)는 그대로 두고 자리만 `reviewer_runs:` 라는 **별도 목록**으로 나눈다. 되돌리기는 목록 이름 하나다.
 
@@ -129,6 +130,9 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-09T20:05:29+09:00 · HEAD abcf09c75734 · 검사 기록 run_d9f158c7adcf
 
-- (없음)
+- [evidence/run_f3865efd8b63.yaml](evidence/run_f3865efd8b63.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_708ab665b453.yaml](evidence/run_708ab665b453.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_6db75c4080d1.yaml](evidence/run_6db75c4080d1.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_d9f158c7adcf.yaml](evidence/run_d9f158c7adcf.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

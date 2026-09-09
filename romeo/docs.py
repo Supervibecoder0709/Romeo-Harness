@@ -107,21 +107,24 @@ def rebuttal_warnings(udir, fm, body, policy):
     ids = [ac for ac, _ in ac_items(body)]
     if not ids:
         return []
-    # 접두에 맞는 **첫 항목 하나**만 읽는다 — 둘 이상이면 `inputs:` 목록 순서상 처음이다.
-    # 뒤 항목으로 넘어가지 않는다: 첫 항목이 없는데 뒤가 있어 통과하면, 「어느 파일이 반박인가」가 목록이 아니라
-    # 파일 존재 여부로 정해져 지시대로 등록한 사람과 다른 답이 나온다.
-    first = next((str(i) for i in (fm.get("inputs") or []) if str(i).startswith(prefix)), None)
-    path = Path(udir) / first if first else None
-    if path is None or not path.exists():
+    # `inputs:` 목록에서 접두에 맞는 **모든** 항목을 읽고 절을 합집합으로 본다(Q-94).
+    # 반박을 두 번 돌려 AC 를 쪼개면 새 AC 는 1차 파일에 있을 수 없다 — 첫 항목만 읽으면 그 AC 가
+    # 영영 미반박으로 남고, 사후에 1차 파일에 절을 더하는 것은 거짓 기록이다(그 반박은 그 AC 를 본 적이 없다).
+    #
+    # **목록 밖 파일은 여전히 읽지 않는다.** 「어느 파일이 반박인가」는 `inputs:` 가 정한다 —
+    # 디렉터리를 훑으면 등록하지 않은 파일이 통과를 만들어, 지시대로 등록한 사람과 다른 답이 나온다.
+    files = [Path(udir) / str(i) for i in (fm.get("inputs") or []) if str(i).startswith(prefix)]
+    existing = [f for f in files if f.exists()]
+    if not existing:
         return ["AC_UNREBUTTED " + ", ".join(ids)]
-    text = path.read_text(encoding="utf-8")
     import re as _re
     covered = set()
-    for ln in text.split("\n"):
-        if ln.startswith(heading):
-            m = _re.match(r"AC-\d+", ln[len(heading) - len("AC-"):])
-            if m:
-                covered.add(m.group(0))
+    for path in existing:
+        for ln in path.read_text(encoding="utf-8").split("\n"):
+            if ln.startswith(heading):
+                m = _re.match(r"AC-\d+", ln[len(heading) - len("AC-"):])
+                if m:
+                    covered.add(m.group(0))
     missing = [i for i in ids if i not in covered]
     return ["AC_UNREBUTTED " + ", ".join(missing)] if missing else []
 

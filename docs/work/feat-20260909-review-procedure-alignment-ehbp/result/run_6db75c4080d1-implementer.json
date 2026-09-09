@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_6db75c4080d1-implementer.json",
+    "sha256": "296a425e165acb47f0a36ab6233a680afd69a5e38f667bdd354e6b61b9b4338d"
+  },
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_6db75c4080d1.yaml",
+  "gate_verdict": "PASS",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_reviewer_attempt_isolation -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_ac_rebuttal_multi -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "blocked_reason": null,
+  "notes": "3회차 — 2회차 검토자 finding 1건을 고쳤다. AC-5 의 바이트 보존을 파일 텍스트에서 attempts: 블록의 원본 줄을 그대로 떼어 비교하는 방식으로 바꿨다(재직렬화 없음). 그 추출이 실제로 변화를 잡는지도 같은 자리에서 세웠다 — 회차가 늘면 다르고, 블록 밖(reviewer_runs)만 바뀌면 같고, 표현만 바꿔도 다르다. 앞선 두 회차의 수정은 그대로다. 근거: run_6db75c4080d1 의 check-1·check-2 와 check-7(992건 통과)."
+}

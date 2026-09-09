@@ -1,0 +1,161 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_f3865efd8b63
+task_id: null
+dispatch_id: null
+unit_id: feat-20260909-review-procedure-alignment-ehbp
+spec_ref:
+  path: docs/work/feat-20260909-review-procedure-alignment-ehbp/spec.md
+  sha256: 9a69286fdde2abbdf441e069e313402c581c7feac7db6110f5b13525896bc54e
+base_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1
+started_at: '2026-09-09T18:25:01+09:00'
+finished_at: '2026-09-09T18:33:08+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_review_guidance_alignment -v
+  exit_code: 0
+  started_at: '2026-09-09T18:25:01+09:00'
+  finished_at: '2026-09-09T18:25:01+09:00'
+  seconds: 0.068
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/01-check-1.log
+  log_sha256: e14ffd82a72032d4068d6a2bf4cbfbe6e28c6e32db8d0e7f86b00ae8a8004705
+  stdout_tail: ''
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-2
+  command: python3 -m unittest tests.test_reviewer_attempt_isolation -v
+  exit_code: 0
+  started_at: '2026-09-09T18:25:01+09:00'
+  finished_at: '2026-09-09T18:25:01+09:00'
+  seconds: 0.075
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/02-check-2.log
+  log_sha256: 5c4f3d4719f630fc6487e0494c814e9e85231f8b844ce149d5c35497021c1759
+  stdout_tail: ''
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-3
+  command: python3 -m unittest tests.test_ac_rebuttal_multi -v
+  exit_code: 0
+  started_at: '2026-09-09T18:25:01+09:00'
+  finished_at: '2026-09-09T18:25:01+09:00'
+  seconds: 0.078
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/03-check-3.log
+  log_sha256: ccb07db0107cce2ca84e135cf7f82549fe7ef89ffac4ecef55cfd82c33787501
+  stdout_tail: ''
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-4
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-09T18:25:01+09:00'
+  finished_at: '2026-09-09T18:25:02+09:00'
+  seconds: 0.168
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/04-check-4.log
+  log_sha256: 0a3560149d105eeeb3382caa97e0ee05352a07fdfb814dc42be69f239c5588e3
+  stdout_tail: compile 검사 PASS
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-09T18:25:02+09:00'
+  finished_at: '2026-09-09T18:25:02+09:00'
+  seconds: 0.177
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/05-check-5.log
+  log_sha256: a86593902f0028844df418dc014c052ebc22387fe1d907c0011d928632f0b7e8
+  stdout_tail: '_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-6
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-09T18:25:02+09:00'
+  finished_at: '2026-09-09T18:25:02+09:00'
+  seconds: 0.129
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/06-check-6.log
+  log_sha256: 92cf882a2299f1bbea49cc2bbdca2b9d17271b7a2060598e15e23fb70654b57b
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  등록 1건 · 미등록 0건 — docs/current/\n  위반 0건"
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: check-7
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-09T18:25:02+09:00'
+  finished_at: '2026-09-09T18:27:50+09:00'
+  seconds: 167.493
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/07-check-7.log
+  log_sha256: 2cfd52af7509f43f3409c80147aaf76ce74377382ac0ce942355a8c50614a1c8
+  stdout_tail: ''
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: review-tree-before
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T18:28:21+09:00'
+  finished_at: '2026-09-09T18:28:22+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/08-review-tree-before.log
+  log_sha256: d95884c82ef02c939ddf09c3f7cbf53caaa3b374f4ef4f76b69c7eaa68a1a7f5
+  stdout_tail: "romeo/envelope.py\n M romeo/run_unit.py\n M tests/test_ac_rebuttal.py\n?? docs/work/feat-20260909-review-procedure-alignment-ehbp/attempts.yaml\n\
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/\n?? docs/work/feat-20260909-review-procedure-alignment-ehbp/result/\n\
+    ?? tests/test_ac_rebuttal_multi.py\n?? tests/test_review_guidance_alignment.py\n?? tests/test_reviewer_attempt_isolation.py"
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: review-tree-after
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/review-procedure-alignment-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T18:33:07+09:00'
+  finished_at: '2026-09-09T18:33:08+09:00'
+  seconds: 0.018
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/09-review-tree-after.log
+  log_sha256: d95884c82ef02c939ddf09c3f7cbf53caaa3b374f4ef4f76b69c7eaa68a1a7f5
+  stdout_tail: "romeo/envelope.py\n M romeo/run_unit.py\n M tests/test_ac_rebuttal.py\n?? docs/work/feat-20260909-review-procedure-alignment-ehbp/attempts.yaml\n\
+    ?? docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/\n?? docs/work/feat-20260909-review-procedure-alignment-ehbp/result/\n\
+    ?? tests/test_ac_rebuttal_multi.py\n?? tests/test_review_guidance_alignment.py\n?? tests/test_reviewer_attempt_isolation.py"
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-review-procedure-alignment-ehbp/review/run_f3865efd8b63-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T18:33:08+09:00'
+  finished_at: '2026-09-09T18:33:08+09:00'
+  seconds: 0.011
+  log: .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/10-review-record.log
+  log_sha256: 99fdd700660e6359167ae17796b8a54f33a3018129b2411d84f53fce6f10e5a5
+  stdout_tail: 596dfec0c5ff9e5c911afeb2c3771d5eb93bbe9883713b4104e3de5e33981903  docs/work/feat-20260909-review-procedure-alignment-ehbp/review/run_f3865efd8b63-reviewer.json
+  head_sha: cc28fdd992d8e00f9f10555ee62d223421ad1e43
+  dirty_tree_hash: a164dd7fc84e806b6fb072805117f23f8a2597307a65c9fc1a81eaa6312c476f
+changed_files:
+- .agents/skills/review/SKILL.md
+- .claude/skills/review/SKILL.md
+- adapters/claude/workflows/review.md
+- adapters/codex/workflows/review.md
+- core/workflows/review/SKILL.md
+- romeo/close.py
+- romeo/docs.py
+- romeo/envelope.py
+- romeo/run_unit.py
+- tests/test_ac_rebuttal.py
+- tests/test_ac_rebuttal_multi.py
+- tests/test_review_guidance_alignment.py
+- tests/test_reviewer_attempt_isolation.py
+artifact_hash: 97ad2284fda9d4a9eb1a4bead4367f1d52b6985ae3704452f9c62e9a66a669cd
+reviewer: null
+verdict: null
+approvals: []

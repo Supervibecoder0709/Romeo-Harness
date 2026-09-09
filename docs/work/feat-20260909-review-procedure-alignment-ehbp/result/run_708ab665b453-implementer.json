@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_708ab665b453-implementer.json",
+    "sha256": "296a425e165acb47f0a36ab6233a680afd69a5e38f667bdd354e6b61b9b4338d"
+  },
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_708ab665b453.yaml",
+  "gate_verdict": "PASS",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_guidance_alignment -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_reviewer_attempt_isolation -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_ac_rebuttal_multi -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "blocked_reason": null,
+  "notes": "2회차 — 1회차 검토자 finding 4건을 전부 고쳤다. (1) write_envelope 가 역할과 무관하게 repeat_gate 를 지나 차단 상태에서 검토자 계약 생성 자체가 막히던 것: 그 호출을 NON_ATTEMPT_ROLES 조건 아래 두고, 검사를 record_start 직접 호출이 아니라 실제 write_envelope 경로로 올렸다(TestContractCreationPath — 구현자는 ValueError, 검토자는 계약이 만들어진다). (2) 같은 run 분기가 역할 확인 전에 base_sha 를 갱신·저장하던 것: reviewer 면 그 앞에서 기존 회차를 그대로 돌려주고, 다른 base_sha 로 오는 케이스를 검사에 더했다. (3) 「바이트로 그대로」가 실제로는 개수·run·result 만 비교하던 것: attempts 목록만 떼어 직렬화한 바이트를 비교한다. (4) 등록 확인의 선행·중단이 없던 것: check() 로 묶어 등록 실패면 (UNREGISTERED, 명령) 하나를 돌려주고 문서를 읽지 않는다 — 읽을 수 없는 루트를 주어 「읽지 않았다」를 관측으로 보이고, 여집합(등록된 명령이면 읽는다)도 함께 세웠다. 근거: run_708ab665b453 의 check-1·check-2 와 check-7(992건 통과)."
+}

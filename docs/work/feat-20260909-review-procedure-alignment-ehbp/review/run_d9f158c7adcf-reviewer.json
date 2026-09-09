@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_d9f158c7adcf-reviewer.json",
+    "sha256": "60c90ba15dd700b22b15ca88008695a8600068409e9e4688e8c1e2c33e0d589f"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_d9f158c7adcf.yaml",
+  "notes": "두 계약과 현재 HEAD의 base_sha가 일치한다. AC-1~3은 check-1과 검사 코드, AC-4는 안내 문서 셋, AC-5~6은 check-2와 회차 기록 코드, AC-7~8은 check-3과 반박 취합 코드, AC-9는 check-4와 생성된 안내 문서로 확인했다. 필수 검사 7개와 원시 로그의 종료 코드는 모두 0이며 head_sha·dirty_tree_hash가 일치한다. 전체 테스트 999개 통과가 기록돼 있다. 승인 이후 spec 변경은 수용 기준 체크 표시뿐이며 검증 계획 변경과 허용 범위 밖 변경은 없다. 검사 재실행과 해시 계산은 하지 않았다. 검토 후 방어 검사와 판정 봉인은 위임한 쪽의 후속 절차다."
+}

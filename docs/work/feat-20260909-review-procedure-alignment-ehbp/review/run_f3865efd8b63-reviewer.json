@@ -1,0 +1,39 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-review-procedure-alignment-ehbp",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-review-procedure-alignment-ehbp/task/run_f3865efd8b63-reviewer.json",
+    "sha256": "b0bee6adde8f6a4327978463142f088e2c3391fd0749304f53cef70ee8fec243"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-6의 차단 상태에서 검토자 계약을 두 번 생성하는 판별이 충족되지 않는다. 실제 계약 생성 함수 write_envelope는 역할과 관계없이 repeat_gate를 호출하므로, 연속 2회 실패 상태에서는 계약 생성 전에 예외가 발생한다(351~365행). 그런데 tests/test_reviewer_attempt_isolation.py:108~109는 이 경로를 거치지 않고 record_start만 직접 호출한다. check-2의 통과는 회차 기록 함수의 결과이며, 요구된 계약 생성 경로의 증거가 아니다.",
+      "file": "romeo/envelope.py",
+      "line": 409
+    },
+    {
+      "summary": "AC-5는 같은 run의 기존 회차를 그대로 반환하도록 요구하지만, 이 분기는 reviewer 여부를 확인하기 전에 base_sha와 base_sha_history를 변경하고 파일을 저장한다. 기존 회차와 다른 base_sha로 검토자 계약을 만들면 검토자 생성만으로 기존 회차가 바뀐다. tests/test_reviewer_attempt_isolation.py:69는 같은 SHA만 전달하므로 이 경우를 확인하지 않는다.",
+      "file": "romeo/envelope.py",
+      "line": 454
+    },
+    {
+      "summary": "AC-5의 다른 run 회차 보존 검사는 기존 항목의 바이트 보존을 증명하지 않는다. 저장 전후 바이트를 읽지만 assertNotEqual로 파일이 달라졌다는 것만 확인하고, 이후에는 회차 개수·run·result만 비교한다. 기존 started_at이나 base_sha가 바뀌어도 이 검사는 통과한다. 따라서 check-2를 승인된 '기존 항목이 바이트로 그대로 남는다'는 조건의 근거로 지목할 수 없다.",
+      "file": "tests/test_reviewer_attempt_isolation.py",
+      "line": 56
+    },
+    {
+      "summary": "AC-2의 '등록을 먼저 확인하고, 등록 실패 시 안내 대조로 넘어가지 않는다'는 순서와 중단 조건이 구현되지 않았다. 문서 대조는 등록 검사와 독립된 테스트에서 무조건 실행된다. 원시 로그 .harness/runs/feat-20260909-review-procedure-alignment-ehbp/run_f3865efd8b63/01-check-1.log:5~20에서도 문서 대조가 먼저 실행되고 실제 등록 확인은 마지막에 실행된다. 미등록 명령 반례 역시 registered의 반환값만 확인하므로 문서 대조가 중단됨을 증명하지 않는다.",
+      "file": "tests/test_review_guidance_alignment.py",
+      "line": 84
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-review-procedure-alignment-ehbp/evidence/run_f3865efd8b63.yaml",
+  "notes": "두 역할 계약의 base_sha와 현재 HEAD가 일치한다. 승인 커밋 대비 spec 변경은 AC 체크 표시뿐이며 required_checks는 유지됐다. 기록된 변경 경로는 구현자 allowed_paths 안에 있다. 필수 검사 7개의 원시 로그에는 모두 exit 0이 있고 전체 테스트는 992건으로 기록됐다. 이 통과 기록과 별개로 위 수용 기준 미달을 판정했다. 검사 재실행·파일 수정·해시 계산은 하지 않았다."
+}
