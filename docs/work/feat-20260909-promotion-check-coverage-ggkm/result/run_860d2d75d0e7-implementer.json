@@ -1,0 +1,61 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promotion-check-coverage-ggkm",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promotion-check-coverage-ggkm/task/run_860d2d75d0e7-implementer.json",
+    "sha256": "1f10e799cee9e9ada5d8480e078bd0130b261657749ada5d81b4c81b2501eeeb"
+  },
+  "evidence_ref": "docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/run_860d2d75d0e7.yaml",
+  "gate_verdict": "PASS",
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_ci_trigger_coverage -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_promotion_registry -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "grep -q 'UNCHECKED_PROMOTION' docs/current/enforcement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "grep -q '이 문서를 검사하는 것과 하지 않는 것' docs/current/enforcement.md",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo integrity | grep -q '등록 1건 · 미등록 0건'",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "python3 -c \"import romeo.validate as v; hits=[str(q) for q in v.find_docs('.') if str(q).startswith('docs/current')]; assert not hits, hits; print('validate 대상에 docs/current 0건')\"",
+      "exit_code": 0
+    }
+  ],
+  "findings": [],
+  "blocked_reason": null,
+  "notes": "회귀 1건을 고쳤다 — tests/test_integrity.py 의 test_broken_link_notations 가 출력 전체에서 sibling.md 를 찾는 단언을 두었는데, 새 UNCHECKED_PROMOTION 이 같은 이름을 다른 판정으로 인쇄해 깨졌다(fixtures/integrity/broken-link 의 docs/current/ 문서는 등록부에 없다 — Q-93 이 미정으로 둔 그 상황이다). 단언의 의도(실재하는 대상은 링크 위반이 아니다)는 그대로 두고 대상을 BROKEN_LINK 줄로 좁혔다. 근거: run_860d2d75d0e7 의 check-7 — 좁히기 전 discover 는 failures=1, 좁힌 뒤 972건 전부 통과. UNCHECKED_PROMOTION 은 문서에 2회 나오지만 「범위」 절의 이름 목록에는 한 번이고 나머지 한 번은 새로 세운 「이 문서를 검사하는 것과 하지 않는 것」 절의 설명이다(AC-8)."
+}

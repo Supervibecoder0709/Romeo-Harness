@@ -1,0 +1,73 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_6e9053d39efa
+task_id: null
+dispatch_id: null
+unit_id: feat-20260909-promotion-check-coverage-ggkm
+spec_ref:
+  path: docs/work/feat-20260909-promotion-check-coverage-ggkm/spec.md
+  sha256: ead5057d841a98dd2c42976a02a4e10fd6d385d7080d60c21e83f1225d65908d
+base_sha: 134e6877a66b86f3dec37b5477a75299624f47e6
+head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1
+started_at: '2026-09-09T13:38:15+09:00'
+finished_at: '2026-09-09T13:40:25+09:00'
+commands:
+- id: review-tree-before
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:38:15+09:00'
+  finished_at: '2026-09-09T13:38:15+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_6e9053d39efa/01-review-tree-before.log
+  log_sha256: 055c8c095e0a403b8ce4d9d0646202dbff6d368586f39acd3a140835a27320e2
+  stdout_tail: "k/feat-20260909-promotion-check-coverage-ggkm/spec.md\n M romeo/integrity.py\n M romeo/validate.py\n\
+    \ M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? tests/test_ci_trigger_coverage.py\n?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-tree-after
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:40:17+09:00'
+  finished_at: '2026-09-09T13:40:17+09:00'
+  seconds: 0.042
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_6e9053d39efa/02-review-tree-after.log
+  log_sha256: 055c8c095e0a403b8ce4d9d0646202dbff6d368586f39acd3a140835a27320e2
+  stdout_tail: "k/feat-20260909-promotion-check-coverage-ggkm/spec.md\n M romeo/integrity.py\n M romeo/validate.py\n\
+    \ M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? tests/test_ci_trigger_coverage.py\n?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_6e9053d39efa-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T13:40:25+09:00'
+  finished_at: '2026-09-09T13:40:25+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_6e9053d39efa/03-review-record.log
+  log_sha256: 946b8210232fa6b43e53845d03e0b1746aa2f1ef5bbcbf2fa8d45471e2a6f13c
+  stdout_tail: 319df1be4f21d1721e85c3c471090397491e4e7405f85badd48183f00cb9ebee  docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_6e9053d39efa-reviewer.json
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+changed_files:
+- .github/workflows/harness.yml
+- docs/current/enforcement.md
+- romeo/integrity.py
+- romeo/validate.py
+- tests/test_ci_trigger_coverage.py
+- tests/test_integrity.py
+- tests/test_promotion_registry.py
+artifact_hash: 979f25694d10d72483aff1850083e7e3be40a37fefe090a88b9507e801254e15
+reviewer: null
+verdict: null
+approvals: []

@@ -1,0 +1,20 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260909-promotion-check-coverage-ggkm
+attempts:
+- n: 1
+  run: run_860d2d75d0e7
+  base_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  started_at: '2026-09-09T13:12:04+09:00'
+  result: pass
+  failure_class: null
+  note: close PASS · required_checks 9/9 · 재실행 9/9 · 검토자 PASS findings 0
+  settled_at: '2026-09-09T13:47:28+09:00'
+- n: 2
+  run: run_6e9053d39efa
+  base_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  started_at: '2026-09-09T13:38:04+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자-only 재실행(RUNBOOK §6.6) — 산출물은 run_860d2d75d0e7 과 같고 이 run 은 검토 판정만 낸다. 관통 회차가 아니다
+  settled_at: '2026-09-09T13:47:28+09:00'
+reviews: []

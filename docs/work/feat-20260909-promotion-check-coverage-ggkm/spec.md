@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-09T12:58:47+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-09T13:47:00+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260909.md, inputs/ac-rebuttal-20260909-2.md]
-evidence: []
+evidence: [evidence/run_860d2d75d0e7.yaml, evidence/run_6e9053d39efa.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -39,16 +39,16 @@ updated: '2026-09-09'
 - **왜 지금:** 두 결함 다 바로 앞 단위(`feat-20260909-promote-integrity-kchq`)가 새 검사를 세우면서 §12 로 남긴 것이고, **그 새 검사 자신의 사각**이다. `.github/workflows/harness.yml` 의 `paths:` 에 `docs/` 로 시작하는 항목이 하나도 없어, 문서만 바뀐 커밋에서는 `bin/romeo integrity` 도 `bin/romeo validate` 도 돌지 않는다 — 표에서 한 행을 지운 커밋이 초록불로 지나간다. 그리고 대조 대상 승격 문서는 문자열 상수 하나로 고정돼 있어, 예정된 두 번째 승격 문서(`decisions.md`)가 들어오면 링크만 검사받고 내용은 아무도 대조하지 않는다. 다음 마일스톤(M4 지표)이 이 사각 위에서 돌기 전에 메운다.
 - **기대 결과:** `docs/current/enforcement.md` 에서 한 행을 지운 커밋이 CI 를 빨간불로 만든다. `docs/current/` 에 대조원이 없는 새 문서를 두면 `bin/romeo integrity` 가 그 경로를 지목하고 종료 코드 1 을 낸다. 그리고 검사 코드가 읽는 자리가 늘어나면 `paths:` 를 함께 넓히지 않는 한 CI 가 실패한다 — 이 사각이 다시 열리지 않는다.
 - **수용 기준:**
-  - [ ] AC-1 `romeo/validate.py` 와 `romeo/integrity.py` 가 각각 자기가 읽는 저장소 하위 루트를 `READ_ROOTS` 상수로 선언하고, 그 상수가 **사본이 아니라 실제 출처**다. 판별 규칙 둘을 모두 만족한다 — ① 두 모듈의 소스에 `docs` 로 시작하는 문자열 리터럴이 나타나는 자리는 루트 상수의 정의뿐이고, 경로 조립(`/ "docs"`)과 다른 모듈에 경로 결정을 넘기는 호출이 0건이다. ② 루트 상수를 검사 안에서 다른 값으로 바꿔치면 `validate.find_docs` 와 `integrity.broken_links` 가 그 새 값 아래를 보고 원래 값 아래를 보지 않는다.
-  - [ ] AC-2 `tests/test_ci_trigger_coverage.py` 가 두 모듈의 `READ_ROOTS` 합집합의 각 루트에 대해 `.github/workflows/harness.yml` 의 `on.push.paths` 와 `on.pull_request.paths` **양쪽 각각**에서 그 루트를 덮는 패턴을 찾고, 덮이지 않은 `(루트, 이벤트)` 쌍을 그 쌍의 형태로 보고한다 — 보고 형태는 `(루트, 이벤트)` 튜플의 목록이다. 한 쌍이라도 나오면 실패한다. 판별 규칙 셋 — ① 「덮는다」는 패턴에서 끝의 `/**` 를 떼어낸 문자열이 그 루트와 같거나 그 루트의 조상 디렉터리 경로일 때만 참이다. ② `/**` 로 끝나지 않는 패턴은 덮지 않는다. ③ 두 목록 중 하나라도 `!` 로 시작하는 항목을 담으면 그것만으로 실패한다 — 제외 패턴은 순서에 따라 앞의 포함을 무효로 만들 수 있어, 이 워크플로에서는 쓰지 않기로 한다.
-  - [ ] AC-3 AC-2 의 판정을 **이벤트마다 따로** 짝으로 보인다. 세 입력은 AC-2 가 정의한 **같은 판정 함수 하나**를 거치며, 세 호출의 차이는 인자로 넘긴 워크플로 사전뿐이다 — 사본별 기대값을 따로 적은 전용 경로를 두지 않는다. 지금 워크플로에서 `docs/` 로 시작하는 패턴을 `push` 에서만 제거한 사본을 넣으면 보고된 쌍의 이벤트가 `push` 뿐이고, `pull_request` 에서만 제거한 사본을 넣으면 `pull_request` 뿐이며, 지금 워크플로 자체를 넣으면 0쌍이다. 세 입력은 지금 파일에서 파생한 사본이며 승인 커밋이나 git 이력을 참조하지 않는다(Q-92 가 지적한 「새 파일은 이전 상태를 이력에서 꺼낼 수 없다」를 피한다).
-  - [ ] AC-4 `.github/workflows/harness.yml` 이 문서 변경에서 실제로 검사를 돌릴 수 있는 상태다 — ① `on.push.paths` 와 `on.pull_request.paths` 가 각각 `docs/current/**` 와 `docs/work/**` 를 담는다. ② 두 목록 어느 쪽에도 `!` 로 시작하는 항목이 없다. ③ 두 이벤트 어느 쪽에도 `branches`·`branches-ignore` 항목이 없다. ④ 그 워크플로의 job 이 `bin/romeo integrity` 와 `bin/romeo validate` 를 스텝의 `run` 으로 담고, 그 두 스텝과 그것을 담은 job 어느 쪽에도 `if:` 가 없다. 넷 중 하나라도 어긋나면 실패한다 — 경로 필터만 넓히고 실행 경로가 막혀 있으면 이 단위는 아무것도 바꾸지 않은 것이다.
-  - [ ] AC-5 `romeo/integrity.py` 가 대조 대상을 `{승격 문서 경로: 그 문서와 대조할 파생 함수}` 매핑으로 갖고, 그 매핑은 **소스에 리터럴로 적힌 키만** 갖는다 — 디렉터리를 훑어 키를 채우지 않는다. 판별 규칙 둘 — ① 임시 루트의 `docs/current/` 에 파일을 더하거나 지워도 `integrity` 모듈의 매핑 키 집합이 그대로다. ② 그 매핑의 **값이 실제 대조 경로에서 호출된다** — 검사 안에서 어떤 키의 값을 대조를 반드시 어긋나게 하는 함수로 바꿔치면 그 문서에 대해 `PROMOTION_DRIFT` 가 나오고 종료 코드가 1 이 된다. 그리고 `docs/current/` 아래 `.md` 중 그 매핑의 키가 아닌 파일이 있으면 `bin/romeo integrity` 가 그 경로를 담은 `UNCHECKED_PROMOTION` 줄을 인쇄하고 종료 코드 1 을 낸다.
-  - [ ] AC-6 지목 여부가 파일 이름이 아니라 **매핑 키에 드는가**로만 갈린다. 임시 루트에 지금의 `docs/current/enforcement.md` 를 두고, 매핑에 없는 `.md` 를 두 이름으로 각각 더할 때마다 그 경로를 담은 줄과 종료 코드 1 이 나오고, 지우면 같은 루트에서 종료 코드 0 이 나온다. 두 이름 중 하나는 예정된 `decisions.md` 이고, 다른 하나는 **실행할 때마다 달라지는 이름**이다(검사가 실행 시점에 만든다) — 특정 이름을 특별 취급한 구현은 그 쪽에서 걸린다.
-  - [ ] AC-7 이 저장소에서 `bin/romeo integrity` 의 종료 코드가 0 이고, 그 0 이 새 검사를 **건너뛴 결과가 아님이 같은 실행의 출력에 드러난다** — `bin/romeo integrity` 가 등록 검사가 실제로 센 값을 한 줄로 인쇄하고(등록된 승격 문서 수와 미등록 수), 이 저장소에서 그 줄이 등록 1건·미등록 0건을 말한다. 다른 루트의 실패가 아니라 이 실행 자신의 출력이 근거다.
-  - [ ] AC-8 `docs/current/enforcement.md` 의 「범위」 절에서 integrity 자신이 인쇄하는 이름을 세는 목록에 `UNCHECKED_PROMOTION` 이 **정확히 한 번** 나오고, 그 목록이 세는 이름은 넷이다.
-  - [ ] AC-9 `docs/current/enforcement.md` 에 「이 문서를 검사하는 것과 하지 않는 것」 절이 생겨, 승격 문서가 frontmatter 를 두지 않는다는 것 · 문서 검증(`romeo validate`)의 대상이 아니라는 것 · 그 이유(문서 검증의 필수 절과 길이 예산은 라우팅 분류에서 계산되는데 승격 문서에는 분류가 없다) · 대신 무엇이 이 문서를 보는가(`bin/romeo integrity` 의 대조·링크·등록 검사)를 적는다. 그 절이 말하는 frontmatter 부재는 참이다 — `docs/current/enforcement.md` 의 첫 줄이 `---` 가 아니다.
-  - [ ] AC-10 AC-9 의 「대상이 아니다」가 참이다 — 저장소 루트에서 `romeo.validate.find_docs('.')` 를 호출하고 그 결과의 각 경로를 저장소 루트 기준 상대경로 문자열로 만들었을 때, `docs/current/` 로 시작하는 것이 0건이다.
+  - [x] AC-1 `romeo/validate.py` 와 `romeo/integrity.py` 가 각각 자기가 읽는 저장소 하위 루트를 `READ_ROOTS` 상수로 선언하고, 그 상수가 **사본이 아니라 실제 출처**다. 판별 규칙 둘을 모두 만족한다 — ① 두 모듈의 소스에 `docs` 로 시작하는 문자열 리터럴이 나타나는 자리는 루트 상수의 정의뿐이고, 경로 조립(`/ "docs"`)과 다른 모듈에 경로 결정을 넘기는 호출이 0건이다. ② 루트 상수를 검사 안에서 다른 값으로 바꿔치면 `validate.find_docs` 와 `integrity.broken_links` 가 그 새 값 아래를 보고 원래 값 아래를 보지 않는다.
+  - [x] AC-2 `tests/test_ci_trigger_coverage.py` 가 두 모듈의 `READ_ROOTS` 합집합의 각 루트에 대해 `.github/workflows/harness.yml` 의 `on.push.paths` 와 `on.pull_request.paths` **양쪽 각각**에서 그 루트를 덮는 패턴을 찾고, 덮이지 않은 `(루트, 이벤트)` 쌍을 그 쌍의 형태로 보고한다 — 보고 형태는 `(루트, 이벤트)` 튜플의 목록이다. 한 쌍이라도 나오면 실패한다. 판별 규칙 셋 — ① 「덮는다」는 패턴에서 끝의 `/**` 를 떼어낸 문자열이 그 루트와 같거나 그 루트의 조상 디렉터리 경로일 때만 참이다. ② `/**` 로 끝나지 않는 패턴은 덮지 않는다. ③ 두 목록 중 하나라도 `!` 로 시작하는 항목을 담으면 그것만으로 실패한다 — 제외 패턴은 순서에 따라 앞의 포함을 무효로 만들 수 있어, 이 워크플로에서는 쓰지 않기로 한다.
+  - [x] AC-3 AC-2 의 판정을 **이벤트마다 따로** 짝으로 보인다. 세 입력은 AC-2 가 정의한 **같은 판정 함수 하나**를 거치며, 세 호출의 차이는 인자로 넘긴 워크플로 사전뿐이다 — 사본별 기대값을 따로 적은 전용 경로를 두지 않는다. 지금 워크플로에서 `docs/` 로 시작하는 패턴을 `push` 에서만 제거한 사본을 넣으면 보고된 쌍의 이벤트가 `push` 뿐이고, `pull_request` 에서만 제거한 사본을 넣으면 `pull_request` 뿐이며, 지금 워크플로 자체를 넣으면 0쌍이다. 세 입력은 지금 파일에서 파생한 사본이며 승인 커밋이나 git 이력을 참조하지 않는다(Q-92 가 지적한 「새 파일은 이전 상태를 이력에서 꺼낼 수 없다」를 피한다).
+  - [x] AC-4 `.github/workflows/harness.yml` 이 문서 변경에서 실제로 검사를 돌릴 수 있는 상태다 — ① `on.push.paths` 와 `on.pull_request.paths` 가 각각 `docs/current/**` 와 `docs/work/**` 를 담는다. ② 두 목록 어느 쪽에도 `!` 로 시작하는 항목이 없다. ③ 두 이벤트 어느 쪽에도 `branches`·`branches-ignore` 항목이 없다. ④ 그 워크플로의 job 이 `bin/romeo integrity` 와 `bin/romeo validate` 를 스텝의 `run` 으로 담고, 그 두 스텝과 그것을 담은 job 어느 쪽에도 `if:` 가 없다. 넷 중 하나라도 어긋나면 실패한다 — 경로 필터만 넓히고 실행 경로가 막혀 있으면 이 단위는 아무것도 바꾸지 않은 것이다.
+  - [x] AC-5 `romeo/integrity.py` 가 대조 대상을 `{승격 문서 경로: 그 문서와 대조할 파생 함수}` 매핑으로 갖고, 그 매핑은 **소스에 리터럴로 적힌 키만** 갖는다 — 디렉터리를 훑어 키를 채우지 않는다. 판별 규칙 둘 — ① 임시 루트의 `docs/current/` 에 파일을 더하거나 지워도 `integrity` 모듈의 매핑 키 집합이 그대로다. ② 그 매핑의 **값이 실제 대조 경로에서 호출된다** — 검사 안에서 어떤 키의 값을 대조를 반드시 어긋나게 하는 함수로 바꿔치면 그 문서에 대해 `PROMOTION_DRIFT` 가 나오고 종료 코드가 1 이 된다. 그리고 `docs/current/` 아래 `.md` 중 그 매핑의 키가 아닌 파일이 있으면 `bin/romeo integrity` 가 그 경로를 담은 `UNCHECKED_PROMOTION` 줄을 인쇄하고 종료 코드 1 을 낸다.
+  - [x] AC-6 지목 여부가 파일 이름이 아니라 **매핑 키에 드는가**로만 갈린다. 임시 루트에 지금의 `docs/current/enforcement.md` 를 두고, 매핑에 없는 `.md` 를 두 이름으로 각각 더할 때마다 그 경로를 담은 줄과 종료 코드 1 이 나오고, 지우면 같은 루트에서 종료 코드 0 이 나온다. 두 이름 중 하나는 예정된 `decisions.md` 이고, 다른 하나는 **실행할 때마다 달라지는 이름**이다(검사가 실행 시점에 만든다) — 특정 이름을 특별 취급한 구현은 그 쪽에서 걸린다.
+  - [x] AC-7 이 저장소에서 `bin/romeo integrity` 의 종료 코드가 0 이고, 그 0 이 새 검사를 **건너뛴 결과가 아님이 같은 실행의 출력에 드러난다** — `bin/romeo integrity` 가 등록 검사가 실제로 센 값을 한 줄로 인쇄하고(등록된 승격 문서 수와 미등록 수), 이 저장소에서 그 줄이 등록 1건·미등록 0건을 말한다. 다른 루트의 실패가 아니라 이 실행 자신의 출력이 근거다.
+  - [x] AC-8 `docs/current/enforcement.md` 의 「범위」 절에서 integrity 자신이 인쇄하는 이름을 세는 목록에 `UNCHECKED_PROMOTION` 이 **정확히 한 번** 나오고, 그 목록이 세는 이름은 넷이다.
+  - [x] AC-9 `docs/current/enforcement.md` 에 「이 문서를 검사하는 것과 하지 않는 것」 절이 생겨, 승격 문서가 frontmatter 를 두지 않는다는 것 · 문서 검증(`romeo validate`)의 대상이 아니라는 것 · 그 이유(문서 검증의 필수 절과 길이 예산은 라우팅 분류에서 계산되는데 승격 문서에는 분류가 없다) · 대신 무엇이 이 문서를 보는가(`bin/romeo integrity` 의 대조·링크·등록 검사)를 적는다. 그 절이 말하는 frontmatter 부재는 참이다 — `docs/current/enforcement.md` 의 첫 줄이 `---` 가 아니다.
+  - [x] AC-10 AC-9 의 「대상이 아니다」가 참이다 — 저장소 루트에서 `romeo.validate.find_docs('.')` 를 호출하고 그 결과의 각 경로를 저장소 루트 기준 상대경로 문자열로 만들었을 때, `docs/current/` 로 시작하는 것이 0건이다.
 - **위험과 되돌리기:** 이 변경은 이 저장소 안에서 끝난다 — 외부 반영·비용·권한 변화가 없다. 되돌리기는 `git revert <커밋>` 한 번이다. 실질 위험은 둘 — ① `paths:` 를 넓혀 문서만 바꾼 커밋에서도 CI 한 벌(약 2분)이 돈다. 의도한 비용이다. ② 새 `UNCHECKED_PROMOTION` 이 거짓 양성을 내면 무관한 커밋이 막힌다. AC-7 이 그것을 지금 저장소에서 실측으로 배제한다. 개별 되돌리기는 `paths:` 두 줄 삭제와 `integrity.py` 의 새 검사 호출 한 줄 삭제다.
 - **결정 필요:** 없음 — 확정 단계에서 둘 다 골랐다. Q-90 은 「검사 코드에서 읽는 루트를 뽑아 `paths:` 와 대조」, Q-91 은 「등록되지 않은 승격 문서를 지목」이다. 미완 표지 토큰(문서 검증이 open loop 로 세는 그 낱말) 잔존 검사는 넣지 않기로 했다 — 지금 승격 문서 본문에 그 낱말이 판정 **설명**으로 3곳 있어 도입 즉시 거짓 양성 3건이다.
 
@@ -133,6 +133,7 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-09T13:47:00+09:00 · HEAD e78a55781d73 · 검사 기록 run_860d2d75d0e7
 
-- (없음)
+- [evidence/run_860d2d75d0e7.yaml](evidence/run_860d2d75d0e7.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
+- [evidence/run_6e9053d39efa.yaml](evidence/run_6e9053d39efa.yaml) — exit codes [0, 0, 0]

@@ -1,0 +1,407 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_860d2d75d0e7
+task_id: null
+dispatch_id: null
+unit_id: feat-20260909-promotion-check-coverage-ggkm
+spec_ref:
+  path: docs/work/feat-20260909-promotion-check-coverage-ggkm/spec.md
+  sha256: ead5057d841a98dd2c42976a02a4e10fd6d385d7080d60c21e83f1225d65908d
+base_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1
+started_at: '2026-09-09T13:12:11+09:00'
+finished_at: '2026-09-09T13:30:37+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_ci_trigger_coverage -v
+  exit_code: 0
+  started_at: '2026-09-09T13:12:11+09:00'
+  finished_at: '2026-09-09T13:12:12+09:00'
+  seconds: 0.17
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/01-check-1.log
+  log_sha256: 10e5c57b94a89d469935edceb48ddfec9459f64716dbd9e380d349325f7be056
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-2
+  command: python3 -m unittest tests.test_promotion_registry -v
+  exit_code: 0
+  started_at: '2026-09-09T13:12:12+09:00'
+  finished_at: '2026-09-09T13:12:13+09:00'
+  seconds: 0.71
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/02-check-2.log
+  log_sha256: 06ce49542a54ad0942cd0d1590250404ff6edc35b99ac0b8fb6bb18299c793ba
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-3
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-09T13:12:13+09:00'
+  finished_at: '2026-09-09T13:12:13+09:00'
+  seconds: 0.256
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/03-check-3.log
+  log_sha256: d640702119337e5549fdb8a8a5048e048d0582b785f437640527c64a460f1430
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  등록 1건 · 미등록 0건 — docs/current/\n  위반 0건"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-4
+  command: grep -q 'UNCHECKED_PROMOTION' docs/current/enforcement.md
+  exit_code: 0
+  started_at: '2026-09-09T13:12:13+09:00'
+  finished_at: '2026-09-09T13:12:13+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/04-check-4.log
+  log_sha256: 1ba12a8d5c88af42e613fce25cad6e142bae089f2113652a7b56e573bd23ff9d
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-5
+  command: grep -q '이 문서를 검사하는 것과 하지 않는 것' docs/current/enforcement.md
+  exit_code: 0
+  started_at: '2026-09-09T13:12:13+09:00'
+  finished_at: '2026-09-09T13:12:13+09:00'
+  seconds: 0.009
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/05-check-5.log
+  log_sha256: bba5db36707cdb1d0c620c2e9394170304ddd4134dee611f66e37fb64f0f8f6a
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-6
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-09T13:12:13+09:00'
+  finished_at: '2026-09-09T13:12:14+09:00'
+  seconds: 0.356
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/06-check-6.log
+  log_sha256: f6588400a233e4e2532e241ab15f10c8b9f29af0be9cb83921109fe30bd2b849
+  stdout_tail: 'eeds_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-7
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-09T13:12:14+09:00'
+  finished_at: '2026-09-09T13:18:08+09:00'
+  seconds: 353.789
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/07-check-7.log
+  log_sha256: 0de195e7a6e594cc8970c9205309f9fa92541d5d7ed984b71958263916f911b4
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-9
+  command: bin/romeo integrity | grep -q '등록 1건 · 미등록 0건'
+  exit_code: 0
+  started_at: '2026-09-09T13:18:08+09:00'
+  finished_at: '2026-09-09T13:18:08+09:00'
+  seconds: 0.264
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/08-check-9.log
+  log_sha256: 78ed91b8f44c709d75d19ff9a828a7b7b866c553a6062cf6d5346f0fab7efe8e
+  stdout_tail: ''
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: check-8
+  command: python3 -c "import romeo.validate as v; hits=[str(q) for q in v.find_docs('.') if str(q).startswith('docs/current')];
+    assert not hits, hits; print('validate 대상에 docs/current 0건')"
+  exit_code: 0
+  started_at: '2026-09-09T13:18:08+09:00'
+  finished_at: '2026-09-09T13:18:09+09:00'
+  seconds: 0.07
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/09-check-8.log
+  log_sha256: 8fde869004708590ea36cf674856729d7b39e0295a6ffde66fabc22275556676
+  stdout_tail: validate 대상에 docs/current 0건
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: tree-before-review
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:19:29+09:00'
+  finished_at: '2026-09-09T13:19:29+09:00'
+  seconds: 0.032
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/10-tree-before-review.log
+  log_sha256: 055c8c095e0a403b8ce4d9d0646202dbff6d368586f39acd3a140835a27320e2
+  stdout_tail: "k/feat-20260909-promotion-check-coverage-ggkm/spec.md\n M romeo/integrity.py\n M romeo/validate.py\n\
+    \ M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? tests/test_ci_trigger_coverage.py\n?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: tree-after-review
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:21:28+09:00'
+  finished_at: '2026-09-09T13:21:28+09:00'
+  seconds: 0.041
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/11-tree-after-review.log
+  log_sha256: 055c8c095e0a403b8ce4d9d0646202dbff6d368586f39acd3a140835a27320e2
+  stdout_tail: "k/feat-20260909-promotion-check-coverage-ggkm/spec.md\n M romeo/integrity.py\n M romeo/validate.py\n\
+    \ M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? tests/test_ci_trigger_coverage.py\n?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_860d2d75d0e7-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T13:21:43+09:00'
+  finished_at: '2026-09-09T13:21:43+09:00'
+  seconds: 0.024
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/12-review-record.log
+  log_sha256: 06e4fe0143d92fffc69202b40951da78cbdfd704aa659d48fbc78ced3d159dd5
+  stdout_tail: e5a413833edbfb280f1f6996b2c5282d3121c004961e7f7210e4515b46aad0ac  docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_860d2d75d0e7-reviewer.json
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-tree-before
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:28:36+09:00'
+  finished_at: '2026-09-09T13:28:36+09:00'
+  seconds: 0.044
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/13-review-tree-before.log
+  log_sha256: 2d3a708b7c1d674c7834b154790e99cc1b26aff5130e506928c3083ae602bbc4
+  stdout_tail: "tegrity.py\n M romeo/validate.py\n M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/review/\n?? tests/test_ci_trigger_coverage.py\n\
+    ?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-tree-after
+  command: git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/promotion-check-coverage-impl1 status
+    --porcelain
+  exit_code: 0
+  started_at: '2026-09-09T13:30:28+09:00'
+  finished_at: '2026-09-09T13:30:29+09:00'
+  seconds: 0.048
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/14-review-tree-after.log
+  log_sha256: 2d3a708b7c1d674c7834b154790e99cc1b26aff5130e506928c3083ae602bbc4
+  stdout_tail: "tegrity.py\n M romeo/validate.py\n M tests/test_integrity.py\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/attempts.yaml\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/\n?? docs/work/feat-20260909-promotion-check-coverage-ggkm/result/\n\
+    ?? docs/work/feat-20260909-promotion-check-coverage-ggkm/review/\n?? tests/test_ci_trigger_coverage.py\n\
+    ?? tests/test_promotion_registry.py"
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+- id: review-record-2
+  command: shasum -a 256 docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_860d2d75d0e7-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-09T13:30:37+09:00'
+  finished_at: '2026-09-09T13:30:37+09:00'
+  seconds: 0.041
+  log: .harness/runs/feat-20260909-promotion-check-coverage-ggkm/run_860d2d75d0e7/15-review-record-2.log
+  log_sha256: e1198e6c4c4085c6d793240a1444460f38fff03cb29372d24b02c45dcb7db846
+  stdout_tail: 841fa50bf81792fc5b423be58e3001bb4283681fcd8d2d34cde3c1dc36925c4a  docs/work/feat-20260909-promotion-check-coverage-ggkm/review/run_860d2d75d0e7-reviewer.json
+  head_sha: e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e
+  dirty_tree_hash: e7295b715d7e0491296d45ae97f4a2bdba1a88393ee0a5d3bb4b7b47665d6cba
+changed_files:
+- .github/workflows/harness.yml
+- docs/current/enforcement.md
+- romeo/integrity.py
+- romeo/validate.py
+- tests/test_ci_trigger_coverage.py
+- tests/test_integrity.py
+- tests/test_promotion_registry.py
+artifact_hash: 979f25694d10d72483aff1850083e7e3be40a37fefe090a88b9507e801254e15
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-09T13:47:00+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-2 «하나라도»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-4 «하나라도»
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-09T12:58:47+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 e78a55781d73 의 하네스 (468개 파일 대조 · /Users/julliettelee/.claude/jobs/7e45da56/tmp/judge-e78a557)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: '검사 기록 = run_860d2d75d0e7 — 검증 계획 9건을 전부 실행한 run · 계획의 검사를 하나도 담지 않은 run 1건은 검사 기록이 아니다(방어
+      검사 등): [''run_6e9053d39efa''] · 지금 트리와 같은 산출물의 run 2건/2건 중'
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence e78a55781d73 vs 현재 e78a55781d73
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence e7295b715d7e vs 현재 e7295b715d7e (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_ci_trigger_coverage -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_promotion_registry -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — grep -q ''UNCHECKED_PROMOTION'' docs/current/enforcement.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — grep -q ''이 문서를 검사하는 것과 하지 않는 것'' docs/current/enforcement.md'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo integrity | grep -q ''등록 1건 · 미등록 0건'''
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — python3 -c "import romeo.validate as v; hits=[str(q) for q in v.find_docs(''.'')
+      if str(q).startswith(''docs/current'')]; assert not hits, hits; print(''validate 대상에 docs/current
+      0건'')"'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 15건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 10건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 9건이 승인 커밋 e78a55781d73 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_ci_trigger_coverage -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_promotion_registry -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — grep -q ''UNCHECKED_PROMOTION'' docs/current/enforcement.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — grep -q ''이 문서를 검사하는 것과 하지 않는 것'' docs/current/enforcement.md'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo integrity | grep -q ''등록 1건 · 미등록 0건'''
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — python3 -c "import romeo.validate as v; hits=[str(q) for q in v.find_docs(''.'')
+      if str(q).startswith(''docs/current'')]; assert not hits, hits; print(''validate 대상에 docs/current
+      0건'')"'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 e78a55781d73 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['.github/workflows/harness.yml', 'docs/current/enforcement.md', 'romeo/integrity.py',
+      'romeo/validate.py', 'tests/test_ci_trigger_coverage.py', 'tests/test_integrity.py', 'tests/test_promotion_registry.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_6e9053d39efa-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

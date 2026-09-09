@@ -15,9 +15,17 @@ CHECKED_RE = re.compile(r"^\s*- \[[xX]\]", re.M)
 #: 검사 대상이 되는 문서 파일 이름. 작업 단위 폴더에는 이것 말고도 계약·증거·결과가 함께 산다.
 DOC_NAMES = ("spec.md", "brief.md", "charter.md")
 
+#: 이 모듈이 읽는 작업 단위 폴더의 루트.
+WORK_ROOT = "docs/work"
+#: 이 모듈이 저장소에서 읽는 루트 전부. **CI 트리거가 이 값을 덮어야 한다**(`tests/test_ci_trigger_coverage.py`).
+#: 검사가 읽는 자리를 늘리면서 워크플로의 `paths:` 를 넓히지 않으면, 그 자리를 바꾼 커밋에서 이 검사는 돌지 않는다 —
+#: 막는 자리에 있으면서 보는 사건이 좁은 상태다(AGENTS.core §11 ①). 그래서 여기가 단일 출처이고,
+#: 아래 함수들은 이 값에서 경로를 만든다. 상수를 두고 함수가 따로 조립하면 그것은 사본이라 어긋날 수 있다.
+READ_ROOTS = (WORK_ROOT,)
+
 
 def find_docs(project_root):
-    base = Path(project_root) / "docs" / "work"
+    base = Path(project_root) / WORK_ROOT
     if not base.is_dir():
         return []
     return sorted(p for p in base.glob("*/*.md") if p.name in DOC_NAMES)

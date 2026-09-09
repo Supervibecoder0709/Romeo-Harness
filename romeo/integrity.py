@@ -28,8 +28,16 @@ from pathlib import Path
 from . import frontmatter
 from .util import load_yaml
 
-#: 승격 문서의 자리. 이 자리는 규약이다 — 검사가 읽는 문서와 요구가 사는 문서가 같아야 한다(§11).
-DOC_PATH = "docs/current/enforcement.md"
+#: 승격 문서가 사는 루트. 이 자리는 규약이다 — 검사가 읽는 문서와 요구가 사는 문서가 같아야 한다(§11).
+CURRENT_ROOT = "docs/current"
+#: 작업 단위 폴더의 루트. id 중복을 세는 자리다.
+WORK_ROOT = "docs/work"
+#: 이 모듈이 저장소에서 읽는 루트 전부. **CI 트리거가 이 값을 덮어야 한다**(`tests/test_ci_trigger_coverage.py`).
+#: 여기를 늘리면서 워크플로의 `paths:` 를 넓히지 않으면, 그 자리를 바꾼 커밋에서 이 검사가 돌지 않는다 —
+#: 막는 자리에 있으면서 보는 사건이 좁은 상태다(AGENTS.core §11 ①). 아래 함수들은 이 값에서 경로를 만든다.
+READ_ROOTS = (CURRENT_ROOT, WORK_ROOT)
+#: 첫 승격 문서의 자리. 등록부(`PROMOTED`)의 키이고, 그 등록부는 `derive` 정의 뒤에 선다.
+DOC_PATH = CURRENT_ROOT + "/enforcement.md"
 #: 판정 id 를 뽑는 코드·정책표. 여기 없는 자리의 판정은 대조하지 않는다(승격 문서의 「범위」 절이 밝힌다).
 CLOSE_SRC = "romeo/close.py"
 VALIDATE_SRC = "romeo/validate.py"
@@ -195,6 +203,15 @@ def derive_ids(project_root="."):
     return {cid: src for (cid, _lv), src in derive(project_root).items()}
 
 
+#: 승격 문서 등록부 — `{승격 문서 경로: 그 문서와 대조할 파생 함수}`.
+#:
+#: **소스에 리터럴로 적힌 키만 갖는다.** 디렉터리를 훑어 채우지 않는다 — 훑어서 채우면
+#: 어떤 문서든 자동으로 등록되므로 `unregistered_promotions` 가 영영 아무것도 찾지 못하고,
+#: 그 검사는 있으면서 아무것도 막지 않는 상태가 된다. 새 승격 문서를 세우는 단위는
+#: 그 문서와 대조할 파생 함수를 **여기에 손으로 적는다** — 그 한 줄이 「이 문서는 무엇과 대조되는가」의 답이다.
+PROMOTED = {DOC_PATH: derive}
+
+
 def _rows(text):
     """문서의 표 중 **`수준` 열을 가진 표**의 데이터 행. `[(첫 열, {열이름: 값})]`.
 
@@ -239,9 +256,9 @@ def document_ids(path):
 
 
 def compare(project_root="."):
-    """(가) 문서와 (나) 코드·정책표의 `(id, 수준)` 쌍 집합을 대조한다. `(대조한 id 개수, 어긋난 줄들)`.
+    """등록부의 각 승격 문서를 그 파생원과 `(id, 수준)` 쌍 집합으로 대조한다. `(대조한 id 개수, 어긋난 줄들)`.
 
-    **코드도 문서도 없을 때만** 대조가 성립하지 않는다 — 그 루트에는 올릴 것도 올린 것도 없다.
+    **코드도 문서도 없을 때만** 그 문서의 대조가 성립하지 않는다 — 그 루트에는 올릴 것도 올린 것도 없다.
     **한쪽만** 없는 루트는 아무것도 없는 루트가 아니라 한쪽이 통째로 사라진 루트다 —
     그 차이를 건너뛰면 판정이 남은 채 목록만 없어진 저장소가 대조를 통과한다.
 
@@ -250,20 +267,26 @@ def compare(project_root="."):
     어긋났다고 볼 것인지는 정해지지 않았다 — 열어 두었다(Q-93). 예외를 두는 것은 새 요구다(§11).
 
     인쇄하는 것은 쌍 집합의 **대칭차**다(AC-2 — 한쪽에만 있는 쌍을 어느 쪽인지와 함께).
-    수준만 다른 id 는 두 줄로 나온다 — 코드에만 있는 쌍 하나와 문서에만 있는 쌍 하나다."""
+    수준만 다른 id 는 두 줄로 나온다 — 코드에만 있는 쌍 하나와 문서에만 있는 쌍 하나다.
+
+    등록부의 **값이 실제로 호출되는 자리가 여기다.** 값을 부르지 않고 키만 세면 등록부는 이름표가 되고
+    대조는 사라진다 — 그 구멍은 값을 어긋나게 하는 함수로 바꿔치면 바로 드러난다.
+    """
     root = Path(project_root)
-    code = derive(root)
-    doc = document(root / DOC_PATH)
-    if not code and not doc:
-        return None, []
-    lines = []
-    for pair in sorted(set(code) ^ set(doc)):
-        cid, level = pair
-        if pair in code:
-            lines.append(f"PROMOTION_DRIFT 코드에만 있다: `{cid}` ({level}) — {code[pair]}")
-        else:
-            lines.append(f"PROMOTION_DRIFT 문서에만 있다: `{cid}` ({level}) — {DOC_PATH}")
-    return len({cid for cid, _lv in set(code) | set(doc)}), lines
+    compared, lines = None, []
+    for doc_path, derive_fn in sorted(PROMOTED.items()):
+        code = derive_fn(root)
+        doc = document(root / doc_path)
+        if not code and not doc:
+            continue
+        compared = (compared or 0) + len({cid for cid, _lv in set(code) | set(doc)})
+        for pair in sorted(set(code) ^ set(doc)):
+            cid, level = pair
+            if pair in code:
+                lines.append(f"PROMOTION_DRIFT 코드에만 있다: `{cid}` ({level}) — {code[pair]}")
+            else:
+                lines.append(f"PROMOTION_DRIFT 문서에만 있다: `{cid}` ({level}) — {doc_path}")
+    return compared, lines
 
 
 #: 검사하지 않는 대상 경로의 선두. 이 저장소 밖을 가리키므로 파일 존재로 판정할 수 없다.
@@ -284,7 +307,7 @@ def _link_target(inner):
 
 def broken_links(project_root="."):
     """`docs/current/` 아래 `.md` 의 상대 인라인 링크 중 대상 파일이 없는 것."""
-    base = Path(project_root) / "docs" / "current"
+    base = Path(project_root) / CURRENT_ROOT
     out = []
     for md in sorted(base.rglob("*.md")) if base.is_dir() else []:
         for inner in LINK_RE.findall(md.read_text(encoding="utf-8")):
@@ -296,9 +319,27 @@ def broken_links(project_root="."):
     return out
 
 
+def unregistered_promotions(project_root="."):
+    """`CURRENT_ROOT` 아래 `.md` 중 `PROMOTED` 의 키가 **아닌** 것.
+
+    승격 문서가 늘어날 때 대조 없이 들어오는 것을 막는다. 링크 검사(`broken_links`)는 이 루트의 모든 문서를
+    훑지만 대조는 등록된 문서에만 붙으므로, 등록을 잊은 문서는 링크만 검사받고 내용은 아무도 보지 않는다 —
+    그것이 「검사 대상 밖의 문서」가 생기는 경로다(Q-91).
+
+    판정은 **파일 이름이 아니라 등록부에 드는가**로만 갈린다. 이름을 특별 취급하는 자리를 두지 않는다."""
+    root = Path(project_root)
+    base = root / CURRENT_ROOT
+    out = []
+    for md in sorted(base.rglob("*.md")) if base.is_dir() else []:
+        rel = md.relative_to(root).as_posix()
+        if rel not in PROMOTED:
+            out.append(f"UNCHECKED_PROMOTION {rel} — 대조할 파생원이 PROMOTED 에 등록되지 않았다")
+    return out
+
+
 def duplicate_unit_ids(project_root="."):
     """`docs/work/` **바로 아래** 폴더의 `spec.md` frontmatter `id` 중복. `spec.md` 가 없는 폴더는 건너뛴다."""
-    base = Path(project_root) / "docs" / "work"
+    base = Path(project_root) / WORK_ROOT
     seen = {}
     for d in sorted(p for p in base.iterdir() if p.is_dir()) if base.is_dir() else []:
         spec = d / "spec.md"
@@ -311,7 +352,7 @@ def duplicate_unit_ids(project_root="."):
         uid = (fm or {}).get("id")
         if uid:
             seen.setdefault(str(uid), []).append(d.name)
-    return [f"DUPLICATE_UNIT_ID {uid} — docs/work/{{{', '.join(dirs)}}}"
+    return [f"DUPLICATE_UNIT_ID {uid} — {WORK_ROOT}/{{{', '.join(dirs)}}}"
             for uid, dirs in sorted(seen.items()) if len(dirs) > 1]
 
 
@@ -324,7 +365,12 @@ def run(project_root="."):
         lines.append(f"  대조 건너뜀 — {DOC_PATH} 도 판정을 뽑을 코드도 이 루트에 없다")
     else:
         lines.append(f"  대조 {compared}건 — {DOC_PATH} ↔ 코드·정책표")
-    violations = drift + broken_links(root) + duplicate_unit_ids(root)
+    unregistered = unregistered_promotions(root)
+    # 등록 검사가 **실제로 돌았다**는 것을 이 실행 자신의 출력으로 남긴다. 종료 코드 0 만으로는
+    # 「돌고 위반이 없었다」와 「호출을 건너뛰었다」가 구분되지 않는다.
+    registered = [k for k in sorted(PROMOTED) if (root / k).is_file()]
+    lines.append(f"  등록 {len(registered)}건 · 미등록 {len(unregistered)}건 — {CURRENT_ROOT}/")
+    violations = drift + unregistered + broken_links(root) + duplicate_unit_ids(root)
     lines += [f"  {v}" for v in violations]
     lines.append(f"  위반 {len(violations)}건")
     return (1 if violations else 0), lines

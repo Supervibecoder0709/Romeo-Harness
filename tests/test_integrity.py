@@ -250,7 +250,11 @@ class Fixtures(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("없는-제목붙은.md", out)      # 경로 뒤에 공백과 따옴표 제목이 붙은 표기
         self.assertIn("없는-공백붙은.md", out)      # 경로 뒤에 공백만 붙은 표기
-        self.assertNotIn("sibling.md", out)         # 같은 표기의 실재하는 대상은 잡지 않는다
+        # 같은 표기의 실재하는 대상은 **링크 위반으로** 잡지 않는다.
+        # 출력 전체가 아니라 BROKEN_LINK 줄만 본다 — 이 fixture 루트의 문서는 승격 등록부에 없으므로
+        # `UNCHECKED_PROMOTION` 줄에도 같은 이름이 나온다. 그것은 이 검사가 보는 것이 아니다.
+        broken = [ln for ln in out.split("\n") if "BROKEN_LINK" in ln]
+        self.assertNotIn("sibling.md", "\n".join(broken))
 
     def test_duplicate_unit_id(self):
         """AC-5 — 폴더 이름은 다르고 frontmatter id 만 같으면 exit 1 이고 그 id 와 폴더를 인쇄한다."""

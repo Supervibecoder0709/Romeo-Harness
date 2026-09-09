@@ -26,6 +26,8 @@ on:
       - 'LICENSE'
       - 'THIRD_PARTY_NOTICES.md'
       - 'THIRD_PARTY_NOTICES.md'
+      - 'docs/current/**'
+      - 'docs/work/**'
       - '.github/workflows/harness.yml'
   pull_request:
     paths:
@@ -49,6 +51,8 @@ on:
       - 'LICENSE'
       - 'THIRD_PARTY_NOTICES.md'
       - 'THIRD_PARTY_NOTICES.md'
+      - 'docs/current/**'
+      - 'docs/work/**'
       - '.github/workflows/harness.yml'
   workflow_dispatch:
 

@@ -85,9 +85,31 @@
 **그 밖의 자리에서 인쇄되는 이름은 이 표에 없다.** 지금 아는 것만 적는다.
 
 - `romeo/docs.py` 의 승인 경고(`AC_UNREBUTTED`), `romeo/doctor.py` · `romeo/parity.py` · `romeo/provenance.py` 등이 내는 이름.
-- `romeo/integrity.py` 자신이 인쇄하는 이름(`PROMOTION_DRIFT` · `BROKEN_LINK` · `DUPLICATE_UNIT_ID`).
+- `romeo/integrity.py` 자신이 인쇄하는 이름 넷 — `PROMOTION_DRIFT` · `UNCHECKED_PROMOTION` · `BROKEN_LINK` · `DUPLICATE_UNIT_ID`.
 - `core/policy/packages.yaml` 의 `warnings:` 카탈로그 — 그것은 메시지 문안이고 집행 자리가 아니다.
   거기 실린 이름 중 실제로 집행되는 것(`AC_UNIVERSAL` · `BUDGET_EXCEEDED`)은 위 표에 출처와 함께 있다.
 
 넓히려면 `romeo/integrity.py` 의 뽑는 자리와 이 절을 **같은 커밋에서** 함께 고친다 —
 요구하는 자리와 보는 자리를 같게 둔다(AGENTS.core §11).
+
+## 이 문서를 검사하는 것과 하지 않는 것
+
+**이 문서에는 frontmatter 가 없다.** 그리고 문서 검증(`romeo validate`)의 대상이 아니다 — 둘은 같은 결정의 두 면이다.
+
+문서 검증이 보는 것(필수 절이 있는가 · 길이 예산을 넘었는가 · profile 이 맞는가)은 전부 **라우팅 분류에서 계산된다.**
+그런데 승격 문서에는 분류가 없다 — 이것은 작업 단위가 아니라 끝난 사실이 모이는 자리이고, 단위·모드·영역·깊이를 갖지 않는다.
+분류 없는 문서에 분류로 계산한 잣대를 대려면 문서마다 가짜 분류를 붙여야 하고, 그러면 이 자리는
+「검증받은 듯한 머리를 달았지만 그 머리가 아무것도 뜻하지 않는」 문서가 된다. 그래서 붙이지 않는다.
+**적어 두고 아무도 안 읽는 것은 결정이고, 적지 않아서 아무도 안 읽는 것은 사고다**(AGENTS.core §11) — 이 절이 그 결정이다.
+
+대신 이 문서를 보는 것은 `bin/romeo integrity` 이고, 세 가지를 본다.
+
+1. **대조** — 아래 표의 `(판정 id, 수준)` 쌍이 코드·정책표에서 다시 뽑은 것과 같은가(`PROMOTION_DRIFT`).
+2. **링크** — 이 문서의 상대 인라인 링크 대상이 실재하는가(`BROKEN_LINK`).
+3. **등록** — `docs/current/` 아래의 문서가 대조할 파생원과 함께 등록돼 있는가(`UNCHECKED_PROMOTION`).
+   등록부는 `romeo/integrity.py` 의 `PROMOTED` 이고, 키는 **손으로 적는다.** 디렉터리를 훑어 채우면
+   어떤 문서든 자동으로 등록되어 이 검사가 아무것도 찾지 못한다.
+
+그 명령은 CI 의 한 스텝이고, 워크플로의 `paths:` 는 `docs/current/**` 를 담는다 —
+이 문서만 바뀐 커밋에서도 위 셋이 돈다. 담지 않으면 검사가 막는 자리에 있으면서 보는 사건이 좁아
+표에서 한 행을 지운 커밋이 초록불로 지나간다. 그 대응은 `tests/test_ci_trigger_coverage.py` 가 지킨다.

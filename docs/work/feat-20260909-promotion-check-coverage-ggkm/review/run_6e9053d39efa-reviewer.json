@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-promotion-check-coverage-ggkm",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-promotion-check-coverage-ggkm/task/run_6e9053d39efa-reviewer.json",
+    "sha256": "419387417fedacae13ffc13aa69d890f602094340369b7510c2a299e8b8ec928"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-promotion-check-coverage-ggkm/evidence/run_860d2d75d0e7.yaml",
+  "notes": "두 작업 계약의 base_sha와 현재 HEAD가 e78a55781d73f450d7c2f2fe11c2f0dfb998fe7e로 일치한다. AC-1~4는 check-1의 9개 테스트 기록과 tests/test_ci_trigger_coverage.py 및 실제 구현·워크플로를 대조했다. AC-5~6은 check-2의 등록부 키 불변·파생 함수 교체·두 이름의 추가 및 삭제 검사 기록으로 확인했다. AC-7은 check-3의 동일 실행에서 등록 1건·미등록 0건과 종료 코드 0을 확인했으며 check-9도 통과했다. AC-8은 docs/current/enforcement.md:88의 네 이름 목록과 check-4, AC-9는 같은 문서의 첫 줄 및 95~115행과 check-5, AC-10은 check-8의 대상 0건 기록과 find_docs 구현으로 확인했다. 필수 검사 9개의 명령·종료 코드·HEAD·작업 트리 식별값이 원시 로그와 일치하며, 전체 테스트 972건 통과 기록을 읽었다. 새 검토 실행의 사전 기록도 같은 작업 트리 식별값을 가리킨다. 현재 변경은 구현자 allowed_paths 안이고, 승인된 명세와의 차이는 수용 기준 체크 표시뿐이다. 검증 계획 변경이나 승인 없는 가드 대상 행동은 확인되지 않았다. 파일 수정·검사 재실행·해시 계산·승인은 하지 않았다."
+}
