@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -519,14 +520,35 @@ def _read_source_tree(root: Path, src: Path):
     return entries
 
 
+def _harness_revision():
+    """이 컴파일을 실행한 **하네스 저장소**의 HEAD.
+
+    부착된 저장소는 그 자체로는 어느 리비전이 붙었는지 말할 수 없다 — `bin/` 과 `romeo/` 가
+    복제되지 않아 명령은 하네스 쪽에서 `--root <대상>` 으로 돌기 때문이다(Q-54).
+    그래서 컴파일이 자기가 선 자리를 대상에 적어 둔다. 값을 못 읽으면 **빈 문자열로 두지 않고**
+    그 사실을 값으로 남긴다 — 부재를 조용한 통과로 만들지 않기 위해서다.
+    """
+    from . import HARNESS_ROOT
+    try:
+        r = subprocess.run(["git", "-C", str(HARNESS_ROOT), "rev-parse", "HEAD"],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return "unavailable: git 을 실행할 수 없다"
+    if r.returncode != 0:
+        return "unavailable: 하네스 저장소가 git 이 아니거나 커밋이 없다"
+    return r.stdout.strip()
+
+
 def _state_bytes(written):
     state = {
         "schema_version": 1,
         "romeo_version": __version__,
+        "harness_revision": _harness_revision(),
         "outputs": sorted(written),
     }
     text = ("# `romeo compile` 산출물 목록. 손으로 고치지 않는다.\n"
             "# 여기 있는 경로는 언제든 다시 생성되므로, 고칠 곳은 core/ 와 adapters/ 다.\n"
+            "# harness_revision 은 이 산출물을 만든 하네스 저장소의 HEAD 다 — 대상 저장소는 그것을 스스로 알 수 없다.\n"
             "---\n" + dump_yaml(state))
     return text.encode("utf-8")
 

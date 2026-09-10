@@ -12,6 +12,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from . import HARNESS_ROOT
+from .attach import RUNBOOK_REL
 from .util import load_any, project_root as _project_root
 
 CONFLICTS_DIR = "fixtures/conflicts"
@@ -189,34 +191,78 @@ def probe_capabilities(root=None, harness_root=None):
     return out
 
 
+def harness_owned(root):
+    """`.harness/compiled.yaml` 의 `outputs` — **하네스가 놓은 것**의 목록이다.
+
+    부착 검사의 대상을 이 목록으로 좁힌다. 대상 저장소가 원래 갖고 있던 자산은 하네스의 판정에
+    들어가지 않는다 — 2026-09-04 실측에서 대상의 기존 스킬 8개가 부착 실패로 세어졌다(Q-55).
+    목록을 읽을 수 없으면 `None` 을 돌려주고, 그때는 **좁히지 않는다**(부재를 면제로 읽지 않는다).
+    """
+    p = Path(root) / ".harness/compiled.yaml"
+    if not p.exists():
+        return None
+    try:
+        data = load_any(p) or {}
+    except Exception:
+        return None
+    outputs = data.get("outputs")
+    if not isinstance(outputs, list):
+        return None
+    return [rel for rel in outputs if isinstance(rel, str) and rel]
+
+
+def _is_owned(path: Path, root: Path, owned):
+    """`path` 가 하네스가 놓은 산출물 안에 있는가. 심링크는 **놓인 자리**를 기준으로 본다."""
+    if owned is None:
+        return True
+    try:
+        rel = path.relative_to(root).as_posix()
+    except ValueError:
+        return False
+    for o in owned:
+        o = o.rstrip("/")
+        if rel == o or rel.startswith(o + "/"):
+            return True
+    return False
+
+
 def probe_skill_files(root):
-    """두 런타임의 스킬 디렉터리를 파일 수준으로 검사한다. 로드 여부는 알 수 없다."""
+    """두 런타임의 스킬 디렉터리를 파일 수준으로 검사한다. 로드 여부는 알 수 없다.
+
+    **검사 종류는 하나도 줄이지 않는다** — 목록 밖의 것도 같은 검사를 돌린다. `problems` 는 그 전부를
+    담고(이 자리의 뜻은 바뀌지 않는다), 판정에 세는 것은 `owned_problems` 뿐이다.
+    범위를 좁히는 것과 검사를 없애는 것은 다르다.
+    """
     from . import frontmatter as fm
     from .compile import load_adapters
 
+    owned = harness_owned(root)
     out = []
     for adapter in load_adapters(root):
         d = root / adapter["skills_dir"]
-        skills, problems = [], []
+        skills, problems, foreign = [], [], []
         if not d.is_dir():
-            out.append({"runtime": adapter["id"], "dir": adapter["skills_dir"],
-                        "count": 0, "problems": ["디렉터리가 없다"], "skills": []})
+            out.append({"runtime": adapter["id"], "dir": adapter["skills_dir"], "count": 0,
+                        "problems": ["디렉터리가 없다"], "owned_problems": ["디렉터리가 없다"],
+                        "foreign_problems": [], "skills": []})
             continue
         for sk in sorted(d.glob("*/SKILL.md")):
             name_dir = sk.parent.name
+            bucket = problems if _is_owned(sk, root, owned) else foreign
             meta, _ = fm.split(sk.read_text(encoding="utf-8"))
             if not meta:
-                problems.append(f"{name_dir}: frontmatter 없음 — discovery 안 된다")
+                bucket.append(f"{name_dir}: frontmatter 없음 — discovery 안 된다")
                 continue
             if not meta.get("name"):
-                problems.append(f"{name_dir}: name 없음")
+                bucket.append(f"{name_dir}: name 없음")
             if not (meta.get("description") or "").strip():
-                problems.append(f"{name_dir}: description 없음 — 라우터가 켤 근거가 없다")
+                bucket.append(f"{name_dir}: description 없음 — 라우터가 켤 근거가 없다")
             if sk.is_symlink() or sk.parent.is_symlink():
-                problems.append(f"{name_dir}: 심링크 — Windows 에서 깨진다")
+                bucket.append(f"{name_dir}: 심링크 — Windows 에서 깨진다")
             skills.append(meta.get("name") or name_dir)
-        out.append({"runtime": adapter["id"], "dir": adapter["skills_dir"],
-                    "count": len(skills), "problems": problems, "skills": sorted(skills)})
+        out.append({"runtime": adapter["id"], "dir": adapter["skills_dir"], "count": len(skills),
+                    "problems": problems + foreign, "owned_problems": problems,
+                    "foreign_problems": foreign, "skills": sorted(skills)})
     return out
 
 
@@ -513,11 +559,83 @@ def runtime_load_mark(probe, entry):
     return mark, note
 
 
+#: 40자 커밋 식별자. **대소문자를 모두 받는다** — git 은 소문자로 내지만 이 값은 손으로 쓸 수 있고,
+#: 소문자만 받으면 대문자가 섞인 그럴듯한 거짓 값에서 실재성 검사를 조용히 건너뛴다(1회차 검토자 finding).
+_HEX40 = re.compile(r"^[0-9a-fA-F]{40}$")
+
+
+def _commit_lookup(sha, harness_root=None):
+    """`sha` 가 **판정 명령을 실행한 하네스 저장소의 로컬 이력**에 있는가.
+
+    셋을 구분한다 — `True`(있다) · `False`(없다) · `None`(확인할 수 없다).
+    판정하는 하네스 자신이 git 이 아니면 실재 여부를 **모르는** 것이지 없는 것이 아니다.
+    모르는 것을 아는 것처럼 말하지 않는다(AGENTS.core §5 · K-68).
+    """
+    from . import gitinfo
+
+    root = Path(harness_root) if harness_root else HARNESS_ROOT
+    if not gitinfo.is_repo(root):
+        return None
+    code, _ = _run(["git", "-C", str(root), "cat-file", "-e", f"{sha}^{{commit}}"])
+    return None if code is None else code == 0
+
+
+def check_attach_complete(root):
+    """부착 정본(`scenarios/10-attach-payload.md` 의 「놓는 것」)과 대조한다.
+
+    **부재를 일치로 읽지 않는다.** 산출물 0개가 목록 0개와 맞아떨어져 빈 저장소가 통과하던 자리다(Q-53).
+    요구는 이 함수가 아니라 그 문서가 소유하고, 여기서는 매번 읽는다 — 목록을 코드에 복사하면
+    문서를 고쳐도 판정이 따라오지 않는다(AGENTS.core §11).
+    """
+    from . import attach as attach_mod
+
+    root = Path(root)
+    findings = []
+    try:
+        gone = attach_mod.missing(root)
+    except (AssertionError, OSError) as exc:
+        return [("ATTACH_MANIFEST_UNREADABLE", attach_mod.RUNBOOK_REL, "", str(exc))]
+    for rel in gone:
+        findings.append(("ATTACH_INCOMPLETE", rel, "",
+                         "부착 정본이 요구하는데 이 루트에 없다 — 붙지 않았거나 덜 붙었다"))
+
+    state = root / ".harness/compiled.yaml"
+    if state.exists():
+        try:
+            data = load_any(state) or {}
+        except Exception:
+            data = {}
+        rev = data.get("harness_revision")
+        if not isinstance(rev, str) or not rev.strip():
+            findings.append(("ATTACH_REVISION_MISSING", ".harness/compiled.yaml", "",
+                             "어느 하네스 리비전이 붙었는지 기록이 없다 — `romeo compile --root <대상>` 으로 다시 만든다"))
+        elif _HEX40.match(rev.strip()) and _commit_lookup(rev.strip()) is False:
+            findings.append(("ATTACH_REVISION_UNKNOWN", ".harness/compiled.yaml", rev.strip(),
+                             "기록된 리비전이 이 하네스 저장소의 로컬 이력에 없다"))
+    return findings
+
+
 def doctor(root=None):
     """전체 진단. 반환값은 렌더링과 테스트가 함께 쓴다."""
     root = Path(root) if root else _project_root()
     from .compile import check_compiled
     from .provenance import check_notices, check_provenance_ids, check_vendor
+
+    completeness = [list(f) for f in check_attach_complete(root)]
+    # 시나리오 10 이 적은 순서 그대로다 — 「1번이 판정이고, 2~4번은 그 위에서만 의미가 있다」.
+    # 붙지 않은 루트에서 산출물·vendor·고지를 대조하는 것은 없는 것을 없는 것과 맞춰 보는 일이고,
+    # 실제로는 대조하다 예외로 죽는다(소스 트리가 없으므로).
+    # 건너뛰는 조건은 **경로 부재**뿐이다 — 리비전이 없는 것은 그 대조를 막지 않는다.
+    if any(f[0] == "ATTACH_INCOMPLETE" for f in completeness):
+        return {
+            "runtimes": probe_runtimes(),
+            "skills": [],
+            "capabilities": [],
+            "observed_load": observations(root),
+            "attach": {"completeness": completeness, "compile": [], "vendor": [], "notices": [],
+                       "vendor_files": [], "skipped": "부착이 불완전해 산출물·vendor·고지·스킬 대조를 하지 않았다"},
+            "conflicts": {"findings": [], "fixtures_ran": 0},
+        }
 
     vendor_f, vendor_c = check_vendor(root)
     prov_f, _ = check_provenance_ids(root)
@@ -528,6 +646,7 @@ def doctor(root=None):
         "capabilities": probe_capabilities(root),
         "observed_load": observations(root),
         "attach": {
+            "completeness": completeness,
             "compile": [list(f) for f in check_compiled(root)],
             "vendor": [list(f) for f in vendor_f] + [list(f) for f in prov_f],
             "notices": [list(f) for f in check_notices(root)],
@@ -552,12 +671,24 @@ def format_report(rep):
         out.append(f"  {s['runtime']:<7} {s['count']}개 · {s['dir']} · 런타임 로드 {mark}")
         if note:
             out.append(f"      기록: {note}")
-        for p in s["problems"]:
+        for p in s.get("owned_problems", s["problems"]):
             out.append(f"      ✗ {p}")
+        for p in s.get("foreign_problems") or []:
+            out.append(f"      · {p}  (대상의 기존 자산 — 부착 판정에 세지 않는다)")
 
     a = rep["attach"]
     out += ["", "## 부착 상태"]
+    comp = a.get("completeness") or []
+    out.append(f"  {'✓' if not comp else '✗'} 부착 정본(`{RUNBOOK_REL}` 의 「놓는 것」): "
+               + ("일치" if not comp else f"{len(comp)}건"))
+    for f in comp:
+        out.append(f"      {f[0]} {f[1]} — {f[3] if len(f) > 3 else ''}")
+    if a.get("skipped"):
+        out.append(f"      → {a['skipped']}")
     for key, label in (("compile", "컴파일 산출물"), ("vendor", "vendor 원문·출처"), ("notices", "제3자 고지")):
+        if a.get("skipped"):
+            out.append(f"  — {label}: 대조하지 않음")
+            continue
         n = len(a[key])
         out.append(f"  {'✓' if n == 0 else '✗'} {label}: {'일치' if n == 0 else f'{n}건 불일치'}")
         for f in a[key][:5]:
@@ -580,9 +711,13 @@ def format_report(rep):
         out.append("  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.")
 
     c = rep["conflicts"]
-    out += ["", f"## 충돌 fixture ({c['fixtures_ran']}종 실행)"]
-    if not c["findings"]:
-        out.append("  ✓ 충돌 0")
+    if a.get("skipped"):
+        out += ["", "## 충돌 fixture", "  — 대조하지 않음"]
+        c = {"findings": []}
+    else:
+        out += ["", f"## 충돌 fixture ({c['fixtures_ran']}종 실행)"]
+        if not c["findings"]:
+            out.append("  ✓ 충돌 0")
     for fid, where, why in [tuple(x) for x in c["findings"]]:
         out.append(f"  ✗ [{fid}] {where} — {why}")
 
@@ -610,7 +745,7 @@ def doctor_problem_count(rep, scope="all"):
     """
     a = rep["attach"]
     env = sum(1 for r in rep["runtimes"] if not r["ok"])
-    repo = (sum(len(s["problems"]) for s in rep["skills"])
-            + sum(len(a[k]) for k in ("compile", "vendor", "notices"))
+    repo = (sum(len(s.get("owned_problems", s["problems"])) for s in rep["skills"])
+            + sum(len(a[k]) for k in ("completeness", "compile", "vendor", "notices"))
             + len(rep["conflicts"]["findings"]))
     return {"environment": env, "repository": repo, "all": env + repo}[scope]

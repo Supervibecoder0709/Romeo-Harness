@@ -1,0 +1,30 @@
+schema: romeo/attempts@0.1.0
+unit_id: init-20260911-m5-attach-update-rollback-sauc
+attempts:
+- n: 1
+  run: run_68f8e0cf3c09
+  base_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  started_at: '2026-09-11T02:32:56+09:00'
+  result: fail
+  failure_class: outputs
+  note: 검토자 FAIL · findings 1건 — AC-9 의 「40자 hex」에 대문자 A-F 가 포함될 수 있는데 romeo/doctor.py 의 _HEX40 이 소문자만
+    받아 그 값에서 실재성 검사를 건너뛴다. 원인은 산출물에 있다
+  settled_at: '2026-09-11T02:54:28+09:00'
+- n: 2
+  run: run_877628bab8bd
+  base_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  started_at: '2026-09-11T02:55:11+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS · findings 0 — 1회차 finding(대문자 hex)을 반영한 뒤 2회차에서 해소
+  settled_at: '2026-09-11T03:00:58+09:00'
+- n: 3
+  run: run_5f973032a158
+  base_sha: f027f3818ef0bb104581d497f6e7ef5d8d8cd090
+  started_at: '2026-09-11T03:06:43+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS · findings 0 — §4 방어 검사(review-tree-before/after) 유효
+  settled_at: '2026-09-11T03:13:12+09:00'
+reviews: []
+reviewer_runs: []
