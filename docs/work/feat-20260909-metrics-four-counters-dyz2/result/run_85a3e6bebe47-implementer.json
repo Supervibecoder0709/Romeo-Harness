@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-metrics-four-counters-dyz2",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-metrics-four-counters-dyz2/task/run_85a3e6bebe47-implementer.json",
+    "sha256": "e7a0fa803cb6969f49ee333d8bee28237d923a94e9e530e64967e121aa805324"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_metrics -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo metrics < /dev/null",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q 'romeo metrics' .github/workflows/harness.yml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_85a3e6bebe47.yaml",
+  "notes": "required_checks 7건이 전부 exit 0 이다 (run_85a3e6bebe47 의 check-1~check-7). check-1 은 tests.test_metrics 26건(1회차 21건 + 이번 회차 5건), check-4 는 하네스 전체 1025건이다.\n\n2회차다. 1회차 검토자의 findings 2건만 고쳤고 1회차 산출물·증거는 그대로 두었다. finding 1(romeo/metrics.py:240 · AC-3): `_reclassification` 의 사건 판별이 `isinstance(entry, dict) and entry` 라 `{\"unit\": null}` 처럼 키만 있고 값이 전부 빈 기록을 truthy 로 세었다. 판별자 `_is_filled` 를 한 자리에 만들고 그것으로 항목의 **내용**을 본다 — `None`·공백뿐인 문자열·항목이 없거나 항목이 전부 빈 컨테이너는 빈 자리이고, `0`·`False` 는 값이므로 채워진 것으로 센다(truthiness 로 판별하면 이 둘이 사라진다). 컨테이너는 **일부라도 말하면** 채워진 것으로 본다 — 모든 키가 채워질 것을 요구하는 반대 방향은 `changes: []` 처럼 빈 목록이 곧 값인 기록을 사건에서 빼므로 같은 결함을 반대쪽으로 만든다. AC-3 의 「그 값을 계산하는 데 필요한 자리」는 지표마다 다르다: 재분류율은 「무엇으로 재분류했는지 말하는가」, 분류 수정률은 `verdict` 하나, T0 처리 시간은 두 시각 **둘 다**다. 정본의 `event_rule` 문장과 docstring 도 같은 자리에서 「빈 항목도, 키만 있고 값이 전부 빈 항목도 사건이 아니다」로 맞췄다 — 인쇄되는 규칙과 구현이 어긋난 것이 이 결함이었다.\n\n같은 결함 모양이 다른 지표에도 있었고 같은 회차에서 함께 고쳤다(검토자 지시). `_classification_correction` 의 `if not verdict` 도 키가 아니라 truthiness 판별이라 공백뿐인 verdict(`\"   \"`)와 값이 전부 빈 컨테이너를 사건으로 세었다 → `_is_filled(verdict)` 로 바꿨다. 근거: run_85a3e6bebe47 의 cmd-8 — 1회차 판별자로 되돌린 사본에서 이 지표가 빈 기록 트리에서 사건 1건을 세어 미집계가 사라진다(실패 subTest `metric='classification-correction-rate'`). `_t0_lead_time` 은 `_parse_time` 이 이미 내용으로 판별하므로(빈 문자열·파싱 불가 → None) 같은 결함이 없고, `gate-miss` 는 `needs_event` 가 거짓이며 값이 대상 범위 전수 건수라 사건 판별 자리가 없다.\n\nfinding 2(tests/test_metrics.py:313 · AC-3 의 실행 증거 부족): `needs_event` 인 지표 셋 중 「사건 0 → 미집계」를 실행해 보인 것이 재분류율 하나뿐이었다. 합성 트리 `build_tree_blank` 를 더했다 — 파일 수는 트리 A 와 같고(fixture 3 · 단위 5) 기록할 자리는 있는데 내용만 비어 있는 트리다(verdict null·공백, closed_at 없음, history `[{}]`·`[{\"unit\": null}]`·`[{\"unit\": \"\", \"mode\": \"   \"}]`·`[{\"policy_version\": null, \"changes\": []}]`). 파일이 없는 트리를 쓰지 않은 이유: 빈 값은 고치기 전에도 막혔으므로 그 통과는 판별력이 없다(AGENTS.core §11 — 반례는 그럴듯한 거짓 값이어야 한다). 새 검사 `Ac3BothCasesForEveryFlaggedMetric` 는 지표 목록을 옮겨 적지 않고 **정본에서 `needs_event` 로 걸러 돌며**(AC-1 과 같은 방식) 사건 0 인 입력과 사건 1 이상인 입력을 각각 실행하고, 돈 지표 집합이 정본의 표시 대상 집합과 같은지까지 대조한다 — 표시 대상이 늘어도 검사가 따라간다. 걸러낸 목록이 비면 두 검사가 빈 검사가 되므로 그것도 따로 막았다. 빈 기록 트리의 정답은 계산식이 아니라 숫자·미집계로 손으로 적었다(`TREE_BLANK_ANSWERS`).\n\n판별력을 양쪽에서 실측했다(AGENTS.core §11). 없는 상태: run_85a3e6bebe47 의 cmd-8 — 이 트리를 사본으로 떠 세 표현(`_is_filled(entry)`·`_is_filled(verdict)`·`_is_filled(e)`)을 1회차 판별자로 되돌리면 새 AC-3 클래스가 실패한다(5건 중 4건 실패 · 재분류율은 빈 기록 트리에서 사건 3건, 분류 수정률은 1건을 세었다). 그 명령의 exit 0 은 「고치기 전 상태에서 새 검사가 실패한다」는 뜻이고, 작업 트리를 바꾸지 않는다(cmd-8 의 tree 해시가 check-4 와 같다). 있는 상태: 같은 run 의 check-1 — 26건 전부 통과.\n\n저장소 트리 실측(check-2)에서 1회차에 코디네이터가 답한 결정은 그대로다: 분류 수정률 20.0%(corrected 2 / verdict 기록 10) · gate 누락 0건 · T0 처리 시간 중앙값 70초(표본 3) · 재분류율 미집계(사건 0 · docs/work/*/spec.md 37건 읽음). 저장소의 verdict 10건은 모두 채워진 문자열이라 `_is_filled` 로 바꿔도 분모·분자가 움직이지 않는다.\n\nspec.md 는 이번 회차에 고치지 않았다 — 확인란·AC·검증 계획 모두 1회차 승인 상태 그대로이고, 수용 기준 체크박스는 1회차에 채운 다섯 개가 그대로 유지된다(AC-3 은 이번 회차로 근거가 강해졌다: 표시 대상 세 지표가 사건 0/사건 1 두 경우를 각각 실행한다). §12 로 남긴 것: 이번 회차에 범위 밖 새 결함은 발견하지 않았다. 1회차에 연 Q-100(재분류 사건을 기록하는 코드 경로가 없다)은 그대로 열려 있고 고치지 않았다."
+}

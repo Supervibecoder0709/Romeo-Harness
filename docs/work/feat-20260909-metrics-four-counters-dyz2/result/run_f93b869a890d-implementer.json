@@ -1,0 +1,51 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-metrics-four-counters-dyz2",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-metrics-four-counters-dyz2/task/run_f93b869a890d-implementer.json",
+    "sha256": "897b953a9d84de8bdf433b01554a43c917e81698f9c42e63f2777f6a6e096269"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_metrics -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo metrics < /dev/null",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "grep -q 'romeo metrics' .github/workflows/harness.yml",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_f93b869a890d.yaml",
+  "notes": "3회차다. required_checks 7건이 전부 exit 0 이다 (run_f93b869a890d 의 check-1~check-7). check-1 은 tests.test_metrics 26건, check-4 는 하네스 전체 1025건이며 둘 다 OK 로 끝났다.\n\n이번 회차는 **산출물을 하나도 바꾸지 않았다.** romeo/metrics.py · tests/test_metrics.py · romeo/cli.py · .github/workflows/harness.yml · docs/planning/open-questions.md · spec.md 는 2회차(run_85a3e6bebe47)가 남긴 상태 그대로다. 2회차 검토자가 PASS findings 0 을 냈고, 그 회차에서 close 를 막은 것은 산출물이 아니라 위임 절차였기 때문이다 — 2회차는 워크트리 head 와 계약 base_sha 가 어긋난 채 시작했고, close 직전에 head 를 맞추자 그때는 증거에 적힌 head 가 현재 HEAD 보다 낡은 값이 되어 FRESH_HEAD 하나만 실패했다. §10 브레이크가 걸렸고 사람이 재검토해 「완료 정의는 달성 가능하다」로 결론했다(attempts.yaml 의 reviews).\n\n그래서 이번 회차가 한 일은 **정렬된 리비전에서 증거를 다시 만든 것**뿐이다. 이번에는 기동 전에 워크트리 head 와 계약 base_sha 가 b70568f17ca029b19702927351b95aee81e5ad48 로 같다는 것을 위임한 쪽이 확인했고, 증거의 7건 전부 head_sha 가 그 값으로 기록됐다(run_f93b869a890d 의 check-1~check-7 각각의 head_sha). 일곱 건의 dirty_tree_hash 도 17266bb652360320ddc7a347161fc76d887e435713755ae69934259f5566eea2 로 전부 같다 — 검사가 작업 트리를 바꾸지 않았다는 뜻이고, 종료 검사의 재실행 대조가 성립한다.\n\n1·2회차의 봉투·증거(run_cf5998614e4c · run_85a3e6bebe47)는 지우지 않고 그대로 두었다. 수용 기준 체크박스 다섯 개는 2회차에 채운 상태 그대로이고 이번 회차에 고치지 않았다 — 확인란의 문장·AC·검증 계획도 승인 시점과 같다. 그 다섯 주장을 이번 리비전의 증거가 다시 뒷받침한다: AC-1·AC-3·AC-4 는 check-1(정본 import 대조 · 합성 트리 정답 대조 · 사건 0/사건 1 두 입력), AC-2·AC-5 는 check-1 과 check-2(표준 입력이 닫힌 비대화형 실행이 exit 0 으로 네 지표 행과 각 행의 원본을 인쇄한다 — 저장소 트리에서 재분류율은 「미집계 · 사건 0건 · docs/work/*/spec.md 37건 읽음」), AC-3 의 CI 노출은 check-3 이다.\n\n저장소 트리 실측(run_f93b869a890d 의 check-2)의 숫자는 2회차와 같다 — 분류 수정률 20.0% · gate 누락 0건 · T0 처리 시간 중앙값 · 재분류율 미집계(사건 0 · 37건 읽음). §12 로 남긴 것: 이번 회차에 범위 밖 새 결함은 발견하지 않았다. 1회차에 연 Q-100(재분류 사건을 기록하는 코드 경로가 없다)은 그대로 열려 있고 고치지 않았다."
+}

@@ -1,0 +1,175 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_cf5998614e4c
+task_id: task_ffdd7634f8b2
+dispatch_id: ctx_645a8ed22c29
+unit_id: feat-20260909-metrics-four-counters-dyz2
+spec_ref:
+  path: docs/work/feat-20260909-metrics-four-counters-dyz2/spec.md
+  sha256: 63032e0627276e3e00de2ca6e5d374cba0ca53743c9a182deadd6b555321083e
+base_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2
+started_at: '2026-09-10T10:55:55+09:00'
+finished_at: '2026-09-10T11:06:52+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_metrics -v
+  exit_code: 0
+  started_at: '2026-09-10T10:55:55+09:00'
+  finished_at: '2026-09-10T10:56:00+09:00'
+  seconds: 4.731
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/01-check-1.log
+  log_sha256: 7648b8d92e0512fd1d56b37735c249ca9640fdd76014362ad380a19f06b4ada5
+  stdout_tail: ''
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-2
+  command: bin/romeo metrics < /dev/null
+  exit_code: 0
+  started_at: '2026-09-10T10:56:00+09:00'
+  finished_at: '2026-09-10T10:56:00+09:00'
+  seconds: 0.557
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/02-check-2.log
+  log_sha256: 44d122560f849757a3d0a36298f80d57b82fe574dea39d594fa6d61261efbf13
+  stdout_tail: '2026-09-02T18:05:40+09:00 → 853초
+
+
+    ### 재분류율 — 미집계
+
+    - 대상 범위: docs/work/*/spec.md · 읽은 파일 37건
+
+    - 읽는 자리: routing.history
+
+    - 사건 규칙: 내용이 채워진 routing.history 항목을 가진 단위 1건 = 사건 1건. 빈 항목은 사건이 아니다
+
+    - 관측 사건: 0건 · 내역: 채워진 routing.history 항목이 있는 단위 0건 / 읽은 단위 37 (빈 항목만 가진 단위 0)
+
+    - 미집계 사유: 관측 사건 0건 — docs/work/*/spec.md 37건을 읽었고 routing.history 에 내용이 채워진 항목이 하나도 없다
+
+    - 사건이 발견된 파일: 없음 — docs/work/*/spec.md 37건을 전부 읽었다'
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-3
+  command: grep -q 'romeo metrics' .github/workflows/harness.yml
+  exit_code: 0
+  started_at: '2026-09-10T10:56:00+09:00'
+  finished_at: '2026-09-10T10:56:01+09:00'
+  seconds: 0.01
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/03-check-3.log
+  log_sha256: e33907d55f102d1bb570b74b9d39190dfd05801940a1904aaff0cfe0e6715323
+  stdout_tail: ''
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-10T10:56:01+09:00'
+  finished_at: '2026-09-10T11:01:55+09:00'
+  seconds: 354.729
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/04-check-4.log
+  log_sha256: 8f2b24eccd92bfe6e3f5157de026bc60b337509aa75c541709a73b90d5c06281
+  stdout_tail: ''
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-5
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-10T11:01:56+09:00'
+  finished_at: '2026-09-10T11:01:56+09:00'
+  seconds: 0.358
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/05-check-5.log
+  log_sha256: 1e07ac5256e1b0768a87912b5a722f7b7eddb057ac29da94a7745f964efdeeaa
+  stdout_tail: 'use-metrics-wr9m/brief.md lines=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-6
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-10T11:01:56+09:00'
+  finished_at: '2026-09-10T11:01:56+09:00'
+  seconds: 0.336
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/06-check-6.log
+  log_sha256: 56124768fb810f8cdc93e42fd2f80424ee05cb5c2b19a4ed07a223dacbc6c41f
+  stdout_tail: compile 검사 PASS
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: check-7
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-10T11:01:56+09:00'
+  finished_at: '2026-09-10T11:01:57+09:00'
+  seconds: 0.253
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/07-check-7.log
+  log_sha256: 0091517e3fda9c01284eaacd0fff5822931c7073e79a298aba02d85c8854a7b0
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2\n  대조 49건\
+    \ — docs/current/enforcement.md ↔ 코드·정책표\n  등록 1건 · 미등록 0건 — docs/current/\n  위반 0건"
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260909-metrics-four-counters-dyz2'
+  exit_code: 0
+  started_at: '2026-09-10T11:04:00+09:00'
+  finished_at: '2026-09-10T11:04:01+09:00'
+  seconds: 0.037
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/08-review-tree-before.log
+  log_sha256: bbdcd7164f51030f5377f41e1d8b163dcea3e51fe9c2d8fc96d44cfc004eb40e
+  stdout_tail: "M .github/workflows/harness.yml\n M docs/planning/open-questions.md\n M romeo/cli.py\n\
+    ?? romeo/metrics.py\n?? tests/test_metrics.py"
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2/.harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-10T11:04:01+09:00'
+  finished_at: '2026-09-10T11:04:01+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/09-reviewer-brief.log
+  log_sha256: 41ee70ea759a804d51f298a8de8397ae92758691f1cc27fe6113971f6580309e
+  stdout_tail: 9e8453679f7cbba006776f7ff9c2b96333aba808ba6b2a8a5bfd45d86087f833  /Users/julliettelee/orca/workspaces/Romeo-Harness/metrics-dyz2/.harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/reviewer-brief.md
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260909-metrics-four-counters-dyz2'
+  exit_code: 0
+  started_at: '2026-09-10T11:06:45+09:00'
+  finished_at: '2026-09-10T11:06:46+09:00'
+  seconds: 0.042
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/10-review-tree-after.log
+  log_sha256: bbdcd7164f51030f5377f41e1d8b163dcea3e51fe9c2d8fc96d44cfc004eb40e
+  stdout_tail: "M .github/workflows/harness.yml\n M docs/planning/open-questions.md\n M romeo/cli.py\n\
+    ?? romeo/metrics.py\n?? tests/test_metrics.py"
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260909-metrics-four-counters-dyz2/review/run_cf5998614e4c-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-10T11:06:52+09:00'
+  finished_at: '2026-09-10T11:06:52+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260909-metrics-four-counters-dyz2/run_cf5998614e4c/11-review-record.log
+  log_sha256: 04ce9688e893f03bdb6cc8b20338276a144fd2f2b28cb9fb2d20d78e709d4a8d
+  stdout_tail: cb8a9333ddaf7875c42efa80935116bbc0d905ecaed1cab20523b98e45e79cf0  docs/work/feat-20260909-metrics-four-counters-dyz2/review/run_cf5998614e4c-reviewer.json
+  head_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  dirty_tree_hash: bc82f92a68f4b34c9a76310fd0529d9ff49c990cd7934d6239950919cc260730
+changed_files:
+- .github/workflows/harness.yml
+- docs/planning/open-questions.md
+- romeo/cli.py
+- romeo/metrics.py
+- tests/test_metrics.py
+artifact_hash: 720b626d83250fc26f2fd5b1a5aae3c5a5d70b1a5d3d1a010e1fe3f6c95a6ee1
+reviewer: null
+verdict: null
+approvals: []

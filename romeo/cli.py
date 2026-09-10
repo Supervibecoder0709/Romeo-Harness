@@ -1,4 +1,4 @@
-"""romeo CLI — route · card · find · context · new · validate · integrity · fixtures(check·report·parity) · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
+"""romeo CLI — route · card · find · context · new · validate · integrity · fixtures(check·report·parity) · metrics · approve · evidence · envelope · review · close · run-unit · id · compile · doctor · vendor · notices."""
 import argparse
 import json
 import sys
@@ -192,6 +192,17 @@ def cmd_fixtures(args):
     print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_report(rep))
     # `route --fixtures … --report` 와 같은 공식이다(Q-37) — 같은 리포트를 내는 두 명령이 다른 판정을 내지 않는다.
     return 0 if rep["total"] and rep["matched"] == rep["total"] and rep["gate_misses"] == 0 else 1
+
+
+
+def cmd_metrics(args):
+    """하네스 지표 4개를 집계해 인쇄한다. 지표의 **값** 때문에 실패하지 않는다 —
+    이 명령은 드러내는 데까지가 일이고, 나쁜 숫자로 절차를 막는 것은 다른 자리의 판정이다."""
+    from .metrics import report
+    root = _root(args)
+    _readings, text = report(root)
+    print(text)
+    return 0
 
 
 def _print_rebuttal_warnings(fm, args):
@@ -514,6 +525,10 @@ def build_parser():
                    help="(parity) 판정 역할의 판정을 다루는 방식 — 기본 advisory(D-76: 인쇄만), strict 는 D-73·D-74 결박(Q-10 실험용)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(fn=cmd_fixtures)
+
+    s = sub.add_parser("metrics", help="하네스 지표 집계 — 분류 수정률·gate 누락·T0 처리 시간·재분류율 (각 숫자의 원본을 함께 인쇄한다)")
+    s.add_argument("--root", help="집계 대상 트리. 생략하면 현재 저장소")
+    s.set_defaults(fn=cmd_metrics)
 
     s = sub.add_parser("approve", help="승인 사건 기록 (approved_at·active). base_sha 는 적지 않는다 — 승인 커밋은 이력에서 찾는다")
     s.add_argument("unit")

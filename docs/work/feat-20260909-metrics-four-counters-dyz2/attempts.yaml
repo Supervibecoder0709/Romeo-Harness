@@ -20,6 +20,16 @@ attempts:
     결함이 없다. 위임한 쪽이 §3.5 의 「워크트리 head == 계약 base_sha」 확인을 2회차에서 건너뛰어, 워커가 head 7e180a2 에서 돌았는데 계약 base
     는 926d65a 였다. 그 어긋남을 close 직전에 ff 로 고치자 evidence 의 head(7e180a2)가 현재 HEAD(926d65a)보다 낡았다
   settled_at: '2026-09-10T11:43:27+09:00'
+- n: 3
+  run: run_f93b869a890d
+  base_sha: b70568f17ca029b19702927351b95aee81e5ad48
+  started_at: '2026-09-10T11:59:12+09:00'
+  result: pass
+  failure_class: null
+  note: close PASS · required_checks 7/7 · 재실행 7/7 · 검토자 PASS findings 0 · 방어 검사 유효 · JUDGE_REVISION 통과.
+    코드는 2회차 상태 그대로이고 이번 회차는 정렬된 리비전(head==base b70568f)에서 증거·검토만 다시 받았다. 2회차 검토 봉투는 죽은 워커가 그 run 의 증거를
+    오염시켜 앵커가 깨졌고, 지우지 않고 review-spoiled/ 로 옮기며 사유를 적었다(그 판정도 PASS 였고 같은 트리 17266bb65236 을 봤다)
+  settled_at: '2026-09-10T15:22:22+09:00'
 reviews:
 - after_attempt: 2
   conclusion: 완료 정의는 달성 가능하다. 2회차 산출물(tree 17266bb65236)이 AC 5개를 전부 충족했고 검토자가 PASS findings 0 을 냈으며, close

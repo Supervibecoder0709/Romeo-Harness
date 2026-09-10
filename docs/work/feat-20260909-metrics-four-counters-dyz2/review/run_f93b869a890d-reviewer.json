@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-metrics-four-counters-dyz2",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-metrics-four-counters-dyz2/task/run_f93b869a890d-reviewer.json",
+    "sha256": "07c83e2e8debbfb9003902eaf91f775eaeabf278da353b92c8a9b52010c91cca"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_f93b869a890d.yaml",
+  "notes": "AC-1은 check-1의 Ac1CanonAndRows와 check-2의 네 지표 출력, AC-2는 Ac2Provenance와 check-2의 경로·필드·파일 수 출력, AC-3은 Ac3Uncounted 및 Ac3BothCasesForEveryFlaggedMetric의 빈 기록·유효 사건 입력, AC-4는 Ac4HandWrittenAnswers의 두 합성 트리 정답 대조, AC-5는 Ac5NeverBlocks와 표준 입력을 닫은 check-2가 뒷받침한다. 검사 코드와 원시 로그를 대조했으며 지표 검사 26건·전체 검사 1025건의 OK 및 필수 검사 7건의 exit 0을 확인했다. 승인본 대비 수용 기준 문장과 required_checks는 동일하고 체크 표시만 변경됐다. 현재 변경은 구현자 allowed_paths 안이며 계약의 guards는 비어 있다. 두 계약의 base_sha, 현재 HEAD, 증거와 원시 로그의 head_sha는 모두 b70568f17ca029b19702927351b95aee81e5ad48이다. 기록된 dirty_tree_hash도 검사별로 동일하다. 해시 재계산·검사 재실행·검토 후 방어 검사와 봉인 대조는 위임자 및 종료 절차에서 수행한다."
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-metrics-four-counters-dyz2",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-metrics-four-counters-dyz2/task/run_85a3e6bebe47-reviewer.json",
+    "sha256": "d27a2b7aa36a16f32e48fededbd6cb7f85a3ed9db69c8f9d1016196927cc41aa"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "비차단 지적: 현재 HEAD와 증거의 head_sha는 7e180a2ed0b4dc847a69308d90a59bd0aec6babd이지만, 두 작업 계약의 base_sha인 926d65aade2dbd0b50f8734811aec060e2d3ee83은 그 다음 커밋이다. git show로 부모 관계를 확인했다. 따라서 계약의 기준 커밋이 현재 HEAD의 이력에 포함되지 않아 romeo/close.py:552의 BASE_SHA 검사에서 거부되는 경로다. 종료 검사는 실행하지 않았다. 위임자가 기준 커밋을 포함하는 작업 공간과 그 상태의 증거를 준비해야 한다. 수용 기준 미달이나 열거된 FAIL 사유에 해당하지 않아 검토 게이트는 내리지 않는다.",
+      "file": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_85a3e6bebe47.yaml",
+      "line": 12
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_85a3e6bebe47.yaml",
+  "notes": "AC-1은 check-1의 Ac1CanonAndRows와 check-2 출력, AC-2는 Ac2Provenance와 check-2의 출처 내역, AC-3은 Ac3BothCasesForEveryFlaggedMetric의 사건 0/사건 있음 검사, AC-4는 Ac4HandWrittenAnswers의 합성 입력별 정답 대조, AC-5는 Ac5NeverBlocks 및 표준 입력을 닫은 실행 기록으로 지목한다. check-1의 26건과 check-4의 1025건 통과를 원시 로그에서 확인했다. cmd-8은 이전 판별 방식에서 새 검사가 실패함을 확인하는 부정 검사이므로 내부 실패 출력과 명령 종료 코드 0이 모순되지 않는다. 필수 검사 7건의 명령·종료 코드·HEAD·작업 트리 지문은 증거와 원시 로그에서 일치한다. 승인 시점 대비 spec 변경은 AC 체크 표시뿐이며 검증 계획은 그대로다. 변경은 허용 범위 안이고 재실행 불가능한 필수 검사는 발견하지 못했다. 파일 변경·검사 재실행·해시 재계산은 하지 않았다. 현재 내용의 지문 대조와 검토 후 방어 검사는 위임한 쪽 및 종료 검사의 몫이다."
+}

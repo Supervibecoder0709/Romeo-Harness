@@ -1,0 +1,29 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260909-metrics-four-counters-dyz2",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260909-metrics-four-counters-dyz2/task/run_cf5998614e4c-reviewer.json",
+    "sha256": "5f6e3a407b9ee2e2200d12ca5de75c6a6a2dc0a419b75dface0a3a9b93390f06"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-3: 재분류 사건을 판별할 때 딕셔너리에 키가 있는지만 확인한다. 따라서 routing.history: [{unit: null}]처럼 내용이 전부 빈 기록도 사건으로 센다. 코드 판독상 합성 트리 A의 [{}]를 이 기록으로 바꾸면 미집계 대신 20.0%가 출력되는 경로다. 이는 spec.md:45의 '계산하는 데 필요한 자리가 다 채워진 기록만 센다'를 위반한다. 키의 존재와 실제 내용이 채워진 기록을 구별해야 한다. 이 반례는 실행하지 않았다.",
+      "file": "romeo/metrics.py",
+      "line": 240
+    },
+    {
+      "summary": "AC-3: 사건 0건을 확인하는 검사는 트리 A만 실행하고, 집계 결과가 0건인 지표만 검사한다. 트리 A에는 분류 수정 기록과 T0 시간 표본이 있으므로 재분류율만 이 조건에 들어간다. 트리 B와 저장소 입력에도 나머지 두 지표의 사건이 존재한다. 따라서 needs_event=True인 분류 수정률·T0 처리 시간의 '사건 0건이면 미집계와 사유를 출력'을 실행해 보인 증거가 없다. check-1의 통과 기록만으로 표시 대상마다 두 경우를 실행하라는 AC-3 전체를 뒷받침할 수 없다.",
+      "file": "tests/test_metrics.py",
+      "line": 313
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260909-metrics-four-counters-dyz2/evidence/run_cf5998614e4c.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD는 지정된 커밋으로 일치한다. 승인 시점 대비 spec 변경은 AC 체크 표시뿐이며 required_checks는 그대로다. 변경 파일은 구현자의 allowed_paths 안에 있다. 필수 검사 7건의 종료 코드 0과 원시 로그를 대조했고, check-1에는 21건, check-4에는 1020건 통과가 기록돼 있다. AC-1·2·4·5는 check-1·2와 현재 코드로 근거를 지목할 수 있으나 AC-3에 위 두 문제가 남는다. 파일 변경, 검사 재실행, 해시 재계산은 하지 않았다. 현재 파일 내용의 지문 대조와 검토 후 방어 검사는 위임한 쪽 및 종료 검사의 몫이다."
+}
