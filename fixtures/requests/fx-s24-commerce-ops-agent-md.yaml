@@ -24,7 +24,14 @@ expected:
   guards:
   - ops-data-change
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: non-code 라 범위 밖 경고. 문서 1건이지만 ops-data 영역이라 가드 ops-data-change 가 facet×intent 로 켜진다
+  followup: 문서 자체는 운영 데이터를 바꾸지 않는다 — 가드가 실제 행동을 겨누는지는 별도 판정 대상(fx-payment-metric-schema 의 followup 과 같은 모양)
 source:
   kind: transcript
   ref: S24

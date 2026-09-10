@@ -27,7 +27,13 @@ expected:
   - design-landing
   - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: payment 게이트는 제품의 결제·정산 영역용이고 API 비용은 가드 payment-charge 가 담당한다. experiment 모드·Standard·실험 설계 섹션 유지
 source:
   kind: transcript
   ref: S11

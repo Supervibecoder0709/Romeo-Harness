@@ -20,7 +20,13 @@ expected:
   parts: []
   guards: []
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: 모든 프로젝트에 영향은 「한 시스템·다른 작업자」= medium. T0·Quick 유지가 rubric 대로다
 source:
   kind: session-log
   ref: claude:-claude:cc839c67

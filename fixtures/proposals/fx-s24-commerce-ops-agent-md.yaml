@@ -1,0 +1,67 @@
+request:
+  text: 커머스 운영 자동화용 AGENT.md를 만든다. 확인된 컨텍스트만 사용하고, 승인이 필요한 위험 작업을 구분하고, 검증 기준을 적는다.
+  project: S24
+  context: S24. 범위 밖이지만 운영 데이터 가드는 정직하게 표시.
+facts:
+- 커머스 운영 자동화용 AGENT.md 를 만든다
+- 확인된 컨텍스트만 쓰고, 승인이 필요한 위험 작업을 구분하고, 검증 기준을 적는다
+assumptions:
+- 코드가 아닌 문서 프로젝트다 — 하네스 범위 밖
+- 문서가 운영 데이터를 다루는 작업을 지시하므로 가드는 정직하게 표시한다
+unknowns:
+- 어느 운영 작업이 위험 작업으로 분류되는지 목록이 있는지
+candidate:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - docs
+  - ops-data
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  slug: commerce-ops-agent-md
+  title: 커머스 운영 자동화 AGENT.md
+factors:
+  scope:
+    level: low
+    note: 문서 1건
+  uncertainty:
+    level: low
+    note: 항목이 명확
+  impact:
+    level: medium
+    note: 운영 자동화의 규칙
+  reversibility:
+    level: low
+    note: 문서 되돌리기
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

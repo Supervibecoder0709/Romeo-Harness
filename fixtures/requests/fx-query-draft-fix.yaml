@@ -20,7 +20,14 @@ expected:
   parts: []
   guards: []
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: 집계 쿼리에 역할 필터를 거는 것이고 PII 컬럼을 새로 노출하지 않는다
+  followup: 쿼리가 유저 단위 행을 내게 되면 privacy-security 게이트 대상이다(applies_to any)
 source:
   kind: session-log
   ref: claude:Documents-Claude-Projects------------:f95922ee

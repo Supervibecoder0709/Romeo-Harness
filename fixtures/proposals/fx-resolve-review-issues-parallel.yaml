@@ -1,0 +1,72 @@
+request:
+  text: '@_bmad-output/implementation-artifacts/code-reviews/code-review-door-<masked-token>.md 이 문서 읽고 순서대로 모든 이슈 해결할때까지
+    작업을 멈추지마. 동시에 진행 가능한 독립적인 이슈들은 병렬 서브에이전트를 활용하고 메인 에이전트는 task를 분배하고 해당 문서의 이슈를 어떻게 해결할지 전략적으로 고민하는 역할을 해야해. 모든 이슈가 고쳐지면
+    해당 문서의 내용을 codex에게 별도 워크트리로 전달해서 수정한 내용과 원본 계획서를 함께 전달하고, 해당 수정 작업 내용을 리뷰 받도록해. codex에게서 리뷰가 도착하면 해당 내용을 검토한 뒤 수정할 부분을
+    채택해서 수정 반영까지 하고 나에게 보고해'
+  project: coupang-automation
+  context: 코드리뷰 문서는 inputs 링크로 흡수(K-62).
+facts:
+- 코드리뷰 문서의 이슈를 전부 해결할 때까지 진행한다
+- 독립 이슈는 병렬 서브에이전트, 메인은 분배·전략
+- 완료 뒤 codex 에 별도 워크트리로 리뷰를 받고 채택분을 반영한다
+assumptions:
+- 리뷰 문서는 inputs 링크로 흡수한다
+- 보안 관련 이슈가 포함돼 있다(door 하드닝 리뷰)
+unknowns:
+- 이슈 개수와 독립성 판단이 문서에 적혀 있는지
+candidate:
+  unit: T1
+  mode: delivery
+  intent: write
+  facets:
+  - security
+  - integration
+  gates:
+  - privacy-security
+  blast_radius: medium
+  uncertainty: low
+  slug: resolve-review-issues-parallel
+  title: 코드리뷰 이슈 병렬 해결과 교차 리뷰
+factors:
+  scope:
+    level: medium
+    note: 리뷰 이슈 다수
+  uncertainty:
+    level: low
+    note: 이슈가 문서에 열거돼 있다
+  impact:
+    level: medium
+    note: 보안·통합 코드
+  reversibility:
+    level: low
+    note: 브랜치 되돌리기
+  coordination:
+    level: high
+    note: 병렬 서브에이전트 + codex 교차 리뷰
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: true
+  note: 보안 하드닝 코드 수정
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

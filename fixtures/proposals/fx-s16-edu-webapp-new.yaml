@@ -1,0 +1,67 @@
+request:
+  text: 초보자 교육용 단일 HTML 실습 웹앱을 처음부터 만든다. 수업 흐름, 연습 문제, 채점, 진행 상태 저장이 필요하다.
+  project: S16
+  context: S16~S22. 새 프로젝트 → T2.
+facts:
+- 초보자 교육용 단일 HTML 웹앱을 처음부터 만든다
+- 수업 흐름·연습 문제·채점·진행 상태 저장 네 기능이 요구된다
+assumptions:
+- 새 프로젝트라 기존 코드베이스가 없다
+- 진행 상태는 브라우저 로컬 저장으로 충분하다(서버 없음)
+unknowns:
+- 수업 내용(커리큘럼)이 이미 있는지
+- 채점 방식(객관식·코드 실행)이 무엇인지
+candidate:
+  unit: T2
+  mode: delivery
+  intent: write
+  facets:
+  - ui
+  gates: []
+  blast_radius: small
+  uncertainty: medium
+  slug: edu-webapp-new
+  title: 초보자 교육용 단일 HTML 실습 웹앱
+factors:
+  scope:
+    level: high
+    note: 새 프로젝트 · 기능 4개
+  uncertainty:
+    level: medium
+    note: 기능 목록은 있으나 수업 내용·채점 방식 미정
+  impact:
+    level: low
+    note: 학습용 · 운영 데이터 없음
+  reversibility:
+    level: low
+    note: 새 저장소
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

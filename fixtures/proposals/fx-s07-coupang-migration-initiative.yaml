@@ -1,0 +1,74 @@
+request:
+  text: 쿠팡 계정 34개를 새 자동화 구조로 마이그레이션한다. 계정마다 GO/NO-GO 판정을 내리고, fail-closed 게이트를 두고, 게이트를 통과하면 재승인 없이 계속 진행하되 크리덴셜이 드러나지 않는
+    증거와 함께 보고한다. 반대 런타임이 read-only로 교차 검토하고, 34개 분모를 전수 종결한다.
+  project: S07
+  context: S07/S08. 이니셔티브 전체. 실행 단계는 fx-account-migration-continue.
+facts:
+- 쿠팡 계정 34개를 새 자동화 구조로 옮기는 이니셔티브 전체다
+- 계정마다 GO/NO-GO 판정과 fail-closed 게이트가 요구된다
+- 반대 런타임의 read-only 교차 검토와 34개 전수 종결이 완료 조건이다
+assumptions:
+- 실행 단계(배치 진행)는 별도 단위로 쪼개진다 — 이 요청은 구조·마일스톤을 세우는 것이다
+- 크리덴셜은 증거에 나타나지 않게 마스킹한다
+unknowns:
+- 34개 계정의 현재 상태(이미 옮긴 것·실패한 것)가 어디에 기록돼 있는지
+- NO-GO 판정의 기준이 문서화돼 있는지
+candidate:
+  unit: T2
+  mode: delivery
+  intent: deploy
+  facets:
+  - ops-data
+  - migration
+  - auth
+  - browser-automation
+  gates:
+  - migration
+  - privacy-security
+  blast_radius: large
+  uncertainty: medium
+  slug: coupang-migration-initiative
+  title: 쿠팡 계정 34개 마이그레이션 이니셔티브
+factors:
+  scope:
+    level: high
+    note: 계정 34개·다단계 마일스톤
+  uncertainty:
+    level: medium
+    note: 구조는 정해졌으나 계정별 판정 기준 미정
+  impact:
+    level: high
+    note: 운영 계정·크리덴셜
+  reversibility:
+    level: high
+    note: 옮긴 계정을 되돌리기 어렵다
+  coordination:
+    level: high
+    note: 두 런타임 교차 검토
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: true
+  note: 크리덴셜 취급
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: true
+  note: 운영 계정 34개 이관
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

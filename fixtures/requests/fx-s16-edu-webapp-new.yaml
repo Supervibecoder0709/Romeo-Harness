@@ -29,7 +29,13 @@ expected:
   - design-ui
   - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: rubric 이 새 프로젝트를 T2 로 정의한다. 단일 HTML 이라도 기능 4개·새 저장소다. Charter 가 부담이면 이 건을 낮출 것이 아니라 rubric 을 바꾼다
 source:
   kind: transcript
   ref: S16

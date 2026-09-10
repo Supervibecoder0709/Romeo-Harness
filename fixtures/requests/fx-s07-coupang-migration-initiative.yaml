@@ -1,6 +1,6 @@
 id: fx-s07-coupang-migration-initiative
-request_text: 쿠팡 계정 34개를 새 자동화 구조로 마이그레이션한다. 계정마다 GO/NO-GO 판정을 내리고, fail-closed 게이트를 두고, 게이트를 통과하면 재승인 없이 계속 진행하되
-  크리덴셜이 드러나지 않는 증거와 함께 보고한다. 반대 런타임이 read-only로 교차 검토하고, 34개 분모를 전수 종결한다.
+request_text: 쿠팡 계정 34개를 새 자동화 구조로 마이그레이션한다. 계정마다 GO/NO-GO 판정을 내리고, fail-closed 게이트를 두고, 게이트를 통과하면 재승인 없이 계속 진행하되 크리덴셜이 드러나지
+  않는 증거와 함께 보고한다. 반대 런타임이 read-only로 교차 검토하고, 34개 분모를 전수 종결한다.
 context:
   project: S07
   kind: code
@@ -45,7 +45,14 @@ expected:
   - bmad-cis
   - superpowers
 acceptable_alternatives: []
-human_correction: null
+human_correction:
+  reviewed_at: '2026-09-10'
+  reviewed_by: user
+  round: shadow-2
+  verdict: confirmed
+  changes: []
+  note: irreversible-policy 게이트는 가격·보존·권한 정책 변경용이라 계정 이관에는 맞지 않는다. 되돌리기 어려움은 migration 게이트와 가드 3종(production-deploy·ops-data-change·db-migration)이
+    덮는다. T2·Deep·Charter 유지
 source:
   kind: transcript
   ref: S07

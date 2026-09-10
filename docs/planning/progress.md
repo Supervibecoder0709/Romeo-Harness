@@ -17,20 +17,20 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `bc1054d` · 2026-09-10)
+## 지금 상태 (기준 `fbb0631` · 2026-09-10)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
-- **마일스톤:** M2·M3·M4 완료. 다음은 D-81 순서의 ④ shadow 20건·v1 릴리스 게이트(§10 #15) → ⑤ M5 `attach`.
+- **마일스톤:** M2·M3·M4 완료. **shadow 20/20 도달(V-10 · 2026-09-10)** — 2차 10건 수정률 1/10, 누적 3/20 = 15%, unit·gate 수정 0/20(`fixtures/shadow/2026-09-10-cards.md`). 다음은 D-81 순서의 ④ 나머지 **v1 릴리스 게이트 판정(§10 #15 · V-0~V-10 증거 대조)** → ⑤ M5 `attach`.
 - **활성 작업 단위:** 없음. 정비 1회 `feat-20260910-sealed-run-worker-settle-37qi`(Q-101 · **1회차 close PASS** · 5/5 · 재실행 5/5 · 검토자 PASS findings 0 · JUDGE_REVISION 통과 · 통합 `bc1054d`).
 - **이 정비가 닫은 것 — 봉인된 run 은 닫힌다.** 검토 봉투가 `review record` 로 기록된 run 에는 `evidence run`·`checks`·`review record` 가 **아무것도 쓰지 않고 실행도 않고** exit 1 로 끝난다(`romeo/evidence.py` `sealing_record` · 실행 전 + 기록 직전 디스크 재읽기). 재작업 위임(RUNBOOK §3.4.2)은 앞 dispatch 의 settle 을 **관측**한 뒤에만 시작하고, `worker-stop` 거부 뒤의 복구 경로(§7 · `terminal close` · **미관측**)가 적혀 있다.
 - **첫 실전이 자기 관통이었다.** 검토 봉인 직후 `evidence run` 프로브가 거부됐다 — dyz2 2회차를 태운 자리가 이제 막힌다.
 - **승인 전 검증:** 프로브 1회(판별 2 exit 1 · 회귀 3 exit 0) + 반박 2회(13건 → 반영 11 · 한계 2: 밀리초 쓰기 경쟁 · 문서 의미의 기계 판정). 검토자 findings 0 — 승인 전 반박이 AC 결함을 전부 걷어낸 첫 정비 단위다(표본 1).
 - **merge-check 네 번째 실사용**도 exit 1 로 정본 `1: pass` 손실을 지목했다 — 정본 복사 뒤 exit 0. 이 자리는 이제 절차가 아니라 습관이다.
-- **다음 행동(D-81 순서):** ④ shadow 20건·v1 릴리스 게이트(§10 #15) → ⑤ M5 `attach`. 정비는 Q-83·Q-64 부터 다시 고른다.
-- **blocker:** 없음. **미푸시** — 승인 `96ffc94` · 통합 `bc1054d` · 이 progress 커밋. 푸시는 별도 승인이다.
-- **최신 CI:** `9382a89` run success(2026-09-10 07:49Z). 이번 푸시가 `romeo/`·`tests/` 를 담아 돈다.
+- **다음 행동(D-81 순서):** ④ v1 릴리스 게이트 판정(§10 #15) — V-0~V-10 각 항목을 관찰 가능한 증거(명령·종료 코드·파일)로 대조한 표를 만들고 사용자가 판정한다 → ⑤ M5 `attach`. 정비는 Q-83·Q-64 부터 다시 고른다.
+- **blocker:** 없음. `fbb0631` 까지 푸시됨. **미푸시** — 이 shadow 2차 커밋. 푸시는 별도 승인이다.
+- **최신 CI:** `fbb0631` run success(2026-09-10 11:42Z · `romeo/`·`tests/` 포함).
 - **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·83~89·92·93·97·98·99·100(`open-questions.md`). **Q-101 해소.**
 - **다음 정비 후보:** Q-83(계약·증거 생성의 판정 리비전) → Q-64 → Q-69·Q-70·Q-99(같은 계열) → Q-82 → Q-88(공유 파서) → Q-97·Q-98·Q-100. Q-89(1회차 통과율)는 관측 10건이 닫는다 — 이번이 1회차 PASS 1건 추가.
 - **진단 (2026-09-07):** 자가봉착의 뿌리는 **판정하는 하네스와 판정받는 하네스가 같은 리비전**이라는 것 —
@@ -56,7 +56,7 @@ authority: derived
 | 2 | #2 | fixture 15~20건 (사용자 3개월 요청 포함) | 완료 (33건) | [원문](archive/checklist-8-48.md#c2) |
 | 3 | #3 | 정책표 3종 + 스키마 + Tech Spec 템플릿 + `/plan` SKILL | 완료 | [원문](archive/checklist-8-48.md#c3) |
 | 4 | #4 | `romeo validate`·`new`·ID + unittest | 완료 | [원문](archive/checklist-8-48.md#c4) |
-| 5 | #5 | `/plan --dry-run` 5건 shadow | 완료 | [원문](archive/checklist-8-48.md#c5) |
+| 5 | #5 | `/plan --dry-run` 5건 shadow | 완료 — **shadow 2차 10건으로 V-10 20/20 도달(2026-09-10)**, `fixtures/shadow/2026-09-10-cards.md` | [원문](archive/checklist-8-48.md#c5) |
 | 6 | #6 | M1: T0 2건 관통 | 완료 | [원문](archive/checklist-8-48.md#c6) |
 | 7 | #7 | stale 거부·미체크 AC 거부 | 완료 (테스트 기준) | [원문](archive/checklist-8-48.md#c7) |
 | 8 | #8b | G-M2 채택 게이트 | 완료 | [원문](archive/checklist-8-48.md#c8) |

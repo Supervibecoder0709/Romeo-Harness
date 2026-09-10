@@ -1,0 +1,65 @@
+request:
+  text: <url> 이 쿼리 draft 수정해줘. owner level 필터 걸어서 실제 유저들만 나오도록 해주고, 타임존은 유저 로컬 기준으로 추릴 수 있는지 확인해줘.
+  project: internal-saas-analytics
+  context: 집계 쿼리 수정. PII 컬럼 없음 → 게이트 없음(제안 단계 판단).
+facts:
+- 쿼리 draft 를 고친다 — owner level 필터로 실제 유저만 남긴다
+- 타임존을 유저 로컬 기준으로 추릴 수 있는지 확인한다
+assumptions:
+- 집계 쿼리이고 PII 컬럼을 새로 노출하지 않는다
+unknowns:
+- 유저 로컬 타임존 컬럼이 존재하는지
+candidate:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - data
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  slug: query-draft-fix
+  title: 분석 쿼리 draft 수정
+factors:
+  scope:
+    level: low
+    note: 쿼리 1건
+  uncertainty:
+    level: low
+    note: 수정 내용이 명확
+  impact:
+    level: low
+    note: draft
+  reversibility:
+    level: low
+    note: draft 되돌리기
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

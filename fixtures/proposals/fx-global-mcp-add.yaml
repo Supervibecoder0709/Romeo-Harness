@@ -1,0 +1,65 @@
+request:
+  text: 전역 mcp에 코덱스 mcp를 추가 하고 싶어. 모든 프로젝트에서 사용하고 싶어.
+  project: home
+  context: 홈 레벨 설정. 모든 프로젝트에 영향 → 영향 반경 medium.
+facts:
+- 전역 설정에 codex MCP 를 추가한다
+- 모든 프로젝트에서 쓰이게 한다
+assumptions:
+- 홈 레벨 설정 파일 1곳을 고친다
+unknowns:
+- 기존 프로젝트별 MCP 설정과 충돌하는지
+candidate:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets:
+  - tooling
+  gates: []
+  blast_radius: medium
+  uncertainty: low
+  slug: global-mcp-add
+  title: 전역 MCP 에 codex 추가
+factors:
+  scope:
+    level: low
+    note: 설정 1건
+  uncertainty:
+    level: low
+    note: 방법이 알려져 있다
+  impact:
+    level: medium
+    note: 모든 프로젝트에 영향
+  reversibility:
+    level: low
+    note: 설정 제거
+  coordination:
+    level: low
+    note: 단독
+gate_checklist:
+- gate: payment
+  checked: false
+  note: null
+- gate: privacy-security
+  checked: false
+  note: null
+- gate: legal
+  checked: false
+  note: null
+- gate: ops-data-deletion
+  checked: false
+  note: null
+- gate: migration
+  checked: false
+  note: null
+- gate: public-api
+  checked: false
+  note: null
+- gate: irreversible-policy
+  checked: false
+  note: null
+- gate: availability
+  checked: false
+  note: null
+needs_decision: []
+reuse_hits: []

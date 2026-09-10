@@ -21,8 +21,8 @@ authority: canonical
 | ID | 가정 | 왜 위험한가 | 검증 방법 | 근거 |
 | --- | --- | --- | --- | --- |
 | A-01 | Claude와 Codex가 같은 계약에서 **의미적으로 동일한** 산출물·게이트 판정을 낸다 | 하네스 전체의 존재 이유인데 아직 한 번도 관통 실행되지 않았다 | v1 수직 슬라이스 + parity fixture | S01 KEEL 리뷰 §1 |
-| A-02 | 정책 테이블 + 2질문 rubric으로 gate 누락 없이 문서 패키지를 결정할 수 있다 | fixture가 아직 0건이다 | fixture 15~20건에서 분류 수정률·gate 누락 수 측정 | COUNCIL 우선순위 0 |
-| A-03 | T0/T1/T2 3-tier가 실제 요청 분포를 충분히 덮는다 | 축소 편향 가능성을 council 스스로 경고했다 | shadow mode 20건 | COUNCIL "전원이 틀릴 수 있는 지점" |
+| A-02 | 정책 테이블 + 2질문 rubric으로 gate 누락 없이 문서 패키지를 결정할 수 있다 | **shadow 20건에서 gate 누락·오탐 0/20, unit 수정 0/20(2026-09-10)**. 수정 3건은 전부 LLM 이 제안한 입력값(mode 1·uncertainty 2)이고 정책표 계산은 20건 전부 사람 확정과 일치했다 — 단, 20건 중 5건은 `source.kind: authored`(Q-50) | 실제 신규 요청이 shadow 에 더 쌓이면 재측정. 게이트 발동 fixture 는 8/8 이지만 발동 건수 자체가 적다(11/38) | COUNCIL 우선순위 0 · `fixtures/shadow/2026-08-27-cards.md`·`2026-09-10-cards.md` · `romeo metrics` |
+| A-03 | T0/T1/T2 3-tier가 실제 요청 분포를 충분히 덮는다 | **shadow 20건에서 unit 수정 0/20(2026-09-10)** — 사람 확정과 전부 일치했다. 축소 편향의 흔적은 없었으나 표본이 저장소 요청에 치우쳐 있다(non-code 2건) | 실제 신규 요청 20건 더 쌓이면 재측정 | COUNCIL "전원이 틀릴 수 있는 지점" · `fixtures/shadow/2026-09-10-cards.md` |
 | A-04 | 경로 불변 + metadata view가 실사용 탐색성을 유지한다 | 5.6 단독 제안이며 로컬 카운슬이 반박할 기회가 없었다 | 문서 30건 시점에서 재평가 | COUNCIL "새로 닫힌 쟁점" |
 | A-05 | `rg` + 구조 검증 스크립트만으로 문서 100건까지 버틴다 | 인덱스 부재의 첫 실패는 조용히 온다 | 문서 수·횡단 조회 빈도 계측 | COUNCIL Consensus 7 |
 | A-06 | Orca orchestration이 이 계약을 안정적으로 지원한다 | 실검증은 `/repo` 파이프라인 1건뿐이다 | v1 슬라이스에서 dispatch·wait·release 재검증 | `archive/`, S23 |
@@ -32,7 +32,7 @@ authority: canonical
 | A-10 | 하네스 부착이 코드 프로젝트가 아닌 프로젝트에도 같은 분류로 작동한다 | 면접 준비·커머스 운영 사례는 T0/T1/T2와 매핑되지 않는다 | **v1 에서는 검증하지 않는다(D-43)**. 비코드 fixture 2건(S15·S24)은 `OUT_OF_SCOPE_NON_CODE` 정직 보고가 기대값 | S15, S24 |
 | A-11 | 고정 SHA 원문(`verbatim`) 스킬이 어댑터 투영 후 Claude `.claude/skills`와 Codex `.agents/skills` **양쪽에서 실제로 discovery**된다 | 정적 분석뿐, 실행 미검증. 실패하면 해당 스킬은 `rewrite` 강등 | M2 doctor 프로브 + 충돌 fixture (K-68) | D-54, archive superpowers `05` |
 | A-12 | ~~BMAD 설치기가 Codex 대상으로도 동작하거나, 동작하지 않아도 "Claude 전용 discovery 능력"으로 정직 표기하면 동등성 게이트에 영향이 없다~~ **전제가 반증됨(2026-08-31, D-77)**: "현재 설치는 `ides: [claude-code]` 뿐" 이라는 관찰은 사용자의 기존 설치 1건(`~/bmad-ordi`)을 본 것이고, **본체는 Codex 를 지원한다** — `platform-codes.yaml` 에서 `codex` 는 preferred, project 타깃 `.agents/skills`, global `~/.codex/skills` 이고 installer 에 Codex setup test 가 있다. 그래서 "정직 표기" 는 필요 없어졌고, 대신 **새 충돌이 생겼다**: `.agents/skills` 는 `romeo compile` 의 쓰기 대상이다(K-64·K-68) | **남은 미검증**: 설치 선언을 읽었을 뿐 Codex 런타임에서 실제로 discovery·실행되는 것은 보지 못했다 | §6.1 5단계에서 Codex 설치 1회 + 양 런타임 discovery 프로브(A-11 과 같은 실행에서) | D-77, `archive/bmad-code-org-BMAD-METHOD/02-workflow-summary.md` §1 [E09][E10] |
-| A-13 | 정책표 fixture 일치율 100%(M0)가 실제 분류 정확도를 뜻한다 | **부분 반증(2026-08-27, shadow 1차 5건)**: 카드 수정률 2/5 = 40%. 단 수정된 것은 정책표 계산이 아니라 LLM 이 제안한 입력 분류값(mode 1·uncertainty 1)이고, unit·hard gate 는 5/5 정확했다. 일치율과 분류 정확도는 실제로 별개임이 확인됐다 | shadow mode 20건까지 15건 남음. 수정 유형(요청에 섞인 조사·판단 단계를 놓쳐 깊이를 낮게 잡음)이 반복되는지 관찰 | M0 리포트 2026-08-27, `fixtures/shadow/2026-08-27-cards.md` |
+| A-13 | 정책표 fixture 일치율 100%(M0)가 실제 분류 정확도를 뜻한다 | **부분 반증(2026-08-27, shadow 1차 5건)**: 카드 수정률 2/5 = 40%. 단 수정된 것은 정책표 계산이 아니라 LLM 이 제안한 입력 분류값(mode 1·uncertainty 1)이고, unit·hard gate 는 5/5 정확했다. 일치율과 분류 정확도는 실제로 별개임이 확인됐다 **2차 측정(2026-09-10, shadow 2차 10건)**: 수정률 1/10, 누적 3/20 = 15%(`romeo metrics` 분류 수정률 15.0%). 수정 유형은 1차와 같다(fx-landing-mobile-optimization uncertainty low → medium — 조사·판단이 섞인 요청의 실행 단계만 봄). unit·gate 는 20/20 | **20건 도달**. 남은 관찰: 같은 유형이 3번째 나오면 rubric 의 uncertainty 정의에 「요청에 계획·판단 요구가 섞이면 medium」 예시를 더할지 | M0 리포트 2026-08-27, `fixtures/shadow/2026-08-27-cards.md` · `fixtures/shadow/2026-09-10-cards.md` |
 
 ---
 
