@@ -1,0 +1,41 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260910-sealed-run-worker-settle-37qi",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260910-sealed-run-worker-settle-37qi/task/run_3bc199b43f95-implementer.json",
+    "sha256": "2e86ac4890ec45774513d240e942cb7791c6fe49466a55ab5876282a3e843c6b"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_sealed_run_refusal -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_runbook_worker_settle -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "bin/romeo integrity",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260910-sealed-run-worker-settle-37qi/evidence/run_3bc199b43f95.yaml",
+  "notes": "run_3bc199b43f95 의 check-1~check-5 전부 exit 0 (check-5 는 1050건 396초). 구현 전 상태에서 check-1 은 13건 중 7건 실패·check-2 는 12건 중 10건 실패를 실측했다(둘 다 판별 검사, 이 run 에는 기록하지 않음 — 위임 식별자 수신 전 실행). 변경 파일 5: romeo/evidence.py(sealing_record·_refuse_if_sealed, run_command 2회·record_review_envelope 1회 판정), adapters/orca/RUNBOOK.md(§3.4.2 0번 단계·두 번째 방어, §7 거부 행, §11.2 미검증 항목), core/workflows/implement/SKILL.md(7번 한 문장), tests/test_sealed_run_refusal.py·tests/test_runbook_worker_settle.py(새 모듈). AC-1~AC-7 체크박스는 check-1(AC-1~4)·check-2(AC-5~7)를 근거로 채웠다. §12 로 남긴 것: 없음 — 범위 밖 결함을 발견하지 않았다."
+}

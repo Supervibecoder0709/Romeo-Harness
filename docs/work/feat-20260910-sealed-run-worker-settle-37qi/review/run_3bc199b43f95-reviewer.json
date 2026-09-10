@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260910-sealed-run-worker-settle-37qi",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260910-sealed-run-worker-settle-37qi/task/run_3bc199b43f95-reviewer.json",
+    "sha256": "1ed45f5c4d0d7a92bc40718a96cca653efefddb1113d4bd430af1b3359ce7e44"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260910-sealed-run-worker-settle-37qi/evidence/run_3bc199b43f95.yaml",
+  "notes": "AC-1~AC-4는 check-1의 13개 검사와 구현 코드, AC-5~AC-7은 check-2의 12개 검사와 해당 문서 문장으로 대조했다. 필수 검사 5개의 명령·종료 코드·head_sha·dirty_tree_hash는 증거와 원시 로그에서 일치한다. 두 역할 계약의 base_sha와 현재 HEAD가 일치하며, 변경은 구현자 allowed_paths 안에 있다. 승인 이후 spec 변경은 수용 기준 체크 표시뿐이고 검증 계획은 유지됐다. 검사 재실행과 해시 재계산은 하지 않았다. 두 번째 봉인 확인 이후의 동시 쓰기 경쟁은 승인된 입력 문서에서 별도 단위로 남긴 한계이며, terminal close의 실제 종료 효과는 요구대로 미관측으로 표시돼 있다."
+}

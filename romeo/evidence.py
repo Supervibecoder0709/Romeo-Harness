@@ -270,12 +270,32 @@ def _stamp_ids(rec, **ids):
         rec[key] = val
 
 
+def sealing_record(rec):
+    """run 을 **봉인**한 기록 — `commands` 에서 `REVIEW_RECORD_LABEL` 라벨(문자열 동일성)의 첫 기록. 없으면 None.
+
+    검토 봉투가 기록된 run 은 판정이 선 run 이다. 그 뒤에 한 줄이라도 더 붙으면 run 의 산출물 식별(마지막 명령의 값)이
+    검토 시점의 것과 갈려 그 판정이 무엇을 본 것인지 말할 수 없게 되고, 되돌릴 수도 없다(Q-101 — 살아남은 워커가 그렇게 했다).
+    상수는 호출 시점에 읽는다 — 정의가 이 함수보다 아래에 있어도, 검사가 바꿔쳐도 그 값이다."""
+    for c in (rec.get("commands") or []):
+        if isinstance(c, dict) and c.get("id") == REVIEW_RECORD_LABEL:
+            return c
+    return None
+
+
+def _refuse_if_sealed(rec, run_name):
+    """봉인된 run 이면 ValueError — 부르는 쪽은 이 뒤에 아무것도 쓰지 않는다."""
+    if sealing_record(rec) is not None:
+        raise ValueError(f"run {run_name} 은 봉인됐다 — 검토 봉투가 기록된({REVIEW_RECORD_LABEL}) run 에는 더 쓰지 않는다. "
+                         f"다시 검토받거나 재작업하려면 --run 으로 새 run 을 만든다")
+
+
 def run_command(unit_id, command, run_name=None, label=None, project_root=".", task_id=None, dispatch_id=None):
     project_root = Path(project_root).resolve()
     if not is_repo(project_root):
         raise RuntimeError("git 저장소가 아니다 — evidence 는 HEAD SHA 에 묶여야 한다")
     run_name = run_name or default_run_name()
     epath, rec = _open_record(project_root, unit_id, run_name)
+    _refuse_if_sealed(rec, run_name)           # ① 실행 전 — 봉인된 run 이면 명령을 실행하지 않는다
     _stamp_ids(rec, task_id=task_id, dispatch_id=dispatch_id)
     base_sha = rec.get("base_sha") or head_sha(project_root)
     n = len(rec["commands"]) + 1
@@ -287,6 +307,9 @@ def run_command(unit_id, command, run_name=None, label=None, project_root=".", t
     t0 = time.time()
     proc = subprocess.run(command, shell=True, cwd=str(project_root), capture_output=True, text=True)
     elapsed = round(time.time() - t0, 3)
+    # ② 기록 직전 — 디스크에서 다시 읽는다. 넘긴 명령 자체가 이 run 을 봉인했을 수 있다(안쪽에서 review record 를 부른 명령).
+    # 그때 명령은 이미 돌았지만 결과는 기록하지 않는다 — 로그 파일도 yaml 갱신도 없다.
+    _refuse_if_sealed(_open_record(project_root, unit_id, run_name)[1], run_name)
     # 명령이 끝난 직후의 산출물 식별. 원시 로그(.harness)는 트리 해시에서 빠지므로 로그를 쓰기 전에 재도 값이 같다.
     state = tree_state(project_root, unit_id, base_sha)
     log_text = mask_secrets(f"$ {command}\n{STDOUT_MARK}\n{proc.stdout}\n{STDERR_MARK}\n{proc.stderr}\n"
@@ -504,6 +527,8 @@ def record_review_envelope(unit_id, run_name, source, project_root="."):
     if not isinstance(env, dict):
         raise ValueError(f"검토자 출력 {source} 이 JSON 객체가 아니다")
     udir = find_unit_dir(project_root, unit_id)
+    # 봉투를 쓰기 전에 본다 — 이미 봉인된 run 에 판정이 다른 봉투를 다시 기록하는 길을 막는다. 봉투 파일도 증거도 바뀌지 않는다.
+    _refuse_if_sealed(_open_record(project_root, unit_id, run_name)[1], run_name)
     rdir = udir / "review"
     rdir.mkdir(exist_ok=True)
     dest = rdir / f"{run_name}-reviewer.json"

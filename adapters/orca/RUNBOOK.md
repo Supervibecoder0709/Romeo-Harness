@@ -469,13 +469,30 @@ Run 유지 · 봉투 재생성 · close PASS. 같은 `<run-id>` 로 계약을 �
 새 워커가 `bin/romeo evidence checks --run <옛 run-id> --task-id <새 task> --dispatch-id <새 dispatch>` 를 부르는 순간 거기서 멈춘다.
 이것은 고쳐야 할 결함이 아니라 **의도된 방어**다 — 한 run 의 증거가 두 위임에 걸쳐 있으면 그 증거는 어느 실행이 만든 것인지 말하지 못한다.
 §3.8 의 식별자 대조가 「값이 다르면 새 `--run` 으로 다시 돌린다」 고 말하는 자리가 여기다.
+**두 번째 방어는 봉인이다.** 봉인 라벨(`review-record`) 기록이 있는 run — 검토 봉투가 `review record` 로 기록된 run — 에는
+`evidence run`·`evidence checks`·`review record` 셋이 기록을 더하지 않는다. 명령을 실행하지도 않고 exit 1 로 끝나며,
+그 run 의 증거·로그·봉투는 바이트 하나 바뀌지 않는다(`romeo/evidence.py` 의 `sealing_record`). 앞 회차의 워커가 살아남아
+같은 run 에 검사를 다시 쓰던 길(Q-101)이 여기서 막힌다 — 식별자가 같아 (1) 을 지나쳐도 봉인이 받는다.
 
 **(2) 산출물 이름이 겹친다.** `<run-id>` 는 네 산출물의 이름 축이다(§3.0) — `task/`·`evidence/`·`result/`·`review/`.
 같은 값을 다시 쓰면 재작업이 앞 회차의 봉투와 증거를 덮어쓰고, 무엇이 무엇을 낳았는지 이력에서 사라진다.
 회차를 나란히 남기는 것이 반복 중단 판정(`attempts.yaml`)의 근거이기도 하다.
 
-밟을 순서 — **닫기가 먼저다.** `run-create` 는 그 자리에서 이 터미널을 새 Run 으로 옮겨 붙이므로(§3.2),
+밟을 순서 — **관측이 먼저고, 닫기가 그 다음이다.** 앞 회차의 워커가 아직 살아 있으면 새 회차가 도는 동안 그 워커가 옛 run 에
+검사를 다시 써서 봉인된 판정을 오염시킨다(Q-101 — 봉인이 그것을 exit 1 로 막지만, 막힌 워커가 그 뒤 무엇을 하는지는 사람이 봐야 한다).
+그래서 첫 단계는 앞 dispatch 가 **settle 됐는지 관측**하는 것이다 — 「멈추라고 했다」 가 아니라 「멈춘 것을 봤다」 다.
+그 다음 `run-create` 는 그 자리에서 이 터미널을 새 Run 으로 옮겨 붙이므로(§3.2),
 옛 Run 의 Task 를 먼저 닫지 않으면 그 다음부터 `consumer_fenced` 로 거부된다.
+
+```bash
+# 0. 앞 dispatch 가 settle 됐는지 관측한다 — 세 갈래
+orca orchestration worker-show --dispatch <옛 dispatch-id> --json
+#   (가) .result.dispatch.status 가 `failed`·`completed` 중 하나이고 .result.observation.status 가 `exited` 이면 settle 이다 → 1 로 간다
+#   (나) 아니면 worker-stop 을 밟고, **수락됐어도** 같은 worker-show 를 다시 돌려 (가) 가 성립할 때만 1 로 간다
+orca orchestration worker-stop --dispatch <옛 dispatch-id> --json
+orca orchestration worker-show --dispatch <옛 dispatch-id> --json
+#   (다) worker-stop 이 `Dispatch ... is not stopping` 으로 거부되면 §7 의 그 행으로 간다 — 그 행의 마지막 확인이 (가) 와 같다
+```
 
 ```bash
 # 1. 옛 Run 의 Task 를 닫는다 — 아직 그 Run 에 붙어 있을 때. 아니면 run-use --id <옛 run-id> 로 먼저 되돌린다
@@ -1424,6 +1441,7 @@ orca worktree list --json
 | 남은 상태 | 명령 | 무엇을 보장하나 |
 | --- | --- | --- |
 | 워커가 멈추지 않는다 | `orca orchestration worker-stop --dispatch <id> --json` | Dispatch 를 봉하고 그 워커 터미널만 멈춘다. **워크트리·setup 터미널·다른 프로세스는 지우지 않는다**(실측 Notes) |
+| `worker-stop` 이 `Dispatch ... is not stopping` 으로 거부한다 (Q-101 · `ctx_396c4aad204d` 에서 실측) | ① `orca orchestration worker-show --dispatch <id> --json` 으로 `.result.terminalResource.ownerDispatchId` 가 그 dispatch id 와 같고 `.result.observation.exactWorker` 가 `true` 임을 확인한다(그 터미널이 정말 이 워커의 것이다) → ② 그 직후 `orca terminal close --terminal <.result.worker.agent_terminal_handle>` → ③ 같은 `worker-show` 로 `.result.dispatch.status` 가 `failed`·`completed` 중 하나이고 `.result.observation.status` 가 `exited` 인 것을 확인한다 — 이것이 settle 이고 §3.4.2 (가)·(다) 의 마지막 확인과 같다 | ② 가 거부된 워커를 실제로 죽이는지는 **미관측**이다 — 근거: 이 저장소의 `.harness/observations.yaml` 과 §11.1 에 그 명령을 실행한 관측 기록이 없고, 거부된 워커의 종료로 관측된 것은 `exitCause.kind operator_close`(사람이 닫은 것) 1건뿐이다. ③ 이 성립하기 전에는 재작업을 위임하지 않는다 — 봉인이 옛 run 의 오염을 막아도 살아 있는 워커의 다음 행동은 관측 대상이다 |
 | 멈췄는지 증명할 수 없다 | `orca orchestration worker-abandon --dispatch <id> --json` | 봉하기만 한다. 살아 있을 수 있는 자원을 그대로 두고 프로세스·파일 조작을 하지 않는다 |
 | 디버깅하려고 살려둔다 | `orca orchestration worker-retain --dispatch <id> --json` | 해제 예외를 기록한다. 이후 명시적 `worker-release` 가 예외를 지우고 해제한다 |
 | 터미널만 남았다 | `orca orchestration worker-release --dispatch <id> --json` | 멱등. `release_unknown` 만 1 |
@@ -1613,3 +1631,6 @@ orca orchestration gate-list --json
   지금 §3.7 (1) 의 `CMD` 는 그 둘을 argv 에 실어 넘기는 형태이므로 채택이 깨지는 쪽이다 — **이 경로는 미해결이다.**
 - **교체 검토자(`claude -p …`)도 argv 프롬프트로 stdin 을 기다리는지.** codex 쪽에서만 관측했고 `< /dev/null` 도 그쪽 블록에만 붙였다(§4).
 - **`--to dispatch:<id>` 로 보낸 답이 ask 스레드를 풀지 못하는 것이 재현되는지.** 표본 1건이다(§3.6). 실효 경로(`--to run: --thread-id`) 쪽도 표본 1건이다.
+- **`orca terminal close --terminal <handle>` 이 `worker-stop` 을 거부한 워커를 실제로 죽이는지.** §7 의 그 행이 지시하는 복구 명령인데
+  아직 한 번도 실행하지 않았다 — 거부된 워커(`ctx_396c4aad204d`)의 종료로 관측된 것은 사람이 닫은 `exitCause.kind operator_close` 1건뿐이다.
+  실행하면 §11.1 로 옮기고 §7 의 「미관측」 을 지운다(`tests/test_runbook_worker_settle.py` 가 그 자리를 지목한다).

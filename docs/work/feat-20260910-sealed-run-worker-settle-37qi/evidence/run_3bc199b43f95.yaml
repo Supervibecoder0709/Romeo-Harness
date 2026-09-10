@@ -1,0 +1,277 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_3bc199b43f95
+task_id: task_7dceba23246b
+dispatch_id: ctx_c91434de6dce
+unit_id: feat-20260910-sealed-run-worker-settle-37qi
+spec_ref:
+  path: docs/work/feat-20260910-sealed-run-worker-settle-37qi/spec.md
+  sha256: 9d70c7bdbec23bf9c6a16a0985774d06d7ee797e43df27ab9476e2a4a7177d89
+base_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi
+started_at: '2026-09-10T20:06:49+09:00'
+finished_at: '2026-09-10T20:17:34+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_sealed_run_refusal -v
+  exit_code: 0
+  started_at: '2026-09-10T20:06:49+09:00'
+  finished_at: '2026-09-10T20:07:01+09:00'
+  seconds: 11.195
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/01-check-1.log
+  log_sha256: 5df1c7ac7a0fa0dffd80172660672d5211b4900285dcb8b522db1835652ac2e9
+  stdout_tail: ''
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: check-2
+  command: python3 -m unittest tests.test_runbook_worker_settle -v
+  exit_code: 0
+  started_at: '2026-09-10T20:07:01+09:00'
+  finished_at: '2026-09-10T20:07:01+09:00'
+  seconds: 0.109
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/02-check-2.log
+  log_sha256: bddc517837253b8d3171c0aa0e8febc5f6ddad3a8b97be2c39514ce0712613b4
+  stdout_tail: ''
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: check-3
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-10T20:07:01+09:00'
+  finished_at: '2026-09-10T20:07:02+09:00'
+  seconds: 0.39
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/03-check-3.log
+  log_sha256: c8044f3fd09f70bd4bd82fa43f45521070cb2a4a63503330d0704ffc89d5b247
+  stdout_tail: 'Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: check-4
+  command: bin/romeo integrity
+  exit_code: 0
+  started_at: '2026-09-10T20:07:02+09:00'
+  finished_at: '2026-09-10T20:07:02+09:00'
+  seconds: 0.273
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/04-check-4.log
+  log_sha256: 7496e75d9c711b6aecd7bc00386613ecb5fe994c3b7ea7c12656259a0ebfd451
+  stdout_tail: "romeo integrity /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi\n\
+    \  대조 49건 — docs/current/enforcement.md ↔ 코드·정책표\n  등록 1건 · 미등록 0건 — docs/current/\n  위반 0건"
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-10T20:07:02+09:00'
+  finished_at: '2026-09-10T20:13:39+09:00'
+  seconds: 396.445
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/05-check-5.log
+  log_sha256: d9b58f736a3ed45fc5bfcf2a71e10b10632b6f1863fa74ee7ad14e201365aed5
+  stdout_tail: ''
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260910-sealed-run-worker-settle-37qi'
+  exit_code: 0
+  started_at: '2026-09-10T20:15:28+09:00'
+  finished_at: '2026-09-10T20:15:28+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/06-review-tree-before.log
+  log_sha256: 25429e18914b111a976c8dc91410719f279b01d201df0508213119422a54f5af
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/implement/SKILL.md\n M romeo/evidence.py\n\
+    ?? tests/test_runbook_worker_settle.py\n?? tests/test_sealed_run_refusal.py"
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi/.harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-10T20:15:28+09:00'
+  finished_at: '2026-09-10T20:15:28+09:00'
+  seconds: 0.025
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/07-reviewer-brief.log
+  log_sha256: 0cad8e74bad4688f4bcc948c2c6fa0578f2eb10f8e6f846756d54827915fc565
+  stdout_tail: 766214737efff14f6ab85ce411d16743ff67a96d0450d160ef75066434814fc6  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260910-sealed-run-worker-settle-37qi/.harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/reviewer-brief.md
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260910-sealed-run-worker-settle-37qi'
+  exit_code: 0
+  started_at: '2026-09-10T20:17:10+09:00'
+  finished_at: '2026-09-10T20:17:10+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/08-review-tree-after.log
+  log_sha256: 25429e18914b111a976c8dc91410719f279b01d201df0508213119422a54f5af
+  stdout_tail: "M adapters/orca/RUNBOOK.md\n M core/workflows/implement/SKILL.md\n M romeo/evidence.py\n\
+    ?? tests/test_runbook_worker_settle.py\n?? tests/test_sealed_run_refusal.py"
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260910-sealed-run-worker-settle-37qi/review/run_3bc199b43f95-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-10T20:17:34+09:00'
+  finished_at: '2026-09-10T20:17:34+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260910-sealed-run-worker-settle-37qi/run_3bc199b43f95/09-review-record.log
+  log_sha256: b60c41ebbceab91b5bd3cc54251f96113883f3cd93ec0f2eee7a4fdc107faece
+  stdout_tail: 794127598387de0bd56a68d4cafa09d718fb2376e21d603332f414d2832b2a1c  docs/work/feat-20260910-sealed-run-worker-settle-37qi/review/run_3bc199b43f95-reviewer.json
+  head_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  dirty_tree_hash: 901161188a148243ea7f3309f819abf6b1c8159145a0b052617fb3577719ccfa
+changed_files:
+- adapters/orca/RUNBOOK.md
+- core/workflows/implement/SKILL.md
+- romeo/evidence.py
+- tests/test_runbook_worker_settle.py
+- tests/test_sealed_run_refusal.py
+artifact_hash: ef9cd89a79dd8b985ebe5704f8dd48221031d7dcf9a3bd48a110c7aad92b3daa
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-10T20:31:12+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-10T19:49:39+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 96ffc94b45a3 의 하네스 (475개 파일 대조 · /Users/julliettelee/.claude/jobs/7e45da56/tmp/judge-96ffc94b45a31eb6b54afbe800854c97672d760f)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_3bc199b43f95 — 검증 계획 5건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 96ffc94b45a3 vs 현재 96ffc94b45a3
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 901161188a14 vs 현재 901161188a14 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_sealed_run_refusal -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_runbook_worker_settle -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest discover -s tests'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 9건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 7건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 5건이 승인 커밋 96ffc94b45a3 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_sealed_run_refusal -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_runbook_worker_settle -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo integrity'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 96ffc94b45a3 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'core/workflows/implement/SKILL.md', 'romeo/evidence.py',
+      'tests/test_runbook_worker_settle.py', 'tests/test_sealed_run_refusal.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_3bc199b43f95-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

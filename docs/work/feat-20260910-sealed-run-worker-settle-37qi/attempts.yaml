@@ -1,0 +1,15 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260910-sealed-run-worker-settle-37qi
+attempts:
+- n: 1
+  run: run_3bc199b43f95
+  base_sha: 96ffc94b45a31eb6b54afbe800854c97672d760f
+  started_at: '2026-09-10T19:51:34+09:00'
+  result: pass
+  failure_class: null
+  note: close PASS · required_checks 5/5 · 재실행 5/5 · 검토자 PASS findings 0 · 방어 검사 유효 · JUDGE_REVISION 통과(승인
+    커밋 96ffc94 스냅샷). 1회차. 봉인 뒤 쓰기 거부가 이 관통에서 실전으로 작동했다 — review record 뒤 evidence run 프로브가 exit 1 로 거부됐고
+    run 은 그대로였다
+  settled_at: '2026-09-10T20:31:36+09:00'
+reviews: []
+reviewer_runs: []
