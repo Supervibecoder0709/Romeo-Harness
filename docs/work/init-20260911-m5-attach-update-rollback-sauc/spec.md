@@ -11,7 +11,7 @@ profile: deep
 blast_radius: large
 uncertainty: medium
 status: active
-approved_at: '2026-09-11T02:31:46+09:00'
+approved_at: '2026-09-11T03:06:09+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -29,6 +29,9 @@ updated: '2026-09-11'
 approval_history:
 - {approved_at: '2026-09-11T02:30:20+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T02:31:46+09:00',
   reason: AC-9 의 실재성 기준을 판정 명령을 실행한 하네스 저장소의 로컬 이력으로 명시 — AC-9 단독 반박 반영}
+- {approved_at: '2026-09-11T02:31:46+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T03:06:09+09:00',
+  reason: '1·2회차 검토가 RUNBOOK §4 의 방어 검사(review-tree-before/after) 없이 돌아, 그 판정이 어느 산출물을 본 것인지 하네스가 확인할
+    수 없다(close 의 REVIEW_VERDICT UNVERIFIED). 확인란과 검증 계획은 바꾸지 않는다 — 같은 산출물을 그 기록과 함께 다시 검토받기 위한 재승인이다'}
 ---
 
 # M5 M1 — 부착을 선언한다: 매니페스트와 리비전, 그것을 읽는 doctor
