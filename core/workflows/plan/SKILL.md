@@ -17,6 +17,8 @@ provenance: [anthropics-skills-skill-format]
 | 확정 | 사람 | 카드를 보고 1클릭으로 확정하거나 단위·깊이·게이트를 고친다 |
 | 강제 | 정책표 | `romeo route` 가 profile·패키지·섹션·검토·격리·차단·부품·가드를 계산한다. 같은 입력이면 항상 같은 출력 |
 
+<!-- romeo:conflict-priority --> 정책이 서로 부딪히면 **앞의 것이 뒤의 것을 이긴다**: `hard_gate` → `execution_block` → `unit` → `required_overlay` → `optional_overlay` → `budget`. 정본은 core/policy/classification.yaml 의 conflict_priority 이고, 이 줄의 목록이 그것과 순서까지 같은지는 tests/test_router_guidance_examples.py 가 이 표식 줄만 읽어 대조한다.
+
 ## 절차
 
 1. **재사용 검색.** `romeo find <핵심어…>` 로 `docs/work/` 와 `docs/current/` 에서 같은 slug·제목·핵심어를

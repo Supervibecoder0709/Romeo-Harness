@@ -1,0 +1,13 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260910-router-fewshot-conflict-guidance-k8dd
+attempts:
+- n: 1
+  run: run_1dd734b69aad
+  base_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  started_at: '2026-09-10T23:03:47+09:00'
+  result: pass
+  failure_class: null
+  note: 1회차 — 구현자 5/5 exit 0 · 검토자 PASS findings 0 · 방어 검사 유효 · 앵커 양쪽 5/5
+  settled_at: '2026-09-10T23:37:32+09:00'
+reviews: []
+reviewer_runs: []

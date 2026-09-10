@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260910-router-fewshot-conflict-guidance-k8dd",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/task/run_1dd734b69aad-reviewer.json",
+    "sha256": "4778bfd15dedd9850a133ca25264a319def617dbf735bad617ebeb041a53df77"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/evidence/run_1dd734b69aad.yaml",
+  "notes": "두 역할의 base_sha와 현재 HEAD가 일치한다. 승인된 수용 기준은 체크 표시만 바뀌었고 required_checks는 유지됐다. 변경은 구현자 allowed_paths 안이다. 가드 대상 행동은 확인되지 않았다.\nAC-1·2는 tests/test_router_guidance_examples.py:180의 정책 필드·fixture 교정값 대조 및 반례 검사, AC-3~5는 같은 파일:221의 정책 사본·출력 대상·줄 예산 검사, AC-6은 같은 파일:334의 기준선 보존 검사, AC-7은 같은 파일:354의 표식 줄 순서·삭제·교환 검사로 뒷받침된다. 정책 예시의 문구는 두 source fixture의 교정 사유와 부합하고, 안내문의 우선순위 순서와 방향도 정책표에 부합한다.\n증거가 지목한 06-check-1.log에서 14건, 10-check-5.log에서 1064건의 통과를 확인했다. 최신 check-1~5 원시 로그는 모두 exit 0이며 동일한 head_sha·dirty_tree_hash를 기록한다. 현재 변경 목록은 증거의 changed_files와 기록 제외 규칙에 부합한다. 필수 명령에서 재실행 불가 사유는 발견하지 않았다. 검사 실행·해시 재계산·파일 수정은 하지 않았으며, 검토 후 방어 검사와 판정 봉인은 위임자 책임이다."
+}

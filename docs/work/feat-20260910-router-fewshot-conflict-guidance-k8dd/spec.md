@@ -10,15 +10,15 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-10T23:01:23+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-10T23:56:54+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260910.md, inputs/ac-rebuttal-20260910-2.md, inputs/card-baseline.proposal.yaml,
   inputs/card-before-20260910.txt, inputs/probe-20260910.md]
-evidence: []
+evidence: [evidence/run_1dd734b69aad.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -40,13 +40,13 @@ updated: '2026-09-10'
 - **왜 지금:** shadow 20건이 예시로 쓸 오분류를 이미 모았고 2건이 같은 유형이다 — 요청에 「계획 세워봐」·「알려줘」처럼 판단·조사 요구가 섞였는데 실행 단계만 보고 불확실성을 낮게 잡았다(fx-landing-copy-revision · fx-landing-mobile-optimization). M5 attach 로 들어가기 전 정비 1회이고, 범위가 작다.
 - **기대 결과:** 제안이 불확실성을 예시와 다르게 잡으면 카드가 그 신호를 한 줄로 인쇄해 사람이 확정 전에 본다. 그 문구를 정책표에서 고치면 카드 출력이 따라 바뀐다 — 요구하는 자리와 보는 자리가 같아진다(§11). `/plan` 안내가 충돌 우선순위를 담는다.
 - **수용 기준:**
-  - [ ] AC-1 `core/policy/classification.yaml` 의 `two_questions.uncertainty.examples` 에 항목이 1건 이상 있고, 각 항목이 `level`·`cue`·`why`·`source` 넷을 빈 값이 아닌 채로 갖는다. `level` 은 `low`·`medium`·`high` 중 하나이고 `source` 는 fixture id 를 1건 이상 담은 목록이다. 지금 정책표에서 이 검사는 통과한다. `cue` 문구가 `source` fixture 의 교정 사유를 옳게 요약하는지는 이 검사가 판정하지 않는다 — 검토자가 그 둘을 나란히 읽는다
-  - [ ] AC-2 각 예시의 `source` 항목마다 `fixtures/requests/<id>.yaml` 이 있고, 그 fixture 의 `human_correction.changes` 에 `field` 가 `classification.uncertainty` 이고 `to` 가 그 예시의 `level` 과 같은 항목이 있다 — 예시의 레벨이 그 fixture 가 기록한 교정 결과값과 같다는 뜻이다. 지금 정책표에서 이 검사는 통과한다. 어느 예시의 `level` 을 그 fixture 의 `to` 가 아닌 다른 허용값으로 바꾸면 실패한다
-  - [ ] AC-3 카드는 예시의 `level` 과 `cue` 를 정책표에서 **읽어** 인쇄하고, 그 줄은 제안의 확정값이 아니라 참고 예시임이 드러나는 접두로 시작한다. 정책표 사본에서 `cue` 값만 바꾸면(`level` 은 그대로) 카드 출력의 그 줄이 바뀐 값을 담는다. 기대 문구는 그 사본에서만 오고, `tests/test_router_guidance_examples.py` 에도 그 파일이 가져오는 어떤 상수·데이터 파일에도 정책표의 실제 `cue` 문자열이 없다
-  - [ ] AC-4 제안의 `candidate.uncertainty` 와 `level` 이 다른 예시는 **전부** 인쇄되고, `level` 이 같은 예시는 인쇄되지 않는다
-  - [ ] AC-5 예시는 한 예시당 한 줄로 인쇄한다. 예시를 인쇄하는 카드의 개행 기준 줄 수가 `core/policy/packages.yaml` 의 `card_max_lines` 를 넘지 않고, 예시 줄 각각의 길이가 카드가 다른 줄에 이미 쓰는 접기 폭을 넘지 않는다
-  - [ ] AC-6 `inputs/card-before-20260910.txt` 는 이 단위 착수 전 `inputs/card-baseline.proposal.yaml` 로 만든 카드 출력이다. 구현 뒤 같은 제안으로 만든 카드가 그 파일의 카드 줄을 **전부** 담는다 — 변경 전에 사람이 보던 줄이 지워지지 않는다. 저장소 상태·설치 상태에 따라 달라지는 줄(재사용 후보·능력 프로브·부품 설치)은 검사가 양쪽에서 같은 규칙으로 제외하고, 그 규칙을 실패 메시지에 인쇄한다
-  - [ ] AC-7 `core/workflows/plan/SKILL.md` 는 **표식으로 특정한 한 줄**에 충돌 우선순위 항목을 적고, 그 줄의 항목 목록이 `classification.yaml` 의 `conflict_priority` 와 순서까지 정확히 같다. 검사는 그 줄만 읽는다 — 본문 아무 데나 나타나는 낱말을 세지 않는다. 구현 뒤 이 검사는 통과한다. 정책표를 그대로 둔 채 그 줄에서 어느 항목이든 하나를 빼면 실패한다. 정책표를 그대로 둔 채 그 줄의 서로 다른 두 항목의 순서를 바꾸어도 실패한다. `tests/test_router_guidance_examples.py` 에는 항목 이름이 인용부호나 백틱에 감싸인 채로 없다. 그 줄의 설명 문장이 우선순위 방향을 옳게 적었는지는 이 검사가 판정하지 않는다 — 검토자가 읽는다
+  - [x] AC-1 `core/policy/classification.yaml` 의 `two_questions.uncertainty.examples` 에 항목이 1건 이상 있고, 각 항목이 `level`·`cue`·`why`·`source` 넷을 빈 값이 아닌 채로 갖는다. `level` 은 `low`·`medium`·`high` 중 하나이고 `source` 는 fixture id 를 1건 이상 담은 목록이다. 지금 정책표에서 이 검사는 통과한다. `cue` 문구가 `source` fixture 의 교정 사유를 옳게 요약하는지는 이 검사가 판정하지 않는다 — 검토자가 그 둘을 나란히 읽는다
+  - [x] AC-2 각 예시의 `source` 항목마다 `fixtures/requests/<id>.yaml` 이 있고, 그 fixture 의 `human_correction.changes` 에 `field` 가 `classification.uncertainty` 이고 `to` 가 그 예시의 `level` 과 같은 항목이 있다 — 예시의 레벨이 그 fixture 가 기록한 교정 결과값과 같다는 뜻이다. 지금 정책표에서 이 검사는 통과한다. 어느 예시의 `level` 을 그 fixture 의 `to` 가 아닌 다른 허용값으로 바꾸면 실패한다
+  - [x] AC-3 카드는 예시의 `level` 과 `cue` 를 정책표에서 **읽어** 인쇄하고, 그 줄은 제안의 확정값이 아니라 참고 예시임이 드러나는 접두로 시작한다. 정책표 사본에서 `cue` 값만 바꾸면(`level` 은 그대로) 카드 출력의 그 줄이 바뀐 값을 담는다. 기대 문구는 그 사본에서만 오고, `tests/test_router_guidance_examples.py` 에도 그 파일이 가져오는 어떤 상수·데이터 파일에도 정책표의 실제 `cue` 문자열이 없다
+  - [x] AC-4 제안의 `candidate.uncertainty` 와 `level` 이 다른 예시는 **전부** 인쇄되고, `level` 이 같은 예시는 인쇄되지 않는다
+  - [x] AC-5 예시는 한 예시당 한 줄로 인쇄한다. 예시를 인쇄하는 카드의 개행 기준 줄 수가 `core/policy/packages.yaml` 의 `card_max_lines` 를 넘지 않고, 예시 줄 각각의 길이가 카드가 다른 줄에 이미 쓰는 접기 폭을 넘지 않는다
+  - [x] AC-6 `inputs/card-before-20260910.txt` 는 이 단위 착수 전 `inputs/card-baseline.proposal.yaml` 로 만든 카드 출력이다. 구현 뒤 같은 제안으로 만든 카드가 그 파일의 카드 줄을 **전부** 담는다 — 변경 전에 사람이 보던 줄이 지워지지 않는다. 저장소 상태·설치 상태에 따라 달라지는 줄(재사용 후보·능력 프로브·부품 설치)은 검사가 양쪽에서 같은 규칙으로 제외하고, 그 규칙을 실패 메시지에 인쇄한다
+  - [x] AC-7 `core/workflows/plan/SKILL.md` 는 **표식으로 특정한 한 줄**에 충돌 우선순위 항목을 적고, 그 줄의 항목 목록이 `classification.yaml` 의 `conflict_priority` 와 순서까지 정확히 같다. 검사는 그 줄만 읽는다 — 본문 아무 데나 나타나는 낱말을 세지 않는다. 구현 뒤 이 검사는 통과한다. 정책표를 그대로 둔 채 그 줄에서 어느 항목이든 하나를 빼면 실패한다. 정책표를 그대로 둔 채 그 줄의 서로 다른 두 항목의 순서를 바꾸어도 실패한다. `tests/test_router_guidance_examples.py` 에는 항목 이름이 인용부호나 백틱에 감싸인 채로 없다. 그 줄의 설명 문장이 우선순위 방향을 옳게 적었는지는 이 검사가 판정하지 않는다 — 검토자가 읽는다
 - **위험과 되돌리기:** 위험은 카드 30줄 예산이다 — 새 줄이 다른 줄을 밀어내면 사람이 보던 것이 사라진다. AC-5(넘지 않는다)와 AC-6(밀어내지 않는다)이 그것을 판정한다. 외부 상태를 바꾸지 않고 되돌리기는 통합 커밋 `git revert` 한 번이다.
 - **결정 필요:** 없음
 
@@ -124,6 +124,6 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-10T23:56:54+09:00 · HEAD 10032db3a839 · 검사 기록 run_1dd734b69aad
 
-- (없음)
+- [evidence/run_1dd734b69aad.yaml](evidence/run_1dd734b69aad.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

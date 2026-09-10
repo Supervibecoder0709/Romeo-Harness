@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260910-router-fewshot-conflict-guidance-k8dd",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/task/run_1dd734b69aad-implementer.json",
+    "sha256": "deb70d588e86381a2abeaa10acc5656e944c8df19073233281f9327ee120498d"
+  },
+  "checks": [
+    {"id": "check-1", "command": "python3 -m unittest tests.test_router_guidance_examples -v", "exit_code": 0},
+    {"id": "check-2", "command": "bin/romeo validate", "exit_code": 0},
+    {"id": "check-3", "command": "bin/romeo fixtures parity --report", "exit_code": 0},
+    {"id": "check-4", "command": "bin/romeo compile --check", "exit_code": 0},
+    {"id": "check-5", "command": "python3 -m unittest discover -s tests", "exit_code": 0}
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/evidence/run_1dd734b69aad.yaml",
+  "notes": "5건 전부 exit 0 (run_1dd734b69aad 의 check-1~check-5). 두 번 기록했고 마지막 기록이 이 산출물의 결과다 — 첫 기록 뒤 AC-3 의 「문구 복제 금지」 조항을 집행하는 검사를 하나 더 넣었기 때문이다(자세한 내용은 아래).\n\n구현: ① core/policy/classification.yaml 의 two_questions.uncertainty 에 examples 1건(level medium · source 는 fx-landing-copy-revision · fx-landing-mobile-optimization) ② romeo/card.py 에 WRAP_WIDTH·EXAMPLE_PREFIX·_uncertainty_examples() — 2질문 줄 바로 아래에서 정책표를 읽어 인쇄한다 ③ core/workflows/plan/SKILL.md 의 역할 분담 표 아래에 <!-- romeo:conflict-priority --> 표식 줄 ④ tests/test_router_guidance_examples.py 14건.\n\n검증 계획은 고치지 않았다 — required_checks 5건을 계약의 문자열 그대로 실행했다. 확인란의 문장도 고치지 않았고 체크 표시만 바꿨다(AC-1~AC-7).\n\n검사 파일에 검사를 하나 더한 근거: AC-3 은 「기대 문구는 사본에서만 오고, tests/test_router_guidance_examples.py 에도 그 파일이 가져오는 어떤 상수·데이터 파일에도 정책표의 실제 cue 문자열이 없다」 를 요구하는데, 승인 전 프로브가 세운 13건에는 그 조항을 보는 자리가 없었다. test_policy_cue_text_is_not_copied_anywhere 가 정책표의 cue 를 읽어 검사 파일·romeo/card.py·inputs/card-before-20260910.txt 세 곳에 없는지 본다. 회귀 방지 검사다(양쪽 상태에서 통과한다) — 판별력은 test_card_prints_the_cue_from_the_policy 가 만든다.\n\n승인 전 프로브(inputs/probe-20260910.md)와의 차이: 프로브는 착수 전 상태에서 8 실패 · 5 통과였고, 이 워크트리의 착수 전 실측은 11 실패 · 3 통과(공전 포함 4건 ok)였다. 차이는 이쪽 검사 두 건이 반례를 만들기 전에 전제(예시가 1건 이상 있는가 · 표식 줄이 정확히 하나인가)를 먼저 확인하기 때문이다 — 전제가 깨진 상태에서 「반례가 실패한다」 를 통과로 세지 않는다. 구현 뒤에는 14/14 통과다.\n\n회귀: 전체 테스트가 착수 전 1050건 OK → 구현 뒤 1063건 OK(check-5, 380.9초). 이 단위가 더한 14건 외에 새로 깨진 검사는 없다.\n\n범위 밖으로 남긴 것(§12): docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/attempts.yaml 이 추적되지 않은 상태로 워크트리에 있다. 이전 회차의 사본으로 보이지만 이 단위의 요청이 아니라 건드리지 않았다."
+}

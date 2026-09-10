@@ -13,6 +13,11 @@ SIZE_KO = {"small": "작음", "medium": "중간", "large": "큼"}
 DOC_KO = {"spec": "Tech Spec", "brief": "Compact Brief", "charter": "Charter"}
 REVIEWER_KO = {"none": "검토자 없음", "opposite-runtime-readonly": "반대 런타임 read-only 검토"}
 ISOLATION_KO = {"none": "실행 없음", "current": "현재 작업 공간", "worktree": "격리 worktree"}
+# 카드가 목록을 접는 폭. 예시 줄도 같은 폭을 쓴다 — 한 화면의 줄들이 서로 다른 폭을 쓰면
+# 「예산 안에 들어간다」 는 판정이 무엇을 잰 것인지 말할 수 없다.
+WRAP_WIDTH = 88
+# 예시 줄의 접두. 이 줄은 제안의 확정값이 아니라 **참고 예시**다 — 접두가 그 둘을 가른다.
+EXAMPLE_PREFIX = "  예시(참고): "
 
 
 def _clip(s, n=110):
@@ -25,7 +30,7 @@ def _list(items, n, prefix="  - "):
     return [prefix + _clip(x, 100) for x in items]
 
 
-def _wrap(prefix, items, width=88, sep=" · ", indent="      "):
+def _wrap(prefix, items, width=WRAP_WIDTH, sep=" · ", indent="      "):
     """목록을 잘라내지 않고 여러 줄로 접는다.
 
     추천 11종을 `_clip` 으로 자르면 사람이 본 목록과 정책표가 달라진다 — 카드가 결정을
@@ -39,6 +44,32 @@ def _wrap(prefix, items, width=88, sep=" · ", indent="      "):
         else:
             cur += piece
     lines.append(cur)
+    return lines
+
+
+def _uncertainty_examples(chosen, pol):
+    """2질문 바로 아래에 붙는 오분류 예시 — 제안이 고른 값과 **다른** 레벨만, 전부 인쇄한다.
+
+    문구는 코드에 없다. `core/policy/classification.yaml` 의 `two_questions.uncertainty.examples`
+    에서 `level` 과 `cue` 를 읽는다 — 정책표를 고치면 이 줄이 따라 바뀐다(§11). 반대로 문구를
+    여기 적으면 카드와 정책표가 두 사본이 되고, 대조되는 것은 둘의 일치일 뿐이다.
+
+    같은 레벨의 예시를 빼는 이유는 그것이 제안의 확정값과 구별되지 않기 때문이다 — 예시는
+    「지금 고른 값이 아닐 수도 있다」 를 보이려고 있고, 같은 값을 다시 인쇄하면 그 일을 하지 못한다.
+    자리를 앞쪽에 두는 이유는 예산 축소가 뒤에서부터 자르기 때문이다.
+
+    한 예시당 한 줄이고 `WRAP_WIDTH` 를 넘지 않는다. 넘치면 자른다 — 긴 문구가 화면에서 여러 줄로
+    접히면 개행 기준 예산은 지켜지고 사람이 보는 카드만 길어진다.
+    """
+    examples = (((pol["classification"].get("two_questions") or {}).get("uncertainty") or {})
+                .get("examples")) or []
+    lines = []
+    for ex in examples:
+        level = ex.get("level")
+        if level == chosen:
+            continue
+        body = f"불확실성 {LEVEL_KO.get(level, level)} — {ex.get('cue', '')}"
+        lines.append(EXAMPLE_PREFIX + _clip(body, WRAP_WIDTH - len(EXAMPLE_PREFIX)))
     return lines
 
 
@@ -142,6 +173,7 @@ def render_card(proposal, route_out, policy=None, root=None, harness_root=None):
     lines.append("5요인: " + " · ".join(f"{FACTOR_KO[k]} {LEVEL_KO[f[k]['level']]}({_clip(f[k]['note'], 28)})" for k in ("scope", "uncertainty", "impact")))
     lines.append("       " + " · ".join(f"{FACTOR_KO[k]} {LEVEL_KO[f[k]['level']]}({_clip(f[k]['note'], 28)})" for k in ("reversibility", "coordination")))
     lines.append(f"2질문: 영향 반경 {SIZE_KO[cand['blast_radius']]} · 불확실성 {LEVEL_KO[cand['uncertainty']]}")
+    lines.extend(_uncertainty_examples(cand["uncertainty"], pol))
     checks = {c["gate"]: c for c in proposal.get("gate_checklist", [])}
     boxes = []
     for g in pol["classification"]["hard_gates"]:

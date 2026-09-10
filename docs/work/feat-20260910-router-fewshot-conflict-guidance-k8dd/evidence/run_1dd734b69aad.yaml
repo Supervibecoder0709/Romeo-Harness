@@ -1,0 +1,360 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_1dd734b69aad
+task_id: task_bd4387697852
+dispatch_id: ctx_5855dfe61a48
+unit_id: feat-20260910-router-fewshot-conflict-guidance-k8dd
+spec_ref:
+  path: docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/spec.md
+  sha256: a226c631c62a95a7b46ef0e999ef09e23dca83ba36550011ba259ed39513f6ec
+base_sha: 10032db3a83981c826265f448c3df6dcee55a119
+head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1
+started_at: '2026-09-10T23:19:32+09:00'
+finished_at: '2026-09-10T23:37:23+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_router_guidance_examples -v
+  exit_code: 0
+  started_at: '2026-09-10T23:19:32+09:00'
+  finished_at: '2026-09-10T23:19:34+09:00'
+  seconds: 1.682
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/01-check-1.log
+  log_sha256: 02f5343525d5b5cf6746a92c7d0317478cb4b32826d3651575a65fb441f06bda
+  stdout_tail: ''
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 78c0cfcf4e31a626a5f03a952be14afcb633642ae5db963e44bfad6dcbfd5adf
+- id: check-2
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-10T23:19:34+09:00'
+  finished_at: '2026-09-10T23:19:34+09:00'
+  seconds: 0.376
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/02-check-2.log
+  log_sha256: 72cd67247dba79ccb71e0c6d3762724a420465f409421c05ca2ed404f229c556
+  stdout_tail: 'reuse-metrics-wr9m/brief.md lines=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 78c0cfcf4e31a626a5f03a952be14afcb633642ae5db963e44bfad6dcbfd5adf
+- id: check-3
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-09-10T23:19:34+09:00'
+  finished_at: '2026-09-10T23:19:37+09:00'
+  seconds: 2.039
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/03-check-3.log
+  log_sha256: 9d5b36217879e6f2d74d0a19e5c1d311c5dd61abb4830d503989c05a8bed7160
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 78c0cfcf4e31a626a5f03a952be14afcb633642ae5db963e44bfad6dcbfd5adf
+- id: check-4
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-10T23:19:37+09:00'
+  finished_at: '2026-09-10T23:19:37+09:00'
+  seconds: 0.347
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/04-check-4.log
+  log_sha256: 35a4894985ff7046a108aba36e04fc19767be39cba2214759a5e1f2dc598279f
+  stdout_tail: compile 검사 PASS
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 78c0cfcf4e31a626a5f03a952be14afcb633642ae5db963e44bfad6dcbfd5adf
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-10T23:19:37+09:00'
+  finished_at: '2026-09-10T23:26:04+09:00'
+  seconds: 386.358
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/05-check-5.log
+  log_sha256: a6b5baa96dfce01adce3fb3979a7dc6dee005a02d4cc63e09095b7351583ed93
+  stdout_tail: ''
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 78c0cfcf4e31a626a5f03a952be14afcb633642ae5db963e44bfad6dcbfd5adf
+- id: check-1
+  command: python3 -m unittest tests.test_router_guidance_examples -v
+  exit_code: 0
+  started_at: '2026-09-10T23:26:54+09:00'
+  finished_at: '2026-09-10T23:26:55+09:00'
+  seconds: 1.708
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/06-check-1.log
+  log_sha256: b6aad4343603d9295a12ec99e032bc8d4e23b75670b1ceead6c3a9208349d04e
+  stdout_tail: ''
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: check-2
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-10T23:26:55+09:00'
+  finished_at: '2026-09-10T23:26:56+09:00'
+  seconds: 0.37
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/07-check-2.log
+  log_sha256: a7797ec9b80ff12b730f6e600c49c8713ce1b2fdb5faa6ed7cfa749f0b70f0cd
+  stdout_tail: 'reuse-metrics-wr9m/brief.md lines=61 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/charter.md
+    lines=83 needs_input=0 unchecked_ac=0
+
+    [PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/spec.md
+    lines=127 needs_input=0 unchecked_ac=0'
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: check-3
+  command: bin/romeo fixtures parity --report
+  exit_code: 0
+  started_at: '2026-09-10T23:26:56+09:00'
+  finished_at: '2026-09-10T23:26:58+09:00'
+  seconds: 2.129
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/08-check-3.log
+  log_sha256: 0033095c66d6c513ac93fa576719142478efdbbbf3138c85715e97e2d9527ba6
+  stdout_tail: '차이를 말하지 않는다; pr-license-field-t1-reviewer-observed: reviewer 판정(advisory · 게이트 아님): baseline
+    FAIL·FAIL / swapped FAIL·FAIL — VERDICT_SAME reviewer 판정이 같다. 판정 흔들림의 원인은 Q-10 이 가진다 — 같은 산출물 재검토로
+    PASS 를 기다리지 않는다.
+
+    이 판정이 대조한 것은 봉투와 증거 기록이다 — 봉투가 주장한 검사는 evidence_ref 가 가리킨 증거의 기록과 명령·종료 코드가 같아야 통과한다. 다만 **여기서 명령을
+    다시 실행하지는 않는다**(다른 곳에서 끝난 실행이다): 증거 기록 자체의 재실행 대조는 그 실행이 벌어진 체크아웃의 종료 검사(`romeo close`)가 한다.'
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: check-4
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-10T23:26:58+09:00'
+  finished_at: '2026-09-10T23:26:59+09:00'
+  seconds: 0.333
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/09-check-4.log
+  log_sha256: 5d7985c3af03674b783508789fbba7aee4f289d5e5e0f10189d8499d342083ed
+  stdout_tail: compile 검사 PASS
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: check-5
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-10T23:26:59+09:00'
+  finished_at: '2026-09-10T23:33:20+09:00'
+  seconds: 380.86
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/10-check-5.log
+  log_sha256: b6829aa1e0540312a5bf3eb46d941a65316879d01be3b9538c57b84947155006
+  stdout_tail: ''
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd'
+  exit_code: 0
+  started_at: '2026-09-10T23:35:21+09:00'
+  finished_at: '2026-09-10T23:35:21+09:00'
+  seconds: 0.035
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/11-review-tree-before.log
+  log_sha256: 2efb668165d64f228eb698fa7bfc57e2e2a5c368e8adcee5d0866209477881fc
+  stdout_tail: "M core/policy/classification.yaml\n M core/workflows/plan/SKILL.md\n M romeo/card.py\n\
+    ?? tests/test_router_guidance_examples.py"
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/.harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-10T23:35:26+09:00'
+  finished_at: '2026-09-10T23:35:26+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/12-reviewer-brief.log
+  log_sha256: a4f9dfa814f39df2f1b773be9eb33b307a65c194afdb6d682d6cf6b0c1d698a4
+  stdout_tail: 55f9bd0ae7e772c0fb0ae0095bb311a659acfc82d50f4a261a715493c74de62c  /Users/julliettelee/orca/workspaces/Romeo-Harness/k8dd-impl-1/.harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/reviewer-brief.md
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd'
+  exit_code: 0
+  started_at: '2026-09-10T23:37:14+09:00'
+  finished_at: '2026-09-10T23:37:14+09:00'
+  seconds: 0.034
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/13-review-tree-after.log
+  log_sha256: 2efb668165d64f228eb698fa7bfc57e2e2a5c368e8adcee5d0866209477881fc
+  stdout_tail: "M core/policy/classification.yaml\n M core/workflows/plan/SKILL.md\n M romeo/card.py\n\
+    ?? tests/test_router_guidance_examples.py"
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/review/run_1dd734b69aad-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-10T23:37:23+09:00'
+  finished_at: '2026-09-10T23:37:23+09:00'
+  seconds: 0.023
+  log: .harness/runs/feat-20260910-router-fewshot-conflict-guidance-k8dd/run_1dd734b69aad/14-review-record.log
+  log_sha256: 065c6e2a4a371146c6577d8cad052e481c8eb3229005f660c701380e2e18aeb2
+  stdout_tail: d0c9d3182d373b13c52f44565bf4eb6d1c0af8b984f7da738b9e1b6dd9993052  docs/work/feat-20260910-router-fewshot-conflict-guidance-k8dd/review/run_1dd734b69aad-reviewer.json
+  head_sha: 10032db3a83981c826265f448c3df6dcee55a119
+  dirty_tree_hash: 3c39be5491231fe03f2a152f3c111e09983dc8eb99218102b23d9b10a7b1d1f8
+changed_files:
+- core/policy/classification.yaml
+- core/workflows/plan/SKILL.md
+- romeo/card.py
+- tests/test_router_guidance_examples.py
+artifact_hash: 2343b13dcfa6182462595e26a7eacb02f3f723a9d3a1a6d50e85df4a0d73d6be
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-10T23:56:54+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-4 «전부»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-6 «전부»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-7 «어느 항목이든»
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-10T23:01:23+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 10032db3a839 의 하네스 (488개 파일 대조 · /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-mvp-planning/be6ef432-97b0-41e3-a178-eeda7e773673/scratchpad/judge)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_1dd734b69aad — 검증 계획 5건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/1건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence 10032db3a839 vs 현재 10032db3a839
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence 3c39be549123 vs 현재 3c39be549123 (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_router_guidance_examples -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest discover -s tests'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 14건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 7건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 5건이 승인 커밋 10032db3a839 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_router_guidance_examples -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — bin/romeo fixtures parity --report'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 10032db3a839 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['core/policy/classification.yaml', 'core/workflows/plan/SKILL.md', 'romeo/card.py',
+      'tests/test_router_guidance_examples.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_1dd734b69aad-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

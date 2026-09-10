@@ -117,6 +117,18 @@ two_questions:
     low: 무엇을 어떻게 만들지 안다
     medium: 무엇은 알지만 방법 일부가 미정이다
     high: 문제 정의나 해법 자체가 미정이다
+    # 분류를 틀리게 만든 신호. 여기가 정본이고 카드가 읽어 인쇄한다 — 문구를 여기서 고치면
+    # 카드 출력이 따라 바뀐다(요구하는 자리와 보는 자리를 같게 둔다, AGENTS.core §11).
+    # 누가 무엇을 읽는지 적어 둔다 — 아무도 읽지 않아도 되는 것은 읽지 않는다고 적는다.
+    #   level·cue → 카드가 인쇄한다(제안이 고른 값과 **다른** 레벨의 예시만).
+    #   why       → 이 표를 여는 사람이 읽는 근거다. 카드는 인쇄하지 않는다.
+    #   source    → tests/test_router_guidance_examples.py 가 fixture 의
+    #               human_correction 과 대조하는 값이다. 카드는 인쇄하지 않는다.
+    examples:
+      - level: medium
+        cue: 요청에 「계획 세워봐」·「알려줘」처럼 판단·조사 요구가 섞여 있다
+        why: 실행 단계만 보면 낮음으로 잡기 쉽다. 무엇을 만들지 알아도 방법 일부가 조사·판단 결과에 달렸으면 중간이다
+        source: [fx-landing-copy-revision, fx-landing-mobile-optimization]
 
 # ── 7. 5요인 (합산하지 않고 각각 한 줄로 설명) ────────────────────────────────
 five_factors:
