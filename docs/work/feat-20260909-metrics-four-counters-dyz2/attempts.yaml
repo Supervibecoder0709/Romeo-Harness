@@ -1,0 +1,14 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260909-metrics-four-counters-dyz2
+attempts:
+- n: 1
+  run: run_cf5998614e4c
+  base_sha: 7e180a2ed0b4dc847a69308d90a59bd0aec6babd
+  started_at: '2026-09-10T10:34:03+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL findings 2 — 재분류 사건 판별이 딕셔너리 truthy 만 보아 {unit: null} 같은 빈 내용도 세고(같은 함수 docstring 이
+    적어 둔 규칙과 어긋난다) · needs_event=True 인 세 지표 중 「사건 0건 → 미집계」를 실행해 보인 것이 재분류율 하나뿐이다'
+  settled_at: '2026-09-10T11:07:34+09:00'
+reviews: []
+reviewer_runs: []
