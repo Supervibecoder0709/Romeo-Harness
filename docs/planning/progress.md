@@ -2,7 +2,7 @@
 id: progress
 type: planning
 status: active
-updated: 2026-09-09
+updated: 2026-09-10
 authority: derived
 ---
 
@@ -17,34 +17,32 @@ authority: derived
 독립 리뷰 findings 원문은 `docs/reviews/` 에 라운드별로 보관한다 —
 [1차(F01~F31)](../reviews/2026-08-28-m2-round1-review/README.md) · [2차(G01~G13)](../reviews/2026-08-28-m2-round2-review/README.md).
 
-## 지금 상태 (기준 `c0a26d6` · 2026-09-09)
+## 지금 상태 (기준 `281b8c8` · 2026-09-10)
 
 > **예산 30줄·2KB.** 회차 서사와 결함 표는 작업 단위(`docs/work/<id>/`)와 `attempts.yaml` 이 소유한다 —
 > 여기 옮겨 적지 않는다(K-63). 아래가 낡았는지는 `git log --oneline <아래 SHA>..HEAD` 로 본다.
 
-- **마일스톤:** M2·M3 완료. M4 charter 는 **M3(승격·무결성)까지 닫혔다** — 남은 것은 M4(지표 `romeo metrics`) 하나다.
-- **활성 작업 단위:** 없음. 정비 2회를 연달아 마쳤다 — `feat-20260909-promotion-check-coverage-ggkm`(Q-90·Q-91 · 1회차 close PASS · 통합 `177b67d`)와
-  `feat-20260909-review-procedure-alignment-ehbp`(Q-94·Q-95·Q-96 · **4회차 close PASS** · 7/7 · 재실행 7/7 · 검토자 PASS findings 0 · 통합 `65744d3`).
-- **이 정비가 남긴 것.** 세 결함 다 §11 ②(요구가 사는 문서와 검사가 읽는 문서가 다르다)였다.
-  **Q-96 은 앞 관통에서 실제로 두 번 close 를 막았다** — 봉인 명령(`romeo review record`)과 방어 검사 라벨(`review-tree-before/after`)이
-  RUNBOOK 에만 있어 어댑터 지시대로 따르면 통과할 수 없었다. 요구의 정본을 `close.py` 에 모으고(`SEAL_COMMAND` 추가)
-  검사가 그것을 **import 로만** 가져와 안내 셋과 대조한다 — 검사에 값을 복사하지 않는 것까지 금지 목록을 정본에서 파생해 막는다.
-  Q-95 는 회차를 여는 자리가 역할을 보게 했고(`reviewer_runs:` · `reviews:` 와 분리 — 그 목록은 `gate()` 가 읽어 §10 차단을 푼다),
-  Q-94 는 반박 파일을 전부 읽되 목록 밖은 **디렉터리로 두어 읽지 않음을 관측**으로 보인다.
-- **§10 브레이크가 이 단위에서 두 번 걸렸다 — 원인이 서로 다르다.** 1·2회차 실패는 산출물 결함이었고(재검토 「달성 가능」 뒤 3회차),
-  3회차 실패는 **완료 정의**였다 — AC-5 의 「바이트로 그대로」는 `save_attempts` 가 파일 전체를 다시 직렬화하므로
-  어떤 구현으로도 참일 수 없다. 딕셔너리 통째 비교로 고쳐 재승인했다(**D-80 5번째** · `abcf09c`).
-  **세 번 같은 자리에서 실패한 것은 수정이 매번 한 겹씩 얕았기 때문이다** — 필드 골라 비교 → 재직렬화한 값 비교 → 파일 텍스트 블록 비교.
-  셋 다 「바이트」라는 낱말을 만족시키려는 시도였고, 그 낱말이 애초에 과했다. **AC 결함 7번째**다.
-- **다음 행동(D-81 순서):** ③ M4 나머지 — **M4 지표 `romeo metrics`** → ④ shadow 20건·v1 릴리스 게이트 → ⑤ M5 `attach`.
-- **blocker:** 없음. 미푸시 없음 — 여기까지 전부 푸시됐다. 워커 워크트리와 브랜치는 정리했다(남은 것은 `main` 과 이 체크아웃뿐).
-- **최신 CI:** `c0a26d6` run **success**. **넓힌 트리거(`docs/current/**`·`docs/work/**`)는 아직 그 자체로 검증되지 않았다** —
-  그 push 가 담은 4개 커밋 중 하나가 `romeo/`·`tests/` 를 바꿔 어차피 돌았다. 부분 증거는 있다:
-  `3c961d8`(`docs/planning/**` 만)은 트리거되지 않았다 — 필터가 실제로 선별한다.
-  `docs/current/` 나 `docs/work/` **만** 담은 push 하나가 CI 를 돌리면 닫힌다.
-- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·83~89·92·93·97·**98·99**(`open-questions.md`).
-  Q-90·Q-91·Q-94·Q-95·Q-96 은 이 두 정비가 닫았다. Q-98(반박 파일 코드 블록 안의 예시 절이 세인다)·Q-99(재승인 커밋으로 워크트리를 옮길 때 미커밋 사본이 ff-only 를 막는다 — Q-70 의 재승인 경로판)이 이번 관통이 §12 로 남긴 것이다.
-- **다음 정비 후보:** Q-83(판정 리비전이 계약·증거 생성에는 미적용) → Q-64 → Q-69·Q-70·Q-99(같은 계열) → Q-82 → Q-88(공유 파서) → Q-97·Q-98. Q-89(1회차 통과율)는 관측 10건이 닫는다.
+- **마일스톤:** M2·M3 완료. **M4 charter 가 닫혔다** — 네 마일스톤(재사용 검색·1-hop 재개·승격과 무결성·지표)이 전부 섰다.
+- **활성 작업 단위:** 없음. `feat-20260909-metrics-four-counters-dyz2`(**3회차 close PASS** · 7/7 · 재실행 7/7 · 검토자 PASS findings 0 · 통합 `281b8c8`).
+- **`romeo metrics` 실측.** 분류 수정률 **20.0%**(corrected 2 / verdict 기록 10) · gate 누락 **0건** · T0 처리 시간 **중앙값 70초**(표본 3) · 재분류율 **미집계**.
+  각 행 아래에 원본 파일 경로·읽은 자리·사건 규칙·읽은 파일 수가 인쇄된다 — 숫자를 손으로 다시 셀 수 있다(K-63).
+- **재분류율이 미집계인 것이 이 단위의 요점이다.** `routing.history` 에 값을 넣는 코드 경로가 없어 `0%` 는
+  「없었다」와 「기록되지 않는다」를 구별하지 못한다(K-68). 고치지 않고 **Q-100** 으로 열었다(§12).
+- **§10 브레이크가 걸렸고 원인이 산출물이 아니었다.** 1회차는 산출물 결함(사건 판별이 `{unit: null}` 을 세었다 —
+  같은 함수 docstring 이 적어 둔 규칙과 어긋났다 · 「사건 0 → 미집계」를 셋 중 하나에만 실행해 보였다).
+  2회차는 그 둘을 고쳐 **검토자 PASS** 였는데 **위임 절차**가 close 를 막았다 — 워크트리 head 와 계약 base_sha 를 맞추지 않고 띄웠고(RUNBOOK §3.5 의 확인을 건너뛰었다),
+  close 직전에 ff 로 맞추자 evidence 의 head 가 낡아 `FRESH_HEAD` 하나에서 멈췄다. 사람이 「달성 가능」으로 재검토했고(**D-80 아님** — AC 는 그대로다),
+  3회차는 **코드를 한 글자도 고치지 않고** 정렬된 리비전에서 증거·검토만 다시 받아 PASS.
+- **이 관통이 연 결함 둘.** **Q-100**(재분류 기록 경로 부재) · **Q-101**(settle 된 회차의 워커가 살아 있으면 봉인된 run 의 증거를 되돌릴 수 없게 오염시킨다 —
+  `worker-stop` 이 거부했고 절차에 그것을 막는 자리가 없다). Q-101 때문에 2회차 검토 봉투를 지우지 않고 `review-spoiled/` 로 옮겨야 close 가 섰다(사용자 승인 · 그 판정도 PASS 였고 같은 트리를 봤다).
+- **승인 전 프로브·반박이 잡지 못한 것이 있었다.** 프로브 1회 + 반박 2회로 AC 결함 6건을 승인 전에 고쳤는데,
+  **코디네이터 자신의 실측 오류**(`human_correction` 의 `verdict` 를 보지 않아 26.3% 를 「수정률」로 적었다)는 구현자의 blocking ask 가, 
+  사건 판별과 실행 증거 부족은 검토자가 잡았다. 승인 전 검증은 AC 문장을 고치고, 구현·검토만이 산출물을 고친다.
+- **다음 행동(D-81 순서):** ④ shadow 20건·v1 릴리스 게이트(§10 #15) → ⑤ M5 `attach`. 그 전에 정비 1회를 넣는다.
+- **blocker:** 없음. **미푸시 4건**(`7e180a2`·`926d65a`·`b70568f`·`281b8c8`) — 푸시는 별도 승인이다.
+- **최신 CI:** `c0a26d6` run success. **넓힌 트리거(`docs/current/**`·`docs/work/**`)는 여전히 그 자체로 미검증이다** — 이번 푸시도 `romeo/`·`tests/` 를 담아 어차피 돈다.
+- **열린 park:** Q-12·13·15~17·19·23·24·26·32~35·46·49~57·58~61·62~65·69~70·71~77·78~82·83~89·92·93·97·98·99·**100·101**(`open-questions.md`).
+- **다음 정비 후보:** **Q-101**(이번 관통이 3회차를 태운 원인) → Q-83 → Q-64 → Q-69·Q-70·Q-99(같은 계열) → Q-82 → Q-88(공유 파서) → Q-97·Q-98·Q-100. Q-89(1회차 통과율)는 관측 10건이 닫는다.
 - **진단 (2026-09-07):** 자가봉착의 뿌리는 **판정하는 하네스와 판정받는 하네스가 같은 리비전**이라는 것 —
   자기참조 9건·드리프트 11건·단위당 Q 2.4건(`docs/reviews/2026-09-07-self-application-diagnosis/`). 권고 1·2·3 은 각각 집행됐고 D-81·Q-02 로 이어졌다.
 ## 마일스톤
@@ -55,7 +53,8 @@ authority: derived
 | M1 T0 최소 관통 (Claude 단독, 현재 작업 공간) | **완료** | [원문](archive/milestones.md) |
 | M2 어댑터·역할·Orca 위임·T1 교차 관통 | **완료 (2026-08-29 · D-76)** | [원문](archive/milestones.md) |
 | M3 기획 깊이 확장 (T2·discovery·gate·doctor) | **완료 (2026-09-04)** — 마지막 조각인 charter 를 쓰는 실제 T2 관통이 `init-20260904-m4-doc-reuse-metrics-wr9m`(1회차 close PASS · 5/5 · 재실행 5/5 · 검토자 PASS findings 0 · 통합 `ec4f97c`)로 닫혔다. 그 관통이 M4 이니셔티브를 열고 첫 마일스톤(재사용 검색)까지 닫았다. 이하는 그 이전 경과다 — G-M3 는 §6.1 **1~5단계 전부 닫힘**(D-77 + `feat-20260831-bmad-attach-probe-tgnb` + `feat-20260831-bmad-install-observe-a3bm`). **5단계 결론은 「공존한다」**. 그 뒤 **관통 사이의 하네스 정비 3회**를 마쳤다 — 1회는 `feat-20260831-park-defects-actm`(park 결함 5건 · 5회차 `run_e3a4af18582c` close · 16/16), 2회는 `feat-20260901-coordinator-procedure-gaps-y8fu`(코디네이터 위임 절차 결함 3건 · 2회차 `run_fc79c4267d1c` close · required_checks 15/15 · 재실행 15/15 · 앵커 양쪽 5/5 · 검토자 PASS findings 0), 3회는 `feat-20260901-task-copy-brief-count-erc6`(`task/` 사본 병합 충돌 · 브리프 검사 개수 하드코딩 · **1회차** `run_e909a3e53aea` close · required_checks 14/14 · 재실행 14/14 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **M3 본체로 돌아와 시나리오 3 을 세웠다** — `feat-20260901-charter-discovery-block-a3xs`(계산만 되던 `blocks` 를 승인·종료 두 지점에서 집행 · `core/templates/charter.md`(T2) · `scenarios/` 런북 · **관통 1회차** `run_d947edf2d24a` close PASS · required_checks 17/17 · 재실행 17/17 · 앵커 양쪽 5/5 · 검토자 PASS findings 0). 그 뒤 **시나리오 8 을 세웠다** — `feat-20260901-scenario-8-capability-probe-s7ny`(능력 프로브를 코어에 정의하고 흔적 경로는 어댑터가 소유 · 카드가 부재와 대안을 인쇄 · 차단 `capability-probed` 가 **거짓만 막고 부재는 막지 않는다** · `scenarios/8-capability-absent.md` · **관통 5회차** `run_d7092f3d25c5` close PASS · required_checks 10/10 · 재실행 10/10 · 검토자 PASS · **§10 브레이크 1회 작동**(3회차 goal · 4회차 outputs → 사람 재검토 뒤 5회차) · 재승인 3회 · 그 관통이 낸 결함은 Q-36~Q-42). 그 뒤 **관통 사이 정비 4회차** — `feat-20260902-scope-grammar-procedure-drift-z5mv`(시나리오 8 관통이 낸 결함 Q-36~Q-42 · 승인 산문이 쓰기 권한이 되던 구멍·CI 빈 검사·RUNBOOK/run-unit 어긋남 5건 · Q-38 은 D-80 · **관통 1회차** `run_0b4ed250c691` close PASS · required_checks 16/16 · 재실행 16/16 · 검토자 PASS findings 0 · 승인 전 프로브 양쪽 실측 + 세 렌즈 반박 검증). 그 뒤 **시나리오 9 를 세워 M3 의 런북 조건을 닫았다** — `feat-20260902-scenario-9-guard-enforcement-95e6`(가드 설명 요구 4항목을 `execution-guards.yaml` 단일 출처에서 승인·종료 두 지점이 읽는다 · 거부 경로 `evidence reject` 와 `BLOCKED_APPROVAL` 종결 판정 · `gate-create` 를 코어에서 걷어내 어댑터가 소유(C-C6) · `scenarios/9-guard-approval.md` · **관통 3회차** `run_108f96346abc` close PASS · required_checks 12/12 · 재실행 12/12 · 검토자 PASS · **§10 브레이크 1회 작동**(1회차 `approval_log_state` 가 로그의 note·seq 를 대조하지 않아 두 지점이 같은 yaml 을 두 번 읽었다 · 2회차 AC-10 의 base 재현을 손으로 적어 봉인 누락 → 사람 재검토 「달성 가능」 뒤 3회차) · 그 관통이 낸 결함은 Q-44·Q-45). **계획 §10 #13 의 「시나리오 3·8·9 런북 PASS」 는 충족됐다**. 그 뒤 **관통 사이 정비 5회차** — `feat-20260903-guard-guidance-vendor-drift-bvjz`(시나리오 9 관통이 §12 로 남긴 Q-44·Q-45 · 가드 `--note` 네 항목을 안내 3곳이 몰라 지시대로 따르면 exit 2 로 막히던 것 · 코어 정책에 남은 집행 수단 사본 제거(C-C6) · 라벨을 정책표에서 **읽어** 대조하는 검사(라벨 1개만 개명해도 검사가 즉시 실패하는 것을 실측) · **관통 2회차** `run_52462dd28eae` close PASS · required_checks 9/9 · 재실행 9/9 · 검토자 PASS findings 0 · **1회차는 검토자 FAIL** — AC-3 이 요구한 「라벨을 바꾸면 새 라벨로 대조한다」가 실제로는 「대조를 그만둔다」였고, 그 원인은 spec 의 AC-2 가 둔 「라벨이 하나라도 나타나면」 조건이었다 · 그 관통이 낸 결함은 Q-47·Q-48). 그 뒤 **관통 사이 정비 6회차** — `feat-20260903-runbook-handle-attempts-drift-w7tm`(정비 5회차가 §12 로 남긴 Q-47·Q-48 · §3.7 의 핸들 확인이 「같은 제목」을 기준으로 삼아 TUI 가 제목을 덮어쓰면 막다른 길이던 것을 `.result.terminal.worktreeId`+`worktreePath`+핸들 대조로 옮겼다 · 통합할 때 워크트리 사본이 위임 쪽 판정을 `started` 로 덮던 것을 막는 `run-unit merge-check` 와 RUNBOOK 새 절 §3.10 · **관통 2회차** `run_cc106a316c68` close PASS · required_checks 9/9 · 재실행 9/9 · 검토자 PASS findings 0 · **1회차는 검토자 FAIL** — AC-4 가 AC-3 과 같은 상태를 반대로 판정했고 원인이 산출물이 아니라 완료 정의여서 AC-4 만 고쳐 재승인했다(D-80) · **그 검사의 첫 실사용이 자기 통합이었다** — merge-check 가 exit 1 로 「회차 2 · pass 가 사라진다」를 지목해 막았고 정본을 반영한 뒤 exit 0 · §3.7 의 제목 덮어쓰기도 이 관통에서 재현됐다). 그 뒤 **hard gate 8 커버리지를 채워 §10 #13 의 나머지 절반을 닫았다** — `feat-20260904-gate-fixture-coverage-q3wy`(fixture 0건이던 5개 게이트 payment·legal·ops-data-deletion·public-api·irreversible-policy 에 요청 fixture 를 1건씩 더해 **8/8** · 게이트 id 를 `classification.yaml` 에서 **읽어** 커버리지와 id 유효성을 대조하는 `tests/test_gate_coverage.py` · 판별력을 검사 안에서 매번 재확인한다(fixture 제거·정책표 id 개명·없는 id 주입 · **id 를 하드코딩한 구현은 개명된 정책표에서 통과해 버린다**는 반례) · **관통 2회차** `run_60db3d61480b` close PASS · required_checks 5/5 · 재실행 5/5 · 검토자 PASS findings 0 · **1회차는 검토자 FAIL** — AC-2 가 「route 실행 전에 손으로 적었다」는 사후 관측 불가능한 시간 순서를 요구했고, 원인이 산출물이 아니라 완료 정의여서 AC-2 만 고쳐 재승인했다(D-80). 자기참조를 끊는 자리를 시간 순서에서 **사람의 확인**(`human_correction`)으로 옮겼다 · **merge-check 가 두 번째 실사용에서도 exit 1 로 막았다** — 회차 2 pass 가 사라지는 것을 지목 · 68개 프로젝트 세션 로그(597MB)를 훑어 실제 요청은 payment 1건뿐이라 **나머지 4건은 `source.kind: authored`** — 그 한계는 Q-50 · 그 관통이 §12 로 남긴 관측은 Q-49). **M3 의 나머지는 charter 를 쓰는 실제 T2 관통 하나다** | D-77, `docs/work/feat-20260831-bmad-install-observe-a3bm/`(status done) 통합 `a9e7af1`, `docs/work/feat-20260831-park-defects-actm/`(status done) 통합 `fd7c7b9`, `docs/work/feat-20260901-coordinator-procedure-gaps-y8fu/`(status done) 통합 `c945686`, `docs/work/feat-20260901-task-copy-brief-count-erc6/`(status done) 통합 `045ea08`, `docs/work/feat-20260901-charter-discovery-block-a3xs/`(status done) 통합 `344fc7e`, `docs/work/feat-20260901-scenario-8-capability-probe-s7ny/`(status done) 통합 `50d3901`, `docs/work/feat-20260902-scope-grammar-procedure-drift-z5mv/`(status done) 통합 `3efc026`, `docs/work/feat-20260902-scenario-9-guard-enforcement-95e6/`(status done) 통합 `16c0751`, `docs/work/feat-20260903-guard-guidance-vendor-drift-bvjz/`(status done) 통합 `0b3a263`, `docs/work/feat-20260903-runbook-handle-attempts-drift-w7tm/`(status done) 통합 `2f7c318`, `docs/work/feat-20260904-gate-fixture-coverage-q3wy/`(status done) 통합 `8eee897` |
-| M4 ~ M7 | 미착수 | [원문](archive/milestones.md) |
+| M4 문서 재사용·승격·지표 (`init-20260904-m4-doc-reuse-metrics-wr9m`) | **완료 (2026-09-10)** — charter 의 네 마일스톤이 전부 섰다. M1 재사용 검색 `romeo find`(통합 `ec4f97c`) · M2 1-hop 재개 `romeo context`(`feat-20260907-context-one-hop-resume-w5jq` · 통합 `7f77699`) · M3 승격과 무결성 `docs/current/` + `romeo integrity`(`feat-20260909-promote-integrity-kchq` 와 `feat-20260909-promotion-check-coverage-ggkm` · 통합 `177b67d`) · **M4 지표 `romeo metrics`**(`feat-20260909-metrics-four-counters-dyz2` · 3회차 close PASS · 통합 `281b8c8`). 계획 §10 #14 의 관찰 결과 네 가지 — 중복 요청에 기존 unit id 제시 · `docs/current/` 승격 1건 이상 · `romeo metrics` 표 출력 · 깨진 링크 0 — 이 전부 명령의 종료 코드로 선다 | `docs/work/init-20260904-m4-doc-reuse-metrics-wr9m/`(status done) |
+| M5 ~ M7 | 미착수 | [원문](archive/milestones.md) |
 
 ## §10 체크리스트
 
