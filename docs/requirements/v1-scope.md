@@ -2,7 +2,7 @@
 id: v1-scope
 type: requirements
 status: draft
-updated: 2026-08-29
+updated: 2026-09-10
 authority: canonical
 ---
 
@@ -36,7 +36,7 @@ authority: canonical
 | V-2 | 템플릿 3개 | Tech Spec(Planning Capsule 섹션 포함), T1 Compact Brief, T2 Charter. 각 길이 캡 명기 |
 | V-3 | `/plan` | 재사용 검색 → 분류 제안 → gate 체크리스트 인쇄 → 사람 1클릭 확정 → 필요한 문서만 생성. 재실행 = 재분류 |
 | V-4 | `/plan-close` + 검증 스크립트 | 스키마·링크·미체크박스·예산·open-loop 검사 → 상태 확정 + `current/` 갱신 |
-| V-5 | 최소 어댑터 | 공통 정의 → `CLAUDE.md`(@AGENTS.md import) / `AGENTS.md`, `.claude/agents` ↔ `.codex/agents`, `.claude/skills` ↔ `.agents/skills`. managed marker + source hash |
+| V-5 | 최소 어댑터 | 공통 정의 → `CLAUDE.md`(@AGENTS.md import) / `AGENTS.md`, `.claude/skills` ↔ `.agents/skills`, 역할은 `.harness/bindings.yaml` 이 런타임에 묶고 강제는 런타임별 수단(claude: `.claude/agents` + settings · codex: 실행 플래그, D-68 — **개정 5**: `.codex/agents` 는 codex 에 그 개념이 없어 요구에서 뺐다). managed marker + source hash |
 | V-6 | 역할 2개 | `implementer`(writer, worktree당 1명) / `reviewer`(read-only) |
 | V-7 | Evidence 계약 | [능력 지도 C-E1](capability-map.md) 최소 필드 |
 | V-8 | 프로젝트 부착 상태 파일 | 하네스 버전과 활성 기능만. 인증정보 없음 (S12) |
@@ -76,6 +76,8 @@ v1의 유일한 합격 기준이다.
 같은 산출물·같은 런타임에서도 흔들리는 것이 관측돼(D-74) **합격 조건으로 쓰지 않고** 동등성 리포트에 advisory 로 인쇄한다.
 판정이 왜 흔들리는지는 [Q-10](../planning/open-questions.md)이 가진다. M2 완료(핵심 동등성 게이트)와 v1 릴리스 완료(V-0~V-11)는 같은 말이 아니다.
 근거: `docs/reviews/2026-08-29-codex-m2-rootcause-review/`.
+
+**개정 5(2026-09-10, [D-82](../decisions/decision-register.md)):** v1 릴리스 게이트 통과. V-0~V-11 대조는 [docs/reviews/2026-09-10-v1-release-gate](../reviews/2026-09-10-v1-release-gate/README.md). V-5 의 `.codex/agents` 요구를 뺐고(위), V-1 의 few-shot 자리는 [Q-102](../planning/open-questions.md) 로 열어 두었다.
 
 근거: S01 KEEL 리뷰 §1, S10 최종 결론, COUNCIL 구현 우선순위 5. 개정 3: 2026-08-27 사용자 재정의. 개정 4: 2026-08-29 사용자 확정(D-76).
 

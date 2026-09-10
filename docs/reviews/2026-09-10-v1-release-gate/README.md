@@ -1,7 +1,7 @@
 ---
 id: review-20260910-v1-release-gate
 type: review
-status: pending_decision
+status: decided
 updated: 2026-09-10
 authority: derived
 ---
@@ -9,7 +9,7 @@ authority: derived
 # v1 릴리스 게이트 판정 자료 — V-0~V-11 증거 대조 (2026-09-10)
 
 정본은 `docs/requirements/v1-scope.md` 「v1에 반드시 들어가는 것」이고, 계획 §10 #15 가 이 판정을 요구한다.
-**판정은 사람이 한다(D-27).** 이 문서는 각 항목을 **오늘 실행한 명령·종료 코드·파일**로 대조한 표이고, 충족하지 못한 낱말을 숨기지 않는다(K-51).
+**판정: 사용자가 2026-09-10 추천대로 확정했다 → [D-82](../../decisions/decision-register.md) · V-5 문구 개정 5 · Q-102 신설 · `v0.1.0` 로컬 태그.** 이 문서는 각 항목을 **오늘 실행한 명령·종료 코드·파일**로 대조한 표이고, 충족하지 못한 낱말을 숨기지 않는다(K-51).
 기준 리비전 `effb059`(shadow 2차 커밋). 실측 명령은 모두 이 체크아웃에서 2026-09-10 에 돌렸다.
 
 ## 대조표
