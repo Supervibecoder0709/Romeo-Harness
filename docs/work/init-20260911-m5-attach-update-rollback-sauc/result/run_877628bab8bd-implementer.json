@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260911-m5-attach-update-rollback-sauc",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260911-m5-attach-update-rollback-sauc/task/run_877628bab8bd-implementer.json",
+    "sha256": "ad1aaae8c6fe37ca2c9d49b5337b0b80dea715d54298fa3d5080c360ad83e9d7"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_manifest -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_attach_runbook -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate docs/work/init-20260911-m5-attach-update-rollback-sauc",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260911-m5-attach-update-rollback-sauc/evidence/run_877628bab8bd.yaml",
+  "notes": "2회차. 1회차 검토자 finding 1건(run_68f8e0cf3c09 의 review 봉투)을 반영했다 — AC-9 의 「40자 hex 커밋 식별자」에는 대문자 A-F 가 들어갈 수 있는데 romeo/doctor.py 의 _HEX40 이 [0-9a-f] 만 받아, 대문자가 섞인 그럴듯한 거짓 값에서 실재성 검사를 조용히 건너뛰었다. 정규식을 [0-9a-fA-F] 로 고치고 그 경우를 겨누는 판별 테스트를 더했다(TestRevisionIsChecked.test_an_uppercase_hex_that_does_not_exist_here_is_refused). 그 테스트의 판별력을 양쪽으로 실측했다 — 고치기 전 정규식으로 되돌리면 exit 1 (AssertionError: 0 == 0 : 대문자 hex 인 실재하지 않는 커밋이 통과했다), 고친 뒤 exit 0. 1회차의 나머지 판정은 그대로다 — 검토자가 base_sha 일치·확인란 문장 무변경·required_checks 6건 유지·변경 경로가 allowed_paths 안임을 확인했고 그 부분에는 finding 이 없었다. 이 회차의 회귀도 0이다(check-4, 1077 tests OK)."
+}

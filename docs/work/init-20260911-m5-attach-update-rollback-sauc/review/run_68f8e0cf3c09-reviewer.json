@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260911-m5-attach-update-rollback-sauc",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260911-m5-attach-update-rollback-sauc/task/run_68f8e0cf3c09-reviewer.json",
+    "sha256": "b07abd8412f2ccf5ae40c7f8ffacd0089f03ac6ad078b58ac20e35c5dedf217d"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-9의 실재성 검사가 대문자 hex 값을 놓칩니다. 562행의 _HEX40은 [0-9a-f]만 허용하고, 이 조건에 맞을 때만 _commit_lookup을 호출합니다. 따라서 로컬에 없는 40자리 hex 식별자에 대문자 A–F가 포함되면 검사를 건너뛰어 ATTACH_REVISION_UNKNOWN을 출력하지 않습니다. spec.md:56의 AC-9에는 소문자 제한이 없습니다. tests/test_attach_manifest.py:273은 숫자로만 구성된 값 하나를 검사하므로 기록된 check-1의 통과로 이 누락이 해소되지 않습니다. 이는 검사 재실행 없이 확인한 코드 분기상의 결함입니다.",
+      "file": "romeo/doctor.py",
+      "line": 610
+    }
+  ],
+  "evidence_ref": "docs/work/init-20260911-m5-attach-update-rollback-sauc/evidence/run_68f8e0cf3c09.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD가 일치한다. 수용 기준 문장은 체크 표시 외에 변경되지 않았고 required_checks 6건도 유지됐다. 기록된 종료 코드와 원시 로그는 모두 통과이며 현재 변경 경로는 구현자 allowed_paths 안이다. 파일 수정, 검사 재실행, 해시 계산은 하지 않았다. 현재 트리 해시의 재계산과 검토 전후 방어 검사는 위임한 쪽의 몫으로 남긴다."
+}

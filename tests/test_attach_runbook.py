@@ -8,7 +8,8 @@ vendor import 0건이 0건과 일치하고, 충돌 fixture 0종에서 충돌이 
 
 **목록의 주인은 이 파일이 아니라 런북이다.** 여기에 경로를 못 박으면 문서와 검사가 갈리고,
 갈린 뒤에는 어느 쪽이 요구인지 말할 수 없다(§11 — 요구하는 자리와 보는 자리를 같게 둔다).
-그래서 `required_paths()` 가 런북을 읽고, `TestTheListIsWhatIsCompared` 가 **목록을 바꿔 넣어**
+그래서 `required_paths()` 가 런북을 읽고(그 함수는 `romeo/attach.py` 에 있다 — `doctor` 도 같은 정본을 읽어야 해서
+프로덕션 코드로 꺼냈다), `TestTheListIsWhatIsCompared` 가 **목록을 바꿔 넣어**
 바뀐 목록으로 대조된다는 것을 매번 재확인한다. 목록에서 한 항목을 빼면 그 항목은 조용히 건너뛰어지는 것이
 아니라 요구에서 사라지고, 그럴듯한 거짓 항목을 더하면 그 자리에서 막힌다.
 """
@@ -21,46 +22,12 @@ import unittest
 from pathlib import Path
 
 from romeo import HARNESS_ROOT
+from romeo.attach import PLACE_HEADING, present as _present, required_paths
 
 RUNBOOK = HARNESS_ROOT / "scenarios/10-attach-payload.md"
-PLACE_HEADING = "## 놓는 것"
 
 #: 런북이 「놓는 것」 절에서 손으로 복사하라고 적는 소스 트리. 부착의 입력이다.
 SOURCE_TREE = ["core/", "adapters/", "vendor/", "provenance/", "skills/repo-archive/", ".harness/bindings.yaml"]
-
-#: `- ` 로 시작하고 백틱 경로가 첫 토큰인 줄만 필수 경로로 읽는다. 런북의 「목록의 문법」과 같은 규칙이다.
-_ITEM = re.compile(r"^-\s+`([^`]+)`")
-
-
-def required_paths(runbook_path):
-    """런북의 「## 놓는 것」 절에서 필수 경로 목록을 읽는다. 문서가 목록의 주인이다."""
-    text = Path(runbook_path).read_text(encoding="utf-8")
-    lines = text.splitlines()
-    try:
-        start = next(i for i, ln in enumerate(lines) if ln.strip() == PLACE_HEADING)
-    except StopIteration:
-        raise AssertionError(f"{runbook_path}: '{PLACE_HEADING}' 절이 없다 — 목록을 읽을 자리가 없다")
-    out = []
-    for ln in lines[start + 1:]:
-        if ln.startswith("## "):
-            break
-        m = _ITEM.match(ln)
-        if m:
-            out.append(m.group(1))
-    if not out:
-        raise AssertionError(f"{runbook_path}: '{PLACE_HEADING}' 절에 백틱 경로 목록이 없다")
-    return out
-
-
-def _present(target: Path) -> bool:
-    """**부재를 통과로 읽지 않는다.** 이름만 있는 빈 디렉터리·빈 파일은 놓인 것이 아니다."""
-    if target.is_symlink() and not target.exists():
-        return False
-    if target.is_dir():
-        return any(p.is_file() and p.stat().st_size > 0 for p in target.rglob("*"))
-    if target.is_file():
-        return target.stat().st_size > 0
-    return False
 
 
 def check(root, paths):

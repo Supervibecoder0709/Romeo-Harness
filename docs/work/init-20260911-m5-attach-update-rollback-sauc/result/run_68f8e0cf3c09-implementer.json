@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260911-m5-attach-update-rollback-sauc",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260911-m5-attach-update-rollback-sauc/task/run_68f8e0cf3c09-implementer.json",
+    "sha256": "ad1aaae8c6fe37ca2c9d49b5337b0b80dea715d54298fa3d5080c360ad83e9d7"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_manifest -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_attach_runbook -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate docs/work/init-20260911-m5-attach-update-rollback-sauc",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260911-m5-attach-update-rollback-sauc/evidence/run_68f8e0cf3c09.yaml",
+  "notes": "구현 중 결함 셋을 만나 설계를 고쳤고, 셋 다 이 단위가 만든 것이 아니라 있던 것이다. ① 부착이 불완전한 루트에서 doctor 가 판정 대신 예외로 죽었다(소스 트리가 없어 plan_outputs 가 core/principles/PROJECT.core.md 를 읽으려다 FileNotFoundError) — Q-67 과 같은 모양이고 다른 자리다. 시나리오 10 이 이미 적은 순서(「1번이 판정이고 2~4번은 그 위에서만 의미가 있다」)대로 경로 부재가 있으면 후속 대조를 하지 않게 고쳤다. ② 그렇게 건너뛴 항목이 「일치」로 인쇄됐다 — 대조하지 않은 것과 대조해서 맞은 것이 같은 화면이었다. 「대조하지 않음」으로 나누었다. ③ probe_skill_files 의 problems 를 owned 로 좁히자 tests/test_doctor.py 의 두 검사가 깨졌다. 그 파일은 쓰기 상한 밖이므로 테스트가 아니라 구현을 고쳤다 — problems 는 모든 문제를 담는 기존 뜻을 유지하고, 판정 합계만 owned_problems 로 좁혔다. 회귀 0(run_68f8e0cf3c09 의 check-4, 1076 tests OK). AC-2 는 하네스 저장소 자신이 대상이라 이 워크트리에서 bin/romeo compile 을 한 번 돌려 .harness/compiled.yaml 에 harness_revision 을 넣었다 — 그 파일은 계약의 allowed_paths 안이다."
+}

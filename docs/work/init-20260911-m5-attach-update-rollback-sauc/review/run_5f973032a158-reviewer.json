@@ -1,0 +1,15 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "init-20260911-m5-attach-update-rollback-sauc",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/init-20260911-m5-attach-update-rollback-sauc/task/run_5f973032a158-reviewer.json",
+    "sha256": "020bd881c7e4d5a92406b193f0beec8b7c0600be76c201a8f073979c11f671e5"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/init-20260911-m5-attach-update-rollback-sauc/evidence/run_5f973032a158.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD가 일치한다. 수용 기준별 근거는 check-1의 원시 로그 .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_5f973032a158/01-check-1.log에 있다: AC-1은 18행, AC-2는 6행, AC-3은 5행, AC-4는 8행, AC-5는 16~17행, AC-6은 14~15행, AC-7은 7행, AC-8은 10~11행, AC-9는 9행과 12~13행이다. 해당 테스트의 조건 검사와 현재 구현을 대조했다. 필수 검사 6건의 기록과 원시 로그는 모두 exit 0이며, 검토 직전 기록까지 동일한 head_sha·dirty_tree_hash를 갖는다. 승인 커밋 대비 spec 변경은 수용 기준 체크 표시뿐이고 required_checks는 그대로다. 현재 변경은 구현자 allowed_paths 안에 있으며 가드 승인 기록을 확인했다. 검사 재실행·파일 변경·해시 계산은 하지 않았다. 검토 후 방어 검사와 결과 봉투 기록은 위임자의 후속 절차다."
+}

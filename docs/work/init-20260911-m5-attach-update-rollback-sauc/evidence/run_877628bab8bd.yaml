@@ -1,0 +1,138 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_877628bab8bd
+task_id: null
+dispatch_id: null
+unit_id: init-20260911-m5-attach-update-rollback-sauc
+spec_ref:
+  path: docs/work/init-20260911-m5-attach-update-rollback-sauc/spec.md
+  sha256: 98b1939701918802b8626bacabe39f35791b5a8053701041c71747523dffb6ba
+base_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/m5-m1-attach-doctor
+started_at: '2026-09-11T02:55:22+09:00'
+finished_at: '2026-09-11T03:00:58+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_manifest -v
+  exit_code: 0
+  started_at: '2026-09-11T02:55:23+09:00'
+  finished_at: '2026-09-11T02:55:34+09:00'
+  seconds: 11.305
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/01-check-1.log
+  log_sha256: 2640c0355b0a653d8445f2cd6abb4aee2ad7f0adb30e7ef3f7d3d297927e9109
+  stdout_tail: ''
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: check-2
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-11T02:55:34+09:00'
+  finished_at: '2026-09-11T02:55:34+09:00'
+  seconds: 0.486
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/02-check-2.log
+  log_sha256: 38cc028730a3c0edf24702913891411aed2352fd0328bd28230963ce0e58b7c3
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: check-3
+  command: python3 -m unittest tests.test_attach_runbook -v
+  exit_code: 0
+  started_at: '2026-09-11T02:55:34+09:00'
+  finished_at: '2026-09-11T02:55:35+09:00'
+  seconds: 0.577
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/03-check-3.log
+  log_sha256: cda9f4c6eb71e2e3b8bc8100edfcbe68df3d113cf02406e8cb3763b8f7edecda
+  stdout_tail: ''
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-11T02:55:35+09:00'
+  finished_at: '2026-09-11T02:58:44+09:00'
+  seconds: 188.899
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/04-check-4.log
+  log_sha256: 28c841a31bef2ceae7b86675bb95fd1015b443a27496d93bcfca364f383a5471
+  stdout_tail: ''
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-11T02:58:44+09:00'
+  finished_at: '2026-09-11T02:58:44+09:00'
+  seconds: 0.164
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/05-check-5.log
+  log_sha256: 4369c64ac7dccf6c6a982c900c8f85fe3c132af45ab688d8fe6d3190687e1fc7
+  stdout_tail: compile 검사 PASS
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: check-6
+  command: bin/romeo validate docs/work/init-20260911-m5-attach-update-rollback-sauc
+  exit_code: 0
+  started_at: '2026-09-11T02:58:44+09:00'
+  finished_at: '2026-09-11T02:58:44+09:00'
+  seconds: 0.078
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/06-check-6.log
+  log_sha256: 423a403e7141fe828d418d6edbb1e5ed4b8619c5e0cbdb53791bfe4241bae893
+  stdout_tail: "[PASS] docs/work/init-20260911-m5-attach-update-rollback-sauc/brief.md lines=74 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/init-20260911-m5-attach-update-rollback-sauc/charter.md lines=111\
+    \ needs_input=0 unchecked_ac=0\n[PASS] docs/work/init-20260911-m5-attach-update-rollback-sauc/spec.md\
+    \ lines=153 needs_input=0 unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 153 > 150"
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+- id: review-record
+  command: shasum -a 256 docs/work/init-20260911-m5-attach-update-rollback-sauc/review/run_877628bab8bd-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-11T03:00:58+09:00'
+  finished_at: '2026-09-11T03:00:58+09:00'
+  seconds: 0.011
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/07-review-record.log
+  log_sha256: 72b5fbf7efbfa65b39a6f34da7a64ac2aba2895babe261c6fcc3cf6249fc8195
+  stdout_tail: 9048e710eaf9b62ef8ff20757b551359128f32a0e24f26cbec50263f93412df5  docs/work/init-20260911-m5-attach-update-rollback-sauc/review/run_877628bab8bd-reviewer.json
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+changed_files:
+- romeo/attach.py
+- romeo/compile.py
+- romeo/doctor.py
+- scenarios/10-attach-payload.md
+- tests/test_attach_manifest.py
+- tests/test_attach_runbook.py
+artifact_hash: 42f84e67499545210adb75975aae195755356db667a9c887faf58bf387a48ba4
+reviewer: null
+verdict: null
+approvals:
+- guard: deletion
+  approved_at: '2026-09-11T02:55:22+09:00'
+  approved_by: Supervibecoder0709
+  note: '영향 범위: 검증이 tempfile.TemporaryDirectory 로 만든 임시 부착 사본만 지운다. 저장소 안의 파일과 실제 프로젝트 저장소는 지우지 않는다 /
+    사전 백업: 지우는 대상이 그 검사가 방금 만든 임시 디렉터리뿐이라 백업할 원본이 없다. 저장소 쪽은 워크트리 m5-m1-attach-doctor 의 git 이력이 스냅샷이다
+    / 복구 방법: 임시 디렉터리는 복구 대상이 아니다. 저장소는 git -C /Users/julliettelee/orca/workspaces/Romeo-Harness/m5-m1-attach-doctor
+    reset --hard f72f2e5 / 확인할 내용: 삭제가 tempfile 컨텍스트 안에서만 일어나고 rm -rf 나 git clean 이 저장소 경로를 가리키지 않는다'
+  seq: 1
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/approve-01-deletion.log
+  log_sha256: e11fa3007ba6fc89c6915086290e3a5daef26121b465c6602d1b99f5f2a79c12
+- guard: production-deploy
+  approved_at: '2026-09-11T02:55:22+09:00'
+  approved_by: Supervibecoder0709
+  note: '영향 범위: 없음 — 이 단위는 배포하지 않는다. intent 가 mixed 라 가드가 발동했을 뿐이고 바뀌는 것은 하네스 저장소의 판정 코드와 테스트다 / 사전 백업:
+    배포 대상이 없어 백업할 운영 상태가 없다. 저장소는 워크트리 git 이력이 스냅샷이다 / 복구 방법: 배포가 없으므로 롤백 대상도 없다. 저장소는 통합 커밋 revert /
+    확인할 내용: required_checks 6건이 전부 로컬 테스트와 자기 검사이고 배포·재시작·외부 반영을 하는 명령이 하나도 없다'
+  seq: 2
+  head_sha: f72f2e5fba04292b4cf379eece011aef240e3b3c
+  dirty_tree_hash: 92dc160f1c68673a7fea07787ae134dfada60ea0dbf7f75abe1edcba4dfa46fa
+  log: .harness/runs/init-20260911-m5-attach-update-rollback-sauc/run_877628bab8bd/approve-02-production-deploy.log
+  log_sha256: fba03ec40182aede500e38c80ab84b64fa4c2f8a340acfff6db12bfd9beeb981

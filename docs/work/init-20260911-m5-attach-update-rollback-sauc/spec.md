@@ -10,14 +10,14 @@ gates: [privacy-security]
 profile: deep
 blast_radius: large
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-11T03:06:09+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-11T03:37:50+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260911.md, inputs/ac-rebuttal-20260911-round2.md, inputs/ac-rebuttal-20260911-ac9.md]
-evidence: []
+evidence: [evidence/run_68f8e0cf3c09.yaml, evidence/run_877628bab8bd.yaml, evidence/run_5f973032a158.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T2=deep', 'profile:gate.any=kept', 'profile:blast.large=kept', 'profile:uncertainty.medium=kept',
@@ -48,15 +48,15 @@ approval_history:
 - **왜 지금:** 지금 `doctor` 는 부착 여부와 **거꾸로** 답한다 — 안 붙인 저장소는 통과(exit 0), 붙인 저장소는 실패(exit 1, 2026-09-04 실측). 부재가 일치로 읽히고(Q-53), 대상의 기존 스킬 8개가 부착 실패로 세어지기 때문이다(Q-55). **요구하는 자리와 보는 자리가 갈려 있다** — 「놓는 것」 정본을 `tests/test_attach_runbook.py` 는 읽는데 `doctor` 는 읽지 않고, 그 구멍을 시나리오 문서가 「4번을 단독으로 쓰지 않는다」는 **주의로** 메우고 있다. 주의는 집행이 아니다(§11).
 - **기대 결과:** 빈 저장소에 그 명령을 걸면 **빠진 경로를 인쇄하며 실패**하고, 시나리오 10 대로 붙인 저장소에서는 **통과**한다. 시나리오 문서의 「4번을 단독으로 쓰지 않는다」 주의가 필요 없어진다. 붙인 저장소를 열면 `.harness/compiled.yaml` 의 `harness_revision` 으로 어느 리비전이 붙었는지 읽을 수 있다.
 - **수용 기준:** 아래에서 「**판정 명령**」은 `bin/romeo doctor --strict --scope repository --root <해당 루트>` 이고, **하네스 저장소 안에서** 실행한다. 「**사본**」은 시나리오 10 의 「놓는 것」 절대로 만든 임시 부착 사본이다.
-  - [ ] AC-1 「놓는 것」이 요구하는 경로가 하나도 없는 빈 루트에서 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_INCOMPLETE` 와 빠진 경로 문자열을 담는다.
-  - [ ] AC-2 하네스 저장소 자신에서 판정 명령의 종료 코드가 0 이다.
-  - [ ] AC-3 사본에서 판정 명령의 종료 코드가 0 이다.
-  - [ ] AC-4 사본에서 「놓는 것」이 요구하는 경로 하나를 지우면 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_INCOMPLETE` 와 지워진 그 경로 문자열을 담는다.
-  - [ ] AC-5 `scenarios/10-attach-payload.md` 의 「놓는 것」 절에 새 경로 한 줄을 더했을 때, 그 경로가 사본에 **없으면** 판정 명령의 종료 코드가 0 이 아니고 그 경로 문자열이 출력에 나오며, 그 경로를 사본에 **놓으면** 종료 코드가 0 이다.
-  - [ ] AC-6 사본의 `.harness/compiled.yaml` `outputs` **밖**에 심링크 스킬을 심으면 판정 명령의 종료 코드가 0 이고, `outputs` **안**의 스킬을 같은 방식으로 심링크로 바꾸면 0 이 아니다 — 심링크 자체가 놓인 위치가 안팎의 기준이다.
-  - [ ] AC-7 한 번의 검사 실행이 사본에 `bin/romeo compile --root <사본>` 을 돌리고, 같은 실행 안에서 사본의 `harness_revision` 과 하네스 저장소 HEAD 를 함께 읽어 비교했을 때 두 값이 같다.
-  - [ ] AC-8 사본의 `harness_revision` 키가 없거나 값이 빈 문자열이면 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_REVISION_MISSING` 을 담는다.
-  - [ ] AC-9 사본의 `harness_revision` 이 40자 hex 커밋 식별자이면서 판정 명령을 실행한 하네스 저장소의 **로컬 이력**(`git cat-file -e <값>`)에 없으면, 판정 명령의 종료 코드가 0 이 아니고 출력이 finding id `ATTACH_REVISION_UNKNOWN` 을 담는다 — 원격만 가진 커밋은 이 기준에서 「없음」이다.
+  - [x] AC-1 「놓는 것」이 요구하는 경로가 하나도 없는 빈 루트에서 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_INCOMPLETE` 와 빠진 경로 문자열을 담는다.
+  - [x] AC-2 하네스 저장소 자신에서 판정 명령의 종료 코드가 0 이다.
+  - [x] AC-3 사본에서 판정 명령의 종료 코드가 0 이다.
+  - [x] AC-4 사본에서 「놓는 것」이 요구하는 경로 하나를 지우면 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_INCOMPLETE` 와 지워진 그 경로 문자열을 담는다.
+  - [x] AC-5 `scenarios/10-attach-payload.md` 의 「놓는 것」 절에 새 경로 한 줄을 더했을 때, 그 경로가 사본에 **없으면** 판정 명령의 종료 코드가 0 이 아니고 그 경로 문자열이 출력에 나오며, 그 경로를 사본에 **놓으면** 종료 코드가 0 이다.
+  - [x] AC-6 사본의 `.harness/compiled.yaml` `outputs` **밖**에 심링크 스킬을 심으면 판정 명령의 종료 코드가 0 이고, `outputs` **안**의 스킬을 같은 방식으로 심링크로 바꾸면 0 이 아니다 — 심링크 자체가 놓인 위치가 안팎의 기준이다.
+  - [x] AC-7 한 번의 검사 실행이 사본에 `bin/romeo compile --root <사본>` 을 돌리고, 같은 실행 안에서 사본의 `harness_revision` 과 하네스 저장소 HEAD 를 함께 읽어 비교했을 때 두 값이 같다.
+  - [x] AC-8 사본의 `harness_revision` 키가 없거나 값이 빈 문자열이면 판정 명령의 종료 코드가 0 이 아니고, 출력이 finding id `ATTACH_REVISION_MISSING` 을 담는다.
+  - [x] AC-9 사본의 `harness_revision` 이 40자 hex 커밋 식별자이면서 판정 명령을 실행한 하네스 저장소의 **로컬 이력**(`git cat-file -e <값>`)에 없으면, 판정 명령의 종료 코드가 0 이 아니고 출력이 finding id `ATTACH_REVISION_UNKNOWN` 을 담는다 — 원격만 가진 커밋은 이 기준에서 「없음」이다.
 - **위험과 되돌리기:** 이 마일스톤은 **실제 프로젝트 저장소에 아무것도 쓰지 않는다** — 검증이 쓰는 것은
   임시 디렉터리의 부착 사본뿐이고, `My-Automated-Worker/instagram-dm-sender` 는 Charter M4 에서만 쓴다.
   실패하면 통합 커밋 하나를 `git revert` 하고 `bin/romeo compile` 로 산출물을 재생성한다. 판정이 엄해지므로
@@ -150,6 +150,8 @@ hard gate 가 발동했다. 승인 전 상태 변경 0건.
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-11T03:37:50+09:00 · HEAD f027f3818ef0 · 검사 기록 run_5f973032a158
 
-- (없음)
+- [evidence/run_68f8e0cf3c09.yaml](evidence/run_68f8e0cf3c09.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_877628bab8bd.yaml](evidence/run_877628bab8bd.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_5f973032a158.yaml](evidence/run_5f973032a158.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)
