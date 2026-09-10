@@ -1,0 +1,40 @@
+# AC-6 의 기준선 제안. 값을 고정하는 이유는 카드 출력을 두 시점에 재현해 대조하기 위해서다.
+# uncertainty 를 low 로 둔 것은 의도다 — 예시의 level(medium)과 달라야 예시 줄이 인쇄되고,
+# 그때 비로소 "예시 줄이 기존 줄을 밀어내는가" 를 볼 수 있다.
+request:
+  text: 결제 실패 배너의 문구를 바꾸고 재시도 버튼을 추가한다. 스펙은 확정됐고 화면 두 곳만 손대면 된다.
+  project: baseline
+  context: null
+facts:
+  - 대상 화면은 둘이고 둘 다 같은 컴포넌트를 쓴다
+assumptions:
+  - 문구 원문은 이미 확정됐다
+unknowns:
+  - 재시도 횟수 상한은 정해지지 않았다
+reuse_hits: []
+candidate:
+  unit: T0
+  mode: delivery
+  intent: write
+  facets: [ui, copy]
+  gates: []
+  blast_radius: small
+  uncertainty: low
+  project_kind: code
+  slug: baseline-card
+  title: 기준선 카드
+factors:
+  scope: {level: low, note: 화면 두 곳}
+  uncertainty: {level: low, note: 무엇을 어떻게 만들지 안다}
+  impact: {level: low, note: 배너 문구}
+  reversibility: {level: low, note: 되돌리기는 커밋 하나}
+  coordination: {level: low, note: 혼자 한다}
+gate_checklist:
+  - {gate: payment, checked: false}
+  - {gate: privacy-security, checked: false}
+  - {gate: legal, checked: false}
+  - {gate: ops-data-deletion, checked: false}
+  - {gate: migration, checked: false}
+  - {gate: public-api, checked: false}
+  - {gate: irreversible-policy, checked: false}
+  - {gate: availability, checked: false}
