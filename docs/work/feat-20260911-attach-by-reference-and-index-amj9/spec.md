@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-11T11:25:42+09:00'
+approved_at: '2026-09-11T11:29:03+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -29,6 +29,10 @@ approval_history:
   reason: '구현이 AC 결함 3건을 드러냈다 — AC-6·AC-7 은 달성 불가능한 낱말이었고(표 구분선과 행동 규범의 코어 경로 인용이 항상 투영된다), AC-8 이 고른
     c4-dangerous-instruction 은 override 로 덮이는 종류라 대상에 심어도 통과한다. 세 문장을 달성 가능하고 판별력 있는 형태로 고쳤다. 검증 계획(required_checks
     6건)은 바꾸지 않았다'}
+- {approved_at: '2026-09-11T11:25:42+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T11:29:03+09:00',
+  reason: 'AC-6·AC-7·AC-8 을 실제로 교체한다. 앞선 재승인 두 건(5ea8c87·244c530)은 치환이 조용히 실패해 spec 본문이 바뀌지 않은 채 approved_at
+    만 갱신됐다 — 그 두 커밋 메시지가 주장한 수정은 이 커밋에서 이루어진다. AC-6 은 서식 줄을 비교 대상에서 빼는 규칙(실측 38/38), AC-7 은 Q-60 이 실측한
+    5종, AC-8 은 대상 산출물만으로 판정하는 c2-no-auto-trigger 로 바꿨다'}
 ---
 
 # 부착을 참조로 바꾸고, 투영되는 인덱스를 대상에 실재하는 것으로 좁힌다
@@ -50,9 +54,9 @@ approval_history:
   - [ ] AC-3 `romeo.attach.required_paths()` 의 항목 집합이 AC-1 의 파일 집합을 **디렉터리 단위로 덮는 것과 정확히 같다** — 한쪽에만 있는 항목이 없다. 그러므로 소스 트리 여섯도, 산출물이 아닌 항목도, 빠진 산출물도 없다.
   - [ ] AC-4 하네스 저장소 자신을 대상으로 한 `bin/romeo compile --check` 와 `bin/romeo doctor --strict --scope repository`(`--root` 없이)의 종료 코드가 각각 0 이고, `python3 -m unittest discover -s tests` 의 종료 코드가 0 이다.
   - [ ] AC-5 `PROJECT.core.md` 의 절에서 ① 표식을 지우거나 ② `all`·`harness-only` 가 아닌 값을 넣거나 ③ 한 절에 표식을 두 줄 넣으면, 세 경우 각각 `bin/romeo compile` 의 종료 코드가 0 이 아니고 출력이 그 절의 제목(앞머리면 `앞머리`)을 담는다.
-  - [ ] AC-6 `romeo:scope harness-only` 절들의 본문 줄(빈 줄 제외) 중 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 나타나는 것이 **한 줄도 없고**, `romeo:scope all` 절들의 본문 줄은 **빠짐없이** 나타난다. 하네스 저장소 자신의 두 지침 파일에는 양쪽 절의 본문 줄이 다 나타난다.
-  - [ ] AC-7 사본의 managed block 에서 백틱으로 감싼 토큰 중 `/` 를 담거나 확장자를 가진 것(`<`·`>` 를 담는 자리표시자는 제외)을 모아 사본 루트 기준으로 대조하면 실재하지 않는 것이 없다. 그 블록에 없는 경로를 한 줄 심으면 검사가 그 경로를 인쇄하며 실패한다.
-  - [ ] AC-8 사본에 `fixtures/` 가 없어도 `doctor` 의 충돌 검사 실행 수가 하네스의 `fixtures/conflicts/*.yaml` 개수와 같고, 사본에 `c4-dangerous-instruction` fixture 가 겨누는 충돌을 심으면 판정 명령의 종료 코드가 0 이 아니며 출력이 **그 fixture 의 id** 를 담는다.
+  - [ ] AC-6 `romeo:scope harness-only` 절들의 **고유 내용 줄**이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 한 줄도 없고, 하네스 저장소 자신의 두 지침 파일에는 빠짐없이 있다. 「고유 내용 줄」은 그 절들의 줄에서 빈 줄·수평선(`---`)·표 구분선(`|` 와 `-`·`:`·공백만으로 된 줄)을 빼고, `romeo:scope all` 절과 `AGENTS.core.md` 에 같은 줄이 있는 것도 뺀 나머지다 — 서식 줄은 어느 소스에도 없으면서 렌더러가 만드는 표에 늘 나타나므로 판별에 쓸 수 없다(2026-09-11 실측: 그렇게 남는 줄 38개가 하네스 자신 블록에 38/38 있다).
+  - [ ] AC-7 Q-60 이 실측한 5종(`docs/planning/progress.md`·`docs/decisions/decision-register.md`·`docs/planning/open-questions.md`·`docs/requirements/`·`docs/reviews/`)이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 하나도 나타나지 않고, 하네스 저장소 자신의 두 지침 파일에는 다섯이 다 나타난다.
+  - [ ] AC-8 사본에 `fixtures/` 가 없어도 `doctor` 의 충돌 검사 실행 수가 하네스의 `fixtures/conflicts/*.yaml` 개수와 같고, 사본에 `.claude/hooks.json` 을 놓으면(`c2-no-auto-trigger` 가 대상의 산출물만으로 판정하는 종류다) 판정 명령의 종료 코드가 0 이 아니며 출력이 **`c2-no-auto-trigger`** 를 담는다.
 - **위험과 되돌리기:** 실제 프로젝트 저장소에는 쓰지 않는다 — 검증이 쓰는 것은 임시 디렉터리 사본뿐이다. 이미 소스 트리를 복제해 둔 저장소가 있으면 그 사본은 **남는다**(지우는 것은 Charter M3 의 `rollback` 이다). 되돌리려면 통합 커밋 하나를 `git revert` 하고 `bin/romeo compile` 로 산출물을 재생성한다.
 - **결정 필요:** 없음. 계획 §3.1 은 이 전환을 금지하지 않는다 — 전문에 「코어 규칙을 복제하지 않는다」는 문장이 없고, 금지 대상은 「override 가 코어를 복제하는 것」이다(`implementation-plan.md:174·198`). 개정도 D-xx 도 필요하지 않다.
 
@@ -77,7 +81,7 @@ approval_history:
 | 1 | 읽는 곳과 쓰는 곳을 분리한다 | `romeo/compile.py` 의 `plan_outputs(root, harness_root=None)` — 소스(`core/`·`adapters/`·`vendor/`·`provenance/`·`skills/`·`.harness/bindings.yaml`)는 `harness_root` 에서 읽고 산출물 경로만 `root` 아래로 만든다. `harness_root` 를 생략하면 `HARNESS_ROOT` 다. `check_compiled`·`compile_all` 도 같은 인자를 넘긴다 | 소비: 없음 → 생산: `plan_outputs(root, harness_root)` · 같은 서명의 `check_compiled`·`compile_all` | 소스 트리를 하나도 복사하지 않은 tmpdir 에 `compile --root` 를 걸어 산출물이 놓이는 것과, 하네스 자신의 `compile --check` 가 그대로 통과하는 것을 확인 (AC-1·AC-4) | 인자를 지우고 `root` 로 되돌린다 |
 | 2 | 인덱스를 저장소별로 가른다 | `core/principles/PROJECT.core.md` 의 각 절(앞머리 포함) 앞에 `<!-- romeo:scope all -->` 또는 `<!-- romeo:scope harness-only -->` 를 적는다. `## 충돌 해소 순서` 만 `all` 이고 나머지는 `harness-only` 다 — 나머지 세 절은 전부 하네스 저장소의 경로를 가리킨다 | 소비: 없음 → 생산: `PROJECT.core.md` 의 절별 `romeo:scope` 표식 | `grep -c 'romeo:scope'` 가 절 개수와 같은 것을 확인 | 표식 줄을 지운다 |
 | 3 | 표식을 **읽어** 투영 범위를 정한다 | `romeo/compile.py` 의 `_render_instructions` 가 그 표식을 읽어, `root` 가 `harness_root` 와 **다를 때**(= 부착) `all` 인 절만 넣는다. 표식이 없는 절을 만나면 `CompileError` 로 그 절의 제목을 말하며 멈춘다 — 표식을 잊은 절이 조용히 새지 않는다 | 소비: 2의 `romeo:scope` 표식 (**코드에 절 이름을 복사하지 않고 매번 읽는다**) → 생산: 부착 대상용 managed block | 표식 하나를 지우면 `compile` 이 그 제목을 말하며 실패하고, 사본 블록에 `harness-only` 절 제목이 없는 것을 확인 (AC-5·AC-6) | 조건을 지워 전부 투영한다 |
-| 4 | 투영된 블록이 가리키는 것이 실재하게 한다 | `tests/test_attach_reference.py` 가 사본의 managed block 에서 백틱 토큰 중 `/` 를 담거나 확장자를 가진 것을 모으고(`<`·`>` 를 담는 자리표시자는 제외) 사본 루트 기준으로 대조한다. 실재하지 않는 것을 찾으면 그 경로를 인쇄하며 실패한다 | 소비: 3의 부착 대상용 블록 → 생산: 블록 경로 실재성 검사 | 사본을 만들어 걸고, 「모든 저장소」 절에 없는 경로를 일부러 넣으면 실패하는 것을 확인 (AC-7) | 검사를 지운다 |
+| 4 | Q-60 이 실측한 5종이 대상에 가지 않게 한다 | `tests/test_attach_reference.py` 가 사본의 managed block 에서 그 다섯 경로를 찾는다. 하나라도 있으면 인쇄하며 실패하고, 하네스 자신의 블록에는 다섯이 다 있어야 한다 | 소비: 3의 부착 대상용 블록 → 생산: Q-60 5종 부재 검사 | 사본과 하네스 자신 양쪽에 걸어 결과가 갈리는 것을 확인 (AC-7) | 검사를 지운다 |
 | 5 | 충돌 fixture 를 하네스에서 읽어 대상을 검사한다 | `romeo/doctor.py` 의 `check_conflicts(root, harness_root=None)` — fixture 파일은 `harness_root/fixtures/conflicts/` 에서 읽고 검사 대상은 `root` 로 넘긴다. 실행 수가 0 이면 그 사실을 finding 으로 낸다. finding 에는 그것을 낸 **fixture 의 id** 가 실린다(이미 그렇다 — 그 자리가 AC-8 의 연결을 만든다) | 소비: 1의 `harness_root` 개념 → 생산: `check_conflicts(root, harness_root)` · 실행 수 0 의 finding | fixture 가 없는 사본에서 실행 수가 1 이상인 것과, 사본에 충돌을 심으면 종료 코드가 0 이 아닌 것을 확인 (AC-8) | 인자를 되돌린다 |
 | 6 | 부착 정본에서 소스 트리를 뺀다 | `scenarios/10-attach-payload.md` 의 「놓는 것」에서 소스 트리 여섯 줄을 빼고, 「앞의 여섯은 손으로 복사하는 하네스 소스 트리다」 문단과 부착 순서를 고친다. `tests/test_attach_runbook.py` 의 `SOURCE_TREE` 와 `attach()` 도 복사를 그만둔다 | 소비: 1의 `plan_outputs(root, harness_root)` → 생산: 8개로 줄어든 `required_paths()` 결과 | `required_paths()` 에 여섯 중 어느 것도 없는 것과, 기존 두 테스트가 그대로 통과하는 것을 확인 (AC-3 · 회귀) | 문서와 목록을 되돌린다 |
 
