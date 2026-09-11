@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-11T11:16:35+09:00'
+approved_at: '2026-09-11T11:25:42+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,11 @@ routing:
   history: []
 created: '2026-09-11'
 updated: '2026-09-11'
+approval_history:
+- {approved_at: '2026-09-11T11:16:35+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T11:25:42+09:00',
+  reason: '구현이 AC 결함 3건을 드러냈다 — AC-6·AC-7 은 달성 불가능한 낱말이었고(표 구분선과 행동 규범의 코어 경로 인용이 항상 투영된다), AC-8 이 고른
+    c4-dangerous-instruction 은 override 로 덮이는 종류라 대상에 심어도 통과한다. 세 문장을 달성 가능하고 판별력 있는 형태로 고쳤다. 검증 계획(required_checks
+    6건)은 바꾸지 않았다'}
 ---
 
 # 부착을 참조로 바꾸고, 투영되는 인덱스를 대상에 실재하는 것으로 좁힌다
