@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-11T11:29:03+09:00'
+approved_at: '2026-09-11T11:30:33+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -33,6 +33,10 @@ approval_history:
   reason: 'AC-6·AC-7·AC-8 을 실제로 교체한다. 앞선 재승인 두 건(5ea8c87·244c530)은 치환이 조용히 실패해 spec 본문이 바뀌지 않은 채 approved_at
     만 갱신됐다 — 그 두 커밋 메시지가 주장한 수정은 이 커밋에서 이루어진다. AC-6 은 서식 줄을 비교 대상에서 빼는 규칙(실측 38/38), AC-7 은 Q-60 이 실측한
     5종, AC-8 은 대상 산출물만으로 판정하는 c2-no-auto-trigger 로 바꿨다'}
+- {approved_at: '2026-09-11T11:29:03+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T11:30:33+09:00',
+  reason: 'AC-7 이 Q-60 의 5종 전부를 요구했으나 다섯째 docs/planning/open-questions.md 는 행동 규범(AGENTS.core.md §12)이
+    인용하고 그 문서는 가르지 않는다 — 인덱스를 가르는 것으로는 닫히지 않는 조건이었다. 실측으로 4종은 이미 빠지고 그 하나만 남는 것을 확인해, AC-7 을 인덱스 절이 가리키던
+    4종으로 좁히고 다섯째는 발견으로 남긴다'}
 ---
 
 # 부착을 참조로 바꾸고, 투영되는 인덱스를 대상에 실재하는 것으로 좁힌다
@@ -55,7 +59,7 @@ approval_history:
   - [ ] AC-4 하네스 저장소 자신을 대상으로 한 `bin/romeo compile --check` 와 `bin/romeo doctor --strict --scope repository`(`--root` 없이)의 종료 코드가 각각 0 이고, `python3 -m unittest discover -s tests` 의 종료 코드가 0 이다.
   - [ ] AC-5 `PROJECT.core.md` 의 절에서 ① 표식을 지우거나 ② `all`·`harness-only` 가 아닌 값을 넣거나 ③ 한 절에 표식을 두 줄 넣으면, 세 경우 각각 `bin/romeo compile` 의 종료 코드가 0 이 아니고 출력이 그 절의 제목(앞머리면 `앞머리`)을 담는다.
   - [ ] AC-6 `romeo:scope harness-only` 절들의 **고유 내용 줄**이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 한 줄도 없고, 하네스 저장소 자신의 두 지침 파일에는 빠짐없이 있다. 「고유 내용 줄」은 그 절들의 줄에서 빈 줄·수평선(`---`)·표 구분선(`|` 와 `-`·`:`·공백만으로 된 줄)을 빼고, `romeo:scope all` 절과 `AGENTS.core.md` 에 같은 줄이 있는 것도 뺀 나머지다 — 서식 줄은 어느 소스에도 없으면서 렌더러가 만드는 표에 늘 나타나므로 판별에 쓸 수 없다(2026-09-11 실측: 그렇게 남는 줄 38개가 하네스 자신 블록에 38/38 있다).
-  - [ ] AC-7 Q-60 이 실측한 5종(`docs/planning/progress.md`·`docs/decisions/decision-register.md`·`docs/planning/open-questions.md`·`docs/requirements/`·`docs/reviews/`)이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 하나도 나타나지 않고, 하네스 저장소 자신의 두 지침 파일에는 다섯이 다 나타난다.
+  - [ ] AC-7 Q-60 이 실측한 5종 중 **인덱스 절이 가리키던 4종**(`docs/planning/progress.md`·`docs/decisions/decision-register.md`·`docs/requirements/`·`docs/reviews/`)이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 하나도 나타나지 않고, 하네스 저장소 자신의 두 지침 파일에는 넷이 다 나타난다. 다섯째 `docs/planning/open-questions.md` 는 **행동 규범이 인용한다**(`AGENTS.core.md` §12 — 가르지 않는 문서다) — 인덱스를 가르는 것으로는 닫히지 않으므로 이 AC 가 요구하지 않고, 그 자리가 대상에 없는 문제는 발견으로 남긴다.
   - [ ] AC-8 사본에 `fixtures/` 가 없어도 `doctor` 의 충돌 검사 실행 수가 하네스의 `fixtures/conflicts/*.yaml` 개수와 같고, 사본에 `.claude/hooks.json` 을 놓으면(`c2-no-auto-trigger` 가 대상의 산출물만으로 판정하는 종류다) 판정 명령의 종료 코드가 0 이 아니며 출력이 **`c2-no-auto-trigger`** 를 담는다.
 - **위험과 되돌리기:** 실제 프로젝트 저장소에는 쓰지 않는다 — 검증이 쓰는 것은 임시 디렉터리 사본뿐이다. 이미 소스 트리를 복제해 둔 저장소가 있으면 그 사본은 **남는다**(지우는 것은 Charter M3 의 `rollback` 이다). 되돌리려면 통합 커밋 하나를 `git revert` 하고 `bin/romeo compile` 로 산출물을 재생성한다.
 - **결정 필요:** 없음. 계획 §3.1 은 이 전환을 금지하지 않는다 — 전문에 「코어 규칙을 복제하지 않는다」는 문장이 없고, 금지 대상은 「override 가 코어를 복제하는 것」이다(`implementation-plan.md:174·198`). 개정도 D-xx 도 필요하지 않다.
