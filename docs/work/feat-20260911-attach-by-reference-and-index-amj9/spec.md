@@ -11,7 +11,7 @@ profile: standard
 blast_radius: medium
 uncertainty: medium
 status: active
-approved_at: '2026-09-11T11:30:33+09:00'
+approved_at: '2026-09-11T12:06:04+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -37,6 +37,9 @@ approval_history:
   reason: 'AC-7 이 Q-60 의 5종 전부를 요구했으나 다섯째 docs/planning/open-questions.md 는 행동 규범(AGENTS.core.md §12)이
     인용하고 그 문서는 가르지 않는다 — 인덱스를 가르는 것으로는 닫히지 않는 조건이었다. 실측으로 4종은 이미 빠지고 그 하나만 남는 것을 확인해, AC-7 을 인덱스 절이 가리키던
     4종으로 좁히고 다섯째는 발견으로 남긴다'}
+- {approved_at: '2026-09-11T11:30:33+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T12:06:04+09:00',
+  reason: '변경 범위가 읽는 경로를 compile·doctor 둘로만 봤다. 참조 전환은 romeo/cli.py(분리를 실제로 켜는 자리)와 romeo/provenance.py(고지의
+    같은 분리)도 건드리고, CLAUDE.md·AGENTS.md 는 compile 이 재생성한다 — 네 경로를 변경 범위에 적는다. 확인란의 수용 기준과 검증 계획은 바꾸지 않았다'}
 ---
 
 # 부착을 참조로 바꾸고, 투영되는 인덱스를 대상에 실재하는 것으로 좁힌다
@@ -68,7 +71,7 @@ approval_history:
 
 아래 「바뀌는 파일·모듈」 줄이 작업 계약의 쓰기 상한(`allowed_paths`)이 된다 — 집행 자리는 `romeo/envelope.py` 의 `change_scope_paths` 다(K-66). 그 줄은 다음 문법으로 읽힌다. 경로는 **백틱**으로 적고, 항목은 `·` 나 줄바꿈 목록으로 나눈다. 설명은 **괄호 안**에 적는다 — 괄호 안의 백틱은 경로로 읽지 않는다. `/` 도 `.` 도 없는 토큰(함수명·플래그)과 공백이 든 토큰은 경로로 읽지 않는다 — 계약을 만들 때 그 목록이 인쇄된다. 루트의 확장자 없는 파일은 `./LICENSE` 처럼 쓴다. 「영향을 받는 부분」·「바꾸지 않는 것」 은 상한에 들어가지 않는다.
 
-- 바뀌는 파일·모듈: `romeo/compile.py` (읽는 곳을 하네스 저장소로 분리 · 절 표식을 읽어 투영 범위를 가른다) · `romeo/doctor.py` (충돌 fixture 를 하네스에서 읽어 대상을 검사) · `core/principles/PROJECT.core.md` (절마다 투영 범위 표식) · `scenarios/10-attach-payload.md` (「놓는 것」에서 소스 트리 여섯을 빼고 부착 순서를 고친다) · `tests/test_attach_runbook.py` (`SOURCE_TREE`·`attach()` 가 더 이상 복사하지 않는다) · `tests/test_attach_manifest.py` (기대 목록이 8개로 바뀐다) · `tests/test_attach_reference.py` (새 파일) · `.harness/compiled.yaml` (재생성 산출물) · `docs/work/feat-20260911-attach-by-reference-and-index-amj9/`
+- 바뀌는 파일·모듈: `romeo/compile.py` (읽는 곳을 하네스 저장소로 분리 · 절 표식을 읽어 투영 범위를 가른다) · `romeo/doctor.py` (충돌 fixture·어댑터 선언·정책표를 하네스에서 읽어 대상을 검사) · `romeo/cli.py` (`--root` 를 준 실행에서만 하네스를 넘긴다 — 이 분리를 실제로 켜는 자리) · `romeo/provenance.py` (고지의 기대값을 하네스에서 만들고 대상 파일과 대조) · `CLAUDE.md` · `AGENTS.md` (compile 이 재생성하는 산출물) · `core/principles/PROJECT.core.md` (절마다 투영 범위 표식) · `scenarios/10-attach-payload.md` (「놓는 것」에서 소스 트리 여섯을 빼고 부착 순서를 고친다) · `tests/test_attach_runbook.py` (`SOURCE_TREE`·`attach()` 가 더 이상 복사하지 않는다) · `tests/test_attach_manifest.py` (기대 목록이 8개로 바뀐다) · `tests/test_attach_reference.py` (새 파일) · `.harness/compiled.yaml` (재생성 산출물) · `docs/work/feat-20260911-attach-by-reference-and-index-amj9/`
 - 영향을 받는 부분: 이미 소스 트리를 복제한 부착 저장소 (그 사본은 남고 더 이상 요구되지 않는다) · `bin/romeo doctor --root <대상>` 의 충돌 검사 실행 수 · CI 의 compile·doctor 단계
 - 바꾸지 않는 것(비범위): `romeo attach` 하위 명령과 preflight·파일별 승인·원자적 적용 (M2 의 다음 단위) · 대상의 실행 권한(Q-58)과 환경 등록(Q-59) · `update --dry-run`·`rollback` (Charter M3) · `AGENTS.core.md` 의 행동 규범 (전부 모든 저장소에 간다 — 가르지 않는다) · 이미 복제된 사본을 지우는 일
 
