@@ -1,0 +1,26 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260911-attach-by-reference-and-index-amj9",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/task/run_dd093d94749c-reviewer.json",
+    "sha256": "dfd0803721fb19be1a00a60a77a3d67d8b64278f07cffc11f31d658b224107ba"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "비차단: _check_c7은 전달받은 하네스 경로를 사용하지 않고 대상의 core/를 검색한다. 참조 부착본에는 core/가 없으므로 파일을 하나도 검사하지 않지만, check_conflicts의 실행 수에는 포함된다. 따라서 '7종 실행'에는 c7의 실제 내용 검사가 빠져 있다. AC-8이 요구한 실행 수 일치와 c2 충돌 검출은 충족하므로 게이트를 내리지는 않는다.",
+      "file": "romeo/doctor.py",
+      "line": 438
+    },
+    {
+      "summary": "비차단·정적 검토: 소스 트리를 읽을 때 경로 경계로 부착 대상 root를 넘긴다. _read_source_tree는 파일 심볼릭 링크의 목적지를 이 경계와 대조하므로, 로컬 스킬에 하네스 내부의 정상 파일을 가리키는 링크가 있으면 참조 부착에서 저장소 밖 경로로 거부된다. 현재 수용 기준에는 이 입력 조건이 없어 게이트 사유로 사용하지 않는다.",
+      "file": "romeo/compile.py",
+      "line": 656
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/evidence/run_dd093d94749c.yaml",
+  "notes": "두 작업 계약의 base_sha와 현재 HEAD가 지정된 ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05로 일치한다. AC-1·2·3·5·6·7·8은 check-1의 테스트 구현과 01-check-1.log에서, AC-4는 check-2·4·5의 원시 로그에서 근거를 확인했다. AC-7의 하네스 AGENTS.md 보존은 AC-6의 양쪽 지침 검사도 뒷받침한다. 검사 6건의 명령·종료 코드·HEAD·트리 식별값은 증거와 원시 로그에서 일치한다. 승인 커밋 대비 spec 변경은 수용 기준 체크 표시뿐이며 required_checks는 유지됐다. 현재 변경 경로는 구현자 allowed_paths 안이다. 재실행 불가능한 검사나 가드 대상 무승인 행동의 근거는 발견하지 못했다. 파일 수정·검사 재실행·해시 계산은 하지 않았다. 현재 트리 해시의 기계적 대조와 검토 후 방어 기록은 위임한 쪽에서 수행해야 한다."
+}

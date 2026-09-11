@@ -226,7 +226,7 @@ def _is_owned(path: Path, root: Path, owned):
     return False
 
 
-def probe_skill_files(root):
+def probe_skill_files(root, harness_root=None):
     """두 런타임의 스킬 디렉터리를 파일 수준으로 검사한다. 로드 여부는 알 수 없다.
 
     **검사 종류는 하나도 줄이지 않는다** — 목록 밖의 것도 같은 검사를 돌린다. `problems` 는 그 전부를
@@ -236,9 +236,12 @@ def probe_skill_files(root):
     from . import frontmatter as fm
     from .compile import load_adapters
 
+    # **어댑터 선언은 하네스가 소유한다** — 대상에는 `adapters/` 가 복제되지 않으므로(참조 부착),
+    # 거기서 읽으면 스킬 디렉터리를 하나도 찾지 못하고 「문제 0건」이 된다. 검사할 곳은 `root` 다.
+    hr = Path(harness_root) if harness_root else root
     owned = harness_owned(root)
     out = []
-    for adapter in load_adapters(root):
+    for adapter in load_adapters(hr):
         d = root / adapter["skills_dir"]
         skills, problems, foreign = [], [], []
         if not d.is_dir():
@@ -266,10 +269,12 @@ def probe_skill_files(root):
     return out
 
 
-def _projected_skill_files(root):
+def _projected_skill_files(root, harness_root=None):
+    """대상에 **투영된** 스킬 파일. 어댑터 선언은 하네스에서 읽고 파일은 `root` 에서 찾는다."""
     from .compile import load_adapters
+    hr = Path(harness_root) if harness_root else root
     files = []
-    for adapter in load_adapters(root):
+    for adapter in load_adapters(hr):
         d = root / adapter["skills_dir"]
         if d.is_dir():
             files += [f for f in sorted(d.rglob("*")) if f.is_file() and f.suffix == ".md"]
@@ -277,23 +282,25 @@ def _projected_skill_files(root):
 
 
 def _override_keys(root):
-    b = root / ".harness/bindings.yaml"
+    """override 정본은 하네스가 소유한다 — 대상이 자기 override 를 선언해 검사를 피하지 못한다."""
+    b = Path(root) / ".harness/bindings.yaml"
     if not b.exists():
         return set()
     return set((load_any(b) or {}).get("overrides") or {})
 
 
-def _check_c1(root, fx):
+def _check_c1(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     """패턴이 있으면 대응 override 가 있어야 한다. 원문을 고칠 수 없으므로 금지가 아니라 흡수로 검사한다."""
     findings = []
-    keys = _override_keys(root)
+    keys = _override_keys(hr)
     pats = fx["patterns"]
     # 리스트면 fixture 하나가 단일 override 를 요구하고, 매핑이면 패턴마다 다른 override 를 요구한다.
     if isinstance(pats, dict):
         needed_for = dict(pats)
     else:
         needed_for = {p: fx.get("requires_override_key") for p in pats}
-    for f in _projected_skill_files(root):
+    for f in _projected_skill_files(root, hr):
         text = f.read_text(encoding="utf-8", errors="replace")
         for pat, needed in needed_for.items():
             if pat in text and needed not in keys:
@@ -302,7 +309,8 @@ def _check_c1(root, fx):
     return findings
 
 
-def _check_c2(root, fx):
+def _check_c2(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     findings = []
     for rel in fx.get("forbidden_hook_files") or []:
         if (root / rel).exists():
@@ -318,7 +326,7 @@ def _check_c2(root, fx):
             if key in data:
                 findings.append((fx["id"], ".claude/settings.json",
                                  f"'{key}' 키가 있다 — 트리거 소유권은 라우터에 있다(K-65)"))
-    for f in _projected_skill_files(root):
+    for f in _projected_skill_files(root, hr):
         low = f.read_text(encoding="utf-8", errors="replace").lower()
         for phrase in fx.get("forbidden_phrases") or []:
             if phrase.lower() in low:
@@ -327,11 +335,12 @@ def _check_c2(root, fx):
     return findings
 
 
-def _check_c3(root, fx):
+def _check_c3(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     from .compile import MANAGED_START, load_adapters
     findings = []
     if fx.get("check_duplicate_skill_names"):
-        for probe in probe_skill_files(root):
+        for probe in probe_skill_files(root, hr):
             seen = {}
             for name in probe["skills"]:
                 seen[name] = seen.get(name, 0) + 1
@@ -357,12 +366,13 @@ def _check_c3(root, fx):
     return findings
 
 
-def _recommend_pairs(root, fx):
+def _recommend_pairs(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     """정책표의 **모든** 부품이 추천하는 (부품 id, 스킬 id) 쌍.
 
     한 부품만 보면 다음에 추가되는 부품이 같은 실수를 반복한다. 정책표 파일을 직접 읽는다 —
     로더 캐시를 거치면 같은 프로세스 안에서 파일을 고쳐 만든 위반이 반영되지 않는다."""
-    data = load_any(root / fx.get("packages_file", "core/policy/packages.yaml")) or {}
+    data = load_any(hr / fx.get("packages_file", "core/policy/packages.yaml")) or {}
     pairs = []
     for pid, part in sorted((data.get("parts") or {}).items()):
         for rid in ((part or {}).get("recommends") or []):
@@ -370,7 +380,8 @@ def _recommend_pairs(root, fx):
     return pairs
 
 
-def _check_c5(root, fx):
+def _check_c5(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     """부품이 설치될 자리를 컴파일 산출물이 점유하고 있는가.
 
     prune 은 `.harness/compiled.yaml` 에 적힌 것만 지운다. 그래서 위험한 것은 두 가지다 —
@@ -380,7 +391,7 @@ def _check_c5(root, fx):
     state = load_any(root / fx.get("state_file", ".harness/compiled.yaml")) or {}
     outputs = [str(o).strip("/") for o in (state.get("outputs") or [])]
     install_dirs = [str(d).strip("/") for d in (fx.get("install_dirs") or [])]
-    names = {rid for _pid, rid in _recommend_pairs(root, fx)}
+    names = {rid for _pid, rid in _recommend_pairs(root, fx, hr)}
     for d in install_dirs:
         for out in outputs:
             if out == d or d.startswith(out + "/"):
@@ -395,10 +406,11 @@ def _check_c5(root, fx):
     return findings
 
 
-def _check_c6(root, fx):
+def _check_c6(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     """추천 목록의 각 id 가 accepted 판정의 출처에서 왔는가, 보류·기각된 것은 아닌가."""
     findings = []
-    imports = (load_any(root / fx.get("imports_file", "provenance/imports.yaml")) or {}).get("imports") or []
+    imports = (load_any(hr / fx.get("imports_file", "provenance/imports.yaml")) or {}).get("imports") or []
     forbidden_statuses = set(fx.get("forbidden_statuses") or [])
     allowed_key = fx.get("allowed_from", "router_recommends")
     allowed_status = fx.get("allowed_status", "accepted")
@@ -406,7 +418,7 @@ def _check_c6(root, fx):
     allowed = {str(r) for e in imports if e.get("status") == allowed_status
                for r in (e.get(allowed_key) or [])}
     where = fx.get("packages_file", "core/policy/packages.yaml")
-    for pid, rid in _recommend_pairs(root, fx):
+    for pid, rid in _recommend_pairs(root, fx, hr):
         if rid in forbidden:
             findings.append((fx["id"], f"{where}:parts.{pid}",
                              f"'{rid}' 는 보류·기각 판정인데 추천 목록에 있다 — 기획 원본이 둘이 된다"))
@@ -417,7 +429,8 @@ def _check_c6(root, fx):
     return findings
 
 
-def _check_c7(root, fx):
+def _check_c7(root, fx, hr=None):
+    hr = Path(hr) if hr else root
     """코어 안에 부품 기본 출력 경로가 박혀 있는가. 원문(c1)과 달리 여기는 흡수가 아니라 부재를 요구한다."""
     findings = []
     pats = [str(x) for x in (fx.get("patterns") or [])]
@@ -444,19 +457,29 @@ CHECKERS = {"pattern_requires_override": _check_c1,
             "no_hardcoded_output_path": _check_c7}
 
 
-def check_conflicts(root=None):
-    """fixtures/conflicts/*.yaml 을 실행한다. (findings, 실행한 fixture 수)."""
+def check_conflicts(root=None, harness_root=None):
+    """충돌 fixture 를 실행한다. (findings, 실행한 fixture 수).
+
+    **fixture 는 하네스에서 읽고 대상은 `root` 를 검사한다.** 둘을 같은 곳에서 읽으면
+    부착 대상에는 `fixtures/` 가 없으므로 **0종 실행으로 통과한다** — 부재가 일치로 읽히던
+    Q-53 과 같은 모양이다. 읽는 곳을 옮기면 같은 fixture 가 어느 저장소에서든 돈다.
+    """
     root = Path(root) if root else _project_root()
-    d = root / CONFLICTS_DIR
+    hr = Path(harness_root) if harness_root else root
+    d = hr / CONFLICTS_DIR
     findings, ran = [], 0
     for f in sorted(d.glob("*.yaml")) if d.is_dir() else []:
         fx = load_any(f) or {}
         fn = CHECKERS.get(fx.get("kind"))
         if not fn:
-            findings.append(("?", str(f.relative_to(root)), f"모르는 kind: {fx.get('kind')}"))
+            findings.append(("?", str(f.relative_to(hr)), f"모르는 kind: {fx.get('kind')}"))
             continue
         ran += 1
-        findings += fn(root, fx)
+        findings += fn(root, fx, hr)
+    if ran == 0:
+        # 충돌 finding 은 (id, where, why) 3-tuple 이다 — format_report 가 그 모양으로 읽는다.
+        findings.append(("CONFLICT_FIXTURES_MISSING", str(CONFLICTS_DIR),
+                         f"충돌 fixture 를 하나도 실행하지 못했다 ({hr / CONFLICTS_DIR}) — 0종 실행은 충돌 0 이 아니다"))
     return findings, ran
 
 
@@ -580,7 +603,7 @@ def _commit_lookup(sha, harness_root=None):
     return None if code is None else code == 0
 
 
-def check_attach_complete(root):
+def check_attach_complete(root, harness_root=None):
     """부착 정본(`scenarios/10-attach-payload.md` 의 「놓는 것」)과 대조한다.
 
     **부재를 일치로 읽지 않는다.** 산출물 0개가 목록 0개와 맞아떨어져 빈 저장소가 통과하던 자리다(Q-53).
@@ -592,7 +615,7 @@ def check_attach_complete(root):
     root = Path(root)
     findings = []
     try:
-        gone = attach_mod.missing(root)
+        gone = attach_mod.missing(root, attach_mod.runbook_path(harness_root))
     except (AssertionError, OSError) as exc:
         return [("ATTACH_MANIFEST_UNREADABLE", attach_mod.RUNBOOK_REL, "", str(exc))]
     for rel in gone:
@@ -609,19 +632,25 @@ def check_attach_complete(root):
         if not isinstance(rev, str) or not rev.strip():
             findings.append(("ATTACH_REVISION_MISSING", ".harness/compiled.yaml", "",
                              "어느 하네스 리비전이 붙었는지 기록이 없다 — `romeo compile --root <대상>` 으로 다시 만든다"))
-        elif _HEX40.match(rev.strip()) and _commit_lookup(rev.strip()) is False:
+        elif _HEX40.match(rev.strip()) and _commit_lookup(rev.strip(), harness_root) is False:
             findings.append(("ATTACH_REVISION_UNKNOWN", ".harness/compiled.yaml", rev.strip(),
                              "기록된 리비전이 이 하네스 저장소의 로컬 이력에 없다"))
     return findings
 
 
-def doctor(root=None):
-    """전체 진단. 반환값은 렌더링과 테스트가 함께 쓴다."""
+def doctor(root=None, harness_root=None):
+    """전체 진단. 반환값은 렌더링과 테스트가 함께 쓴다.
+
+    **읽는 곳과 쓰는 곳이 다르다.** 정책표·출처·바인딩·fixture 는 `harness_root` 에서 읽고,
+    검사 대상은 `root` 다. 둘을 같은 곳에서 읽으면 부착 대상에서는 원본이 없어 검사가
+    0건으로 통과한다 — 부재가 일치로 읽히던 Q-53 과 같은 모양이다.
+    """
     root = Path(root) if root else _project_root()
+    hr = Path(harness_root) if harness_root else root
     from .compile import check_compiled
     from .provenance import check_notices, check_provenance_ids, check_vendor
 
-    completeness = [list(f) for f in check_attach_complete(root)]
+    completeness = [list(f) for f in check_attach_complete(root, harness_root=hr)]
     # 시나리오 10 이 적은 순서 그대로다 — 「1번이 판정이고, 2~4번은 그 위에서만 의미가 있다」.
     # 붙지 않은 루트에서 산출물·vendor·고지를 대조하는 것은 없는 것을 없는 것과 맞춰 보는 일이고,
     # 실제로는 대조하다 예외로 죽는다(소스 트리가 없으므로).
@@ -637,19 +666,19 @@ def doctor(root=None):
             "conflicts": {"findings": [], "fixtures_ran": 0},
         }
 
-    vendor_f, vendor_c = check_vendor(root)
-    prov_f, _ = check_provenance_ids(root)
-    conflicts, ran = check_conflicts(root)
+    vendor_f, vendor_c = check_vendor(hr)
+    prov_f, _ = check_provenance_ids(hr)
+    conflicts, ran = check_conflicts(root, harness_root=hr)
     return {
         "runtimes": probe_runtimes(),
-        "skills": probe_skill_files(root),
+        "skills": probe_skill_files(root, hr),
         "capabilities": probe_capabilities(root),
         "observed_load": observations(root),
         "attach": {
             "completeness": completeness,
-            "compile": [list(f) for f in check_compiled(root)],
+            "compile": [list(f) for f in check_compiled(root, harness_root=hr)],
             "vendor": [list(f) for f in vendor_f] + [list(f) for f in prov_f],
-            "notices": [list(f) for f in check_notices(root)],
+            "notices": [list(f) for f in check_notices(root, harness_root=hr)],
             "vendor_files": vendor_c["files"],
         },
         "conflicts": {"findings": [list(f) for f in conflicts], "fixtures_ran": ran},

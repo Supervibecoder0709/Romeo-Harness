@@ -33,17 +33,12 @@ vendor import 0건이 0건과 일치하고, 충돌 fixture 0종에서 충돌이 
 그 항목은 조용히 건너뛰어지는 것이 아니라 요구에서 사라지고, 항목을 더하면 그 자리에서 막힌다.
 검사가 매번 목록을 바꿔 넣어 그 사실을 재확인한다.
 
-앞의 여섯은 **손으로 복사하는 하네스 소스 트리**다. `romeo compile` 의 `--root` 가 읽는 곳과 쓰는 곳을 둘 다 정하므로
-(`romeo/compile.py` 의 `plan_outputs`), 대상 저장소 안에 이것들이 없으면 컴파일은 산출물 0개로 **성공**한다.
+**하네스 소스는 복제하지 않는다.** `romeo compile` 은 소스(`core/`·`adapters/`·`vendor/`·`provenance/`·
+`skills/`·`.harness/bindings.yaml`)를 **하네스 저장소에서** 읽고 산출물만 `--root` 아래에 쓴다
+(`romeo/compile.py` 의 `plan_outputs(root, harness_root)`). 그래서 대상에 놓이는 것은 아래 여덟뿐이고,
+낡을 사본이 없으므로 드리프트도 없다. 2026-09-04 에는 소스 여섯을 손으로 복사해야 했다 — 그 단계가 사라졌다(Q-54).
 
-- `core/` — 코어 규칙·정책표·역할 계약·워크플로 원본
-- `adapters/` — 런타임 매핑(지침 파일 경로·스킬 경로·권한 설정 경로)
-- `vendor/` — 채택된 부품 원문. `provenance/imports.yaml` 이 `accepted` · `verbatim` 으로 표시한 것만 투영된다
-- `provenance/` — 부품 출처·라이선스. `THIRD_PARTY_NOTICES.md` 의 원본이다
-- `skills/repo-archive/` — 어댑터의 `local_skills` 원본
-- `.harness/bindings.yaml` — 역할↔런타임 바인딩·권한 상한 정본
-
-뒤의 여덟은 **`romeo compile` 과 `romeo notices` 가 만드는 산출물**이다. 손으로 만들지 않는다.
+아래 여덟은 **`romeo compile` 과 `romeo notices` 가 만드는 산출물**이다. 손으로 만들지 않는다.
 
 - `.harness/compiled.yaml` — 무엇이 하네스 소유인지 적는 목록. 이것이 없으면 되돌리기가 성립하지 않는다
 - `CLAUDE.md` — managed block 주입 (마커 밖은 보존한다)
@@ -54,9 +49,9 @@ vendor import 0건이 0건과 일치하고, 충돌 fixture 0종에서 충돌이 
 - `.agents/skills/` — 같은 것의 다른 런타임 투영
 - `THIRD_PARTY_NOTICES.md` — `bin/romeo notices` 산출물
 
-놓는 순서는 소스 트리 여섯 → `bin/romeo compile --root <대상>` → `bin/romeo notices --root <대상>` 이다.
-`bin/` 과 `romeo/`(파이썬 패키지)는 **놓지 않는다** — 명령은 하네스 저장소에서 `--root <대상>` 으로 실행한다.
-그래서 대상 저장소만으로는 라우터를 돌릴 수 없다. 그 사실이 M5 `attach` 가 답해야 할 것이다(`docs/planning/open-questions.md` Q-54).
+놓는 순서는 `bin/romeo compile --root <대상>` → `bin/romeo notices --root <대상>` 두 줄이다.
+`bin/` 과 `romeo/`(파이썬 패키지)도 **놓지 않는다** — 명령은 하네스 저장소에서 `--root <대상>` 으로 실행한다.
+그래서 대상 저장소만으로는 라우터를 돌릴 수 없다. 그 한 줄을 어떻게 줄일지는 M5 의 `attach` 명령이 가져간다.
 
 ## 덮는 것과 보존
 

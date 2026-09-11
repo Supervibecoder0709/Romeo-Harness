@@ -1,0 +1,72 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260911-attach-by-reference-and-index-amj9
+attempts:
+- n: 1
+  run: run_7a06709d9e8b
+  base_sha: b2e70237d0603f92095eee7aab1df785ae7dab8d
+  started_at: '2026-09-11T11:17:09+09:00'
+  result: fail
+  failure_class: goal
+  note: 구현이 AC 결함 3건을 드러냈다. AC-6 은 달성 불가능하다 — 마크다운 표 구분선이 항상 투영되는 AGENTS.core.md 에도 있어 「harness-only 절의
+    줄이 한 줄도 없다」를 만족할 수 없다. AC-7 도 같다 — 행동 규범이 core/ 경로를 인용하므로 「블록이 가리키는 경로가 전부 실재한다」가 성립할 수 없다. AC-8 은
+    c4-dangerous-instruction 을 골랐는데 그 fixture 는 override 로 덮이는 종류라 대상에 지시를 심어도 통과한다. 원인은 산출물이 아니라 완료 정의다
+  settled_at: '2026-09-11T11:25:00+09:00'
+- n: 2
+  run: run_69fa1b309fd2
+  base_sha: 85535127a354457f41375ac4baded05414dffa5e
+  started_at: '2026-09-11T11:29:12+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+- n: 3
+  run: run_393b0a0b4507
+  base_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  started_at: '2026-09-11T11:31:03+09:00'
+  result: fail
+  failure_class: goal
+  note: 검사 6/6 통과했으나 changed_files 가 쓰기 상한을 넘었다 — romeo/cli.py(CLI 가 --root 실행에서만 하네스를 넘기는 자리) · romeo/provenance.py(notices
+    의 기대값을 하네스에서 만든다) · CLAUDE.md·AGENTS.md(compile 산출물). 네 경로 다 참조 전환에 필수이고 되돌릴 수 없다. 원인은 spec 의 「변경
+    범위」가 읽는 경로를 compile·doctor 둘로만 봤다는 것 — 완료 정의 쪽이다
+  settled_at: '2026-09-11T12:05:41+09:00'
+- n: 4
+  run: run_7e8bca687146
+  base_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  started_at: '2026-09-11T12:06:13+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL · findings 3건 — 전부 구현이 AC 를 덜 구현한 것이다. ① AC-1 의 집합 일치 검사가 단방향(outputs 밖만 찾고 outputs
+    에 적힌 채 없는 것은 안 본다) ② AC-5 의 검사가 split_index_sections 예외만 보고 bin/romeo compile 의 종료 코드·출력을 보지 않는다 ③
+    비차단: _check_c3 가 받은 하네스 경로를 probe_skill_files 에 넘기지 않아 부착 대상에서 스킬 이름 중복 검사가 생략된다'
+  settled_at: '2026-09-11T12:17:03+09:00'
+- n: 5
+  run: run_dd093d94749c
+  base_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  started_at: '2026-09-11T12:17:57+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS · 비차단 findings 2건(_check_c7 의 하네스 경로 미사용 · _read_source_tree 의 심링크 경계) — 둘 다 AC 밖이라 게이트를
+    내리지 않았고 발견으로 남긴다
+  settled_at: '2026-09-11T12:27:42+09:00'
+reviews:
+- after_attempt: 1
+  conclusion: '달성 가능하다 — AC-6 을 한 번 더 고친 뒤 3회차를 돈다. 1·2회차가 같은 자리에서 막혔고 두 번 다 원인은 완료 정의였다: AC-6 이 「그 절들에만
+    있는 줄」의 비교 대상을 소스 문서 두 곳(all 절·AGENTS.core.md)으로만 한정해, 렌더러가 만드는 표의 구분선 같은 서식 줄을 셈에 넣지 못했다 — 그 줄들은 어느
+    소스에도 없으면서 대상 블록에는 항상 있다. 실측: 서식 줄(표 구분선·수평선)을 뺀 harness-only 고유 내용 줄이 38개이고 그 38개가 하네스 자신 블록에 38/38
+    있다. 그 38개가 대상 블록에 없어야 한다는 조건은 판별력을 유지하면서 달성 가능하다.'
+  by: Supervibecoder0709
+  at: '2026-09-11T11:27:28+09:00'
+- after_attempt: 3
+  conclusion: 달성 가능하다 — 변경 범위에 네 경로를 더하고 3회차를 돈다. 1회차는 AC 3건이 달성 불가능해서, 2회차는 변경 범위가 좁아서 막혔다. 둘 다 산출물이
+    아니라 완료 정의 쪽이고, 구현은 두 회차 모두 검사를 통과시켰다(2회차 6/6). 더할 네 경로는 전부 「읽는 곳과 쓰는 곳을 나눈다」는 이 단위의 요청 안에 있다 — romeo/cli.py
+    는 그 분리를 실제로 켜는 자리, romeo/provenance.py 는 notices 의 같은 분리, CLAUDE.md·AGENTS.md 는 compile 이 재생성하는 산출물이다.
+    범위를 넓히는 것이 아니라 처음부터 그 안에 있었어야 한 것을 적는다.
+  by: Supervibecoder0709
+  at: '2026-09-11T12:05:41+09:00'
+- after_attempt: 4
+  conclusion: '달성 가능하다 — 4회차를 돈다. 이번 실패는 앞 두 회차와 성격이 다르다: 완료 정의가 아니라 산출물이 덜 구현됐고, findings 3건 모두 고칠 수
+    있는 구현 결함이다(집합 검사를 양방향으로, AC-5 검사를 CLI 경로로, _check_c3 에 하네스 경로 전달). AC 문장은 바꾸지 않는다 — 검토자가 AC 를 기준으로
+    구현의 부족을 지적했으므로 완료 정의는 이번에 제 역할을 했다.'
+  by: Supervibecoder0709
+  at: '2026-09-11T12:17:03+09:00'
+reviewer_runs: []

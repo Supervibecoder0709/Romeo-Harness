@@ -10,14 +10,14 @@ gates: []
 profile: standard
 blast_radius: medium
 uncertainty: medium
-status: active
-approved_at: '2026-09-11T11:29:03+09:00'
+status: done
+approved_at: '2026-09-11T12:06:04+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-11T12:46:44+09:00'
 parent: init-20260911-m5-attach-update-rollback-sauc
 inputs: [inputs/ac-rebuttal-20260911.md, inputs/ac-rebuttal-20260911-round2.md]
-evidence: []
+evidence: [evidence/run_393b0a0b4507.yaml, evidence/run_7e8bca687146.yaml, evidence/run_dd093d94749c.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -33,6 +33,13 @@ approval_history:
   reason: 'AC-6·AC-7·AC-8 을 실제로 교체한다. 앞선 재승인 두 건(5ea8c87·244c530)은 치환이 조용히 실패해 spec 본문이 바뀌지 않은 채 approved_at
     만 갱신됐다 — 그 두 커밋 메시지가 주장한 수정은 이 커밋에서 이루어진다. AC-6 은 서식 줄을 비교 대상에서 빼는 규칙(실측 38/38), AC-7 은 Q-60 이 실측한
     5종, AC-8 은 대상 산출물만으로 판정하는 c2-no-auto-trigger 로 바꿨다'}
+- {approved_at: '2026-09-11T11:29:03+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T11:30:33+09:00',
+  reason: 'AC-7 이 Q-60 의 5종 전부를 요구했으나 다섯째 docs/planning/open-questions.md 는 행동 규범(AGENTS.core.md §12)이
+    인용하고 그 문서는 가르지 않는다 — 인덱스를 가르는 것으로는 닫히지 않는 조건이었다. 실측으로 4종은 이미 빠지고 그 하나만 남는 것을 확인해, AC-7 을 인덱스 절이 가리키던
+    4종으로 좁히고 다섯째는 발견으로 남긴다'}
+- {approved_at: '2026-09-11T11:30:33+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-11T12:06:04+09:00',
+  reason: '변경 범위가 읽는 경로를 compile·doctor 둘로만 봤다. 참조 전환은 romeo/cli.py(분리를 실제로 켜는 자리)와 romeo/provenance.py(고지의
+    같은 분리)도 건드리고, CLAUDE.md·AGENTS.md 는 compile 이 재생성한다 — 네 경로를 변경 범위에 적는다. 확인란의 수용 기준과 검증 계획은 바꾸지 않았다'}
 ---
 
 # 부착을 참조로 바꾸고, 투영되는 인덱스를 대상에 실재하는 것으로 좁힌다
@@ -49,14 +56,14 @@ approval_history:
 - **왜 지금:** 지금은 `compile --root <대상>` 이 대상 **안에서** `core/`·`adapters/`·`vendor/`·`provenance/`·`skills/`·`.harness/bindings.yaml` 을 읽으므로, 그 여섯을 손으로 복사해야만 부착이 성립한다. 사본은 하네스가 갱신되면 낡고, 계획이 경고한 드리프트가 그것이다. 같은 모양이 `doctor` 의 충돌 fixture 에도 있다 — 대상의 `fixtures/` 를 읽으므로 **부착 대상에서는 0종 실행으로 통과한다**(Q-53 과 같은 「부재가 일치로 읽히는」 자리). 그리고 대상 `CLAUDE.md` 는 그 저장소에 **없는 파일 5종**을 세션 시작에 읽으라고 지시한다(Q-60 · 2026-09-04 실측).
 - **기대 결과:** 부착 대상에 놓이는 것이 14개에서 **8개**(컴파일·고지 산출물)로 줄고, 소스 트리 사본이 사라진다. 대상 지침은 그 저장소에 실재하는 것만 가리킨다. 충돌 fixture 는 하네스의 것을 읽어 **대상을 검사한다** — 0종으로 통과하지 않는다.
 - **수용 기준:** 아래 낱말은 이 뜻이다. 「**사본**」 = 빈 디렉터리에 `bin/romeo compile --root` 와 `bin/romeo notices --root` 만 걸어 만든 부착본(소스 트리를 손으로 복사하지 않는다). 「**판정 명령**」 = `bin/romeo doctor --strict --scope repository --root <사본>`. 「**절**」 = `PROJECT.core.md` 본문에서 `## ` 로 시작하는 줄부터 다음 `## ` 줄 앞까지, 그리고 첫 `## ` 앞의 앞머리. 모든 명령은 하네스 저장소 안에서 실행한다.
-  - [ ] AC-1 빈 디렉터리에 `bin/romeo compile --root <그 디렉터리>` 와 `bin/romeo notices --root <그 디렉터리>` 를 걸면 각 종료 코드가 0 이고, **실행이 끝난 뒤 그 루트의 파일 집합**이 `.harness/compiled.yaml` 의 `outputs` + `.harness/compiled.yaml` + `THIRD_PARTY_NOTICES.md` 와 정확히 같다 — 그 밖의 파일이 하나도 남지 않으므로 소스 사본도 남지 않는다.
-  - [ ] AC-2 사본에서 판정 명령의 종료 코드가 0 이고, 같은 사본에서 `outputs` 가 담은 파일 하나를 지우면 종료 코드가 0 이 아니며 출력이 그 경로를 담는다 — 하네스 저장소는 그대로이므로 그 실패는 `--root` 가 사본을 본 결과다.
-  - [ ] AC-3 `romeo.attach.required_paths()` 의 항목 집합이 AC-1 의 파일 집합을 **디렉터리 단위로 덮는 것과 정확히 같다** — 한쪽에만 있는 항목이 없다. 그러므로 소스 트리 여섯도, 산출물이 아닌 항목도, 빠진 산출물도 없다.
-  - [ ] AC-4 하네스 저장소 자신을 대상으로 한 `bin/romeo compile --check` 와 `bin/romeo doctor --strict --scope repository`(`--root` 없이)의 종료 코드가 각각 0 이고, `python3 -m unittest discover -s tests` 의 종료 코드가 0 이다.
-  - [ ] AC-5 `PROJECT.core.md` 의 절에서 ① 표식을 지우거나 ② `all`·`harness-only` 가 아닌 값을 넣거나 ③ 한 절에 표식을 두 줄 넣으면, 세 경우 각각 `bin/romeo compile` 의 종료 코드가 0 이 아니고 출력이 그 절의 제목(앞머리면 `앞머리`)을 담는다.
-  - [ ] AC-6 `romeo:scope harness-only` 절들의 **고유 내용 줄**이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 한 줄도 없고, 하네스 저장소 자신의 두 지침 파일에는 빠짐없이 있다. 「고유 내용 줄」은 그 절들의 줄에서 빈 줄·수평선(`---`)·표 구분선(`|` 와 `-`·`:`·공백만으로 된 줄)을 빼고, `romeo:scope all` 절과 `AGENTS.core.md` 에 같은 줄이 있는 것도 뺀 나머지다 — 서식 줄은 어느 소스에도 없으면서 렌더러가 만드는 표에 늘 나타나므로 판별에 쓸 수 없다(2026-09-11 실측: 그렇게 남는 줄 38개가 하네스 자신 블록에 38/38 있다).
-  - [ ] AC-7 Q-60 이 실측한 5종(`docs/planning/progress.md`·`docs/decisions/decision-register.md`·`docs/planning/open-questions.md`·`docs/requirements/`·`docs/reviews/`)이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 하나도 나타나지 않고, 하네스 저장소 자신의 두 지침 파일에는 다섯이 다 나타난다.
-  - [ ] AC-8 사본에 `fixtures/` 가 없어도 `doctor` 의 충돌 검사 실행 수가 하네스의 `fixtures/conflicts/*.yaml` 개수와 같고, 사본에 `.claude/hooks.json` 을 놓으면(`c2-no-auto-trigger` 가 대상의 산출물만으로 판정하는 종류다) 판정 명령의 종료 코드가 0 이 아니며 출력이 **`c2-no-auto-trigger`** 를 담는다.
+  - [x] AC-1 빈 디렉터리에 `bin/romeo compile --root <그 디렉터리>` 와 `bin/romeo notices --root <그 디렉터리>` 를 걸면 각 종료 코드가 0 이고, **실행이 끝난 뒤 그 루트의 파일 집합**이 `.harness/compiled.yaml` 의 `outputs` + `.harness/compiled.yaml` + `THIRD_PARTY_NOTICES.md` 와 정확히 같다 — 그 밖의 파일이 하나도 남지 않으므로 소스 사본도 남지 않는다.
+  - [x] AC-2 사본에서 판정 명령의 종료 코드가 0 이고, 같은 사본에서 `outputs` 가 담은 파일 하나를 지우면 종료 코드가 0 이 아니며 출력이 그 경로를 담는다 — 하네스 저장소는 그대로이므로 그 실패는 `--root` 가 사본을 본 결과다.
+  - [x] AC-3 `romeo.attach.required_paths()` 의 항목 집합이 AC-1 의 파일 집합을 **디렉터리 단위로 덮는 것과 정확히 같다** — 한쪽에만 있는 항목이 없다. 그러므로 소스 트리 여섯도, 산출물이 아닌 항목도, 빠진 산출물도 없다.
+  - [x] AC-4 하네스 저장소 자신을 대상으로 한 `bin/romeo compile --check` 와 `bin/romeo doctor --strict --scope repository`(`--root` 없이)의 종료 코드가 각각 0 이고, `python3 -m unittest discover -s tests` 의 종료 코드가 0 이다.
+  - [x] AC-5 `PROJECT.core.md` 의 절에서 ① 표식을 지우거나 ② `all`·`harness-only` 가 아닌 값을 넣거나 ③ 한 절에 표식을 두 줄 넣으면, 세 경우 각각 `bin/romeo compile` 의 종료 코드가 0 이 아니고 출력이 그 절의 제목(앞머리면 `앞머리`)을 담는다.
+  - [x] AC-6 `romeo:scope harness-only` 절들의 **고유 내용 줄**이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 한 줄도 없고, 하네스 저장소 자신의 두 지침 파일에는 빠짐없이 있다. 「고유 내용 줄」은 그 절들의 줄에서 빈 줄·수평선(`---`)·표 구분선(`|` 와 `-`·`:`·공백만으로 된 줄)을 빼고, `romeo:scope all` 절과 `AGENTS.core.md` 에 같은 줄이 있는 것도 뺀 나머지다 — 서식 줄은 어느 소스에도 없으면서 렌더러가 만드는 표에 늘 나타나므로 판별에 쓸 수 없다(2026-09-11 실측: 그렇게 남는 줄 38개가 하네스 자신 블록에 38/38 있다).
+  - [x] AC-7 Q-60 이 실측한 5종 중 **인덱스 절이 가리키던 4종**(`docs/planning/progress.md`·`docs/decisions/decision-register.md`·`docs/requirements/`·`docs/reviews/`)이 사본의 `CLAUDE.md`·`AGENTS.md` managed block 에 하나도 나타나지 않고, 하네스 저장소 자신의 두 지침 파일에는 넷이 다 나타난다. 다섯째 `docs/planning/open-questions.md` 는 **행동 규범이 인용한다**(`AGENTS.core.md` §12 — 가르지 않는 문서다) — 인덱스를 가르는 것으로는 닫히지 않으므로 이 AC 가 요구하지 않고, 그 자리가 대상에 없는 문제는 발견으로 남긴다.
+  - [x] AC-8 사본에 `fixtures/` 가 없어도 `doctor` 의 충돌 검사 실행 수가 하네스의 `fixtures/conflicts/*.yaml` 개수와 같고, 사본에 `.claude/hooks.json` 을 놓으면(`c2-no-auto-trigger` 가 대상의 산출물만으로 판정하는 종류다) 판정 명령의 종료 코드가 0 이 아니며 출력이 **`c2-no-auto-trigger`** 를 담는다.
 - **위험과 되돌리기:** 실제 프로젝트 저장소에는 쓰지 않는다 — 검증이 쓰는 것은 임시 디렉터리 사본뿐이다. 이미 소스 트리를 복제해 둔 저장소가 있으면 그 사본은 **남는다**(지우는 것은 Charter M3 의 `rollback` 이다). 되돌리려면 통합 커밋 하나를 `git revert` 하고 `bin/romeo compile` 로 산출물을 재생성한다.
 - **결정 필요:** 없음. 계획 §3.1 은 이 전환을 금지하지 않는다 — 전문에 「코어 규칙을 복제하지 않는다」는 문장이 없고, 금지 대상은 「override 가 코어를 복제하는 것」이다(`implementation-plan.md:174·198`). 개정도 D-xx 도 필요하지 않다.
 
@@ -64,7 +71,7 @@ approval_history:
 
 아래 「바뀌는 파일·모듈」 줄이 작업 계약의 쓰기 상한(`allowed_paths`)이 된다 — 집행 자리는 `romeo/envelope.py` 의 `change_scope_paths` 다(K-66). 그 줄은 다음 문법으로 읽힌다. 경로는 **백틱**으로 적고, 항목은 `·` 나 줄바꿈 목록으로 나눈다. 설명은 **괄호 안**에 적는다 — 괄호 안의 백틱은 경로로 읽지 않는다. `/` 도 `.` 도 없는 토큰(함수명·플래그)과 공백이 든 토큰은 경로로 읽지 않는다 — 계약을 만들 때 그 목록이 인쇄된다. 루트의 확장자 없는 파일은 `./LICENSE` 처럼 쓴다. 「영향을 받는 부분」·「바꾸지 않는 것」 은 상한에 들어가지 않는다.
 
-- 바뀌는 파일·모듈: `romeo/compile.py` (읽는 곳을 하네스 저장소로 분리 · 절 표식을 읽어 투영 범위를 가른다) · `romeo/doctor.py` (충돌 fixture 를 하네스에서 읽어 대상을 검사) · `core/principles/PROJECT.core.md` (절마다 투영 범위 표식) · `scenarios/10-attach-payload.md` (「놓는 것」에서 소스 트리 여섯을 빼고 부착 순서를 고친다) · `tests/test_attach_runbook.py` (`SOURCE_TREE`·`attach()` 가 더 이상 복사하지 않는다) · `tests/test_attach_manifest.py` (기대 목록이 8개로 바뀐다) · `tests/test_attach_reference.py` (새 파일) · `.harness/compiled.yaml` (재생성 산출물) · `docs/work/feat-20260911-attach-by-reference-and-index-amj9/`
+- 바뀌는 파일·모듈: `romeo/compile.py` (읽는 곳을 하네스 저장소로 분리 · 절 표식을 읽어 투영 범위를 가른다) · `romeo/doctor.py` (충돌 fixture·어댑터 선언·정책표를 하네스에서 읽어 대상을 검사) · `romeo/cli.py` (`--root` 를 준 실행에서만 하네스를 넘긴다 — 이 분리를 실제로 켜는 자리) · `romeo/provenance.py` (고지의 기대값을 하네스에서 만들고 대상 파일과 대조) · `CLAUDE.md` · `AGENTS.md` (compile 이 재생성하는 산출물) · `core/principles/PROJECT.core.md` (절마다 투영 범위 표식) · `scenarios/10-attach-payload.md` (「놓는 것」에서 소스 트리 여섯을 빼고 부착 순서를 고친다) · `tests/test_attach_runbook.py` (`SOURCE_TREE`·`attach()` 가 더 이상 복사하지 않는다) · `tests/test_attach_manifest.py` (기대 목록이 8개로 바뀐다) · `tests/test_attach_reference.py` (새 파일) · `.harness/compiled.yaml` (재생성 산출물) · `docs/work/feat-20260911-attach-by-reference-and-index-amj9/`
 - 영향을 받는 부분: 이미 소스 트리를 복제한 부착 저장소 (그 사본은 남고 더 이상 요구되지 않는다) · `bin/romeo doctor --root <대상>` 의 충돌 검사 실행 수 · CI 의 compile·doctor 단계
 - 바꾸지 않는 것(비범위): `romeo attach` 하위 명령과 preflight·파일별 승인·원자적 적용 (M2 의 다음 단위) · 대상의 실행 권한(Q-58)과 환경 등록(Q-59) · `update --dry-run`·`rollback` (Charter M3) · `AGENTS.core.md` 의 행동 규범 (전부 모든 저장소에 간다 — 가르지 않는다) · 이미 복제된 사본을 지우는 일
 
@@ -124,6 +131,8 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-11T12:46:44+09:00 · HEAD ec14953d2ec2 · 검사 기록 run_dd093d94749c
 
-- (없음)
+- [evidence/run_393b0a0b4507.yaml](evidence/run_393b0a0b4507.yaml) — exit codes [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_7e8bca687146.yaml](evidence/run_7e8bca687146.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_dd093d94749c.yaml](evidence/run_dd093d94749c.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

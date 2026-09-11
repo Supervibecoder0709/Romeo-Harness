@@ -14,6 +14,16 @@ def _root(args):
     return Path(args.root).resolve() if getattr(args, "root", None) else _project_root()
 
 
+def _harness_root(args):
+    """`--root` 를 준 실행은 **부착**이다 — 그때만 읽는 곳과 쓰는 곳이 갈린다.
+
+    소스(정책표·어댑터·역할·출처·fixture)는 이 패키지가 사는 저장소에서 읽고 산출물만 `--root` 아래에 쓴다.
+    `--root` 가 없으면 `None` 을 돌려준다 — 읽는 곳과 쓰는 곳이 같다는 뜻이고, 부르는 함수가 `root` 를 쓴다.
+    """
+    from . import HARNESS_ROOT
+    return HARNESS_ROOT if getattr(args, "root", None) else None
+
+
 def _load_classification(args):
     if getattr(args, "proposal", None):
         prop = load_any(args.proposal)
@@ -383,14 +393,14 @@ def cmd_id(args):
 
 def cmd_compile(args):
     from .compile import check_compiled, compile_all
-    root = _root(args)
+    root, hr = _root(args), _harness_root(args)
     if args.check:
-        findings = check_compiled(root)
+        findings = check_compiled(root, harness_root=hr)
         for code, path, _, why in findings:
             print(f"{code} {path} — {why}", file=sys.stderr)
         print(f"compile 검사 {'PASS' if not findings else f'FAIL ({len(findings)}건)'}")
         return 0 if not findings else 1
-    written = compile_all(root)
+    written = compile_all(root, harness_root=hr)
     if args.json:
         print(json.dumps({"outputs": written}, ensure_ascii=False, indent=1))
     else:
@@ -402,7 +412,7 @@ def cmd_compile(args):
 
 def cmd_doctor(args):
     from .doctor import doctor, doctor_problem_count, format_report
-    rep = doctor(_root(args))
+    rep = doctor(_root(args), harness_root=_harness_root(args))
     print(json.dumps(rep, ensure_ascii=False, indent=1) if args.json else format_report(rep))
     if args.strict:
         return 0 if doctor_problem_count(rep, args.scope) == 0 else 1
@@ -446,15 +456,15 @@ def cmd_vendor(args):
 
 def cmd_notices(args):
     from .provenance import check_notices, write_notices, NOTICES_PATH
-    root = _root(args)
+    root, hr = _root(args), _harness_root(args)
     if args.check:
-        findings = check_notices(root)
+        findings = check_notices(root, harness_root=hr)
         for code, path, _, why in findings:
             print(f"{code} {path} — {why}", file=sys.stderr)
         if not findings:
             print(f"{NOTICES_PATH} 는 imports.yaml 과 일치한다")
         return 0 if not findings else 1
-    write_notices(root)
+    write_notices(root, harness_root=hr)
     print(f"{NOTICES_PATH} 생성")
     return 0
 

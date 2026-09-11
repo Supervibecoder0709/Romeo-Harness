@@ -113,7 +113,7 @@ class TestTheRunbookIsWhatDoctorReads(unittest.TestCase):
         cls.td = tempfile.TemporaryDirectory()
         cls.harness = Path(cls.td.name) / "harness"
         cls.harness.mkdir(parents=True)
-        for rel in ("bin", "romeo", "scenarios", "core", "adapters", "vendor", "provenance", "skills"):
+        for rel in ("bin", "romeo", "scenarios", "core", "adapters", "vendor", "provenance", "skills", "fixtures"):
             src = HARNESS_ROOT / rel
             if src.is_dir():
                 shutil.copytree(src, cls.harness / rel)

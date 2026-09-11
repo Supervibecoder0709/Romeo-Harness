@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260911-attach-by-reference-and-index-amj9",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/task/run_7e8bca687146-implementer.json",
+    "sha256": "008e13f259bd854ac9425102e43d0a4ce6e5545428bb4f42390e5562809e1311"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_reference -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/evidence/run_7e8bca687146.yaml",
+  "notes": "3회차. 1·2회차는 둘 다 완료 정의 쪽에서 막혔고 산출물은 두 번 다 검사를 통과했다 — 1회차는 AC-6·7·8 이 달성 불가능했고(표 구분선과 행동 규범의 코어 경로 인용이 항상 투영된다), 2회차는 변경 범위가 읽는 경로를 compile·doctor 둘로만 봐서 changed_files 가 상한을 넘었다. §10 브레이크가 연속 실패 2회에서 작동해 재검토를 요구했고, 두 번 다 달성 가능성을 실측한 뒤 결론을 기록했다. 구현 중 드러난 읽기 경로가 spec 작성 시점의 예상보다 넓었다 — plan_outputs 외에 _render_skill, probe_skill_files/_projected_skill_files(어댑터 선언), _check_c* (정책표·출처·바인딩), check_notices 까지 같은 분리가 필요했다. 기본값은 root 로 두고(읽는 곳 = 쓰는 곳) CLI 가 --root 실행에서만 하네스를 넘긴다 — 그러면 자기 루트의 정책표를 고쳐 검사 반응을 보는 기존 fixture 테스트 14건이 그대로 돈다. 표식 줄은 산출물에 남긴다 — 「인덱스 원본이 블록에 그대로 들어간다」는 체크리스트 32 의 계약을 지킨다. 회귀 0(check-4, 1093 tests OK)."
+}

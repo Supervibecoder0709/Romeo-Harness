@@ -1,0 +1,180 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_393b0a0b4507
+task_id: null
+dispatch_id: null
+unit_id: feat-20260911-attach-by-reference-and-index-amj9
+spec_ref:
+  path: docs/work/feat-20260911-attach-by-reference-and-index-amj9/spec.md
+  sha256: 7a22c5feedbbad23f863e3ca75b35174efa2fcadffbb41446682dc26ea158dc7
+base_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/m5-m2-attach-reference
+started_at: '2026-09-11T11:31:03+09:00'
+finished_at: '2026-09-11T12:05:13+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_reference -v
+  exit_code: 0
+  started_at: '2026-09-11T11:31:03+09:00'
+  finished_at: '2026-09-11T11:31:10+09:00'
+  seconds: 6.794
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/01-check-1.log
+  log_sha256: e3b7b7db40ab65e10e58152222fed8ea076334902d4cee5cb8225ae7197ef933
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-2
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-11T11:31:10+09:00'
+  finished_at: '2026-09-11T11:31:11+09:00'
+  seconds: 0.951
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/02-check-2.log
+  log_sha256: b687b56940dcd07d2b998ccc4839af36aed58ed88d13ac5d130192d8ef4089d4
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-3
+  command: python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest -v
+  exit_code: 1
+  started_at: '2026-09-11T11:31:11+09:00'
+  finished_at: '2026-09-11T11:31:30+09:00'
+  seconds: 18.713
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/03-check-3.log
+  log_sha256: 2c4345778d8fca2c4d6bf39e313af9a7e888fb3beca093ca2c0924abce8b8a0e
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 1
+  started_at: '2026-09-11T11:31:30+09:00'
+  finished_at: '2026-09-11T11:37:56+09:00'
+  seconds: 386.305
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/04-check-4.log
+  log_sha256: 61073a3ff371f0c7a8ec29dfafb5783892d8092bf8d02ea0d0df0d362b1fa0ea
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-11T11:37:56+09:00'
+  finished_at: '2026-09-11T11:37:57+09:00'
+  seconds: 0.329
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/05-check-5.log
+  log_sha256: 9bff7ac3a19ff05be2d457bcc678265fc5e7686a288673b88ec398696c506c7a
+  stdout_tail: compile 검사 PASS
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-6
+  command: bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9
+  exit_code: 0
+  started_at: '2026-09-11T11:37:57+09:00'
+  finished_at: '2026-09-11T11:37:57+09:00'
+  seconds: 0.151
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/06-check-6.log
+  log_sha256: af38a102c904ddc228d7b6b8ad0dcc9ece171c42ab7930ed6079259a99afb1f6
+  stdout_tail: "[PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/brief.md lines=70 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/spec.md lines=134\
+    \ needs_input=0 unchecked_ac=8\n    WARN  UNCHECKED_AC 8개"
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 782b737a5c6eca7e85b82f30bc268661391c5365d8af248c771f9a067e97a6d7
+- id: check-1
+  command: python3 -m unittest tests.test_attach_reference -v
+  exit_code: 0
+  started_at: '2026-09-11T11:58:19+09:00'
+  finished_at: '2026-09-11T11:58:27+09:00'
+  seconds: 7.626
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/07-check-1.log
+  log_sha256: 259b7cf7c2862e4c2785cfaef4ddd50bf53df479bad1000a7bbc2df447527393
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+- id: check-2
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-11T11:58:27+09:00'
+  finished_at: '2026-09-11T11:58:28+09:00'
+  seconds: 0.944
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/08-check-2.log
+  log_sha256: dfb262cb00ad889d730c8c13cf07ccff761c4cf34738eddb68f00f4cd3f1ebf6
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+- id: check-3
+  command: python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest -v
+  exit_code: 0
+  started_at: '2026-09-11T11:58:28+09:00'
+  finished_at: '2026-09-11T11:58:47+09:00'
+  seconds: 18.882
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/09-check-3.log
+  log_sha256: d07b50ce78eead90339087ef9a633f073e71e6d132d3bbce575ec6adefd5a680
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-11T11:58:47+09:00'
+  finished_at: '2026-09-11T12:05:12+09:00'
+  seconds: 385.016
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/10-check-4.log
+  log_sha256: 2fa3b8e0199c8c53125c0617c0180b3d6a2411b823f6fd2c3b5f02e38d675eb3
+  stdout_tail: ''
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-11T12:05:12+09:00'
+  finished_at: '2026-09-11T12:05:13+09:00'
+  seconds: 0.327
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/11-check-5.log
+  log_sha256: 3713919dd79dd4717fd33d3f4804bfc47d1d7fb0f55c4c5f4732c322e846cde3
+  stdout_tail: compile 검사 PASS
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+- id: check-6
+  command: bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9
+  exit_code: 0
+  started_at: '2026-09-11T12:05:13+09:00'
+  finished_at: '2026-09-11T12:05:13+09:00'
+  seconds: 0.15
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_393b0a0b4507/12-check-6.log
+  log_sha256: 2d15afcab366a648007ac46644656a4f2b1350b939e285750b6964c1d4d64abe
+  stdout_tail: "[PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/brief.md lines=70 needs_input=0\
+    \ unchecked_ac=0\n[PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/spec.md lines=134\
+    \ needs_input=0 unchecked_ac=8\n    WARN  UNCHECKED_AC 8개"
+  head_sha: 1fa91a96b74d594e41f34f13ef25556783008d3e
+  dirty_tree_hash: 910609d010a572d57d2948e00bfa7f74471d6c3774a1fe32b118e05af92bc87e
+changed_files:
+- AGENTS.md
+- CLAUDE.md
+- core/principles/PROJECT.core.md
+- romeo/cli.py
+- romeo/compile.py
+- romeo/doctor.py
+- romeo/provenance.py
+- scenarios/10-attach-payload.md
+- tests/test_attach_manifest.py
+- tests/test_attach_reference.py
+- tests/test_attach_runbook.py
+artifact_hash: ed701355681b61ff2afc6f0441c536d1baf58aef151310b5f289a1b2a180570b
+reviewer: null
+verdict: null
+approvals: []

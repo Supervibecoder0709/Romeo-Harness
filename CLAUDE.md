@@ -1,8 +1,10 @@
-<!-- romeo:managed start v0.1.0 source=core/principles/{PROJECT,AGENTS}.core.md sha=08dc14bf -->
+<!-- romeo:managed start v0.1.0 source=core/principles/{PROJECT,AGENTS}.core.md sha=8d847027 -->
 # Romeo 하네스 규칙 (자동 생성)
 
 원본은 `core/principles/PROJECT.core.md`(이 저장소의 인덱스)와 `core/principles/AGENTS.core.md`(행동 규칙)이고 이 블록은 `romeo compile` 이 만든다.
 **마커 안을 고치지 않는다** — 다음 컴파일에서 사라진다. 마커 밖에 쓴 내용은 보존된다.
+
+<!-- romeo:scope harness-only -->
 
 이 문서는 **이 저장소가 무엇이고 어디에 무엇이 있는지**를 담는다. 행동 규범은 담지 않는다 —
 그것은 `core/principles/AGENTS.core.md` 가 소유하고 이 블록 아래에 이어진다.
@@ -15,11 +17,13 @@
 아니라, 요청을 이해하고 필요한 작업 방식만 골라 계획·실행·검증·기록까지 일관되게 수행하는 체계다.
 
 ## 충돌 해소 순서
+<!-- romeo:scope all -->
 
 현재 사용자의 명시적 요청 → 승인된 현재 문서와 결정 → 프로젝트 인덱스 → 과거 대화·조사 자료 →
 참고 저장소 → 일반적인 권고. 충돌을 임의로 해석하지 말고 차이와 추천안을 알린다.
 
 ## 세션을 시작할 때 — 세 번만 본다
+<!-- romeo:scope harness-only -->
 
 | # | 무엇 | 어디 |
 | --- | --- | --- |
@@ -28,6 +32,7 @@
 | ③ | CI 빨간불 여부 | 저장소의 CI 실행 목록에서 최신 1건 |
 
 ## 문서 인덱스
+<!-- romeo:scope harness-only -->
 
 | 알고 싶은 것 | 파일 |
 | --- | --- |
@@ -49,6 +54,7 @@
 | 동등성 게이트 케이스 | `fixtures/parity/` |
 
 ## 이 저장소에만 해당하는 것
+<!-- romeo:scope harness-only -->
 
 - **하네스가 하네스를 만든다.** 여기서 만든 규칙이 이 저장소 자신에게 적용된다 —
   권한 상한이나 종료 검사를 고치면 다음 작업이 바로 그 규칙 아래 돈다.
