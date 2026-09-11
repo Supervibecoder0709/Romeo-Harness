@@ -1,0 +1,46 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260911-attach-by-reference-and-index-amj9",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/task/run_dd093d94749c-implementer.json",
+    "sha256": "008e13f259bd854ac9425102e43d0a4ce6e5545428bb4f42390e5562809e1311"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_attach_reference -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260911-attach-by-reference-and-index-amj9/evidence/run_dd093d94749c.yaml",
+  "notes": "4회차. 3회차 검토자 findings 3건을 반영했다(run_7e8bca687146 의 review 봉투). ① AC-1 의 집합 일치 검사가 단방향이었다 — outputs 밖의 파일만 찾고 outputs 에 적힌 채 실재하지 않는 항목은 보지 않았다. 양방향으로 고쳤다. ② AC-5 의 검사가 split_index_sections 에 문자열을 넘겨 예외만 봤다 — bin/romeo compile 이 그 문서를 읽는 경로를 지나지 않는다. 하네스 사본을 만들어 그 인덱스를 고치고 compile --root 를 돌려 종료 코드와 출력의 절 제목을 본다. 원본 저장소의 파일은 건드리지 않는다. ③ 비차단 지적 — _check_c3 가 받은 하네스 경로를 probe_skill_files 에 넘기지 않아 부착 대상에서 스킬 이름 중복 검사가 생략됐다. hr 을 넘기도록 고쳤다. 그 자리를 겨누는 검사는 이 단위의 AC 밖이라 새로 만들지 않았다 — 같은 분리의 나머지 자리들과 함께 c3 커버리지는 발견으로 남긴다(§12). 앞 세 회차 중 1·2회차는 완료 정의 쪽(AC 달성 불가능·변경 범위 누락), 3회차는 산출물 쪽이었다. §10 브레이크가 연속 2회·3회에서 각각 작동해 재검토를 요구했고 세 번 다 결론을 기록했다. 회귀 0(check-4, 1093 tests OK)."
+}

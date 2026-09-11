@@ -393,18 +393,22 @@ def render_notices(root=None):
     return "\n".join(out).rstrip() + "\n"
 
 
-def write_notices(root=None):
+def write_notices(root=None, harness_root=None):
+    """고지는 **하네스의 `imports.yaml`** 에서 만들고 **대상**에 쓴다 — 대상에는 provenance 가 없다."""
     root = Path(root) if root else _project_root()
-    text = render_notices(root)
+    text = render_notices(Path(harness_root) if harness_root else root)
     (root / NOTICES_PATH).write_text(text, encoding="utf-8")
     return text
 
 
-def check_notices(root=None):
-    """디스크의 THIRD_PARTY_NOTICES.md 가 imports.yaml 과 일치하는지."""
+def check_notices(root=None, harness_root=None):
+    """디스크의 THIRD_PARTY_NOTICES.md 가 imports.yaml 과 일치하는지.
+
+    기대값은 **하네스의** `imports.yaml` 에서 만들고, 대조 대상 파일은 `root` 에 있다.
+    """
     root = Path(root) if root else _project_root()
     path = root / NOTICES_PATH
-    expected = render_notices(root)
+    expected = render_notices(Path(harness_root) if harness_root else root)
     if not path.exists():
         return [("NOTICES_MISSING", NOTICES_PATH, "", "생성되지 않았다")]
     if path.read_text(encoding="utf-8") != expected:

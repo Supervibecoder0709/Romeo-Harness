@@ -26,8 +26,9 @@ from romeo.attach import PLACE_HEADING, present as _present, required_paths
 
 RUNBOOK = HARNESS_ROOT / "scenarios/10-attach-payload.md"
 
-#: 런북이 「놓는 것」 절에서 손으로 복사하라고 적는 소스 트리. 부착의 입력이다.
-SOURCE_TREE = ["core/", "adapters/", "vendor/", "provenance/", "skills/repo-archive/", ".harness/bindings.yaml"]
+#: 부착은 소스를 복제하지 않는다 — `compile` 이 하네스에서 읽고 산출물만 대상에 쓴다(Q-54).
+#: 이 자리는 비어 있는 것이 정본이다. 무엇이 놓이는지는 런북의 「놓는 것」 절이 소유한다.
+SOURCE_TREE = []
 
 
 def check(root, paths):
@@ -42,15 +43,8 @@ def _romeo(*args, root):
 
 
 def attach(root: Path):
-    """런북의 「놓는 것」 순서를 그대로 밟는다 — 소스 트리 여섯 → compile → notices."""
+    """런북의 「놓는 것」 순서를 그대로 밟는다 — compile → notices. 복사하는 것은 없다."""
     root.mkdir(parents=True, exist_ok=True)
-    for rel in SOURCE_TREE:
-        src, dst = HARNESS_ROOT / rel.rstrip("/"), root / rel.rstrip("/")
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        if src.is_dir():
-            shutil.copytree(src, dst)
-        else:
-            shutil.copy2(src, dst)
     for cmd in (("compile",), ("notices",)):
         r = _romeo(*cmd, root=root)
         if r.returncode != 0:
@@ -149,24 +143,24 @@ class TestTheListIsWhatIsCompared(unittest.TestCase):
         return fake
 
     def test_removing_an_item_removes_the_requirement(self):
-        """`vendor/` 를 목록에서 빼면, vendor 가 없는 루트가 **통과한다** — 건너뛰는 것이 아니라 요구가 사라진다."""
-        line = "- `vendor/` "
-        mutated = required_paths(self._runbook_with(line, "그 줄을 지운다 — "))
-        self.assertNotIn("vendor/", mutated)
+        """`.agents/skills/` 를 목록에서 빼면, 그것이 없는 루트가 **통과한다** — 건너뛰는 것이 아니라 요구가 사라진다."""
+        rel = ".agents/skills/"
+        mutated = required_paths(self._runbook_with(f"- `{rel}` ", "그 줄을 지운다 — "))
+        self.assertNotIn(rel, mutated)
         self.assertEqual(len(mutated), len(self.paths) - 1)
 
         with tempfile.TemporaryDirectory() as td:
-            root = Path(td) / "no-vendor"
-            shutil.copytree(self.attached, root)
-            shutil.rmtree(root / "vendor")
-            self.assertEqual(check(root, self.paths), ["vendor/"], "원래 목록이 vendor 부재를 잡지 못했다")
-            self.assertEqual(check(root, mutated), [], "바뀐 목록이 여전히 vendor 를 요구한다")
+            root = Path(td) / "no-agents-skills"
+            shutil.copytree(self.attached, root, symlinks=True)
+            shutil.rmtree(root / rel.rstrip("/"))
+            self.assertEqual(check(root, self.paths), [rel], f"원래 목록이 {rel} 부재를 잡지 못했다")
+            self.assertEqual(check(root, mutated), [], f"바뀐 목록이 여전히 {rel} 를 요구한다")
 
     def test_adding_a_plausible_false_item_blocks(self):
         """그럴듯한 거짓 값 — 형태는 하네스 경로인데 존재하지 않는 항목을 더하면 부착된 루트가 막힌다."""
         fake_path = "core/principles/ATTACH.core.md"
         mutated = required_paths(
-            self._runbook_with("- `.harness/bindings.yaml` ", f"- `{fake_path}` — 그럴듯한 거짓 값\n- `.harness/bindings.yaml` "))
+            self._runbook_with("- `THIRD_PARTY_NOTICES.md` ", f"- `{fake_path}` — 그럴듯한 거짓 값\n- `THIRD_PARTY_NOTICES.md` "))
         self.assertIn(fake_path, mutated)
         self.assertEqual(check(self.attached, self.paths), [], "부착된 루트가 원래 목록에서 막혔다")
         self.assertEqual(check(self.attached, mutated), [fake_path],

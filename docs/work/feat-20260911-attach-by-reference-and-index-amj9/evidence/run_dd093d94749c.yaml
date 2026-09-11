@@ -1,0 +1,305 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_dd093d94749c
+task_id: null
+dispatch_id: null
+unit_id: feat-20260911-attach-by-reference-and-index-amj9
+spec_ref:
+  path: docs/work/feat-20260911-attach-by-reference-and-index-amj9/spec.md
+  sha256: 32609bbc7f2a1b03bed9cfe81d61a7737cd5a7ac078a165d421d310b1100f485
+base_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/m5-m2-attach-reference
+started_at: '2026-09-11T12:17:58+09:00'
+finished_at: '2026-09-11T12:27:42+09:00'
+commands:
+- id: check-1
+  command: python3 -m unittest tests.test_attach_reference -v
+  exit_code: 0
+  started_at: '2026-09-11T12:17:58+09:00'
+  finished_at: '2026-09-11T12:18:06+09:00'
+  seconds: 8.146
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/01-check-1.log
+  log_sha256: 69950d52631acf6fd691c5481ad54e6a11327f8288be9a1348d94c084cfb9aa9
+  stdout_tail: ''
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: check-2
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-11T12:18:06+09:00'
+  finished_at: '2026-09-11T12:18:07+09:00'
+  seconds: 0.946
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/02-check-2.log
+  log_sha256: 854b12b79c8b4d4c06a5b743224db83aca9881144c635b2b9a36ac9f106be82b
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: check-3
+  command: python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest -v
+  exit_code: 0
+  started_at: '2026-09-11T12:18:07+09:00'
+  finished_at: '2026-09-11T12:18:27+09:00'
+  seconds: 19.37
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/03-check-3.log
+  log_sha256: cd1a6550d48a6a0eeda53e731927808221e072f5c514214a46a8ee519b895f39
+  stdout_tail: ''
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: check-4
+  command: python3 -m unittest discover -s tests
+  exit_code: 0
+  started_at: '2026-09-11T12:18:27+09:00'
+  finished_at: '2026-09-11T12:25:09+09:00'
+  seconds: 402.274
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/04-check-4.log
+  log_sha256: 12d28fbe065a4a9da5d895281e9e33a027cbcc5b1c1b40885dbf22060209cec8
+  stdout_tail: ''
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: check-5
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-11T12:25:09+09:00'
+  finished_at: '2026-09-11T12:25:10+09:00'
+  seconds: 0.343
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/05-check-5.log
+  log_sha256: cdad700ad11aa37042e10ab062577a7afe1702d0988802876ab12f8db37bb683
+  stdout_tail: compile 검사 PASS
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: check-6
+  command: bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9
+  exit_code: 0
+  started_at: '2026-09-11T12:25:10+09:00'
+  finished_at: '2026-09-11T12:25:10+09:00'
+  seconds: 0.156
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/06-check-6.log
+  log_sha256: 7fd1ba3ca6b8b7fa296aecb981047ac367bf7f90fafe983326762d3eaec82429
+  stdout_tail: '[PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/brief.md lines=70 needs_input=0
+    unchecked_ac=0
+
+    [PASS] docs/work/feat-20260911-attach-by-reference-and-index-amj9/spec.md lines=137 needs_input=0
+    unchecked_ac=0'
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260911-attach-by-reference-and-index-amj9'
+  exit_code: 0
+  started_at: '2026-09-11T12:25:35+09:00'
+  finished_at: '2026-09-11T12:25:35+09:00'
+  seconds: 0.037
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/07-review-tree-before.log
+  log_sha256: 1351503843ab713853387209a777f804425a85d9e830fd671aac667f9d9d94b1
+  stdout_tail: "M AGENTS.md\n M CLAUDE.md\n M core/principles/PROJECT.core.md\n M romeo/cli.py\n M romeo/compile.py\n\
+    \ M romeo/doctor.py\n M romeo/provenance.py\n M scenarios/10-attach-payload.md\n M tests/test_attach_manifest.py\n\
+    \ A tests/test_attach_reference.py\n M tests/test_attach_runbook.py"
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260911-attach-by-reference-and-index-amj9'
+  exit_code: 0
+  started_at: '2026-09-11T12:27:30+09:00'
+  finished_at: '2026-09-11T12:27:30+09:00'
+  seconds: 0.038
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/08-review-tree-after.log
+  log_sha256: 1351503843ab713853387209a777f804425a85d9e830fd671aac667f9d9d94b1
+  stdout_tail: "M AGENTS.md\n M CLAUDE.md\n M core/principles/PROJECT.core.md\n M romeo/cli.py\n M romeo/compile.py\n\
+    \ M romeo/doctor.py\n M romeo/provenance.py\n M scenarios/10-attach-payload.md\n M tests/test_attach_manifest.py\n\
+    \ A tests/test_attach_reference.py\n M tests/test_attach_runbook.py"
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260911-attach-by-reference-and-index-amj9/review/run_dd093d94749c-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-11T12:27:42+09:00'
+  finished_at: '2026-09-11T12:27:42+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260911-attach-by-reference-and-index-amj9/run_dd093d94749c/09-review-record.log
+  log_sha256: 57d3cf3b5953d1454b0158e8c514d89d272ae62a11fbb5aeddc1cf17747e6e38
+  stdout_tail: 5e6740fd5b549994db96e913656d1e36873c82cd370e1c85dfbabaabfe77e37d  docs/work/feat-20260911-attach-by-reference-and-index-amj9/review/run_dd093d94749c-reviewer.json
+  head_sha: ec14953d2ec2fe5ee6a57ba44b301c2dac53eb05
+  dirty_tree_hash: fec1e88df2ac95634c503c4bb6ca0dc7e9ab99054a6e6f94b6d43d5f2a162d4f
+changed_files:
+- AGENTS.md
+- CLAUDE.md
+- core/principles/PROJECT.core.md
+- romeo/cli.py
+- romeo/compile.py
+- romeo/doctor.py
+- romeo/provenance.py
+- scenarios/10-attach-payload.md
+- tests/test_attach_manifest.py
+- tests/test_attach_reference.py
+- tests/test_attach_runbook.py
+artifact_hash: fcc06824f8faa51857db0d2a0907fb6fb1c49cf8f17b7d5257969b0722db2ea3
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-11T12:46:44+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-11T12:06:04+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 ec14953d2ec2 의 하네스 (491개 파일 대조 · /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-mvp-planning/36b1f561-0f8f-495c-bc1b-a189846ed2a9/scratchpad/judge2)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_dd093d94749c — 검증 계획 6건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/3건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence ec14953d2ec2 vs 현재 ec14953d2ec2
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence fec1e88df2ac vs 현재 fec1e88df2ac (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_attach_reference -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 9건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 8건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 6건이 승인 커밋 ec14953d2ec2 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_attach_reference -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_attach_runbook tests.test_attach_manifest
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest discover -s tests'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — bin/romeo validate docs/work/feat-20260911-attach-by-reference-and-index-amj9'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 ec14953d2ec2 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['AGENTS.md', 'CLAUDE.md', 'core/principles/PROJECT.core.md', 'romeo/cli.py',
+      'romeo/compile.py', 'romeo/doctor.py', 'romeo/provenance.py', 'scenarios/10-attach-payload.md',
+      'tests/test_attach_manifest.py', 'tests/test_attach_reference.py', 'tests/test_attach_runbook.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_7e8bca687146-reviewer.json: FAIL(findings 3건 — 첫째: AC-1의 파일 집합 일치를 뒷받침하는 검사가 단방향이다. 이
+      검사는 실제 파일 중 outputs 밖의 항목) — 다른 산출물(ec14953+910609d010a5)을 본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 ec14953+fec1e88df2ac
+      이다(검사 기록 run 의 head_sha+dirty_tree_hash, D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_dd093d94749c-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

@@ -4,7 +4,7 @@
 ---
 schema_version: 1
 romeo_version: 0.1.0
-harness_revision: f72f2e5fba04292b4cf379eece011aef240e3b3c
+harness_revision: 1fa91a96b74d594e41f34f13ef25556783008d3e
 outputs:
 - .agents/skills/finishing-a-development-branch
 - .agents/skills/implement/SKILL.md

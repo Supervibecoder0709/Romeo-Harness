@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from . import __version__
+from . import __version__, HARNESS_ROOT
 from .util import load_any, dump_yaml, project_root as _project_root
 
 MANAGED_START = "<!-- romeo:managed start"
@@ -238,16 +238,69 @@ def _render_permission_ceiling(adapter, bindings):
     return lines
 
 
-def _render_instructions(root, adapter, bindings, roles):
+#: 인덱스 절의 투영 범위 표식. **이 값 목록이 닫힌 목록이다** — 그 밖의 값은 거부한다.
+SCOPE_MARK = re.compile(r"^<!--\s*romeo:scope\s+(\S+)\s*-->\s*$")
+SCOPE_VALUES = ("all", "harness-only")
+
+
+def split_index_sections(text):
+    """인덱스 본문을 절로 가른다 — 첫 `## ` 앞은 「앞머리」, 그 뒤는 `## ` 줄마다 하나씩.
+
+    돌려주는 것은 `[(제목, 범위, 줄 목록), …]` 이다. 표식이 없거나, 닫힌 목록 밖의 값이거나,
+    한 절에 두 줄이 있으면 `CompileError` 를 낸다 — **표식을 잊은 절이 조용히 새지 않는다.**
+    범위를 코드에 적지 않고 문서에서 읽는 이유는, 적는 자리와 보는 자리가 갈리면 어느 쪽이 요구인지
+    말할 수 없게 되기 때문이다(AGENTS.core §11).
+    """
+    sections, title, buf, marks = [], "앞머리", [], []
+
+    def close():
+        if len(marks) > 1:
+            raise CompileError(f"PROJECT.core.md 의 절 '{title}': romeo:scope 표식이 {len(marks)}줄이다 — 한 줄만 둔다")
+        if not marks:
+            raise CompileError(f"PROJECT.core.md 의 절 '{title}': romeo:scope 표식이 없다 — "
+                               f"{' 또는 '.join(SCOPE_VALUES)} 중 하나를 적는다")
+        if marks[0] not in SCOPE_VALUES:
+            raise CompileError(f"PROJECT.core.md 의 절 '{title}': romeo:scope 값 '{marks[0]}' 은 "
+                               f"닫힌 목록 {list(SCOPE_VALUES)} 에 없다")
+        sections.append((title, marks[0], buf))
+
+    for ln in text.splitlines():
+        m = SCOPE_MARK.match(ln)
+        if m:
+            # 표식 줄은 **산출물에 그대로 남는다** — 그 절이 어느 범위인지 지침을 읽는 사람도 알아야 하고,
+            # 「인덱스 원본이 블록에 그대로 들어간다」는 기존 계약(체크리스트 32)도 그렇게 지켜진다.
+            marks.append(m.group(1))
+            buf.append(ln)
+            continue
+        if ln.startswith("## "):
+            close()
+            title, buf, marks = ln[3:].strip(), [ln], []
+            continue
+        buf.append(ln)
+    close()
+    return sections
+
+
+def _render_instructions(root, adapter, bindings, roles, target_root=None):
     """지침 파일 managed block 본문 — 프로젝트 인덱스·원칙·역할 계약은 두 런타임이 같은 것을 받고,
     강제 수단과 권한 상한은 그 런타임의 것만 인쇄한다.
 
     인덱스를 이 블록에 넣는 이유: 마커 밖에 손으로 유지하면 한쪽 런타임만 그것을 보는 상태가 만들어지고,
-    그 어긋남을 검사하는 게이트가 없다. 같은 것을 보지 않는 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다."""
+    그 어긋남을 검사하는 게이트가 없다. 같은 것을 보지 않는 두 실행의 판정이 같다는 것은 동등성의 증거가 아니다.
+
+    **`target_root` 가 `root` 와 다르면 부착이다.** 그때 인덱스는 `romeo:scope all` 절만 투영한다 —
+    나머지 절은 이 저장소의 경로를 가리키므로, 그대로 보내면 대상에 없는 파일을 읽으라고 지시하게 된다(Q-60).
+    행동 규범(`AGENTS.core.md`)은 가르지 않는다 — 전부 모든 저장소에 간다.
+    """
     index_src = root / "core/principles/PROJECT.core.md"
     core = root / "core/principles/AGENTS.core.md"
-    _, index = _strip_frontmatter(index_src.read_text(encoding="utf-8"))
+    _, index_text = _strip_frontmatter(index_src.read_text(encoding="utf-8"))
     _, principles = _strip_frontmatter(core.read_text(encoding="utf-8"))
+
+    sections = split_index_sections(index_text)
+    attaching = target_root is not None and Path(target_root).resolve() != Path(root).resolve()
+    kept = [s for s in sections if s[1] == "all"] if attaching else sections
+    index = "\n".join("\n".join(lines) for _title, _scope, lines in kept)
 
     lines = ["# Romeo 하네스 규칙 (자동 생성)", "",
              "원본은 `core/principles/PROJECT.core.md`(이 저장소의 인덱스)와 "
@@ -408,13 +461,21 @@ def _output_rel(root: Path, target, what: str) -> str:
     return str(raw)
 
 
-def plan_outputs(root):
-    """(파일 산출물 dict{path: text}, 트리 산출물 list[(src, dst)]) 를 계산한다. 쓰지는 않는다."""
+def plan_outputs(root, harness_root=None):
+    """(파일 산출물 dict{path: text}, 트리 산출물 list[(src, dst)]) 를 계산한다. 쓰지는 않는다.
+
+    **읽는 곳과 쓰는 곳은 다르다.** 소스(`core/`·`adapters/`·`vendor/`·`provenance/`·`skills/`·
+    `.harness/bindings.yaml`)는 `harness_root` 에서 읽고, 산출물 경로만 `root` 아래로 만든다.
+    그래서 부착 대상에 하네스 소스를 복제하지 않는다 — 사본이 없으면 낡을 것도 없다.
+    **`harness_root` 를 생략하면 `root` 와 같다** — 읽는 곳과 쓰는 곳을 나누는 것은 부르는 쪽의 결정이고,
+    기본값이 그것을 몰래 정하지 않는다. CLI 는 `--root` 가 주어진 실행에서만 하네스를 넘긴다.
+    """
     root = Path(root)
-    bindings = load_any(root / ".harness/bindings.yaml") if (root / ".harness/bindings.yaml").exists() else {}
-    roles = load_roles(root)
+    hr = Path(harness_root) if harness_root else root
+    bindings = load_any(hr / ".harness/bindings.yaml") if (hr / ".harness/bindings.yaml").exists() else {}
+    roles = load_roles(hr)
     files, trees = {}, []
-    for adapter in load_adapters(root):
+    for adapter in load_adapters(hr):
         instructions_file = _output_rel(
             root, adapter["instructions_file"], f"{adapter['id']}.instructions_file")
         skills_dir = _output_rel(root, adapter["skills_dir"], f"{adapter['id']}.skills_dir")
@@ -422,7 +483,7 @@ def plan_outputs(root):
         if adapter.get("settings_file"):
             settings_file = _output_rel(
                 root, adapter["settings_file"], f"{adapter['id']}.settings_file")
-        files[instructions_file] = ("managed", _render_instructions(root, adapter, bindings, roles),
+        files[instructions_file] = ("managed", _render_instructions(hr, adapter, bindings, roles, target_root=root),
                                     "core/principles/{PROJECT,AGENTS}.core.md")
         if settings_file and (adapter.get("settings_deny") or adapter.get("settings_ask")):
             files[settings_file] = ("settings", _owned_settings(adapter), None)
@@ -441,14 +502,14 @@ def plan_outputs(root):
         for name, cfg in (adapter.get("workflows") or {}).items():
             rel = _output_rel(root, f"{skills_dir}/{name}/SKILL.md",
                               f"{adapter['id']}.workflows.{name}")
-            files[rel] = ("full", _render_skill(root, adapter, name, cfg), None)
+            files[rel] = ("full", _render_skill(hr, adapter, name, cfg), None)
         if adapter.get("project_vendor_skills"):
-            for sname, src in accepted_vendor_skills(root):
+            for sname, src in accepted_vendor_skills(hr):
                 rel = _output_rel(root, f"{skills_dir}/{sname}",
                                   f"{adapter['id']}.project_vendor_skills")
                 trees.append((src, root / rel))
         for local in (adapter.get("local_skills") or []):
-            src = _inside(root, local["source"], f"{adapter['id']}.local_skills.source")
+            src = _inside(hr, local["source"], f"{adapter['id']}.local_skills.source")
             rel = _output_rel(root, f"{skills_dir}/{local['name']}",
                               f"{adapter['id']}.local_skills.name")
             trees.append((src, root / rel))
@@ -553,9 +614,9 @@ def _state_bytes(written):
     return text.encode("utf-8")
 
 
-def _prepare_compile(root: Path, prune: bool):
+def _prepare_compile(root: Path, prune: bool, harness_root=None):
     """모든 입력·경로를 읽고 검증해 메모리 계획으로 만든다. 출력은 쓰지 않는다."""
-    files, trees = plan_outputs(root)
+    files, trees = plan_outputs(root, harness_root)
     tree_rels = [str(dst.relative_to(root)) for _src, dst in trees]
     if len(tree_rels) != len(set(tree_rels)):
         raise CompileError("같은 skill destination 이 두 번 계획됐다")
@@ -742,11 +803,11 @@ def _commit_stage(root: Path, plan, stage: Path):
         raise CompileError(f"compile 반영 실패; 원래 상태로 rollback 했다: {exc}") from exc
 
 
-def compile_all(root=None, prune=True):
+def compile_all(root=None, prune=True, harness_root=None):
     """완성본을 staging 한 뒤 원자 교체한다. 실패하면 모든 기존 산출물을 복구한다."""
     root = Path(root) if root else _project_root()
     try:
-        plan = _prepare_compile(root, prune)
+        plan = _prepare_compile(root, prune, harness_root)
     except CompileError:
         raise
     except Exception as exc:
@@ -768,11 +829,11 @@ def compile_all(root=None, prune=True):
     return plan["written"]
 
 
-def check_compiled(root=None):
+def check_compiled(root=None, harness_root=None):
     """산출물이 현재 코어와 일치하는지. 마커 밖 사용자 텍스트는 보지 않는다."""
     root = Path(root) if root else _project_root()
     findings = []
-    files, trees = plan_outputs(root)
+    files, trees = plan_outputs(root, harness_root)
 
     for rel, (mode, content, source) in sorted(files.items()):
         path = root / rel
