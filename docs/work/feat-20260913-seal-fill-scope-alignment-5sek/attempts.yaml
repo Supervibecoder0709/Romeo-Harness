@@ -1,0 +1,22 @@
+schema: romeo/attempts@0.1.0
+unit_id: feat-20260913-seal-fill-scope-alignment-5sek
+attempts:
+- n: 1
+  run: run_359d5c2dbcb6
+  base_sha: 9d1c4f7672089e4efc7726a94679d256661f0b6d
+  started_at: '2026-09-13T01:51:16+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL(AC_UNMET) — AC-5: scope_root 가 목록·객체면 SCOPE_ROOTS(set) 비교에서 unhashable type TypeError
+    로 doctor 가 중단돼 fixture id 를 말하지 못한다. 실측 재현 확인'
+  settled_at: '2026-09-13T02:31:46+09:00'
+- n: 2
+  run: run_4474b6ab9169
+  base_sha: 9d1c4f7672089e4efc7726a94679d256661f0b6d
+  started_at: '2026-09-13T02:31:58+09:00'
+  result: started
+  failure_class: null
+  note: null
+  settled_at: null
+reviews: []
+reviewer_runs: []
