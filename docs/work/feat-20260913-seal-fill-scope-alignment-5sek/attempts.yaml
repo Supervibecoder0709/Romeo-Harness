@@ -12,11 +12,22 @@ attempts:
   settled_at: '2026-09-13T02:31:46+09:00'
 - n: 2
   run: run_4474b6ab9169
-  base_sha: 9d1c4f7672089e4efc7726a94679d256661f0b6d
+  base_sha: 89f281cc904151a382387a2d6c8f0b328b6054b9
   started_at: '2026-09-13T02:31:58+09:00'
-  result: started
-  failure_class: null
-  note: null
-  settled_at: null
-reviews: []
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL(AC_UNMET) — c6 가 scope_root: target 을 선언했지만 _check_c6 는 root 를 쓰지 않고 imports·정책표를 모두
+    harness_root 에서 읽는다. 선언이 거짓이다'
+  settled_at: '2026-09-13T02:48:14+09:00'
+  base_sha_history:
+  - 9d1c4f7672089e4efc7726a94679d256661f0b6d
+reviews:
+- after_attempt: 2
+  conclusion: '완료 정의는 달성 가능하다 — 다만 AC-5 가 절반만 말하고 있었다. 전수 조사: 충돌 fixture 7개 중 선언과 실제가 어긋난 것은 c6 하나뿐이다(c1·c2·c3·c4·c5
+    는 root 를 실제로 쓰고 target 선언이 참, c7 은 harness 선언이 참). c6 는 정책표(core/policy/packages.yaml)와 출처(provenance/imports.yaml)를
+    둘 다 harness_root 에서 읽으므로 실제로 하네스 자기검사이고, 부착 대상에는 그 두 파일이 없다 — 선언을 harness 로 바꾸는 것이 사실에 맞다. 회차 2번을
+    태운 원인은 산출물이 아니라 완료 정의의 모호함이다(1회차 반박에서 나온 「선언과 실제 실행의 일치를 요구하지 않는다」를 절반만 반영했다). 그래서 3회차 전에 AC-5 를 재승인해
+    「그 선언은 참이다」를 행동으로 판별 가능한 명제로 명시하고 check-11 을 더했다. 사용자 확정 2026-09-13.'
+  by: Supervibecoder0709
+  at: '2026-09-13T12:59:24+09:00'
 reviewer_runs: []

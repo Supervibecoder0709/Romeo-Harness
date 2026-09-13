@@ -11,7 +11,7 @@ profile: standard
 blast_radius: small
 uncertainty: medium
 status: active
-approved_at: '2026-09-13T01:49:18+09:00'
+approved_at: '2026-09-13T12:59:14+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
 closed_at: null
@@ -24,6 +24,12 @@ routing:
   history: []
 created: '2026-09-13'
 updated: '2026-09-13'
+approval_history:
+- {approved_at: '2026-09-13T01:49:18+09:00', approved_by: Supervibecoder0709, superseded_at: '2026-09-13T12:59:14+09:00',
+  reason: 'AC-5 가 절반만 말했다 — 「선언이 정한 루트를 넘긴다」까지만 요구해 선언 자체가 참인지는 아무도 보지 않았다. 2회차 검토자가 scope_root: target
+    을 선언한 c6 의 검사가 실제로는 정책표·출처를 둘 다 harness_root 에서 읽는 것을 잡았다(실측 재현 확인). AC-5 에 「그 선언은 참이다」를 행동으로 판별 가능한
+    명제로 더하고(target 은 대상 내용에 따라 판정이 달라지고 harness 는 달라지지 않는다) 그것을 보는 check-11 을 추가한다. AC 체크박스는 전부 비워 구현자가
+    증거와 함께 채우게 한다 — 승인 전에 채워 두면 close 의 체크박스 검사가 아무것도 확인하지 않는다'}
 ---
 
 # 요구하는 자리에서 본다 — 봉인·채움·검사 범위의 세 자리
@@ -44,21 +50,22 @@ updated: '2026-09-13'
   검토자 브리프의 `base_sha` 는 손으로 옮겨 적을 값이 아니라 계약 파일에서 읽는 값이 되며,
   충돌 fixture 는 자기가 어느 저장소를 검사하는지 스스로 말한다.
 - **수용 기준:**
-  - [x] AC-1 검토 run 의 증거에 종료 검사가 판정에 쓰는 방어 검사 기록이 빠져 있으면, `romeo review record` 가
+  - [ ] AC-1 검토 run 의 증거에 종료 검사가 판정에 쓰는 방어 검사 기록이 빠져 있으면, `romeo review record` 가
         **빠진 라벨을 모두** 이름으로 말하는 경고를 인쇄한다. 봉인은 그대로 이뤄지고, 그 명령의 종료 코드는
         같은 봉투를 방어 검사가 전부 있는 run 에 기록했을 때와 같다.
-  - [x] AC-2 종료 검사가 판정에 쓰는 방어 검사 라벨 목록의 **정의가 저장소에 하나뿐**이고, AC-1 의 경고는 그 정의를 읽는다 —
+  - [ ] AC-2 종료 검사가 판정에 쓰는 방어 검사 라벨 목록의 **정의가 저장소에 하나뿐**이고, AC-1 의 경고는 그 정의를 읽는다 —
         그 한 자리의 라벨 이름을 바꾸면 경고가 말하는 이름도 함께 바뀐다.
-  - [x] AC-3 `fill_brief.py` 는 검토자 계약 파일의 **경로**를 받고, 채워진 브리프의 `base_sha` 는 그 JSON 의 값이며
+  - [ ] AC-3 `fill_brief.py` 는 검토자 계약 파일의 **경로**를 받고, 채워진 브리프의 `base_sha` 는 그 JSON 의 값이며
         계약 sha256 은 **그 파일의 바이트에서 계산한** 값이다 — 계약 파일의 `base_sha` 를 바꾸면 브리프의 `base_sha` 가 바뀌고,
         그 파일의 내용을 바꾸면 브리프의 sha256 이 바뀐다. 그 두 값을 따로 넘기는 인자는 이 스크립트에 없다.
-  - [x] AC-4 없어진 인자 이름을 넘기는 호출은 **어디서 오든** `fill_brief.py` 가 0 이 아닌 종료 코드로 거부한다 —
+  - [ ] AC-4 없어진 인자 이름을 넘기는 호출은 **어디서 오든** `fill_brief.py` 가 0 이 아닌 종료 코드로 거부한다 —
         그래서 문자열 검색에서 빠지는 간접 호출도 실행 시점에 드러난다. 그리고 이 저장소에서 그 스크립트를 **지시하는**
         자리 — 실행 명령(런북 §3.7 · `romeo/run_unit.py`)과 그 명령을 설명하는 산문 — 에 없어진 인자 이름이 남아 있지 않다.
-  - [x] AC-5 충돌 fixture 는 자기 검사 대상 저장소를 **허용된 값으로** 선언하고, `check_conflicts` 는
-        **그 선언이 정한 루트**를 그 fixture 의 검사에 넘긴다. 선언이 없거나 허용 목록 밖의 값인 fixture 가 있으면
-        `doctor` 가 그 fixture 의 id 를 말하며 문제를 낸다.
-  - [x] AC-6 c7 은 하네스를 선언하므로 대상 루트에 `core/` 가 **있든 없든** 하네스의 코어를 검사한다 —
+  - [ ] AC-5 충돌 fixture 는 자기 검사 대상 저장소를 **허용된 값으로** 선언하고, `check_conflicts` 는
+        **그 선언이 정한 루트**를 그 fixture 의 검사에 넘긴다. **그리고 그 선언은 참이다** — `target` 을 선언한
+        fixture 의 판정은 대상 저장소의 내용에 따라 달라지고, `harness` 를 선언한 fixture 의 판정은 대상이 무엇이든
+        달라지지 않는다. 선언이 없거나 허용 목록 밖의 값이면 `doctor` 가 그 fixture 의 id 를 말하며 문제를 낸다.
+  - [ ] AC-6 c7 은 하네스를 선언하므로 대상 루트에 `core/` 가 **있든 없든** 하네스의 코어를 검사한다 —
         하네스 코어에만 금지 패턴을 심으면 c7 의 findings 가 **그 파일의 경로**를 가리키고,
         대상 코어에만 심으면 c7 의 findings 가 나오지 않는다.
 - **위험과 되돌리기:** ① AC-1 의 경고를 차단으로 잘못 만들면 이 명령이 없던 시절의 봉투를 되살릴 길이 막힌다 — 그래서 종료 코드를 바꾸지 않는 것을 AC-1 이 직접 요구한다(K-31). ② `fill_brief.py` 의 인자를 바꾸면 그것을 부르는 자리가 함께 바뀌어야 하고, 하나라도 놓치면 다음 관통의 검토자 기동이 그 자리에서 멈춘다 — 그래서 AC-4 가 **스크립트 쪽에서** 거부하게 해 검색에 의존하지 않는다. 되돌리기: 세 변경 다 이 저장소 안의 로컬 커밋이라 `git revert <통합 커밋>` 하나로 끝나고, 외부 저장소·운영 데이터·권한 경계를 건드리지 않는다.
@@ -71,9 +78,7 @@ updated: '2026-09-13'
 - 바뀌는 파일·모듈: `romeo/evidence.py` (봉인 전 경고) · `romeo/cli.py` (경고 출력 자리) · `romeo/close.py` (방어 검사 라벨 목록을 공용으로) ·
   `romeo/doctor.py` (fixture 선언을 읽어 검사 루트를 고른다) · `romeo/run_unit.py` (검토자 브리프 명령 문자열) ·
   `adapters/orca/prompts/fill_brief.py` (계약 파일에서 읽는다) · `adapters/orca/RUNBOOK.md` (§3.7 호출 자리) ·
-  `fixtures/conflicts/` (검사 대상 저장소 선언) · `tests/` (판별 검사) ·
-  `docs/work/feat-20260913-seal-fill-scope-alignment-5sek/` (이 단위의 산출물) ·
-  `docs/planning/open-questions.md` (Q-103·Q-104·Q-105 의 상태)
+  `fixtures/conflicts/` (검사 대상 저장소 선언) · `tests/` (판별 검사) · `docs/work/feat-20260913-seal-fill-scope-alignment-5sek/` (이 단위의 산출물) · `docs/planning/open-questions.md` (Q-103·Q-104·Q-105 의 상태)
 - 영향을 받는 부분: 다음 관통의 검토자 위임 절차 — 브리프를 채우는 명령과 봉인하는 명령이 둘 다 바뀐다. 종료 검사(`romeo close`)의 `REVIEW_VERDICT` **판정 기준은 바뀌지 않는다** — 같은 것을 더 이른 자리에서 한 번 더 볼 뿐이다.
 - 바꾸지 않는 것(비범위): Q-105 ②(`_read_source_tree` 의 심링크 경계 — 지금 발동하지 않아 Q-105 에 열어 둔다) · M5 M2 둘째 단위의 내용(`romeo attach` · Q-58 · Q-59 · Q-106) · `docs/planning/progress.md`(통합 뒤 별도 커밋) · `review record` 를 차단으로 바꾸는 것 · 종료 검사의 판정 기준.
 
@@ -113,7 +118,7 @@ required_checks — `romeo close` 가 evidence 의 commands·exit_codes 와 대�
 그래서 `|| true` 를 붙이지 않는다 — 종료 코드를 항상 0 으로 만들어 위반을 통과시킨다.
 부정 조건은 `!` 로 쓴다: `! grep -q '<있으면 안 되는 것>' <파일>`.
 
-**판별 검사와 회귀 방지 검사를 구분한다(§11).** check-1 ~ check-6 은 **판별 검사**다 — 이 단위의 변경이 없으면 실패해야 하고, 승인 전에 현재 상태(실패)와 가상 완료 상태(성공) 양쪽에서 실행해 보인다. check-7 ~ check-10 은 **회귀 방지 검사**이고 양쪽 상태에서 통과가 예상되므로 그 양쪽 실측의 대상이 아니다.
+**판별 검사와 회귀 방지 검사를 구분한다(§11).** check-1 ~ check-6 과 check-11 은 **판별 검사**이고, check-7 ~ check-10 은 **회귀 방지 검사**라 양쪽 실측의 대상이 아니다. check-11 은 2026-09-13 재승인이 더한 것이다 — 2회차 검토자가 `scope_root: target` 을 선언한 c6 의 검사가 실제로는 하네스만 읽는 것을 잡았고, 선언의 **진실성**을 보는 자리가 없었다.
 
 **check-7 의 실측 시간은 410초**(2026-09-13 · 1093 tests · OK)이고 재실행 상한은 검사 한 건당 600초다(`romeo/evidence.py` 의 `RERUN_TIMEOUT`) — 상한의 68% 라 close 의 근접 경고(80%) 아래다.
 
@@ -139,6 +144,8 @@ required_checks:
     command: "bin/romeo compile --check"
   - id: check-10
     command: "bin/romeo doctor --strict --scope repository"
+  - id: check-11
+    command: "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads -v"
 ```
 
 ## 증거
