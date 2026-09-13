@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_42fb8669b085-reviewer.json",
+    "sha256": "0816e3ec7dcb954bb07a9ce841cb5e095656dbd4be43002fc39c722c9d2e972d"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-4 미달: 위임 명령을 설명하는 문장에 아직 '해시는 fill_brief.py --task-sha256 이 그 자리에서 계산한다'가 남아 있다. 삭제된 인자를 현재 사용법으로 안내하므로, 명령을 설명하는 산문에도 없어진 인자 이름이 남지 않아야 한다는 spec.md:61-63을 충족하지 않는다. check-4는 인자 거부와 두 실행 명령만 확인하고 설명문은 검사하지 않아 이 잔존에도 통과한다(tests/test_reviewer_brief.py:177-199). 해당 설명을 --task로 받은 계약 파일에서 계산하는 현재 동작에 맞춰야 한다.",
+      "file": "tests/test_run_unit.py",
+      "line": 484
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_42fb8669b085.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD는 지정값으로 일치한다. 승인본 대비 spec 변경은 체크 표시뿐이며 required_checks와 변경 경로의 허용 범위를 확인했다. AC-1은 check-1, AC-2는 check-2, AC-3은 check-3, AC-5는 check-5·check-11, AC-6은 check-6의 코드와 원시 로그로 뒷받침된다. 필수 검사 11건의 exit 0 기록과 동일한 head/tree 식별자를 확인했으나 AC-4의 설명문 요구는 미충족이다. 검사 재실행·해시 계산·파일 변경은 하지 않았다."
+}

@@ -510,6 +510,26 @@ def approval_log_state(project_root, approval, kind="approve"):
     return True, ""
 
 
+#: 봉인 직전 경고의 코드 이름 — cli 가 이 문자열로 이 경고를 식별한다(Q-103).
+DEFENSIVE_RECORDS_MISSING_WARNING = "DEFENSIVE_RECORDS_MISSING"
+
+
+def _warn_missing_defensive_records(project_root, unit_id, run_name):
+    """봉인 직전 — 이 run 의 증거에 종료 검사(close)가 판정에 쓰는 방어 검사 기록이 빠져 있으면 표준 오류에 경고한다.
+
+    아무것도 막지 않는다 — 이 함수는 raise 하지 않고, 부르는 쪽의 봉인(run_command)은 그대로 진행된다.
+    빠진 라벨을 **모두** 이름으로 말한다(AC-1). 라벨 목록은 `close.DEFENSIVE_LABELS` 를 호출 시점에 읽는다 —
+    값을 복사하면(`from .close import DEFENSIVE_LABELS`) 그 정의를 바꿔도 여기가 따라가지 않아 정의가 두 자리가 된다(AC-2)."""
+    from . import close  # 지연 import — close 가 evidence 를 모듈 최상단에서 import 하므로 순환을 피한다
+    _, rec = _open_record(project_root, unit_id, run_name)
+    have = {c.get("id") for c in (rec.get("commands") or []) if isinstance(c, dict)}
+    missing = [label for label in close.DEFENSIVE_LABELS if label not in have]
+    if missing:
+        print(f"{DEFENSIVE_RECORDS_MISSING_WARNING}: run {run_name} 의 증거에 방어 검사 기록이 없다 — "
+              f"{', '.join(missing)} (종료 검사가 검토 시점의 산출물을 판정할 때 읽는다, RUNBOOK §4). "
+              f"봉인은 그대로 진행한다", file=sys.stderr)
+
+
 def record_review_envelope(unit_id, run_name, source, project_root="."):
     """검토자의 출력(결과 계약 JSON)을 `docs/work/<id>/review/<run>-reviewer.json` 에 기록하고 **그 파일의 sha256 을 같은 run 의 증거에 남긴다.**
 
@@ -534,6 +554,7 @@ def record_review_envelope(unit_id, run_name, source, project_root="."):
     dest = rdir / f"{run_name}-reviewer.json"
     dest.write_text(json.dumps(env, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     rel_dest = rel(dest, project_root)
+    _warn_missing_defensive_records(project_root, unit_id, run_name)  # 봉인 전 — 경고만, 막지 않는다(AC-1)
     res = run_command(unit_id, f"shasum -a 256 {rel_dest}", run_name=run_name, label=REVIEW_RECORD_LABEL,
                       project_root=project_root)
     return {"path": str(dest), "sha256": sha256_file(dest), "evidence": res["evidence"], "command": res["command"]}

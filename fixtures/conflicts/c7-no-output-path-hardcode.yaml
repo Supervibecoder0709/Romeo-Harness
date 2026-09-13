@@ -11,6 +11,9 @@ id: c7-no-output-path-hardcode
 title: 코어에 부품 기본 출력 경로가 없다
 constraints: [K-62]
 kind: no_hardcoded_output_path
+# 이 fixture 가 검사하는 저장소(Q-105 ①) — **하네스 자신**이다. 코어는 우리가 쓰는 곳이므로
+# 대상(부착 프로젝트)에 core/ 가 있든 없든 언제나 하네스의 core/ 를 본다.
+scope_root: harness
 scope_dirs: [core]
 patterns:
   - "_bmad-output"

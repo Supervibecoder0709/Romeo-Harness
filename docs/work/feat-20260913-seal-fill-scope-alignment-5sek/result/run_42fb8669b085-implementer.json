@@ -1,0 +1,71 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_42fb8669b085-implementer.json",
+    "sha256": "41dc7c4424f10d878b1838060791a43515cd62cdd3f9b0511380c76476c3c8f3"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads -v",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_42fb8669b085.yaml",
+  "notes": "3회차 — 2회차(run_4474b6ab9169) 검토자 findings 1건(P2·AC-5·c6)과 재승인(cd7fce4)이 더한 AC-5 뒷문장·check-11 을 닫았다. 변경 3곳: ① fixtures/conflicts/c6-no-second-plan-origin.yaml 의 scope_root 를 target→harness 로(사실에 맞춤 — _check_c6·_recommend_pairs 는 정책표·출처를 둘 다 하네스에서 읽고 그 두 파일은 부착 대상에 없다; _check_c6 의 동작은 건드리지 않았다). ② tests/test_doctor.py 에 check-11 test_every_scope_declaration_matches_what_the_check_reads 와 kind 별 위반 심기(_VIOLATION_SEEDERS) 추가 — fixture 7개(있는 것 전부)를 돌아, 그 fixture 가 잡도록 설계된 위반을 대상에만·하네스에만 심어 판정을 비교한다: target 선언은 「대상에 심은 위반이 판정을 바꾼다」, harness 선언은 「대상이 깨끗하든·위반을 심었든·core/ 가 없든 판정이 같다」+「하네스에 심은 위반은 판정을 바꾼다(공허 통과 방지)」. 심는 법이 없는 kind 는 fixture id·kind 를 말하며 실패한다. ③ docs/planning/open-questions.md Q-105 행에 c6=harness 와 진실성 검사 한 줄. 양쪽 실측(§11): 같은 run 의 cmd-1 — c6 가 target 이던 트리(59f0eef2)에서 check-11 명령을 돌리면 exit 1, 실패 메시지가 c6-no-second-plan-origin 의 id 를 말한다(c1~c5 는 통과한 뒤). 고친 뒤 check-11 exit 0(트리 58a0672b). 판별력의 경계(보조 기록, 저장소 밖 임시 사본에서 실측 — 작업 트리 불변, 트리 해시 58a0672b 유지): cmd-13 c7 을 target 으로 뒤집으면 check-11 은 통과(0)한다 — _check_c7 은 받은 루트를 그대로 읽으므로 그 선언은 행동으로는 참이다; 그 뒤집기는 cmd-14 check-6 이 잡는다(exit 1, 「대상에 core/ 가 없어도 하네스 코어에 심은 패턴을 c7 이 찾아야 한다」). cmd-15 c1 을 harness 로 뒤집어도 check-11 은 통과(0)한다 — 같은 이유로 행동상 참인 선언이다. 즉 check-11 은 「선언과 실행이 같은 말을 하는가」(AC-5 의 문장 그대로)를 보고, 「어느 값을 선언해야 하는가」(설계 의도)는 보지 않는다 — 현재 checker 중 받은 루트를 무시하는 것은 _check_c6 뿐이라 거짓 선언이 가능한 자리는 c6:target 하나이고 그것이 cmd-1 이다. AC 체크박스 6개를 모두 [x] 로 채웠다(문장 불변): AC-1 check-1 · AC-2 check-2 · AC-3 check-3 · AC-4 check-4 · AC-5 check-5+check-11(+cmd-1 반례) · AC-6 check-6. 확인란 문장과 required_checks 명령 문자열은 고치지 않았다. 1·2회차가 통과시킨 AC-1~4·6 의 구현은 건드리지 않았다. check-7 은 414.4초(상한 600초의 69%, 근접 경고 80% 아래). 모든 기록의 head_sha 는 계약 base_sha(cd7fce4)와 같고, check-1~11 의 트리 해시는 1종(58a0672b)이다. 범위 밖 발견(고치지 않음): (a) check-11 의 위반 심기는 kind 가 pattern_requires_override 인 fixture 에 한해 하네스 bindings 에서 첫 패턴의 override 를 빼는 전제를 세 판정에 똑같이 깐다 — override 정본이 하네스라 대상만 바꿔서는 c1·c4 가 켜질 수 없기 때문이며, 이것은 c1·c4 의 판정이 대상 내용 「과」 하네스 override 에 함께 달려 있다는 뜻이다(AC-5 는 target 에 대해 「하네스에 달려 있지 않다」를 요구하지 않는다). 새 열린 질문으로 적을 만큼의 결함은 아니라 open-questions 에는 더하지 않았다."
+}

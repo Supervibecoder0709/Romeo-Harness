@@ -30,6 +30,15 @@ attempts:
   note: '검토자 FAIL(AC_UNMET) — AC-4: tests/test_run_unit.py:484 docstring 에 ''해시는 fill_brief.py --task-sha256
     이 그 자리에서 계산한다'' 가 남았다. 저장소 전수 확인 결과 진짜 위반은 이 한 줄이고 나머지 언급은 거부 검사·템플릿 자리표시자 이름·과거 기록이라 정당하다'
   settled_at: '2026-09-13T13:24:15+09:00'
+- n: 4
+  run: run_2104b3f7e55d
+  base_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  started_at: '2026-09-13T20:19:07+09:00'
+  result: pass
+  failure_class: null
+  note: 검토자 PASS · findings 1건은 비차단(Q-107 · reviewer-brief.md 머리말이 Q-104 이전 흐름을 말한다 · 생성된 브리프에서는 제거되는
+    부분)
+  settled_at: '2026-09-13T20:42:14+09:00'
 reviews:
 - after_attempt: 2
   conclusion: '완료 정의는 달성 가능하다 — 다만 AC-5 가 절반만 말하고 있었다. 전수 조사: 충돌 fixture 7개 중 선언과 실제가 어긋난 것은 c6 하나뿐이다(c1·c2·c3·c4·c5

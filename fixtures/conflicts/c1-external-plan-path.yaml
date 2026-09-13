@@ -8,6 +8,8 @@ id: c1-external-plan-path
 title: 부품이 가리키는 외부 계획 경로에는 흡수 규칙이 있어야 한다
 constraints: [K-61, K-62]
 kind: pattern_requires_override
+# 이 fixture 가 검사하는 저장소(Q-105 ①) — 부착 대상(부품 원문이 실제로 투영되는 자리)이다.
+scope_root: target
 scope: projected_skills
 patterns:
   - "docs/superpowers/plans"

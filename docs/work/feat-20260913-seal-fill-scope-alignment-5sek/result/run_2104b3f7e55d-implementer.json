@@ -1,0 +1,71 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_2104b3f7e55d-implementer.json",
+    "sha256": "be91a2ccc27f84a5ae8132eb11f52746a42c0fab079638becfd1e7ebe4a7ee8b"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    },
+    {
+      "id": "check-11",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads -v",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_2104b3f7e55d.yaml",
+  "notes": "4회차 — 3회차(run_42fb8669b085) 검토자 findings 1건(AC-4 · tests/test_run_unit.py:484)만 닫았다. AC-1·2·3·5·6 의 구현, _check_c6, 확인란 문장, required_checks 의 명령 id·문자열은 불변이다. 수정 ①: 484행 docstring 의 문장을 현재 동작으로 — 해시는 `fill_brief.py --task` 가 받은 검토자 계약 파일에서 그 자리에서 계산한다(Q-104). 수정 ②: check-4(tests/test_reviewer_brief.py 의 같은 메서드, 명령 문자열 불변)를 산문까지 넓혔다 — `_dead_instructions(REPO)` 가 빈 목록이어야 통과한다. 구별 규칙 셋을 검사 안에 두었다: (1) 인자 형태(앞의 하이픈 둘)로만 본다 → 정본 템플릿의 자리표시자 `<task-sha256>`·`<base-sha>` 는 대상이 아니다. (2) .py 는 docstring·주석만 산문이고 문자열 리터럴·호출은 검사 코드다 → tests/test_run_unit.py:563 과 tests/test_reviewer_brief.py:184·192·199 의 거부 검사·거부 호출은 대상이 아니다. (3) 스크립트 이름(fill_brief)이 있는 줄과 거기서 역슬래시로 이어진 줄만 지시하는 줄이다 → 같은 파일의 다른 줄에서 envelope build·run-unit 에 쓰는 `--base-sha` 는 대상이 아니다. 기록(docs/ — planning/archive·open-questions Q-40·Q-41·작업 단위 기록)과 외부 원문(archive/·vendor/), 런타임 상태(.git·.harness)는 걷지 않는다. 실측 비용 0.12초(전체 트리). 양쪽 실측(§11): 이 run 의 ac4-prose-counterexample — 작업 트리 사본(저장소 밖 scratchpad)에 HEAD(d545eae)의 tests/test_run_unit.py 를 되살리면(그 파일의 484행 docstring 은 고치기 전 문장 그대로다 — 1~3회차는 그 docstring 을 건드리지 않았고, 로그 3행이 그 줄을 `484:` 로 인쇄한다) 넓힌 check-4 가 정확히 `tests/test_run_unit.py:484` 를 지목하며 FAILED 한다 — `!` 로 exit 0 이 기대 결과다(로그 26·40행). 고친 트리에서는 check-4 가 exit 0 이다(같은 run 의 check-4). 사본은 저장소 밖이라 작업 트리는 불변이고, 이 run 의 기록 12건은 트리 해시 1종·head_sha 1종(d545eae3 = 계약 base_sha)이다. 규칙 자체의 판별 검사 TestDeadInstructionRule 2건을 같은 파일에 두었고(check-7 에 포함) 잡아야 할 3형(docstring·주석·이어진 명령)과 오탐하면 안 되는 6형(거부 호출·assertNotIn·자리표시자 이름·docs 기록·archive 원문·다른 명령의 같은 이름·스크립트를 지시하지 않는 줄)을 가짜 트리에서 양쪽으로 본다. check-7 은 377.7초(상한 600초의 63%). §12 발견 1건은 고치지 않았다: adapters/orca/prompts/reviewer-brief.md 9~10행 머리말이 Q-104 이전 흐름(`<base-sha>` 는 위임한 쪽이 옮겨 적고 `<task-sha256>` 은 shasum 으로 계산)을 말한다 — 없어진 인자 이름이 없어 AC-4 의 대상이 아니고 `---` 위라 검토자에게 가지 않는다. docs/planning/open-questions.md 에 Q-107 로 열었다. AC 체크박스는 승인 커밋에 이미 전부 [x] 였고 그대로다 — AC-4 는 이제 넓힌 check-4 와 ac4-prose-counterexample 이 뒷받침한다."
+}

@@ -174,7 +174,7 @@ def settle_attempt(data, run, result, failure_class=None, note=None):
 
 # --------------------------------------------------------------------------- 위임 명령
 
-def delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewer_sha256):
+def delegation_commands(unit_id, run, base_sha, workspace, harness_root):
     """RUNBOOK §3.2~§3.7 의 명령 문자열. 여기서 실행하지 않는다 — dry-run 은 인쇄까지다.
 
     문자열을 만드는 자리를 한 곳에 두는 것이 목적이다. 손으로 조립하면 회차마다 달라진다.
@@ -187,12 +187,14 @@ def delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewe
       §3.4 가 요구한 항목 5개(결과 계약 형식 · 체크박스는 구현자가 채운다 · 계약이 없으면 스스로 만든다 · `--task-id`·`--dispatch-id` ·
       dispatch-id 는 기동 뒤 전달)는 그 정본에 있다 — 여기 다시 적으면 두 벌이 된다.
     - 검토자 `task-create --spec` 은 경로와 절차만이다. **해시를 넣지 않는다** — `--spec` 에 복사된 해시는 재승인 뒤 갱신되지 않아
-      검토자에게 낡은 값이 도달했다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 그 자리에서 계산해 절차 파일에 적는다 —
-      그 명령을 `reviewer-brief` 로 함께 인쇄하고, 1단계가 만든 검토자 계약의 sha256 을 그대로 싣는다.
+      검토자에게 낡은 값이 도달했다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task` 가 검토자 계약 파일을 **그 자리에서** 읽어
+      base_sha 와 sha256 을 함께 계산해 절차 파일에 적는다(Q-104) — 옮겨 적는 인자가 없으므로 여기서 sha256 을 따로 들고 있지 않는다.
+      그 명령을 `reviewer-brief` 로 함께 인쇄한다.
       `<W>` 는 §3.5 가 만드는 구현자 워크트리의 절대 경로다 — 이 시점에는 없으므로 자리표시자로 남는다."""
     harness_root = Path(harness_root or HARNESS_ROOT)
     udir = f"docs/work/{unit_id}"
     task = f"{udir}/task/{run}"
+    reviewer_task = f"<W>/{task}-reviewer.json"
     runs_dir = f".harness/runs/{unit_id}/{run}"
     impl_spec = f"{runs_dir}/implementer-spec.md"
     brief = shlex.quote(str(harness_root / "adapters/orca/prompts/implementer-brief.md"))
@@ -216,7 +218,7 @@ def delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewe
          f"orca orchestration send --to dispatch:<dispatch-id> --type status --subject '위임 식별자' "
          f"--body '<task-id> · <dispatch-id> — 받기 전에는 evidence 기록을 시작하지 않는다'"),
         ("reviewer-brief",
-         f"python3 {fill_brief} --unit {unit_id} --run {run} --base-sha {base_sha} --task-sha256 {reviewer_sha256} "
+         f"python3 {fill_brief} --unit {unit_id} --run {run} --task {reviewer_task} "
          f"--runtime codex --mode base --out <W>/{runs_dir}/reviewer-brief.md"),
         ("reviewer-spawn", "codex exec -s read-only -C <구현자 워크트리 절대경로> "
                            "--output-schema core/schemas/result-envelope.json -o <워크트리 밖 출력 파일>"),
@@ -385,13 +387,13 @@ def _stage_contract(project_root, unit_id, run, base_sha, harness_root, record=T
 PLACEHOLDER_RE = re.compile(r"<[^<>]+>")
 
 
-def _stage_delegate(unit_id, run, base_sha, workspace, spawn, harness_root, reviewer_sha256, cwd=None):
+def _stage_delegate(unit_id, run, base_sha, workspace, spawn, harness_root, cwd=None):
     """② 위임 명령 출력. 기본은 인쇄까지다 — 기동은 비용이 드는 실행이라 `--spawn` 을 명시해야 한다(K-66).
 
     `--spawn` 은 **자리표시자가 없는 명령까지만** 실행하고, 첫 자리표시자에서 멈춰 무엇이 필요한지 말한다.
     이어붙이려면 각 명령의 반환 JSON 에서 어느 필드가 그 값인지 알아야 하는데 그 필드 이름은 아직 실측되지 않았다
     (RUNBOOK §11). 모르는 것을 아는 것처럼 파싱하지 않는다(K-54) — 값이 정해지면 여기서 이어진다."""
-    cmds = delegation_commands(unit_id, run, base_sha, workspace, harness_root, reviewer_sha256)
+    cmds = delegation_commands(unit_id, run, base_sha, workspace, harness_root)
     if not spawn:
         return _stage("delegate", "dry-run", f"{len(cmds)}개 명령을 인쇄했다 — 실행하지 않았다(--spawn 없음)",
                       commands=cmds)
@@ -534,10 +536,8 @@ def run_unit(unit_id, project_root=".", harness_root=None, run=None, base_sha=No
     # 회차는 계약 생성이 이미 남겼다(K-63) — 여기서 다시 쓰면 그 기록을 낡은 사본으로 덮는다.
     data = load_attempts(project_root, unit_id)
 
-    # 검토자 계약의 sha256 — §3.7 의 fill_brief 명령이 이 값을 --task-sha256 으로 싣는다. 손으로 적지 않는다.
-    reviewer_sha256 = next(b["sha256"] for b in contract["built"] if b["role"] == "reviewer")
     stages.append(contract)
-    stages.append(_stage_delegate(unit_id, run, resolved_base, workspace, spawn, harness_root, reviewer_sha256,
+    stages.append(_stage_delegate(unit_id, run, resolved_base, workspace, spawn, harness_root,
                                   cwd=project_root))
     stages.append(_stage_collect(project_root, unit_id, run, harness_root))
     stages.append(_stage_evidence(project_root, unit_id, run))

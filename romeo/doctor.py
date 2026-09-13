@@ -431,7 +431,10 @@ def _check_c6(root, fx, hr=None):
 
 def _check_c7(root, fx, hr=None):
     hr = Path(hr) if hr else root
-    """코어 안에 부품 기본 출력 경로가 박혀 있는가. 원문(c1)과 달리 여기는 흡수가 아니라 부재를 요구한다."""
+    """코어 안에 부품 기본 출력 경로가 박혀 있는가. 원문(c1)과 달리 여기는 흡수가 아니라 부재를 요구한다.
+
+    이 fixture 는 `scope_root: harness` 를 선언한다(Q-105 ①) — `check_conflicts` 가 그래서 `root` 자리에
+    **하네스 자신**을 넘긴다. 대상(부착 프로젝트)에 `core/` 가 없어도 이 검사는 하네스의 core/ 를 본다."""
     findings = []
     pats = [str(x) for x in (fx.get("patterns") or [])]
     for rel in fx.get("scope_dirs") or []:
@@ -457,12 +460,21 @@ CHECKERS = {"pattern_requires_override": _check_c1,
             "no_hardcoded_output_path": _check_c7}
 
 
+#: fixture 의 `scope_root` 에 허용되는 값 — 그 fixture 가 검사할 저장소를 스스로 선언한다(Q-105 ①).
+#: `target` 은 부착 대상(부품 원문·컴파일 산출물이 실제로 있는 곳), `harness` 는 하네스 자신
+#: (코어처럼 대상에는 없을 수도 있는 것을 본다). 선언이 없거나 이 집합 밖이면 그 fixture 는 돌리지
+#: 않고 fixture id 를 말하는 문제로 낸다 — 조용히 대상을 검사해 버리면(구 동작) 그 fixture 가
+#: 실제로 무엇을 보는지 선언과 실행이 어긋날 수 있다.
+SCOPE_ROOTS = {"target", "harness"}
+
+
 def check_conflicts(root=None, harness_root=None):
     """충돌 fixture 를 실행한다. (findings, 실행한 fixture 수).
 
-    **fixture 는 하네스에서 읽고 대상은 `root` 를 검사한다.** 둘을 같은 곳에서 읽으면
-    부착 대상에는 `fixtures/` 가 없으므로 **0종 실행으로 통과한다** — 부재가 일치로 읽히던
-    Q-53 과 같은 모양이다. 읽는 곳을 옮기면 같은 fixture 가 어느 저장소에서든 돈다.
+    **fixture 는 하네스에서 읽는다.** 무엇을 검사할지는 각 fixture 의 `scope_root` 선언이 정한다 —
+    `target`(부착 대상)이거나 `harness`(하네스 자신). 기본을 대상 하나로 고정하면 c7 처럼
+    "대상이 아니라 하네스 자신을 봐야 하는" fixture 가 대상에 그 디렉터리가 없을 때 0건 검사로
+    조용히 통과한다(Q-105 ①) — 부재가 일치로 읽히던 Q-53 과 같은 모양이다.
     """
     root = Path(root) if root else _project_root()
     hr = Path(harness_root) if harness_root else root
@@ -474,8 +486,16 @@ def check_conflicts(root=None, harness_root=None):
         if not fn:
             findings.append(("?", str(f.relative_to(hr)), f"모르는 kind: {fx.get('kind')}"))
             continue
+        scope_root = fx.get("scope_root")
+        # 문자열인지 먼저 본다 — 목록·객체는 집합 비교 자체가 `unhashable type` 로 죽어 fixture id 를
+        # 말하지 못한다. 「허용 목록 밖」은 여집합이므로 비문자열도 선언 누락과 같은 보고 경로로 보낸다.
+        if not isinstance(scope_root, str) or scope_root not in SCOPE_ROOTS:
+            findings.append((fx.get("id", f.stem), str(f.relative_to(hr)),
+                             f"scope_root 선언이 없거나 허용 값({sorted(SCOPE_ROOTS)}) 밖이다: {scope_root!r} — "
+                             f"이 fixture 가 무엇을 검사하는지 선언돼 있지 않아 돌리지 않았다"))
+            continue
         ran += 1
-        findings += fn(root, fx, hr)
+        findings += fn(root if scope_root == "target" else hr, fx, hr)
     if ran == 0:
         # 충돌 finding 은 (id, where, why) 3-tuple 이다 — format_report 가 그 모양으로 읽는다.
         findings.append(("CONFLICT_FIXTURES_MISSING", str(CONFLICTS_DIR),

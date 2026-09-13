@@ -481,7 +481,7 @@ class TestDelegationCommandsMatchRunbook(_UnitRepo, unittest.TestCase):
     ② 구현자 `task-create --spec` 이 §3.4 가 요구한 항목 5개(결과 계약 형식 · 체크박스는 구현자가 채운다 · 계약이 없으면
     스스로 만든다 · `--task-id`·`--dispatch-id` 플래그 · dispatch-id 는 기동 뒤 전달)를 담지 않았다. 요구하는 자리(RUNBOOK)와
     만드는 자리(`run_unit.py`)가 어긋난 §11 의 사례다 — 정본 절차 파일에서 채우게 해 둘을 같게 둔다.
-    검토자 `--spec` 에는 해시를 넣지 않는다(Q-41) — 해시는 `fill_brief.py --task-sha256` 이 그 자리에서 계산한다."""
+    검토자 `--spec` 에는 해시를 넣지 않는다(Q-41) — 해시는 `fill_brief.py --task` 가 받은 검토자 계약 파일에서 그 자리에서 계산한다(Q-104)."""
 
     BRIEF = HARNESS_ROOT / "adapters/orca/prompts/implementer-brief.md"
     #: §3.4 의 항목 5개가 정본에 있다는 것을 보는 문구
@@ -551,24 +551,26 @@ class TestDelegationCommandsMatchRunbook(_UnitRepo, unittest.TestCase):
                      "core/workflows/review/SKILL.md", "§3.7", "해시는 거기서 계산한다", "읽기 전용"):
             self.assertIn(want, rev, want)
 
-    # ── ④ fill_brief 명령이 1단계 검토자 계약의 sha256 을 그대로 싣는다 ──────
-    def test_fill_brief_command_carries_the_reviewer_contract_sha256(self):
+    # ── ④ fill_brief 명령이 검토자 계약 파일의 경로를 싣는다 — base_sha 도 sha256 도 옮겨 적지 않는다(Q-104) ──
+    def test_fill_brief_command_carries_the_reviewer_contract_path(self):
         contract, cmds = self._commands()
         sha = next(b["sha256"] for b in contract["built"] if b["role"] == "reviewer")
         self.assertEqual(sha, sha256_file(self.root / "docs/work" / self.unit / "task" / "run_a-reviewer.json"))
         fill = self._one(cmds, "reviewer-brief")
         self.assertIn(str(HARNESS_ROOT / "adapters/orca/prompts/fill_brief.py"), fill)
-        self.assertIn(f"--task-sha256 {sha}", fill)
-        self.assertIn(f"--unit {self.unit} --run run_a --base-sha {self.base}", fill)
+        self.assertIn(f"--task <W>/docs/work/{self.unit}/task/run_a-reviewer.json", fill)
+        self.assertNotIn("--base-sha", fill)
+        self.assertNotIn("--task-sha256", fill)
+        self.assertIn(f"--unit {self.unit} --run run_a", fill)
         self.assertIn("--runtime codex --mode base", fill)
         self.assertIn(f"--out <W>/.harness/runs/{self.unit}/run_a/reviewer-brief.md", fill)
         names = [n for n, _ in cmds]
         self.assertLess(names.index("reviewer-brief"), names.index("reviewer-spawn"))
 
-    def test_delegation_commands_takes_the_harness_root_and_the_reviewer_sha256(self):
-        cmds = delegation_commands(self.unit, "run_x", self.base, "worktree", HARNESS_ROOT, "f" * 64)
+    def test_delegation_commands_takes_the_harness_root(self):
+        cmds = delegation_commands(self.unit, "run_x", self.base, "worktree", HARNESS_ROOT)
         self.assertEqual(cmds[0][0], "run-show")
-        self.assertIn("--task-sha256 " + "f" * 64, dict(cmds)["reviewer-brief"])
+        self.assertIn(f"--task <W>/docs/work/{self.unit}/task/run_x-reviewer.json", dict(cmds)["reviewer-brief"])
 
     # ── ⑤ 종전 동작 유지 — 인쇄까지다 ─────────────────────────────────────────
     def test_delegation_commands_are_printed_not_executed(self):

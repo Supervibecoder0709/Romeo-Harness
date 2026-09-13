@@ -11,6 +11,8 @@ id: c5-bmad-install-path
 title: 부품이 설치될 자리를 컴파일 산출물이 점유하지 않는다
 constraints: [K-64]
 kind: install_path_collision
+# 이 fixture 가 검사하는 저장소(Q-105 ①) — 부착 대상이다.
+scope_root: target
 state_file: .harness/compiled.yaml
 # 부품 설치기가 쓰는 디렉터리. 컴파일 산출물은 이 안의 **이름 붙은 하위 경로**만 소유할 수 있다.
 install_dirs:

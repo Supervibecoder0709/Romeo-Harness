@@ -217,7 +217,7 @@ class TestDelegationBlockMatchesRunUnit(unittest.TestCase):
     def _printed(self):
         from romeo import HARNESS_ROOT
         from romeo.run_unit import delegation_commands
-        cmds = dict(delegation_commands(self.UNIT, self.RUN, "a" * 40, "worktree", HARNESS_ROOT, "f" * 64))
+        cmds = dict(delegation_commands(self.UNIT, self.RUN, "a" * 40, "worktree", HARNESS_ROOT))
         return cmds["task-create:implementer"], cmds["task-create:reviewer"]
 
     def test_the_block_uses_only_the_three_placeholders(self):
@@ -241,7 +241,7 @@ class TestReapprovalRuleIsConditional(unittest.TestCase):
     """§3.4·§3.4.1 — Run 재생성은 `--spec` 에 낡은 해시가 들어간 경우에만 (Q-41).
 
     §3.4.1 이 Run 재생성을 요구하는 근거는 `task-create --spec` 에 문자열로 복사된 낡은 계약 해시가 검토자에게 도달하는
-    것이었다. `--spec` 에 해시를 넣지 않으면(검토자 프롬프트의 해시는 `fill_brief.py --task-sha256` 이 그 자리에서 계산한다)
+    것이었다. `--spec` 에 해시를 넣지 않으면(검토자 프롬프트의 해시는 `fill_brief.py --task` 가 계약 파일을 그 자리에서 읽어 계산한다)
     그 위험이 없다 — 2026-09-02 5회차가 Run 을 유지하고 봉투만 다시 만들어 close PASS 로 끝났다."""
 
     SECTION_34 = (r"^### 3\.4 ", r"^### 3\.4\.1 ")

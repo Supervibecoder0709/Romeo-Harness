@@ -1,0 +1,21 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_2104b3f7e55d-reviewer.json",
+    "sha256": "50d0c297dacea4588e644e4232719315b0eab902523c760cb0e84dc567d8e3a7"
+  },
+  "checks": [],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [
+    {
+      "summary": "비차단·기존 Q-107: 템플릿 머리말은 base_sha를 옮겨 적고 계약 해시를 별도로 계산한다고 설명하지만, 현재 fill_brief.py는 계약 파일에서 두 값을 읽고 계산한다. 생성된 브리프에서는 제거되는 머리말이며 이번 변경 범위 밖이다.",
+      "file": "adapters/orca/prompts/reviewer-brief.md",
+      "line": 10
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_2104b3f7e55d.yaml",
+  "notes": "두 계약의 base_sha와 현재 HEAD가 일치한다. 구현 코드·검사 내용·원시 로그를 대조했다. 수용 기준별 근거는 AC-1=check-1, AC-2=check-2, AC-3=check-3, AC-4=check-4 및 ac4-prose-counterexample, AC-5=check-5·check-11, AC-6=check-6이다. 필수 검사 11건은 모두 종료 코드 0으로 기록됐고, 원시 로그의 head·tree 값도 증거 기록과 일치한다. 승인 기준 대비 수용 기준 문장과 required_checks 변경은 없으며 변경 파일은 허용 범위 안이다. 재실행 불가능한 검사나 가드 대상의 미승인 행동은 발견하지 못했다. 파일 수정·검사 실행·해시 재계산은 하지 않았다. 검토 후 방어 기록과 결과 봉인은 위임한 쪽의 후속 절차다."
+}

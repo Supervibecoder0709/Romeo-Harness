@@ -10,6 +10,10 @@ id: c6-no-second-plan-origin
 title: 보류·기각된 부품이 라우터 추천에 실리지 않는다
 constraints: [K-61]
 kind: no_second_plan_origin
+# 이 fixture 가 검사하는 저장소(Q-105 ①) — **하네스 자신**이다. 정책표(packages_file)와 출처(imports_file)는
+# 하네스가 소유하고 부착 대상에는 없다 — 검사도 둘 다 하네스에서 읽는다(`_check_c6`·`_recommend_pairs`).
+# 2회차 검토자가 `target` 선언이 거짓임을 잡았다: 대상에 심은 위반이 판정을 바꾸지 않았다.
+scope_root: harness
 packages_file: core/policy/packages.yaml
 imports_file: provenance/imports.yaml
 # 이 판정을 받은 id 는 추천에 있으면 안 된다.

@@ -10,14 +10,15 @@ gates: []
 profile: standard
 blast_radius: small
 uncertainty: medium
-status: active
+status: done
 approved_at: '2026-09-13T12:59:14+09:00'
 approved_by: Supervibecoder0709
 base_sha: null
-closed_at: null
+closed_at: '2026-09-13T20:55:56+09:00'
 parent: null
 inputs: [inputs/ac-rebuttal-20260913.md, inputs/probe-20260913.md]
-evidence: []
+evidence: [evidence/run_359d5c2dbcb6.yaml, evidence/run_4474b6ab9169.yaml, evidence/run_42fb8669b085.yaml,
+  evidence/run_2104b3f7e55d.yaml]
 routing:
   policy_version: 0.1.0
   fired_rules: ['profile:base:T1=standard', 'profile:uncertainty.medium=kept', 'overlay:profile.standard-or-deeper']
@@ -50,22 +51,22 @@ approval_history:
   검토자 브리프의 `base_sha` 는 손으로 옮겨 적을 값이 아니라 계약 파일에서 읽는 값이 되며,
   충돌 fixture 는 자기가 어느 저장소를 검사하는지 스스로 말한다.
 - **수용 기준:**
-  - [ ] AC-1 검토 run 의 증거에 종료 검사가 판정에 쓰는 방어 검사 기록이 빠져 있으면, `romeo review record` 가
+  - [x] AC-1 검토 run 의 증거에 종료 검사가 판정에 쓰는 방어 검사 기록이 빠져 있으면, `romeo review record` 가
         **빠진 라벨을 모두** 이름으로 말하는 경고를 인쇄한다. 봉인은 그대로 이뤄지고, 그 명령의 종료 코드는
         같은 봉투를 방어 검사가 전부 있는 run 에 기록했을 때와 같다.
-  - [ ] AC-2 종료 검사가 판정에 쓰는 방어 검사 라벨 목록의 **정의가 저장소에 하나뿐**이고, AC-1 의 경고는 그 정의를 읽는다 —
+  - [x] AC-2 종료 검사가 판정에 쓰는 방어 검사 라벨 목록의 **정의가 저장소에 하나뿐**이고, AC-1 의 경고는 그 정의를 읽는다 —
         그 한 자리의 라벨 이름을 바꾸면 경고가 말하는 이름도 함께 바뀐다.
-  - [ ] AC-3 `fill_brief.py` 는 검토자 계약 파일의 **경로**를 받고, 채워진 브리프의 `base_sha` 는 그 JSON 의 값이며
+  - [x] AC-3 `fill_brief.py` 는 검토자 계약 파일의 **경로**를 받고, 채워진 브리프의 `base_sha` 는 그 JSON 의 값이며
         계약 sha256 은 **그 파일의 바이트에서 계산한** 값이다 — 계약 파일의 `base_sha` 를 바꾸면 브리프의 `base_sha` 가 바뀌고,
         그 파일의 내용을 바꾸면 브리프의 sha256 이 바뀐다. 그 두 값을 따로 넘기는 인자는 이 스크립트에 없다.
-  - [ ] AC-4 없어진 인자 이름을 넘기는 호출은 **어디서 오든** `fill_brief.py` 가 0 이 아닌 종료 코드로 거부한다 —
+  - [x] AC-4 없어진 인자 이름을 넘기는 호출은 **어디서 오든** `fill_brief.py` 가 0 이 아닌 종료 코드로 거부한다 —
         그래서 문자열 검색에서 빠지는 간접 호출도 실행 시점에 드러난다. 그리고 이 저장소에서 그 스크립트를 **지시하는**
         자리 — 실행 명령(런북 §3.7 · `romeo/run_unit.py`)과 그 명령을 설명하는 산문 — 에 없어진 인자 이름이 남아 있지 않다.
-  - [ ] AC-5 충돌 fixture 는 자기 검사 대상 저장소를 **허용된 값으로** 선언하고, `check_conflicts` 는
+  - [x] AC-5 충돌 fixture 는 자기 검사 대상 저장소를 **허용된 값으로** 선언하고, `check_conflicts` 는
         **그 선언이 정한 루트**를 그 fixture 의 검사에 넘긴다. **그리고 그 선언은 참이다** — `target` 을 선언한
         fixture 의 판정은 대상 저장소의 내용에 따라 달라지고, `harness` 를 선언한 fixture 의 판정은 대상이 무엇이든
         달라지지 않는다. 선언이 없거나 허용 목록 밖의 값이면 `doctor` 가 그 fixture 의 id 를 말하며 문제를 낸다.
-  - [ ] AC-6 c7 은 하네스를 선언하므로 대상 루트에 `core/` 가 **있든 없든** 하네스의 코어를 검사한다 —
+  - [x] AC-6 c7 은 하네스를 선언하므로 대상 루트에 `core/` 가 **있든 없든** 하네스의 코어를 검사한다 —
         하네스 코어에만 금지 패턴을 심으면 c7 의 findings 가 **그 파일의 경로**를 가리키고,
         대상 코어에만 심으면 c7 의 findings 가 나오지 않는다.
 - **위험과 되돌리기:** ① AC-1 의 경고를 차단으로 잘못 만들면 이 명령이 없던 시절의 봉투를 되살릴 길이 막힌다 — 그래서 종료 코드를 바꾸지 않는 것을 AC-1 이 직접 요구한다(K-31). ② `fill_brief.py` 의 인자를 바꾸면 그것을 부르는 자리가 함께 바뀌어야 하고, 하나라도 놓치면 다음 관통의 검토자 기동이 그 자리에서 멈춘다 — 그래서 AC-4 가 **스크립트 쪽에서** 거부하게 해 검색에 의존하지 않는다. 되돌리기: 세 변경 다 이 저장소 안의 로컬 커밋이라 `git revert <통합 커밋>` 하나로 끝나고, 외부 저장소·운영 데이터·권한 경계를 건드리지 않는다.
@@ -150,6 +151,9 @@ required_checks:
 
 ## 증거
 
-close 시 `evidence/<run>.yaml` 링크가 여기에 채워진다. 실행 자체는 완료가 아니다(K-51).
+close PASS · 2026-09-13T20:55:56+09:00 · HEAD d545eae336f9 · 검사 기록 run_2104b3f7e55d
 
-- (없음)
+- [evidence/run_359d5c2dbcb6.yaml](evidence/run_359d5c2dbcb6.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_4474b6ab9169.yaml](evidence/run_4474b6ab9169.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+- [evidence/run_42fb8669b085.yaml](evidence/run_42fb8669b085.yaml) — exit codes [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+- [evidence/run_2104b3f7e55d.yaml](evidence/run_2104b3f7e55d.yaml) — exit codes [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (검사 기록)

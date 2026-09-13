@@ -391,8 +391,8 @@ orca orchestration task-create --run <run-id> \
 「명령을 실행하지 않는다」 를 조건 없이 옮겨 적으면 codex 검토자가 파일을 하나도 읽지 못한다 — 그 런타임에서 읽기·검색은 셸 명령이기 때문이다(체크리스트 42).
 
 **`--spec` 에는 해시를 넣지 않는다 — 경로와 절차만.** 계약 파일의 sha256 을 `--spec` 문자열에 복사하면, 재승인으로 계약이 바뀌어도
-그 문자열은 갱신되지 않아 검토자에게 낡은 해시가 도달한다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 **그 자리에서**
-계약 파일을 읽어 계산하고 절차 파일 `P` 에 적는다 — 검토자가 받는 해시는 그 하나다. 이 규칙을 지킨 실행에서는 재승인이 Run 재생성을
+그 문자열은 갱신되지 않아 검토자에게 낡은 해시가 도달한다(§3.4.1). 해시는 §3.7 의 `fill_brief.py --task` 가 **그 자리에서**
+계약 파일의 바이트를 읽어 계산하고 절차 파일 `P` 에 적는다 — 검토자가 받는 해시는 그 하나다. 이 규칙을 지킨 실행에서는 재승인이 Run 재생성을
 요구하지 않는다(§3.4.1 · Q-41).
 
 **이 시점에 아는 식별자는 둘뿐이다 — `<run-id>` 와 `<task-id>`.** `<dispatch-id>` 는 §3.5 의 `worker-start` 가
@@ -431,14 +431,14 @@ orca orchestration task-create --run <run-id> \
 `envelope build` 가 내는 계약이 달라진다 — `spec_ref.sha256` 이 바뀌므로 계약 파일 자체의 sha256 도 바뀐다.
 그런데 §3.4 의 `task-create --spec` 은 **그 시점의 값을 문자열로 복사해 둔 것**이다. 재승인 뒤에도 그 문자열은
 그대로 남고, `worker-start --terminal` 이 채택한 터미널에 주입하는 것도 그 문자열이다.
-그 결과 검토자는 **낡은 해시**(주입된 `--spec` 이 실은 값)와 새 해시(§3.7 의 `fill_brief.py` 가 `--task-sha256` 으로
-그 자리에서 다시 계산해 절차 파일에 적은 값)를 **둘 다** 받는다. 어느 쪽을 `task_envelope_ref.sha256` 에 옮겨
+그 결과 검토자는 **낡은 해시**(주입된 `--spec` 이 실은 값)와 새 해시(§3.7 의 `fill_brief.py` 가 `--task` 로 받은
+계약 파일에서 그 자리에서 다시 계산해 절차 파일에 적은 값)를 **둘 다** 받는다. 어느 쪽을 `task_envelope_ref.sha256` 에 옮겨
 적을지는 검토자의 선택이 되고, 그 선택은 §3.8 의 앵커 검사에서 통과와 거부를 가른다.
 직전 관통에서 실제로 두 값이 함께 도달했다 — 그 실행은 검토자가 새 해시를 골라 우연히 넘어갔다.
 **우연을 절차로 두지 않는다.**
 
 **그 위험은 `--spec` 에 해시가 들어간 경우에만 있다.** §3.4 의 규칙대로 `--spec` 에 경로와 절차만 넣었으면 갱신되지 않는
-문자열 안에 낡을 값이 없다 — 검토자가 받는 해시는 §3.7 의 `fill_brief.py --task-sha256` 이 새 계약에서 그 자리에서 계산한 것 하나뿐이다.
+문자열 안에 낡을 값이 없다 — 검토자가 받는 해시는 §3.7 의 `fill_brief.py --task` 가 새 계약 파일에서 그 자리에서 계산한 것 하나뿐이다.
 그때는 **Run 과 Task 를 유지한다.** 새 승인 커밋을 `<base-sha>` 로 삼아 봉투(§3.3 · §3.5.1 — 같은 `<run-id>` 로 다시 만든다)와
 절차 파일 `P`(§3.7)만 다시 만들고, §3.5.1 부터 평소대로 밟는다. 2026-09-02 시나리오 8 5회차가 그 형태였다 —
 Run 유지 · 봉투 재생성 · close PASS. 같은 `<run-id>` 로 계약을 다시 만들면 회차 기록의 `base_sha` 가 새 값으로 옮겨지고 이전 값은
@@ -734,13 +734,12 @@ T=$W/docs/work/<id>/task/<run-id>-reviewer.json      # §3.5.1 이 이 워크트
 # 출력은 검토 대상 워크트리의 **제외 경로 안**(.harness/runs/<id>/<run-id>/)에 둔다 — 신선도·방어 검사가 그 경로를 빼므로 검토를 깨지 않는다.
 P=$W/.harness/runs/<id>/<run-id>/reviewer-brief.md
 python3 adapters/orca/prompts/fill_brief.py --unit <id> --run <run-id> \
-  --base-sha "$(python3 -c "import json,sys; print(json.load(open(sys.argv[1]))['base_sha'])" "$T")" \
-  --task-sha256 "$(shasum -a 256 "$T" | cut -d' ' -f1)" \
+  --task "$T" \
   --runtime <codex|claude — 이 실행의 검토자 런타임> --mode base --out "$P"
 # 검토자가 받은 입력을 그 run 의 증거에 남긴다(재현 가능성 · K-51). .harness 는 트리 해시에서 빠지므로 방어 검사와 어긋나지 않는다.
 bin/romeo evidence run --unit <id> --run <run-id> --root "$W" --label reviewer-brief -- shasum -a 256 "$P"
 
-# 계약의 sha256 은 fill_brief 가 --task-sha256 으로 받아 적는다(위) — 손으로 적지 않는다. 아래 상자가 그 이유다.
+# base_sha 는 --task 가 가리킨 "$T" 의 base_sha 필드에서, 계약의 sha256 은 그 파일의 바이트에서 fill_brief 가 계산해 적는다(위) — 손으로 적지 않는다. 아래 상자가 그 이유다.
 
 CMD="codex -s read-only -C '$W' \"\$(cat '$P'; cat '$T')\""
 

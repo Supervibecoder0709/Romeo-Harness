@@ -7,6 +7,8 @@ id: c4-dangerous-instruction
 title: 부품이 지시하는 위험 명령에는 대응 override 가 있어야 한다
 constraints: [K-66]
 kind: pattern_requires_override
+# 이 fixture 가 검사하는 저장소(Q-105 ①) — 부착 대상이다.
+scope_root: target
 scope: projected_skills
 # 패턴마다 어떤 override 가 그것을 덮는지 명시한다.
 # "아무 override 나 하나 있으면 통과" 로 두면 검사가 무의미해진다.

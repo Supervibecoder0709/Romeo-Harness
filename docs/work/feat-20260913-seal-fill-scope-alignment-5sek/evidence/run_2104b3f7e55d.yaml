@@ -1,0 +1,473 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_2104b3f7e55d
+task_id: task_ff1b64ebbb6a
+dispatch_id: ctx_bfef4118d1fe
+unit_id: feat-20260913-seal-fill-scope-alignment-5sek
+spec_ref:
+  path: docs/work/feat-20260913-seal-fill-scope-alignment-5sek/spec.md
+  sha256: 32dc93737cd9c5f619504ebe5427c0b46da006265cbfc751f261922b4cb1cbb9
+base_sha: d545eae336f92796950b49043f94d53292c6ab1f
+head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek
+started_at: '2026-09-13T20:31:59+09:00'
+finished_at: '2026-09-13T20:42:14+09:00'
+commands:
+- id: ac4-prose-counterexample
+  command: S=$(mktemp -d /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-impl-feat-20260913-seal-fill-scope-alignment-5sek/a37da046-ba6f-4954-9aaf-09966cb1c6b8/scratchpad/ac4-before.XXXXXX)
+    && tar -cf - --exclude=./.git --exclude=./.harness/runs --exclude=./.harness/cache . | tar -xf - -C
+    "$S" && git show HEAD:tests/test_run_unit.py > "$S/tests/test_run_unit.py" && grep -n -- '--task-sha256'
+    "$S/tests/test_run_unit.py" | head -1 && git -C "$S" init -q && cd "$S" && ! python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:31:59+09:00'
+  finished_at: '2026-09-13T20:32:01+09:00'
+  seconds: 1.458
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/01-ac4-prose-counterexample.log
+  log_sha256: 4f43b81c1dc30e14a53cf1018ba82bf253190ab32483d470436f97b08faa8c10
+  stdout_tail: '484:    검토자 `--spec` 에는 해시를 넣지 않는다(Q-41) — 해시는 `fill_brief.py --task-sha256` 이 그 자리에서
+    계산한다."""'
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-1
+  command: python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:01+09:00'
+  finished_at: '2026-09-13T20:32:02+09:00'
+  seconds: 1.267
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/02-check-1.log
+  log_sha256: 1dd71272f44446534232624b16bbcc3f9d29d6c10c5536a550914393e20ccbf1
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-2
+  command: python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:02+09:00'
+  finished_at: '2026-09-13T20:32:03+09:00'
+  seconds: 0.812
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/03-check-2.log
+  log_sha256: 1e87930f3315a2f753cf9b62fc4390924e2f9dd65dfc80099bcdc1179fa078df
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-3
+  command: python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:03+09:00'
+  finished_at: '2026-09-13T20:32:04+09:00'
+  seconds: 0.101
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/04-check-3.log
+  log_sha256: a234396e61e3af6e918da0a0ee9ba5a701983c6fe3500047b2deb9d1c56a6e39
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-4
+  command: python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:04+09:00'
+  finished_at: '2026-09-13T20:32:04+09:00'
+  seconds: 0.232
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/05-check-4.log
+  log_sha256: 85f684310102a53b5f68e3bbca1939fed1398408cc2f0dc9aa56e54ebdb475ee
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-5
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:04+09:00'
+  finished_at: '2026-09-13T20:32:06+09:00'
+  seconds: 1.695
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/06-check-5.log
+  log_sha256: d0010f165ee87462980b110c921b5133eb13d517bad5e2d98d1d6d3e10c33a04
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-6
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:32:06+09:00'
+  finished_at: '2026-09-13T20:32:08+09:00'
+  seconds: 1.706
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/07-check-6.log
+  log_sha256: 6d3dd875928236f86a8315e33a26546b458cf869bef939ade6f3030289bd1033
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-7
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-13T20:32:08+09:00'
+  finished_at: '2026-09-13T20:38:25+09:00'
+  seconds: 377.664
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/08-check-7.log
+  log_sha256: f1d332430af3811f7c4cf138a0422d612bf130e193c34ae70ba76725c75cdfd3
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-8
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-13T20:38:26+09:00'
+  finished_at: '2026-09-13T20:38:26+09:00'
+  seconds: 0.383
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/09-check-8.log
+  log_sha256: d60d7686a6c399bac96dba27057129ab88dc232194468081b902ec9a7a136fe6
+  stdout_tail: "impl-feat-20260913-seal-fill-scope-alignment-5sek/docs/work/init-20260911-m5-attach-update-rollback-sauc/charter.md\
+    \ lines=111 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/docs/work/init-20260911-m5-attach-update-rollback-sauc/spec.md\
+    \ lines=158 needs_input=0 unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 158 > 150"
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-9
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-13T20:38:26+09:00'
+  finished_at: '2026-09-13T20:38:27+09:00'
+  seconds: 0.321
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/10-check-9.log
+  log_sha256: 940bd41a2cd9459112b4429c2aebae70f06e68b7cb86350bace6985cf2ce1c2c
+  stdout_tail: compile 검사 PASS
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-10
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-13T20:38:27+09:00'
+  finished_at: '2026-09-13T20:38:28+09:00'
+  seconds: 0.924
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/11-check-10.log
+  log_sha256: e9a614ea4f332e1bb1db49b2aacff0161e3ba82cd1701ceff091c0df74ec42ac
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: check-11
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T20:38:28+09:00'
+  finished_at: '2026-09-13T20:38:37+09:00'
+  seconds: 8.752
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/12-check-11.log
+  log_sha256: 9b764c3b79395b4180b8336dbdd1a0fd21e66bc26d0b55ebba77ee1383d15cbd
+  stdout_tail: ''
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260913-seal-fill-scope-alignment-5sek'
+  exit_code: 0
+  started_at: '2026-09-13T20:39:38+09:00'
+  finished_at: '2026-09-13T20:39:38+09:00'
+  seconds: 0.034
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/13-review-tree-before.log
+  log_sha256: 0a16e01edd855ea36d83cadc4a45c6b10ea74681bfb3671dfafd07d3a8323ac0
+  stdout_tail: "/c4-dangerous-instruction.yaml\n M fixtures/conflicts/c5-bmad-install-path.yaml\n M fixtures/conflicts/c6-no-second-plan-origin.yaml\n\
+    \ M fixtures/conflicts/c7-no-output-path-hardcode.yaml\n M romeo/doctor.py\n M romeo/evidence.py\n\
+    \ M romeo/run_unit.py\n M tests/test_doctor.py\n M tests/test_reviewer_brief.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py\n?? tests/test_review_seal_warning.py"
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/.harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-13T20:39:38+09:00'
+  finished_at: '2026-09-13T20:39:39+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/14-reviewer-brief.log
+  log_sha256: fa6aebb4f76739fb9e604be125bc38c73c77dbc9be4eb017cd299cf2fc1ae528
+  stdout_tail: 2f2f1cd6eba54a4da8f933ec67dd33909dc96908786269eb8abe638a0037cf69  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/.harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/reviewer-brief.md
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260913-seal-fill-scope-alignment-5sek'
+  exit_code: 0
+  started_at: '2026-09-13T20:42:04+09:00'
+  finished_at: '2026-09-13T20:42:04+09:00'
+  seconds: 0.034
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/15-review-tree-after.log
+  log_sha256: 0a16e01edd855ea36d83cadc4a45c6b10ea74681bfb3671dfafd07d3a8323ac0
+  stdout_tail: "/c4-dangerous-instruction.yaml\n M fixtures/conflicts/c5-bmad-install-path.yaml\n M fixtures/conflicts/c6-no-second-plan-origin.yaml\n\
+    \ M fixtures/conflicts/c7-no-output-path-hardcode.yaml\n M romeo/doctor.py\n M romeo/evidence.py\n\
+    \ M romeo/run_unit.py\n M tests/test_doctor.py\n M tests/test_reviewer_brief.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py\n?? tests/test_review_seal_warning.py"
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260913-seal-fill-scope-alignment-5sek/review/run_2104b3f7e55d-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-13T20:42:14+09:00'
+  finished_at: '2026-09-13T20:42:14+09:00'
+  seconds: 0.021
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_2104b3f7e55d/16-review-record.log
+  log_sha256: 8b16c3564d03dbd45c6849f54db8bd71985c6e29634ed1f1c58ac675061d8473
+  stdout_tail: 0b18ed30b3078952d3ceab36b23fa7d1bacf4e68698f51e0776783a1a7c4fd1a  docs/work/feat-20260913-seal-fill-scope-alignment-5sek/review/run_2104b3f7e55d-reviewer.json
+  head_sha: d545eae336f92796950b49043f94d53292c6ab1f
+  dirty_tree_hash: d3354e49b7abc005cf2d5ecad9b31fde29b4a8174def6df1ffcabc5f90ca62cc
+changed_files:
+- adapters/orca/RUNBOOK.md
+- adapters/orca/prompts/fill_brief.py
+- docs/planning/open-questions.md
+- fixtures/conflicts/c1-external-plan-path.yaml
+- fixtures/conflicts/c2-no-auto-trigger.yaml
+- fixtures/conflicts/c3-name-and-marker.yaml
+- fixtures/conflicts/c4-dangerous-instruction.yaml
+- fixtures/conflicts/c5-bmad-install-path.yaml
+- fixtures/conflicts/c6-no-second-plan-origin.yaml
+- fixtures/conflicts/c7-no-output-path-hardcode.yaml
+- romeo/doctor.py
+- romeo/evidence.py
+- romeo/run_unit.py
+- tests/test_doctor.py
+- tests/test_review_seal_warning.py
+- tests/test_reviewer_brief.py
+- tests/test_run_unit.py
+- tests/test_runbook_procedure.py
+artifact_hash: 459955b4fb1c3e96b19adc3d02cd9737f40f9265e8e69620445a9b8f314bc4d5
+reviewer: null
+verdict: PASS
+approvals: []
+close:
+  at: '2026-09-13T20:55:56+09:00'
+  checks:
+  - id: FRONTMATTER_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: BUDGET_EXCEEDED 156 > 150
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-1 «전부»
+  - id: DOC_WARNING
+    ok: true
+    level: warning
+    detail: AC_UNIVERSAL AC-6 «하나라도»
+  - id: APPROVED
+    ok: true
+    level: error
+    detail: status=active approved_at=2026-09-13T12:59:14+09:00
+  - id: HAS_EVIDENCE
+    ok: true
+    level: error
+    detail: ''
+  - id: JUDGE_REVISION
+    ok: true
+    level: error
+    detail: 판정 하네스 = 승인 커밋 cd7fce4beaaa 의 하네스 (492개 파일 대조 · /private/var/folders/cz/6b68hs55753g47c9vbr4k14c0000gn/T/tmp.mklpBXRmHa)
+  - id: EVIDENCE_SELECTED
+    ok: true
+    level: error
+    detail: 검사 기록 = run_2104b3f7e55d — 검증 계획 11건을 전부 실행한 run · 지금 트리와 같은 산출물의 run 1건/4건 중
+  - id: FRESH_HEAD
+    ok: true
+    level: error
+    detail: evidence d545eae336f9 vs 현재 d545eae336f9
+  - id: FRESH_TREE
+    ok: true
+    level: error
+    detail: evidence d3354e49b7ab vs 현재 d3354e49b7ab (tracked 수정·staged·untracked 포함)
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-1: exit 0 — python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-2: exit 0 — python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-3: exit 0 — python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-4: exit 0 — python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-5: exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-6: exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target
+      -v'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-7: exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-8: exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-9: exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-10: exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK
+    ok: true
+    level: error
+    detail: 'check-11: exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+      -v'
+  - id: EVIDENCE_LOG
+    ok: true
+    level: error
+    detail: 16건이 원시 로그·log_sha256 과 일치 · 산출물 식별이 봉인된 자리와 같다
+  - id: BLOCK_SATISFIED
+    ok: true
+    level: error
+    detail: 'spec-ready: 확인란이 채워졌고 수용 기준 6건'
+  - id: CHECK_PLAN_COMMITTED
+    ok: true
+    level: error
+    detail: 검사 11건이 승인 커밋 cd7fce4beaaa 의 spec.md 와 같다
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-1: 재실행도 exit 0 — python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-2: 재실행도 exit 0 — python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-3: 재실행도 exit 0 — python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-4: 재실행도 exit 0 — python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-5: 재실행도 exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-6: 재실행도 exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target
+      -v'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-7: 재실행도 exit 0 — python3 -m unittest discover -s tests -q'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-8: 재실행도 exit 0 — bin/romeo validate'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-9: 재실행도 exit 0 — bin/romeo compile --check'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-10: 재실행도 exit 0 — bin/romeo doctor --strict --scope repository'
+  - id: REQUIRED_CHECK_RERUN
+    ok: true
+    level: error
+    detail: 'check-11: 재실행도 exit 0 — python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+      -v'
+  - id: AC_ALL_CHECKED
+    ok: true
+    level: error
+    detail: 미체크 0개
+  - id: AC_TEXT_UNCHANGED
+    ok: true
+    level: error
+    detail: 확인란의 문장이 승인 커밋 cd7fce4beaaa 과 같다(체크 표시 제외)
+  - id: NO_OPEN_LOOP
+    ok: true
+    level: error
+    detail: ''
+  - id: HAS_CHANGE
+    ok: true
+    level: error
+    detail: changed_files ['adapters/orca/RUNBOOK.md', 'adapters/orca/prompts/fill_brief.py', 'docs/planning/open-questions.md',
+      'fixtures/conflicts/c1-external-plan-path.yaml', 'fixtures/conflicts/c2-no-auto-trigger.yaml', 'fixtures/conflicts/c3-name-and-marker.yaml',
+      'fixtures/conflicts/c4-dangerous-instruction.yaml', 'fixtures/conflicts/c5-bmad-install-path.yaml',
+      'fixtures/conflicts/c6-no-second-plan-origin.yaml', 'fixtures/conflicts/c7-no-output-path-hardcode.yaml',
+      'romeo/doctor.py', 'romeo/evidence.py', 'romeo/run_unit.py', 'tests/test_doctor.py', 'tests/test_review_seal_warning.py',
+      'tests/test_reviewer_brief.py', 'tests/test_run_unit.py', 'tests/test_runbook_procedure.py']
+  - id: SPEC_UNCHANGED_SINCE_EVIDENCE
+    ok: true
+    level: warning
+    detail: ''
+  - id: HAS_REVIEW
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ENVELOPE_VALID
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_TASK_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_BASE_SHA
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_EVIDENCE_ANCHORED
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_ROLE_CONTRACT
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_SUPERSEDED
+    ok: false
+    level: warning
+    detail: 'run_359d5c2dbcb6-reviewer.json: FAIL(findings 1건 — 첫째: [P2][AC-5] scope_root에 목록이나 객체가 들어오면
+      fixture id를 보고하지 못하고 do) — 재승인 전 승인(approved_at 2026-09-13T01:49:18+09:00)으로 낸 판정 · 다른 산출물(9d1c4f7+42273718143b)을
+      본 판정이라 이 close 의 대상이 아니다; run_42fb8669b085-reviewer.json: FAIL(findings 1건 — 첫째: AC-4 미달: 위임 명령을
+      설명하는 문장에 아직 ''해시는 fill_brief.py --task-sha256) — 다른 산출물(cd7fce4+58a0672bfb58)을 본 판정이라 이 close 의
+      대상이 아니다; run_4474b6ab9169-reviewer.json: FAIL(findings 1건 — 첫째: AC-5 미충족: c6는 검사 대상을 target으로 선언하지만,
+      실제로는 하네스만 검사한다. _check_) — 재승인 전 승인(approved_at 2026-09-13T01:49:18+09:00)으로 낸 판정 · 다른 산출물(89f281c+9cb61aa38baa)을
+      본 판정이라 이 close 의 대상이 아니다. 현재 산출물은 d545eae+d3354e49b7ab 이다(검사 기록 run 의 head_sha+dirty_tree_hash,
+      D-73)'
+  - id: REVIEW_FAIL_REASONS
+    ok: true
+    level: error
+    detail: ''
+  - id: REVIEW_VERDICT
+    ok: true
+    level: error
+    detail: 'run_2104b3f7e55d-reviewer.json: PASS'
+  - id: REVIEW_SAMPLE
+    ok: false
+    level: warning
+    detail: '현재 산출물에 PASS 1건 — 같은 산출물에서도 검토 판정은 흔들린다(D-74 관측). D-75 (b) 확정: 1건으로 닫는다. 표본 2건은 요구하지 않으며,
+      같은 산출물을 다시 검토해 PASS 를 기다리지 않는다'

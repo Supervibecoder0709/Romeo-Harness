@@ -5,12 +5,17 @@
 검토자는 파일을 하나도 읽지 못한다. 런타임별 읽기 수단 한 줄은 이 어댑터가 붙이고, 코어 문구는 건드리지 않는다(C-C6).
 
     python3 adapters/orca/prompts/fill_brief.py --unit <id> --run <run-id> --evidence-run <run> \
-        --base-sha <sha> --task-sha256 <sha256> --runtime codex|claude --mode base|rerun --out <파일>
+        --task <검토자 계약 파일 경로> --runtime codex|claude --mode base|rerun --out <파일>
+
+`base_sha` 는 옮겨 적는 값이 아니라 `--task` 가 가리키는 검토자 계약 파일(JSON)의 `base_sha` 필드에서 읽고,
+계약 sha256 은 그 파일의 **바이트**에서 계산한다(Q-104) — 둘을 따로 넘기는 인자는 없다.
 
 검증: 남은 자리표시자 0 · HTML 주석 0 · 읽기 수단 문장 정확히 1개 · base 모드면 evidence-run == run-id.
 출력 파일은 검토 대상 워크트리의 제외 경로(`.harness/runs/<id>/<run-id>/reviewer-brief.md`)에 두는 것을 권장한다.
 """
 import argparse
+import hashlib
+import json
 import re
 import sys
 from pathlib import Path
@@ -61,20 +66,43 @@ def problems(filled, mode, values):
     return out
 
 
+def task_values(path):
+    """검토자 계약 파일에서 base_sha 를 읽고, 그 파일의 바이트에서 sha256 을 계산한다(Q-104). (base_sha, sha256, 문제) —
+    문제가 있으면 앞의 둘은 None 이다. base_sha 와 sha256 을 따로 넘기는 인자가 없으므로 이 함수가 유일한 출처다."""
+    p = Path(path)
+    try:
+        raw = p.read_bytes()
+    except OSError as e:
+        return None, None, f"검토자 계약 파일 {path} 을 읽을 수 없다 ({e})"
+    try:
+        data = json.loads(raw.decode("utf-8"))
+    except ValueError as e:
+        return None, None, f"검토자 계약 파일 {path} 이 JSON 이 아니다 ({e})"
+    base_sha = data.get("base_sha") if isinstance(data, dict) else None
+    if not isinstance(base_sha, str) or not base_sha:
+        return None, None, f"검토자 계약 파일 {path} 에 base_sha 필드가 없다"
+    return base_sha, hashlib.sha256(raw).hexdigest(), None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     ap.add_argument("--unit", required=True)
     ap.add_argument("--run", required=True, help="이 실행의 Run id (검토자 계약·출력 경로)")
     ap.add_argument("--evidence-run", help="검토자가 읽을 구현자 증거의 Run id. 생략하면 --run 과 같다(§3 기준 실행)")
-    ap.add_argument("--base-sha", required=True, help="검토자 계약 파일의 base_sha 필드 값을 옮겨 적는다")
-    ap.add_argument("--task-sha256", required=True, help="검토자 계약 파일의 sha256 (shasum -a 256)")
+    ap.add_argument("--task", required=True,
+                    help="검토자 계약 파일 경로 — base_sha 는 이 JSON 의 필드에서 읽고, "
+                         "계약 sha256 은 이 파일의 바이트에서 계산한다(둘 다 옮겨 적지 않는다)")
     ap.add_argument("--runtime", required=True, choices=sorted(READ_MEANS))
     ap.add_argument("--mode", default="base", choices=sorted(MODE_NOTE), help="base=§3 기준 실행 · rerun=§6.6 검토자-only 재실행")
     ap.add_argument("--out", help="쓸 파일. 생략하면 표준 출력")
     ap.add_argument("--template", default=str(TEMPLATE))
     args = ap.parse_args(argv)
+    base_sha, task_sha256, task_problem = task_values(args.task)
+    if task_problem:
+        print(f"FILL_INVALID {task_problem}", file=sys.stderr)
+        return 1
     values = {"id": args.unit, "run-id": args.run, "evidence-run": args.evidence_run or args.run,
-              "base-sha": args.base_sha, "task-sha256": args.task_sha256}
+              "base-sha": base_sha, "task-sha256": task_sha256}
     filled = fill(Path(args.template).read_text(encoding="utf-8"), values, args.runtime, args.mode)
     bad = problems(filled, args.mode, values)
     if bad:

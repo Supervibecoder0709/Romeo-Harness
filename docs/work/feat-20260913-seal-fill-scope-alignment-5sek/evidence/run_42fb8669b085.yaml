@@ -1,0 +1,278 @@
+schema: romeo/evidence@0.1.0
+romeo_version: 0.1.0
+repo_id: https://github.com/Supervibecoder0709/Romeo-Harness.git
+run_id: run_42fb8669b085
+task_id: task_afc2bde13d9e
+dispatch_id: ctx_f8135ff2b9e9
+unit_id: feat-20260913-seal-fill-scope-alignment-5sek
+spec_ref:
+  path: docs/work/feat-20260913-seal-fill-scope-alignment-5sek/spec.md
+  sha256: 32dc93737cd9c5f619504ebe5427c0b46da006265cbfc751f261922b4cb1cbb9
+base_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+environment:
+  os: macOS-26.5.2-arm64-arm-64bit
+  python: 3.9.6
+  cwd: /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek
+started_at: '2026-09-13T13:07:56+09:00'
+finished_at: '2026-09-13T13:24:15+09:00'
+commands:
+- id: cmd-1
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+    -v
+  exit_code: 1
+  started_at: '2026-09-13T13:07:56+09:00'
+  finished_at: '2026-09-13T13:08:03+09:00'
+  seconds: 7.625
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/01-cmd-1.log
+  log_sha256: b752ab0057bef0bcf9fa422bc98e13dbf5cf25045c4e0a9082726a820b2261bb
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 59f0eef2dbd2e1f5c8a06c1b113a4cffeb3aa764f85b44c39fe8aed20a29bb30
+- id: check-1
+  command: python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:34+09:00'
+  finished_at: '2026-09-13T13:09:35+09:00'
+  seconds: 1.287
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/02-check-1.log
+  log_sha256: 512fdac39557ca561908eeced3523f2b43b9b48929d6952022eb743ed89323cc
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-2
+  command: python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:35+09:00'
+  finished_at: '2026-09-13T13:09:36+09:00'
+  seconds: 0.866
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/03-check-2.log
+  log_sha256: caacdd0a2e8a10bfd2292b4f972c27da9918b10c32c78bbc0735ecc235c05eba
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-3
+  command: python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:36+09:00'
+  finished_at: '2026-09-13T13:09:36+09:00'
+  seconds: 0.106
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/04-check-3.log
+  log_sha256: fb8f740c4a55df46812af33b8680156e0cd08e4bf16ac6d5f25b6ec1776305f8
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-4
+  command: python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:36+09:00'
+  finished_at: '2026-09-13T13:09:37+09:00'
+  seconds: 0.114
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/05-check-4.log
+  log_sha256: 6611c6abca639b64fd6153bed48702733a09a4b8cea29d266777e5395c945067
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-5
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:37+09:00'
+  finished_at: '2026-09-13T13:09:38+09:00'
+  seconds: 1.678
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/06-check-5.log
+  log_sha256: dd2b08dceff67f473c726c73adbca905d5232117e5c1c1728535b2bb755ca42c
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-6
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:09:39+09:00'
+  finished_at: '2026-09-13T13:09:40+09:00'
+  seconds: 1.792
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/07-check-6.log
+  log_sha256: 655a5b8e4afdc72667ce622516742cb70855794174c504b49c7ffc695ab7a2de
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-7
+  command: python3 -m unittest discover -s tests -q
+  exit_code: 0
+  started_at: '2026-09-13T13:09:40+09:00'
+  finished_at: '2026-09-13T13:16:35+09:00'
+  seconds: 414.426
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/08-check-7.log
+  log_sha256: 71a95a3885a9f0410da9cb4036b2dbecb2272fb9a0b70a964b425fb2eeb1a1a4
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-8
+  command: bin/romeo validate
+  exit_code: 0
+  started_at: '2026-09-13T13:16:35+09:00'
+  finished_at: '2026-09-13T13:16:36+09:00'
+  seconds: 0.423
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/09-check-8.log
+  log_sha256: 3e07588b67aa7d4338e5b38ac6dd0436b189062a9e646fb5d6af5350a3fcbc11
+  stdout_tail: "impl-feat-20260913-seal-fill-scope-alignment-5sek/docs/work/init-20260911-m5-attach-update-rollback-sauc/charter.md\
+    \ lines=111 needs_input=0 unchecked_ac=0\n[PASS] /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/docs/work/init-20260911-m5-attach-update-rollback-sauc/spec.md\
+    \ lines=158 needs_input=0 unchecked_ac=0\n    WARN  BUDGET_EXCEEDED 158 > 150"
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-9
+  command: bin/romeo compile --check
+  exit_code: 0
+  started_at: '2026-09-13T13:16:36+09:00'
+  finished_at: '2026-09-13T13:16:36+09:00'
+  seconds: 0.365
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/10-check-9.log
+  log_sha256: 61b7a574d605cc3cf9615631b4660dcb4ba32e4bb451f9cfcddbc9a7ace0890e
+  stdout_tail: compile 검사 PASS
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-10
+  command: bin/romeo doctor --strict --scope repository
+  exit_code: 0
+  started_at: '2026-09-13T13:16:36+09:00'
+  finished_at: '2026-09-13T13:16:37+09:00'
+  seconds: 1.031
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/11-check-10.log
+  log_sha256: f9c493c8fb359113f36a413d5b4d06be821154c4d487a44fe426efc4747e2d75
+  stdout_tail: "뒤 단계만 자동화한다\n      대안: 같은 결과를 내는 프로그램 인터페이스가 있는지 먼저 조사한다(별도 조사 단위로 연다)\n      대안: 그 능력이\
+    \ 필요한 단계를 범위에서 빼고 나머지를 먼저 낸다\n  · discovery.bmad: absent — 설치 흔적 없음 (_bmad/_config/manifest.yaml)\n\
+    \  미설치는 결함이 아니다 — 이 절은 인쇄만 하고 아래 결과에 세지 않는다.\n\n## 충돌 fixture (7종 실행)\n  ✓ 충돌 0\n\n결과 · 저장소: PASS\
+    \ · 이 머신의 런타임: PASS\n주의: claude · codex 의 런타임 로드는 아직 대조되지 않았다 — 위 줄의 '미관찰'·'대조 불가'·'미관찰 <이름>' 은 그\
+    \ 런타임에서 로드가 확인된 적이 없다는 뜻이다(A-11)."
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: check-11
+  command: python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+    -v
+  exit_code: 0
+  started_at: '2026-09-13T13:16:38+09:00'
+  finished_at: '2026-09-13T13:16:47+09:00'
+  seconds: 9.183
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/12-check-11.log
+  log_sha256: 1d6c5a3e2e3c4b48464a453102782de80ee8726d47d931dea8aae5ae3294f71e
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: cmd-13
+  command: sh -c 'cd /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-impl-feat-20260913-seal-fill-scope-alignment-5sek/f2ffb0d2-5458-4772-ada6-0d823e566ca6/scratchpad/flip/c7t
+    && python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+    -v'
+  exit_code: 0
+  started_at: '2026-09-13T13:18:21+09:00'
+  finished_at: '2026-09-13T13:18:30+09:00'
+  seconds: 8.665
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/13-cmd-13.log
+  log_sha256: bfbf5fc3bba10a70fe728d43433ec746a794d9b706edaa9d7979c0b5d3e27d8b
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: cmd-14
+  command: sh -c 'cd /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-impl-feat-20260913-seal-fill-scope-alignment-5sek/f2ffb0d2-5458-4772-ada6-0d823e566ca6/scratchpad/flip/c7t
+    && python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target
+    -v'
+  exit_code: 1
+  started_at: '2026-09-13T13:18:30+09:00'
+  finished_at: '2026-09-13T13:18:32+09:00'
+  seconds: 1.228
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/14-cmd-14.log
+  log_sha256: dd96f4f03883b3599963afcae0cdb1367565632db19bbd41dba150070fc4eb2d
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: cmd-15
+  command: sh -c 'cd /private/tmp/claude-501/-Users-julliettelee-orca-workspaces-Romeo-Harness-impl-feat-20260913-seal-fill-scope-alignment-5sek/f2ffb0d2-5458-4772-ada6-0d823e566ca6/scratchpad/flip/c1h
+    && python3 -m unittest tests.test_doctor.TestConflictFixtures.test_every_scope_declaration_matches_what_the_check_reads
+    -v'
+  exit_code: 0
+  started_at: '2026-09-13T13:18:32+09:00'
+  finished_at: '2026-09-13T13:18:41+09:00'
+  seconds: 8.79
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/15-cmd-15.log
+  log_sha256: 87dd7933f235811be377e52ecc29ce61e8d457ed004662af03f59f60f8b14e6f
+  stdout_tail: ''
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: review-tree-before
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260913-seal-fill-scope-alignment-5sek'
+  exit_code: 0
+  started_at: '2026-09-13T13:20:14+09:00'
+  finished_at: '2026-09-13T13:20:14+09:00'
+  seconds: 0.035
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/16-review-tree-before.log
+  log_sha256: 63c69b727a4a136e052ad9508ea7d905b08cd4e59a3918ebaf9b303cb167f7c4
+  stdout_tail: "/c4-dangerous-instruction.yaml\n M fixtures/conflicts/c5-bmad-install-path.yaml\n M fixtures/conflicts/c6-no-second-plan-origin.yaml\n\
+    \ M fixtures/conflicts/c7-no-output-path-hardcode.yaml\n M romeo/doctor.py\n M romeo/evidence.py\n\
+    \ M romeo/run_unit.py\n M tests/test_doctor.py\n M tests/test_reviewer_brief.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py\n?? tests/test_review_seal_warning.py"
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: reviewer-brief
+  command: shasum -a 256 /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/.harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/reviewer-brief.md
+  exit_code: 0
+  started_at: '2026-09-13T13:20:14+09:00'
+  finished_at: '2026-09-13T13:20:14+09:00'
+  seconds: 0.02
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/17-reviewer-brief.log
+  log_sha256: dfcb426ab892f135c6adcdf9fe1e555974eb5462316e529c7b77dc9f5c5e600a
+  stdout_tail: 7c28bb1cc062fe19f6ffc8c37c06a6368819e96654a299fc2105bf56ca8e53b0  /Users/julliettelee/orca/workspaces/Romeo-Harness/impl-feat-20260913-seal-fill-scope-alignment-5sek/.harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/reviewer-brief.md
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: review-tree-after
+  command: git status --porcelain -- . ':(exclude).harness' ':(exclude)docs/work/feat-20260913-seal-fill-scope-alignment-5sek'
+  exit_code: 0
+  started_at: '2026-09-13T13:23:18+09:00'
+  finished_at: '2026-09-13T13:23:18+09:00'
+  seconds: 0.039
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/18-review-tree-after.log
+  log_sha256: 63c69b727a4a136e052ad9508ea7d905b08cd4e59a3918ebaf9b303cb167f7c4
+  stdout_tail: "/c4-dangerous-instruction.yaml\n M fixtures/conflicts/c5-bmad-install-path.yaml\n M fixtures/conflicts/c6-no-second-plan-origin.yaml\n\
+    \ M fixtures/conflicts/c7-no-output-path-hardcode.yaml\n M romeo/doctor.py\n M romeo/evidence.py\n\
+    \ M romeo/run_unit.py\n M tests/test_doctor.py\n M tests/test_reviewer_brief.py\n M tests/test_run_unit.py\n\
+    \ M tests/test_runbook_procedure.py\n?? tests/test_review_seal_warning.py"
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+- id: review-record
+  command: shasum -a 256 docs/work/feat-20260913-seal-fill-scope-alignment-5sek/review/run_42fb8669b085-reviewer.json
+  exit_code: 0
+  started_at: '2026-09-13T13:24:14+09:00'
+  finished_at: '2026-09-13T13:24:15+09:00'
+  seconds: 0.022
+  log: .harness/runs/feat-20260913-seal-fill-scope-alignment-5sek/run_42fb8669b085/19-review-record.log
+  log_sha256: 4e1be9128b683bb8230c4968c99f39c8d996cc39160c7d4e2da6844d6a99e8c6
+  stdout_tail: 0ebc0905f31fda3ffa489a2c35d52618226495b07fd39f6bc00a703ce2dd5726  docs/work/feat-20260913-seal-fill-scope-alignment-5sek/review/run_42fb8669b085-reviewer.json
+  head_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  dirty_tree_hash: 58a0672bfb58a2057011483d25408e0e02604f6af754005a1662673db6152d85
+changed_files:
+- adapters/orca/RUNBOOK.md
+- adapters/orca/prompts/fill_brief.py
+- docs/planning/open-questions.md
+- fixtures/conflicts/c1-external-plan-path.yaml
+- fixtures/conflicts/c2-no-auto-trigger.yaml
+- fixtures/conflicts/c3-name-and-marker.yaml
+- fixtures/conflicts/c4-dangerous-instruction.yaml
+- fixtures/conflicts/c5-bmad-install-path.yaml
+- fixtures/conflicts/c6-no-second-plan-origin.yaml
+- fixtures/conflicts/c7-no-output-path-hardcode.yaml
+- romeo/doctor.py
+- romeo/evidence.py
+- romeo/run_unit.py
+- tests/test_doctor.py
+- tests/test_review_seal_warning.py
+- tests/test_reviewer_brief.py
+- tests/test_run_unit.py
+- tests/test_runbook_procedure.py
+artifact_hash: a98146fc3d6b9b262d7022a48e612670690730aa992d0bd00511c42e761554e6
+reviewer: null
+verdict: null
+approvals: []

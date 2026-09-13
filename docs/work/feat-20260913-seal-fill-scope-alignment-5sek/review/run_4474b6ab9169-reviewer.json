@@ -1,0 +1,24 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "reviewer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_4474b6ab9169-reviewer.json",
+    "sha256": "8107d056b6e7d38ebc7a03d5258d3de9f1b8e0b4dcfc68d1beeed41a56e00958"
+  },
+  "checks": [],
+  "gate_verdict": "FAIL",
+  "blocked_reason": null,
+  "fail_reasons": [
+    "AC_UNMET"
+  ],
+  "findings": [
+    {
+      "summary": "AC-5 미충족: c6는 검사 대상을 target으로 선언하지만, 실제로는 하네스만 검사한다. _check_c6는 출처 파일을 harness_root에서 읽고(romeo/doctor.py:413), 호출하는 _recommend_pairs도 정책표를 harness_root에서 읽는다(romeo/doctor.py:375). 따라서 대상과 하네스가 서로 다른 저장소이면 대상의 정책·출처 변경은 c6 판정에 반영되지 않는다. 새 선언을 실제 검사 대상과 맞춰야 한다. check-5는 선언 누락과 허용 밖 값만 검사하므로 이 유효한 값의 의미상 불일치를 검출하지 않는다.",
+      "file": "fixtures/conflicts/c6-no-second-plan-origin.yaml",
+      "line": 14
+    }
+  ],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_4474b6ab9169.yaml",
+  "notes": "두 역할 계약의 base_sha와 현재 HEAD가 일치한다. AC-1~4·AC-6은 check-1~4·check-6의 코드와 원시 로그가 뒷받침하며, 목록·객체 선언 처리 보완은 check-5와 ac5-cli-list-scope-root 기록으로 확인했다. 필수 검사 10개의 성공 기록이 있어도 위 AC-5 불일치는 남는다. 승인 기준·required_checks 변경과 허용 경로 밖 변경은 발견하지 않았다. 파일 수정, 검사 재실행, 해시 재계산은 하지 않았다."
+}

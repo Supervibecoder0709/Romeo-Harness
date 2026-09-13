@@ -1,0 +1,66 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_4474b6ab9169-implementer.json",
+    "sha256": "5bc3510434889ab1db13bc4637a81386dde886f77993b14f698309744f598cab"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_4474b6ab9169.yaml",
+  "notes": "2회차 — 1회차(run_359d5c2dbcb6) 검토자 findings 1건(P2·AC-5)만 닫았다. 원인: check_conflicts 가 scope_root 를 문자열 여부 확인 없이 집합 SCOPE_ROOTS 와 비교해, 목록·객체(YAML `scope_root: [target]`·`{value: target}`)가 들어오면 `TypeError: unhashable type` 로 doctor 가 중단되고 fixture id 를 말하지 못했다. 수정(romeo/doctor.py check_conflicts): `not isinstance(scope_root, str) or scope_root not in SCOPE_ROOTS` — 비문자열은 선언 누락과 **같은 보고 경로**(fixture id 를 말하는 finding)로 보낸다. check-5(tests/test_doctor.py, 명령 id·문자열은 그대로)의 범위를 여집합으로 넓혔다: 선언 없음·허용 밖 문자열·빈 문자열·목록·객체·수·불·null 각각에 대해 check_conflicts 가 예외 없이 돌아오고 c1 의 id 와 'scope_root' 를 말하는 finding 이 있어야 통과한다. 양쪽 실측: 넓힌 check-5 를 수정 전 doctor.py 에 돌리면 목록에서 `TypeError: unhashable type: 'list'` 로 error(세션 내 관측 — 수정 뒤에는 그 상태를 재현할 수 없어 evidence 에는 없다), 수정 뒤 ok(run_4474b6ab9169 의 check-5). 검토자가 지적한 상위 CLI 경로는 보조 기록 run_4474b6ab9169 의 ac5-cli-list-scope-root 가 뒷받침한다 — HEAD archive 임시 사본(저장소 밖)에 현재 doctor.py 와 fixtures 를 얹고 c1 의 scope_root 를 목록으로 바꿔 `bin/romeo doctor --strict --scope repository` 를 돌리면 c1 id 와 scope_root 를 말하는 finding 이 인쇄되고 exit 1 이다(작업 트리 불변 — 그 기록의 트리 해시가 check-1~10 과 같다). romeo/cli.py 는 고치지 않았다 — 예외가 check_conflicts 에서 나지 않게 됐으므로 상위에서 처리할 것이 없다. evidence 에 check-1~6 이 두 번 기록된 이유: 첫 evidence checks 실행을 도구 시간 제한(10분) 밖에서 돌리기 위해 check-7 도중 중단하고 분리 프로세스로 처음부터 다시 돌렸다. 두 기록 모두 exit 0 이고 같은 트리 해시(9cb61aa38baa…)이며 마지막 기록이 결과다(close 는 명령 문자열별 마지막 기록을 읽는다). 모든 기록의 head_sha 는 계약 base_sha(89f281cc)와 같고 트리 해시는 1종이다. check-7 은 197.9초(1회차 440.9초)로 상한 600초의 33%다. 1회차가 통과시킨 AC-1~4·6 의 구현은 건드리지 않았고, 확인란 문장과 required_checks 는 불변이다. AC 체크박스는 승인 커밋에 이미 [x] 였고 그대로다 — AC-5 는 이제 넓힌 check-5 와 ac5-cli-list-scope-root 가 뒷받침한다."
+}

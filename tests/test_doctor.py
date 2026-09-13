@@ -193,6 +193,92 @@ class TestProbes(unittest.TestCase):
                              f"{runtime} 스킬 파일에 문제가 있다: {probes[runtime]['problems']}")
 
 
+# ── AC-5 뒷문장 — scope_root 선언의 진실성을 보는 재료 (check-11) ────────────────────────
+# 선언이 참인지는 **행동**으로만 판별한다: 그 fixture 가 잡도록 설계된 위반을 대상에만 심었을 때
+# 판정이 바뀌는가(target), 하네스에만 심었을 때 바뀌고 대상이 무엇이든 바뀌지 않는가(harness).
+# 아래는 kind 마다 그 위반을 주어진 루트에 심는 법이다. fixture **자신의 필드**(patterns·
+# forbidden_hook_files·instructions_files·state_file·packages_file·scope_dirs)를 읽어 만들므로
+# 같은 kind 의 fixture 가 늘어도 그대로 덮는다. 새 kind 가 여기 없으면 검사가 그 fixture 의 id 와
+# kind 를 말하며 실패한다 — 조용히 건너뛰면 그 선언은 아무도 보지 않은 것이 된다.
+
+
+def _edit_yaml(path, mutate):
+    import yaml
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    mutate(data)
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+
+
+def _first_pattern_and_key(fx):
+    pats = fx["patterns"]
+    if isinstance(pats, dict):
+        pat = next(iter(pats))
+        return pat, pats[pat]
+    return pats[0], fx["requires_override_key"]
+
+
+def _prepare_pattern_requires_override(harness, fx):
+    """위반이 아니라 위반이 **보이게 하는 전제** — 세 판정(기준·대상에 심음·하네스에 심음)에 똑같이 깔린다.
+
+    override 정본은 하네스가 소유한다(`_override_keys`). 흡수 규칙이 살아 있으면 어느 루트에 패턴을
+    심어도 잡히지 않으므로, 첫 패턴의 흡수 규칙을 하네스에서 뺀다."""
+    _pat, key = _first_pattern_and_key(fx)
+    _edit_yaml(harness / ".harness/bindings.yaml", lambda d: (d.get("overrides") or {}).pop(key, None))
+
+
+def _plant_pattern_requires_override(root, fx, harness):
+    from romeo.compile import load_adapters
+    pat, _key = _first_pattern_and_key(fx)
+    d = root / load_adapters(harness)[0]["skills_dir"] / "scope-probe"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "SKILL.md").write_text(f"---\nname: scope-probe\ndescription: 심은 위반\n---\n\n{pat}\n",
+                                encoding="utf-8")
+
+
+def _plant_no_auto_trigger(root, fx, harness):
+    p = root / fx["forbidden_hook_files"][0]
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("{}", encoding="utf-8")
+
+
+def _plant_collision(root, fx, harness):
+    p = root / fx["instructions_files"][0]
+    text = p.read_text(encoding="utf-8") if p.exists() else ""
+    p.write_text(text + "\n<!-- scope-probe:managed start -->\n남의 블록\n<!-- scope-probe:managed end -->\n",
+                 encoding="utf-8")
+
+
+def _plant_install_path_collision(root, fx, harness):
+    _edit_yaml(root / fx.get("state_file", ".harness/compiled.yaml"),
+               lambda d: d.setdefault("outputs", []).append(fx["install_dirs"][0]))
+
+
+def _plant_no_second_plan_origin(root, fx, harness):
+    def add(d):
+        parts = d.setdefault("parts", {})
+        pid = sorted(parts)[0]
+        part = parts[pid] = parts.get(pid) or {}
+        part.setdefault("recommends", []).append("scope-probe-made-up-skill")
+    _edit_yaml(root / fx.get("packages_file", "core/policy/packages.yaml"), add)
+
+
+def _plant_no_hardcoded_output_path(root, fx, harness):
+    d = root / fx["scope_dirs"][0]
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "scope-probe.md").write_text(f"# 심은 위반\n{fx['patterns'][0]}\n", encoding="utf-8")
+
+
+#: kind → (하네스 전제, 위반을 심는 법). 전제가 없는 kind 는 None.
+_VIOLATION_SEEDERS = {
+    "pattern_requires_override": (_prepare_pattern_requires_override, _plant_pattern_requires_override),
+    "no_auto_trigger": (None, _plant_no_auto_trigger),
+    "collision": (None, _plant_collision),
+    "install_path_collision": (None, _plant_install_path_collision),
+    "no_second_plan_origin": (None, _plant_no_second_plan_origin),
+    "no_hardcoded_output_path": (None, _plant_no_hardcoded_output_path),
+}
+
+
 class TestConflictFixtures(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP"))
@@ -205,6 +291,107 @@ class TestConflictFixtures(unittest.TestCase):
         findings, ran = check_conflicts(self.root)
         self.assertEqual(findings, [], f"깨끗한 트리인데 충돌: {findings}")
         self.assertGreaterEqual(ran, 3)
+
+    # ── scope_root 선언 (Q-105 ①) ────────────────────────────────────────
+    def test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem(self):
+        """AC-5 — scope_root 선언이 없거나 허용 값(target·harness) 밖이면 doctor 가
+        그 fixture 를 돌리지 않고 fixture id 를 말하는 문제로 낸다.
+
+        「허용 목록 밖의 값」은 열거가 아니라 여집합이다 — 문자열이 아닌 값(목록·객체·수·불·null)도
+        그 안에 든다. 목록·객체는 집합 비교에서 `unhashable type` 예외를 내므로(1회차 검토자 반례),
+        선언 누락과 **같은 보고 경로**로 fixture id 를 말해야 하고 doctor 가 중단되면 안 된다."""
+        import yaml
+        p = self.root / "fixtures/conflicts/c1-external-plan-path.yaml"
+        data = yaml.safe_load(p.read_text(encoding="utf-8"))
+
+        def reports_the_fixture(label):
+            findings, _ = check_conflicts(self.root)   # 예외 없이 돌아와야 한다 — 중단은 보고가 아니다
+            self.assertTrue(any(f[0] == "c1-external-plan-path" and "scope_root" in f[2] for f in findings),
+                            f"scope_root 가 {label}인데 fixture id 를 말하는 문제가 없다")
+
+        del data["scope_root"]
+        p.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+        reports_the_fixture("없음")
+
+        outside = [("허용 값 밖의 문자열", "not-a-real-scope"),
+                   ("빈 문자열", ""),
+                   ("목록", ["target"]),                 # YAML `scope_root: [target]`
+                   ("객체", {"value": "target"}),        # YAML `scope_root: {value: target}`
+                   ("수", 1),
+                   ("불", True),
+                   ("null", None)]
+        for label, value in outside:
+            data["scope_root"] = value
+            p.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+            reports_the_fixture(label)
+
+    def test_every_scope_declaration_matches_what_the_check_reads(self):
+        """AC-5 뒷문장 — **그 선언은 참이다.** fixture 7개(있는 것 전부)를 돌아 각 선언을 행동으로 판별한다:
+        `target` 을 선언한 fixture 의 판정은 대상 저장소의 내용에 따라 달라지고, `harness` 를 선언한
+        fixture 의 판정은 대상이 무엇이든(깨끗하든·위반을 심었든·core/ 가 없든) 달라지지 않는다.
+
+        판정은 「그 fixture 가 잡도록 설계된 위반」을 **한쪽 루트에만** 심어 비교한다 — 대상과 하네스는
+        서로 다른 트리다. 2회차 검토자 반례: c6 는 `target` 을 선언했지만 `_check_c6` 와 `_recommend_pairs`
+        가 정책표·출처를 둘 다 하네스에서 읽어, 대상에 심은 위반이 판정을 바꾸지 않았다 — 그 상태에서
+        이 검사는 c6 의 id 를 말하며 실패한다.
+
+        `harness` 쪽에는 「하네스에 심은 위반은 판정을 바꾼다」를 함께 요구한다 — 아무것도 읽지 않는 검사는
+        「대상이 무엇이든 같다」를 공허하게 만족하기 때문이다. 어느 fixture 가 어느 값을 선언해야 **하는가**
+        (설계 의도)는 여기서 보지 않는다 — c7 의 의도는 check-6 이 본다. 여기서 보는 것은 선언과 실행이
+        같은 말을 하는가뿐이다."""
+        import yaml
+        from romeo.doctor import SCOPE_ROOTS
+
+        fixture_files = sorted((self.root / "fixtures/conflicts").glob("*.yaml"))
+        self.assertGreaterEqual(len(fixture_files), 7, "충돌 fixture 가 7개보다 적다 — 전수를 돌 수 없다")
+        examined = []
+        for fpath in fixture_files:
+            fx = yaml.safe_load(fpath.read_text(encoding="utf-8")) or {}
+            fid, kind, scope = fx.get("id", fpath.stem), fx.get("kind"), fx.get("scope_root")
+            self.assertIn(scope, SCOPE_ROOTS, f"{fid}: scope_root {scope!r} — 허용 값이 아니면 진실성을 물을 수 없다")
+            self.assertIn(kind, _VIOLATION_SEEDERS,
+                          f"{fid}: kind {kind!r} 의 위반을 심는 법이 이 검사에 없다 — 심지 못하면 선언을 판별할 수 없다")
+            prepare, plant = _VIOLATION_SEEDERS[kind]
+
+            with tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP")) as tmp:
+                def copy_of(src, name):
+                    return shutil.copytree(src, Path(tmp) / name, symlinks=True)
+
+                harness = copy_of(self.root, "harness")
+                if prepare:
+                    prepare(harness, fx)
+                harness_planted = copy_of(harness, "harness-planted")
+                plant(harness_planted, fx, harness)
+
+                target = copy_of(self.root, "target")
+                target_planted = copy_of(self.root, "target-planted")
+                plant(target_planted, fx, harness)
+                target_no_core = copy_of(self.root, "target-no-core")   # 참조 부착본의 실제 모양
+                shutil.rmtree(target_no_core / "core")
+
+                def verdict(t, h):
+                    findings, _ = check_conflicts(t, harness_root=h)
+                    return sorted(f for f in findings if f[0] == fid)
+
+                base = verdict(target, harness)
+                by_target = {"위반을 심은 대상": verdict(target_planted, harness),
+                             "core/ 가 없는 대상": verdict(target_no_core, harness)}
+                by_harness = verdict(target, harness_planted)
+
+            if scope == "target":
+                self.assertNotEqual(by_target["위반을 심은 대상"], base,
+                                    f"{fid}: scope_root: target 을 선언했지만 대상에 심은 위반이 판정을 바꾸지 않는다 — "
+                                    f"검사가 대상을 읽지 않으므로 선언이 거짓이다 (판정 {base})")
+            else:
+                for label, v in by_target.items():
+                    self.assertEqual(v, base,
+                                     f"{fid}: scope_root: harness 를 선언했지만 {label}에서 판정이 달라진다 — "
+                                     f"검사가 대상을 읽으므로 선언이 거짓이다")
+                self.assertNotEqual(by_harness, base,
+                                    f"{fid}: scope_root: harness 를 선언했지만 하네스에 심은 위반이 판정을 바꾸지 않는다 — "
+                                    f"아무것도 읽지 않는 검사는 「대상이 무엇이든 같다」를 공허하게 만족한다")
+            examined.append((fid, scope))
+        self.assertEqual(len(examined), len(fixture_files), examined)
 
     # ── c1: 외부 계획 경로 ─────────────────────────────────────────────
     def test_c1_flags_external_path_without_override(self):
@@ -295,6 +482,34 @@ class TestConflictFixtures(unittest.TestCase):
         # fixtures/conflicts 는 그 문자열을 검사 대상으로 적어 둔 곳이다 — 자기 자신을 잡으면 안 된다.
         findings, _ = check_conflicts(self.root)
         self.assertEqual([f for f in findings if f[0] == "c7-no-output-path-hardcode"], [])
+
+    def test_c7_checks_the_harness_core_regardless_of_the_target(self):
+        """AC-6 — c7 은 scope_root: harness 를 선언한다(Q-105 ①). 대상 core/ 유무와 무관하게 하네스의 core/ 를 본다 —
+        하네스 코어에만 심으면 findings 가 그 파일의 경로를 가리키고, 대상 코어에만 심으면 findings 가 나오지 않는다."""
+        pattern_comment = "\n# 산출물은 _bmad-output/ 에 둔다\n"
+
+        # ① 하네스 코어에만 심는다. 대상에는 core/ 가 아예 없다(부착 프로젝트의 실제 모양) — 그래도 잡아야 한다.
+        with tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP")) as hr_tmp, \
+             tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP")) as tgt_tmp:
+            harness_root = make_tree(Path(hr_tmp))
+            packages = harness_root / "core/policy/packages.yaml"
+            packages.write_text(packages.read_text(encoding="utf-8") + pattern_comment, encoding="utf-8")
+            target_root = make_tree(Path(tgt_tmp))
+            shutil.rmtree(target_root / "core")
+            self.assertFalse((target_root / "core").exists())
+            findings, _ = check_conflicts(target_root, harness_root=harness_root)
+            c7 = [f for f in findings if f[0] == "c7-no-output-path-hardcode"]
+            self.assertTrue(c7, "대상에 core/ 가 없어도 하네스 코어에 심은 패턴을 c7 이 찾아야 한다")
+            self.assertTrue(any(f[1] == "core/policy/packages.yaml" for f in c7), c7)
+
+        # ② 대상 코어에만 심는다 — 하네스(self.root, 깨끗한 트리)를 본 것이면 findings 가 없어야 한다.
+        with tempfile.TemporaryDirectory(dir=os.environ.get("ROMEO_TEST_TMP")) as tgt_tmp2:
+            target_root2 = make_tree(Path(tgt_tmp2))
+            packages2 = target_root2 / "core/policy/packages.yaml"
+            packages2.write_text(packages2.read_text(encoding="utf-8") + pattern_comment, encoding="utf-8")
+            findings2, _ = check_conflicts(target_root2, harness_root=self.root)
+            self.assertEqual([f for f in findings2 if f[0] == "c7-no-output-path-hardcode"], [],
+                             "대상 코어에만 심었는데 c7 이 findings 를 냈다 — 하네스가 아니라 대상을 본 것이다")
 
     # ── c2: 자동 트리거 ────────────────────────────────────────────────
     def test_c2_flags_repo_hook_file(self):

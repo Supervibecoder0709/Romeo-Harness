@@ -1,0 +1,66 @@
+{
+  "schema": "romeo/result-envelope@0.1.0",
+  "unit_id": "feat-20260913-seal-fill-scope-alignment-5sek",
+  "role": "implementer",
+  "task_envelope_ref": {
+    "path": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/task/run_359d5c2dbcb6-implementer.json",
+    "sha256": "6ce53db4f7aebf4c8fc8582326c54f059cd3bbb9a699b4aa994047a8bea0e254"
+  },
+  "checks": [
+    {
+      "id": "check-1",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_a_run_missing_the_defensive_records_warns_and_still_seals -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-2",
+      "command": "python3 -m unittest tests.test_review_seal_warning.TestReviewSealWarning.test_the_warning_reads_the_label_list_close_judges_with -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-3",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_base_sha_and_hash_are_derived_from_the_contract_file -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-4",
+      "command": "python3 -m unittest tests.test_reviewer_brief.TestFillBrief.test_removed_arguments_are_refused_and_both_call_sites_match -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-5",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_a_fixture_with_no_or_invalid_scope_declaration_is_a_problem -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-6",
+      "command": "python3 -m unittest tests.test_doctor.TestConflictFixtures.test_c7_checks_the_harness_core_regardless_of_the_target -v",
+      "exit_code": 0
+    },
+    {
+      "id": "check-7",
+      "command": "python3 -m unittest discover -s tests -q",
+      "exit_code": 0
+    },
+    {
+      "id": "check-8",
+      "command": "bin/romeo validate",
+      "exit_code": 0
+    },
+    {
+      "id": "check-9",
+      "command": "bin/romeo compile --check",
+      "exit_code": 0
+    },
+    {
+      "id": "check-10",
+      "command": "bin/romeo doctor --strict --scope repository",
+      "exit_code": 0
+    }
+  ],
+  "gate_verdict": "PASS",
+  "blocked_reason": null,
+  "findings": [],
+  "evidence_ref": "docs/work/feat-20260913-seal-fill-scope-alignment-5sek/evidence/run_359d5c2dbcb6.yaml",
+  "notes": "판별 검사(check-1~6) 6건은 승인 전 프로브(inputs/probe-20260913.md)가 이미 기존 상태 FAIL·가상 완료 상태 PASS 양쪽을 실측했고, 이 run 에서 실제 구현으로 전부 PASS 를 재확인했다(run_359d5c2dbcb6 의 check-1~check-6). check-7(전체 테스트 스위트, 1099건 — 기존 1093건 + 이 단위가 더한 6건)은 440.868초로 재실행 상한 600초의 73%다(승인 시점 실측 410초에서 소폭 증가 — CPU 부하 차이로 보이며 상한·근접 경고(80%) 아래다). AC-1~AC-6 은 spec.md 승인 시점에 이미 [x]로 표시돼 있었다(체크 표시는 승인 시점과 같다 — 문장을 고치지 않았다) — 이 run 의 check-1~check-6 결과가 그 표시를 뒷받침하는 증거다. romeo/cli.py·romeo/close.py 는 계약의 allowed_paths 에 있었지만 고치지 않았다 — 경고는 evidence.py 의 record_review_envelope 안에서 직접 stderr 로 내고, DEFENSIVE_LABELS 단일 출처는 이미 romeo/close.py 에 있어 새로 만들 필요가 없었다(승인 전 프로브도 같은 판단이었다). Q-103·Q-104·Q-105 ①을 docs/planning/open-questions.md 에서 해소로 표시했다 — Q-105 ②(심링크 경계)는 이 단위의 비범위라 그대로 열어 두었다."
+}
