@@ -21,6 +21,15 @@ attempts:
   settled_at: '2026-09-13T02:48:14+09:00'
   base_sha_history:
   - 9d1c4f7672089e4efc7726a94679d256661f0b6d
+- n: 3
+  run: run_42fb8669b085
+  base_sha: cd7fce4beaaab5eccbf3ed616ec9d678c4f98757
+  started_at: '2026-09-13T12:59:51+09:00'
+  result: fail
+  failure_class: outputs
+  note: '검토자 FAIL(AC_UNMET) — AC-4: tests/test_run_unit.py:484 docstring 에 ''해시는 fill_brief.py --task-sha256
+    이 그 자리에서 계산한다'' 가 남았다. 저장소 전수 확인 결과 진짜 위반은 이 한 줄이고 나머지 언급은 거부 검사·템플릿 자리표시자 이름·과거 기록이라 정당하다'
+  settled_at: '2026-09-13T13:24:15+09:00'
 reviews:
 - after_attempt: 2
   conclusion: '완료 정의는 달성 가능하다 — 다만 AC-5 가 절반만 말하고 있었다. 전수 조사: 충돌 fixture 7개 중 선언과 실제가 어긋난 것은 c6 하나뿐이다(c1·c2·c3·c4·c5
@@ -30,4 +39,12 @@ reviews:
     「그 선언은 참이다」를 행동으로 판별 가능한 명제로 명시하고 check-11 을 더했다. 사용자 확정 2026-09-13.'
   by: Supervibecoder0709
   at: '2026-09-13T12:59:24+09:00'
+- after_attempt: 3
+  conclusion: 완료 정의는 달성 가능하다 — 이번 실패는 완료 정의가 아니라 구현 누락이다. AC-4 는 이미 「그 명령을 설명하는 산문」을 명시하고 있고 검토자 읽기가 그
+    문장에 충실하다. 저장소 전수 확인 결과 남은 위반은 tests/test_run_unit.py:484 docstring 한 줄뿐이고, 나머지 --task-sha256 언급은 전부
+    정당하다(거부 검사 assertNotIn · 템플릿 자리표시자 이름 <task-sha256> 은 CLI 인자가 아니다 · docs/ 의 과거 기록). 구현자가 자기 검사로 알
+    수 없었던 이유는 check-4 가 산문을 보지 않기 때문이다 — 4회차에서 그 한 줄을 새 인터페이스로 고치고 check-4 를 산문까지 보도록 넓힌다(명령 id·문자열은 불변이라
+    재승인 대상이 아니다). AC 는 고치지 않는다. 사용자 확정 2026-09-13.
+  by: Supervibecoder0709
+  at: '2026-09-13T20:18:58+09:00'
 reviewer_runs: []
